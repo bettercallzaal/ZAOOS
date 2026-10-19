@@ -50,6 +50,47 @@ export type AdminCommand =
 
 export const ARCHIVE_CATEGORY = 'archive';
 /** Sent privately to anyone who is not Zaal. */
+/**
+ * The posting permissions "archive" takes away. CreatePrivateThreads is here
+ * too: without it a member could still open a private thread in an archived
+ * channel (evaluator note on #4024).
+ */
+export const ARCHIVE_POST_PERMS = [
+  'SendMessages',
+  'SendMessagesInThreads',
+  'CreatePublicThreads',
+  'CreatePrivateThreads',
+] as const;
+export type ArchivePerm = (typeof ARCHIVE_POST_PERMS)[number];
+
+/** Every archive posting permission set to one value: false to deny, null to clear. */
+export function archivePerms<T extends boolean | null>(value: T): Record<ArchivePerm, T> {
+  return {
+    SendMessages: value,
+    SendMessagesInThreads: value,
+    CreatePublicThreads: value,
+    CreatePrivateThreads: value,
+  };
+}
+
+/**
+ * Which role or member overrides to clear on archive: those that ALLOW any
+ * posting permission, because an allow beats the @everyone deny. An override
+ * that only denies is left alone, and @everyone itself is never touched here.
+ */
+export function overridesToClear<B>(
+  overwrites: Iterable<{ id: string; allow: { any(bits: B[]): boolean } }>,
+  everyoneId: string,
+  postBits: B[],
+): string[] {
+  const ids: string[] = [];
+  for (const ow of overwrites) {
+    if (ow.id === everyoneId) continue;
+    if (ow.allow.any(postBits)) ids.push(ow.id);
+  }
+  return ids;
+}
+
 export const ADMIN_REFUSAL_LINE = 'Only Zaal can run admin commands. Nothing was changed.';
 const MAX_NAME = 100;
 

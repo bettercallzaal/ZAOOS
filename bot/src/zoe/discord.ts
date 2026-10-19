@@ -58,10 +58,13 @@ import { markAsked, NAME_SAVED_PUBLIC_LINE, peopleLogEnabled, recordPersonTurn }
 import { MEMBER_DM_LIMIT_LINE, newMemberDmLimiter } from './member-dm';
 import {
   ADMIN_REFUSAL_LINE,
+  ARCHIVE_POST_PERMS,
   type AdminEnv,
   appendAdminLog,
+  archivePerms,
   discordAdminEnabled,
   isDiscordOwner,
+  overridesToClear,
   parseAdminCommand,
   runAdminCommand,
 } from './discord-admin';
@@ -143,22 +146,13 @@ function discordAdminEnv(message: Message<true>): AdminEnv {
       const ch = await fetchChannel(id);
       if (ch.isThread()) throw new Error('a thread cannot be archived this way; it archives itself');
       await ch.setParent(archiveCategoryId, { lockPermissions: false });
-      await ch.permissionOverwrites.edit(guild.roles.everyone, {
-        SendMessages: false,
-        SendMessagesInThreads: false,
-        CreatePublicThreads: false,
-      });
+      await ch.permissionOverwrites.edit(guild.roles.everyone, archivePerms(false));
       // A role or member override that ALLOWS posting beats the @everyone deny,
       // so clear those allows (set neutral, not deny). Evaluator note, #4022.
-      let cleared = 0;
-      for (const ow of ch.permissionOverwrites.cache.values()) {
-        if (ow.id === guild.roles.everyone.id) continue;
-        if (ow.allow.any([PermissionFlagsBits.SendMessages, PermissionFlagsBits.SendMessagesInThreads, PermissionFlagsBits.CreatePublicThreads])) {
-          await ch.permissionOverwrites.edit(ow.id, { SendMessages: null, SendMessagesInThreads: null, CreatePublicThreads: null });
-          cleared++;
-        }
-      }
-      return { cleared };
+      const postBits = ARCHIVE_POST_PERMS.map((p) => PermissionFlagsBits[p]);
+      const toClear = overridesToClear(ch.permissionOverwrites.cache.values(), guild.roles.everyone.id, postBits);
+      for (const id of toClear) await ch.permissionOverwrites.edit(id, archivePerms(null));
+      return { cleared: toClear.length };
     },
     async createThread(name) {
       if (message.channel.type !== ChannelType.GuildText) throw new Error('threads start from a text channel');

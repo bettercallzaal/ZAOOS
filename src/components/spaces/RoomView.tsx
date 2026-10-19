@@ -2,9 +2,10 @@
 
 import { useCall, useCallStateHooks } from '@stream-io/video-react-sdk';
 import dynamic from 'next/dynamic';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useAutoStreamMarker } from '@/hooks/useAutoStreamMarker';
 import { useRadio } from '@/hooks/useRadio';
+import { useVisibleInterval } from '@/hooks/useVisibleInterval';
 import {
   type BroadcastState,
   type BroadcastTarget,
@@ -157,26 +158,25 @@ export function RoomView({
   }, [isHost, hostFid]);
 
   // Poll for song request count (badge on Requests tab)
-  useEffect(() => {
+  const pollSongRequests = useCallback(async () => {
     if (!roomId) return;
-    const poll = async () => {
-      try {
-        const res = await fetch(`/api/spaces/song-request?roomId=${roomId}`);
-        if (res.ok) {
-          const data = await res.json();
-          const pending = (data.requests ?? []).filter(
-            (r: { status: string }) => r.status === 'pending',
-          );
-          setRequestCount(pending.length);
-        }
-      } catch {
-        /* ignore */
+    try {
+      const res = await fetch(`/api/spaces/song-request?roomId=${roomId}`);
+      if (res.ok) {
+        const data = await res.json();
+        const pending = (data.requests ?? []).filter(
+          (r: { status: string }) => r.status === 'pending',
+        );
+        setRequestCount(pending.length);
       }
-    };
-    poll();
-    const interval = setInterval(poll, 10_000);
-    return () => clearInterval(interval);
+    } catch {
+      /* ignore */
+    }
   }, [roomId]);
+  useEffect(() => {
+    pollSongRequests();
+  }, [pollSongRequests]);
+  useVisibleInterval(pollSongRequests, roomId ? 10_000 : null);
 
   // Auto-switch to content-first when screen share starts, restore when it stops
   useEffect(() => {

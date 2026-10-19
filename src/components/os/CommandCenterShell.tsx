@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { AgentEvent, AgentStatus } from '@/components/admin/agents/constants';
 import { AGENTS } from '@/components/admin/agents/constants';
+import { useVisibleInterval } from '@/hooks/useVisibleInterval';
 import { getSupabaseBrowser } from '@/lib/db/supabase';
 import { APP_REGISTRY, getApp } from '@/lib/os/app-manifest';
 import type { AppCategory, AppManifest, ShellId } from '@/lib/os/types';
@@ -133,9 +134,8 @@ export function CommandCenterShell({
 
   useEffect(() => {
     fetchData();
-    const timer = setInterval(fetchData, 20_000);
-    return () => clearInterval(timer);
   }, [fetchData]);
+  useVisibleInterval(fetchData, 20_000);
 
   // Realtime events subscription
   useEffect(() => {

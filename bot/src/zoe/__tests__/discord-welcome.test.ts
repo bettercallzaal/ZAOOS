@@ -36,7 +36,7 @@ describe('config', () => {
   });
 });
 
-describe('wording (proposed, pending Zaal)', () => {
+describe('wording (approved by Zaal)', () => {
   it('no dashes or emoji, and the welcome names only the new member', () => {
     for (const t of [ROLE_PICKER_TEXT, welcomeText('<@42>')]) {
       expect(t).not.toMatch(/[–—]/);

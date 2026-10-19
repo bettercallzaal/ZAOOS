@@ -2,9 +2,8 @@
  * discord-welcome.ts - role picker, welcome on join, and which invite brought them.
  *
  * Zaal, 2026-10-18, picking from five Discord ideas: "All of them". This is A,
- * the one that speaks in public, so every public word here waits on his OK:
- * both flags are off by default and the wording below is a PROPOSAL until he
- * approves it.
+ * the one that speaks in public. Zaal approved the wording below on 2026-10-18
+ * (option A, as proposed). Both flags still default off; turning them on is his.
  *
  * 1. Role picker (ZOE_DISCORD_SELF_ROLES = role names, comma-separated). Zaal
  *    runs /roles post in a channel; ZOE posts one message with a button per
@@ -46,7 +45,7 @@ export function welcomeChannelName(env: NodeJS.ProcessEnv = process.env): string
   return (env.ZOE_DISCORD_WELCOME_CHANNEL ?? 'welcome').trim().replace(/^#/, '').toLowerCase();
 }
 
-/** PROPOSED wording, pending Zaal's approval (the flags stay off until then). */
+/** Wording approved by Zaal on 2026-10-18. Changing it is a public-wording change: ask him first. */
 export const ROLE_PICKER_TEXT = 'Pick the roles that fit you. Tap again to remove one.';
 export function welcomeText(memberMention: string): string {
   return `Welcome to ZM, ${memberMention}. This is The ZAO's music home. Pick the roles that fit you below, then say hi.`;

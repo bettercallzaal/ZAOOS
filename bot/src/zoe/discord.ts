@@ -40,6 +40,8 @@ import {
   type ApplicationCommandDataResolvable,
   type ButtonComponentData,
   ComponentType,
+  GuildScheduledEventEntityType,
+  GuildScheduledEventPrivacyLevel,
   type ButtonInteraction,
   type ChatInputCommandInteraction,
   type Guild,
@@ -81,6 +83,15 @@ import {
   welcomeText,
 } from './discord-welcome';
 import {
+  allowFeedbackCard,
+  buildFeedbackCard,
+  feedbackChannels,
+  feedbackProject,
+  newFeedbackLimiter,
+  shouldCaptureFeedback,
+} from './discord-feedback';
+import { addTeamTask } from './team-tracker';
+import {
   ADMIN_REFUSAL_LINE,
   ARCHIVE_POST_PERMS,
   type AdminEnv,
@@ -92,6 +103,17 @@ import {
   parseAdminCommand,
   runAdminCommand,
 } from './discord-admin';
+import cron from 'node-cron';
+import {
+  buildDiscordDigest,
+  claimDigestDay,
+  DIGEST_CRON,
+  DIGEST_FETCH_LIMIT,
+  DIGEST_WINDOW_MS,
+  type DigestChannel,
+  discordDigestEnabled,
+  releaseDigestDay,
+} from './discord-digest';
 import { ADMIN_SLASH_COMMANDS, ADMIN_SLASH_NAMES, KICK_CONFIRM_PREFIX, slashToAdminCommand } from './discord-slash';
 import { config as loadEnv } from 'dotenv';
 
@@ -103,6 +125,39 @@ const COMMUNITY_ASKS_ENABLED = process.env.DISCORD_COMMUNITY_ASKS_ENABLED === '1
 const CHANNEL_READ = discordChannelRead();
 
 const turnLimiter = newMemberDmLimiter();
+const feedbackLimiter = newFeedbackLimiter();
+
+/**
+ * A post in a feedback channel (discord-feedback.ts) becomes a board card.
+ * Runs alongside the normal handler and never replies in the channel; a cap or
+ * a board failure is logged, not shown.
+ */
+async function captureFeedback(message: Message<true>): Promise<void> {
+  const name = 'name' in message.channel ? message.channel.name : '';
+  if (!shouldCaptureFeedback({ channelName: name, bot: message.author.bot, content: message.content }, feedbackChannels())) return;
+  if (!allowFeedbackCard(feedbackLimiter, message.author.id, Date.now())) {
+    console.log(`[zoe/discord-feedback] cap reached, not carded: ${message.url}`);
+    return;
+  }
+  const card = buildFeedbackCard(
+    {
+      guildName: message.guild.name,
+      channelName: name,
+      authorName: message.member?.displayName ?? message.author.username,
+      content: message.content,
+      url: message.url,
+      postedAt: message.createdAt,
+    },
+    feedbackProject(),
+  );
+  const res = await addTeamTask(card);
+  if (res.ok) {
+    console.log(`[zoe/discord-feedback] carded ${message.url}`);
+    featureRan('discord-feedback', name);
+  } else {
+    console.error(`[zoe/discord-feedback] board write failed for ${message.url}: ${res.error}`);
+  }
+}
 
 // Maximum message length for Discord (2000 chars).
 const DISCORD_MAX = 1990;
@@ -215,6 +270,36 @@ function discordAdminEnv(guild: Guild, here: GuildTextBasedChannel | null): Admi
     // Reached only from a confirmed kick (runAdminCommand's kick case).
     async kick(userId, reason) {
       await (await guild.members.fetch(userId)).kick(reason);
+    },
+    async voiceChannel(id) {
+      const ch = await guild.channels.fetch(id).catch(() => null);
+      return ch && (ch.type === ChannelType.GuildVoice || ch.type === ChannelType.GuildStageVoice) ? { name: ch.name } : null;
+    },
+    // Members-only (GuildOnly); Administrator covers Manage Events.
+    async createEvent(e) {
+      const base = {
+        name: e.name,
+        scheduledStartTime: e.start,
+        scheduledEndTime: e.end,
+        privacyLevel: GuildScheduledEventPrivacyLevel.GuildOnly,
+        reason: ADMIN_AUDIT_REASON,
+        ...(e.description ? { description: e.description } : {}),
+      } as const;
+      const ev = e.channelId
+        ? await guild.scheduledEvents.create({
+            ...base,
+            entityType:
+              (await guild.channels.fetch(e.channelId))?.type === ChannelType.GuildStageVoice
+                ? GuildScheduledEventEntityType.StageInstance
+                : GuildScheduledEventEntityType.Voice,
+            channel: e.channelId,
+          })
+        : await guild.scheduledEvents.create({
+            ...base,
+            entityType: GuildScheduledEventEntityType.External,
+            entityMetadata: { location: e.location ?? '' },
+          });
+      return { id: ev.id, url: ev.url };
     },
   };
 }
@@ -401,6 +486,61 @@ async function welcomeMember(member: GuildMember): Promise<void> {
   featureRan('discord-welcome', guild.id);
 }
 
+/**
+ * The daily digest (discord-digest.ts): read the last 24 hours of every text
+ * channel ZOE can read, and DM Zaal the summary. Read-only on the server; the
+ * one send is a DM to DISCORD_ZAAL_ID. A channel that fails to read is skipped.
+ */
+async function runDiscordDigest(client: Client): Promise<void> {
+  if (!DISCORD_ZAAL_ID) return;
+  const cutoff = Date.now() - DIGEST_WINDOW_MS;
+  for (const guild of client.guilds.cache.values()) {
+    if (!(await claimDigestDay(guild.id))) continue;
+    const me = guild.members.me;
+    const channels: DigestChannel[] = [];
+    for (const ch of guild.channels.cache.values()) {
+      if (ch.type !== ChannelType.GuildText) continue;
+      const perms = me ? ch.permissionsFor(me) : null;
+      if (!perms?.has([PermissionFlagsBits.ViewChannel, PermissionFlagsBits.ReadMessageHistory])) continue;
+      try {
+        const got = await ch.messages.fetch({ limit: DIGEST_FETCH_LIMIT });
+        const inWindow = [...got.values()].filter((m) => m.createdTimestamp >= cutoff && !m.system);
+        channels.push({
+          id: ch.id,
+          name: ch.name,
+          capped: got.size >= DIGEST_FETCH_LIMIT && inWindow.length === got.size,
+          messages: inWindow.reverse().map((m) => ({
+            id: m.id,
+            authorId: m.author.id,
+            authorName: m.member?.displayName ?? m.author.username,
+            bot: m.author.bot,
+            content: m.content,
+            createdAt: m.createdTimestamp,
+            replyToId: m.reference?.messageId,
+            mentionsOwner: m.mentions.users.has(DISCORD_ZAAL_ID),
+          })),
+        });
+      } catch (err) {
+        console.error(`[zoe/discord-digest] could not read #${ch.name}: ${(err as Error).message}`);
+      }
+    }
+    const text = buildDiscordDigest(guild.name, guild.id, channels, DISCORD_ZAAL_ID, CHANNEL_READ);
+    if (!text) {
+      console.log(`[zoe/discord-digest] guild ${guild.id}: no messages in 24h, nothing sent`);
+      continue;
+    }
+    try {
+      const zaal = await client.users.fetch(DISCORD_ZAAL_ID);
+      for (const chunk of chunkMessage(text)) await zaal.send({ content: chunk, allowedMentions: { parse: [] } });
+      console.log(`[zoe/discord-digest] guild ${guild.id}: sent, ${channels.length} channels read`);
+      featureRan('discord-digest', guild.id);
+    } catch (err) {
+      console.error(`[zoe/discord-digest] could not DM Zaal: ${(err as Error).message}`);
+      await releaseDigestDay(guild.id);
+    }
+  }
+}
+
 /** Register the admin slash commands in every server ZOE is in. Guild commands appear at once. */
 async function registerAdminSlash(client: Client): Promise<void> {
   for (const guild of client.guilds.cache.values()) {
@@ -495,6 +635,17 @@ export async function bootDiscordClient(): Promise<Client | null> {
         });
       }
     }
+    // Feedback capture reads message text; without the intent every post is
+    // empty and nothing would be carded, silently (same trap as #4029).
+    if (feedbackChannels().size > 0 && !CHANNEL_READ) {
+      console.warn('[zoe/discord-feedback] ZOE_DISCORD_FEEDBACK_CHANNELS is set but DISCORD_CHANNEL_READ is off: no message text, so no cards');
+    }
+    // Daily digest to Zaal, 18:00 ET (ZOE_DISCORD_DIGEST=1, default off).
+    if (discordDigestEnabled()) {
+      cron.schedule(DIGEST_CRON, () => void runDiscordDigest(client).catch((e) => console.error('[zoe/discord-digest]', (e as Error).message)), {
+        timezone: 'America/New_York',
+      });
+    }
   });
 
   /**
@@ -510,6 +661,10 @@ export async function bootDiscordClient(): Promise<Client | null> {
   client.on('messageCreate', async (message) => {
     try {
       if (message.author.bot || message.system) return;
+
+      // Feedback channels to the board. Fire and forget: it never replies and
+      // never stops the normal handling below (first-handler-wins.md).
+      if (message.inGuild()) void captureFeedback(message).catch((e) => console.error('[zoe/discord-feedback]', (e as Error).message));
 
       const isOwnerDM = message.channel.isDMBased() && !!DISCORD_ZAAL_ID && message.author.id === DISCORD_ZAAL_ID;
 

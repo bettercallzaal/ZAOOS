@@ -5,6 +5,7 @@ import { PermissionFlagsBits, PermissionsBitField } from 'discord.js';
 import { describe, expect, it } from 'vitest';
 import {
   ADMIN_REFUSAL_LINE,
+  type AdminCommand,
   type AdminEnv,
   appendAdminLog,
   ARCHIVE_CATEGORY,
@@ -15,6 +16,7 @@ import {
   discordAdminEnabled,
   isDiscordOwner,
   MAX_TIMEOUT_MINUTES,
+  nyTimeToUtc,
   overridesToClear,
   parseAdminCommand,
   runAdminCommand,
@@ -170,6 +172,14 @@ function fakeGuild(archiveCleared = 0) {
     },
     async kick(userId, reason) {
       calls.push(`kick ${userId} ${reason}`);
+    },
+    now: () => Date.parse('2026-10-18T12:00:00Z'),
+    async voiceChannel(id) {
+      return id === 'v1' ? { name: 'Listening Room' } : null;
+    },
+    async createEvent(e) {
+      calls.push(`event ${e.name} ${e.start.toISOString()} ${e.end.toISOString()} ${e.channelId ?? '-'} ${e.location ?? '-'} ${e.description ?? '-'}`);
+      return { id: 'e1', url: 'https://discord.com/events/1/e1' };
     },
   };
   return { env, calls };
@@ -349,6 +359,71 @@ describe('member commands on a fake guild', () => {
   });
 });
 
+describe('nyTimeToUtc', () => {
+  it.each([
+    ['2026-10-23', '20:00', '2026-10-24T00:00:00.000Z'], // EDT, UTC-4
+    ['2026-10-23', '8pm', '2026-10-24T00:00:00.000Z'],
+    ['2026-10-23', '8:30 PM', '2026-10-24T00:30:00.000Z'],
+    ['2026-12-05', '12am', '2026-12-05T05:00:00.000Z'], // EST, UTC-5
+    ['2026-12-05', '12pm', '2026-12-05T17:00:00.000Z'],
+    ['2026-11-01', '09:00', '2026-11-01T14:00:00.000Z'], // the morning DST ends
+    ['2026-03-08', '09:00', '2026-03-08T13:00:00.000Z'], // the morning DST starts
+  ])('%s %s New York is %s', (date, time, want) => {
+    expect(nyTimeToUtc(date, time)?.toISOString()).toBe(want);
+  });
+
+  it.each([
+    ['2026-02-30', '20:00'],
+    ['2026-10-23', '25:00'],
+    ['2026-10-23', '13pm'],
+    ['23-10-2026', '8pm'],
+    ['2026-10-23', 'evening'],
+  ])('rejects %s %s', (date, time) => {
+    expect(nyTimeToUtc(date, time)).toBeNull();
+  });
+});
+
+describe('event on a fake guild', () => {
+  const ev = (over: Partial<Extract<AdminCommand, { kind: 'event' }>> = {}): AdminCommand => ({
+    kind: 'event',
+    name: 'Listening party',
+    date: '2026-10-23',
+    time: '8pm',
+    minutes: 90,
+    ...over,
+  });
+
+  it('a voice-channel event, with the New York time in the reply', async () => {
+    const g = fakeGuild();
+    const r = await runAdminCommand(ev({ channelId: 'v1', description: 'new MixZ drops' }), g.env);
+    expect(r.ok).toBe(true);
+    expect(r.reply).toContain('Created the event "Listening party" for Fri, Oct 23, 8:00 PM EDT, 90 minutes. https://discord.com/events/1/e1');
+    expect(g.calls).toEqual(['event Listening party 2026-10-24T00:00:00.000Z 2026-10-24T01:30:00.000Z v1 - new MixZ drops']);
+  });
+
+  it('a location event, cleaned', async () => {
+    const g = fakeGuild();
+    await runAdminCommand(ev({ location: '<@1> the parklet stage' }), g.env);
+    expect(g.calls[0]).toContain(' - 1 the parklet stage -');
+  });
+
+  it.each([
+    [{ time: 'later' }, 'Date is YYYY-MM-DD'],
+    [{ date: '2026-10-01' }, 'already passed'],
+    [{ minutes: 5 }, 'Length is 15 to 1440'],
+    [{ minutes: 2000 }, 'Length is 15 to 1440'],
+    [{ name: '<>' }, 'needs a name'],
+    [{ channelId: 'text1' }, 'voice or stage channel'],
+    [{}, 'a voice channel or a location'],
+  ])('refuses %j before creating anything', async (over, why) => {
+    const g = fakeGuild();
+    const r = await runAdminCommand(ev(over as Partial<Extract<AdminCommand, { kind: 'event' }>>), g.env);
+    expect(r.ok).toBe(false);
+    expect(r.reply).toContain(why);
+    expect(g.calls).toEqual([]);
+  });
+});
+
 describe('appendAdminLog', () => {
   it('writes one owner-only JSON line per call', async () => {
     const path = join(mkdtempSync(join(tmpdir(), 'zoe-admin-')), 'discord-admin.jsonl');
@@ -411,6 +486,13 @@ describe('wiring in discord.ts', () => {
     expect(block.match(/await appendAdminLog\(/g)).toHaveLength(3);
     expect(block).toContain("allowedMentions: { parse: [], repliedUser: false }");
     expect(block).toContain('return;');
+  });
+
+  it('events are members-only, carry the audit reason, and an outside event needs its location', () => {
+    const env = d.slice(d.indexOf('async createEvent(e) {'), d.indexOf('/** Reasons for kicks waiting'));
+    expect(env).toContain('privacyLevel: GuildScheduledEventPrivacyLevel.GuildOnly,');
+    expect(env).toContain('reason: ADMIN_AUDIT_REASON,');
+    expect(env).toContain("entityType: GuildScheduledEventEntityType.External,\n            entityMetadata: { location: e.location ?? '' },");
   });
 
   it('nothing in the admin env deletes or bans, and it kicks in one place only', () => {

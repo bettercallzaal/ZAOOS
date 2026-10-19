@@ -4,7 +4,7 @@
 topic: agents
 type: research
 status: archive-candidate
-last-validated: 2026-05-21
+last-validated: 2026-10-19
 original-query: Design multi-agent orchestration hierarchy with OpenClaw, Paperclip, and ElizaOS (reconstructed)
 tier: archive
 note: OpenClaw, Paperclip, and ElizaOS migration decommissioned 2026-05-04 per CLAUDE.md. Doc archived as historical reference of attempted agent stack architecture.
@@ -189,6 +189,21 @@ The key: Zaal is NOT a separate system. Zaal IS a Claude Code session that has t
 | **vibeeval/vibecosystem** | 311 | MIT | Self-learning agents that improve across sessions, 134 agents + 246 skills |
 | **ComposioHQ/agent-orchestrator** | 5.6K | MIT | Git worktree isolation for parallel agents, CI/CD-aware |
 | **elizaOS/eliza** | 17.9K | MIT | Farcaster plugin v1.0.5, XMTP plugin v1.1.0, Supabase adapter |
+
+## Updated 2026-10-19
+
+Key developments in the reference frameworks since last-validated (2026-05-21). All sources are search-snippet only (full-page WebFetch blocked by network policy) -- marked PARTIAL.
+
+**ElizaOS major version jump (PARTIAL -- source: elizaos.news search snippets)**
+The doc cited v1.7.2. ElizaOS v2.0.0 shipped May 19, 2026 (one day before the previous validation), with v2.0.3 stable May 20, 2026. v2.0.3 hardened the CI pipeline, fixed sub-agent routing, and introduced `@elizaos/vault` (AES-256-GCM secrets encryption with OS keychain integration). The star count (17.9K in this doc) is likely outdated. The Farcaster and XMTP plugin version numbers cited here (v1.0.5, v1.1.0) should be re-verified against v2.x changelog before any future use.
+
+**A2A Protocol reached v1.0, 150+ org adoption (PARTIAL -- source: search snippets from linuxfoundation.org, a2a-protocol.org)**
+This doc already referenced A2A but as an emerging project. By March 12, 2026, A2A shipped v1.0 as a production-ready open standard under the Linux Foundation Agentic AI Foundation (AAIF). v1.0.1 (May 2026) added an extension mechanism. Search snippets report 150+ organizations and deep integration in Google, Microsoft, and AWS platforms. A2A is now the de facto agent-to-agent coordination layer alongside MCP (agent-to-tool). Security research has begun: arXiv 2609.10871 is a systematic security analysis (UNVERIFIED -- fetch failed).
+
+**Microsoft MAF 1.0 GA and Claude Code Dynamic Workflows (PARTIAL -- source: search snippets)**
+Microsoft Agent Framework 1.0 GA shipped April 3, 2026, unifying AutoGen and Semantic Kernel with native MCP and A2A support. Claude Code Dynamic Workflows launched May 28, 2026, enabling hierarchical subagents up to 3 levels. These are more relevant to ZAO's actual current stack (ZOE uses Claude Code) than the decommissioned OpenClaw/Paperclip stack.
+
+**Stack status unchanged:** The ZAO agent stack remains as documented in CLAUDE.md -- ZOE (zaoclaw_bot), ZAO Devz (zaodevz_bot), Bonfire (zabal_bonfire), ZAOstock bot. OpenClaw and Paperclip remain decommissioned. This doc stands as historical reference only.
 
 ## Sources
 

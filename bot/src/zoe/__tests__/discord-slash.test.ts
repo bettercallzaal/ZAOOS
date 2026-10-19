@@ -102,7 +102,10 @@ describe('wiring in discord.ts', () => {
     expect(owner).toBeGreaterThan(-1);
     expect(owner).toBeLessThan(button.indexOf('runAdminCommand('));
     expect(button).toContain('Date.now() - pending.at > KICK_CONFIRM_MS');
-    expect(d.match(/confirmed: true/g)).toHaveLength(1);
+    // Two confirmed kicks exist: this button, and the spam alert's second press (discord-spam).
+    expect(d.match(/confirmed: true/g)).toHaveLength(2);
+    const spam = d.slice(d.indexOf('async function handleSpamButton('), d.indexOf('/** Register the admin slash commands'));
+    expect(spam).toContain('confirmed: true');
     expect(button).toContain('confirmed: true');
     expect(d).toContain(`\${KICK_CONFIRM_PREFIX}\${userId}`);
     expect(KICK_CONFIRM_PREFIX).toBe('zadm_kick_');

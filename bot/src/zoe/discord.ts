@@ -66,6 +66,20 @@ import { featureRan } from './feature-ran';
 import { markAsked, NAME_SAVED_PUBLIC_LINE, peopleLogEnabled, recordPersonTurn } from './people';
 import { MEMBER_DM_LIMIT_LINE, newMemberDmLimiter } from './member-dm';
 import {
+  allowAlert,
+  newAlertLimiter,
+  newRecentPosts,
+  parseSpamButton,
+  recordPost,
+  SPAM_ALERT_SCORE,
+  SPAM_BUTTON_PREFIX,
+  type SpamAction,
+  spamAlertText,
+  spamButtonId,
+  spamWatchEnabled,
+  scoreSpam,
+} from './discord-spam';
+import {
   ADMIN_REFUSAL_LINE,
   ARCHIVE_POST_PERMS,
   type AdminEnv,
@@ -296,6 +310,113 @@ async function handleKickButton(i: ButtonInteraction): Promise<void> {
   await i.update({ content: result.reply, components: [], allowedMentions: { parse: [] } });
 }
 
+const recentPosts = newRecentPosts();
+const spamAlerts = newAlertLimiter();
+/** Spam kicks waiting on Zaal's second press, by "guild:user". Ten minutes. */
+const pendingSpamKicks = new Map<string, number>();
+
+function spamRow(guildId: string, userId: string, actions: Array<[SpamAction, string, ButtonStyle.Danger | ButtonStyle.Secondary]>): ActionRowData<ButtonComponentData> {
+  return {
+    type: ComponentType.ActionRow,
+    components: actions.map(([a, label, style]) => ({ type: ComponentType.Button, customId: spamButtonId(a, guildId, userId), label, style })),
+  };
+}
+
+/**
+ * Spam watch (discord-spam.ts, ZOE_DISCORD_SPAM_WATCH=1): score a guild message
+ * and, past the line, DM Zaal the reasons with buttons. Never touches the
+ * message or the member itself. Zaal, server admins and moderators are skipped.
+ */
+async function watchForSpam(message: Message<true>, client: Client): Promise<void> {
+  if (!DISCORD_ZAAL_ID || message.author.id === DISCORD_ZAAL_ID) return;
+  const perms = message.member?.permissions;
+  if (perms?.has(PermissionFlagsBits.Administrator) || perms?.has(PermissionFlagsBits.ManageMessages)) return;
+  const now = Date.now();
+  const verdict = scoreSpam({
+    content: message.content,
+    accountAgeMs: now - message.author.createdTimestamp,
+    canMentionEveryone: !!perms?.has(PermissionFlagsBits.MentionEveryone),
+    sameTextOtherChannels: message.content.trim() ? recordPost(recentPosts, message.author.id, message.channelId, message.content, now) : 0,
+  });
+  if (verdict.score < SPAM_ALERT_SCORE) return;
+  if (!allowAlert(spamAlerts, message.author.id, now)) return;
+  const text = spamAlertText({
+    authorName: message.member?.displayName ?? message.author.username,
+    channelName: 'name' in message.channel ? message.channel.name : 'channel',
+    content: message.content,
+    url: message.url,
+    verdict,
+  });
+  // Buttons only while admin commands are on; otherwise the alert is information.
+  const components = discordAdminEnabled()
+    ? [
+        spamRow(message.guildId, message.author.id, [
+          ['to60', 'Timeout 1 hour', ButtonStyle.Secondary],
+          ['to1440', 'Timeout 1 day', ButtonStyle.Secondary],
+          ['kick', 'Kick', ButtonStyle.Danger],
+          ['ignore', 'Ignore', ButtonStyle.Secondary],
+        ]),
+      ]
+    : [];
+  const zaal = await client.users.fetch(DISCORD_ZAAL_ID);
+  await zaal.send({ content: text, components, allowedMentions: { parse: [] } });
+  console.log(`[zoe/discord-spam] alerted Zaal, score ${verdict.score}: ${message.url}`);
+  featureRan('discord-spam', String(verdict.score));
+}
+
+/**
+ * A press under a spam alert, in Zaal's DM. The server comes from the button
+ * id. Zaal only, admin on; kick needs a second press within ten minutes.
+ */
+async function handleSpamButton(i: ButtonInteraction, client: Client): Promise<void> {
+  const by = i.user.id;
+  const b = parseSpamButton(i.customId);
+  const guild = b ? client.guilds.cache.get(b.guildId) : undefined;
+  if (!b || !guild || !discordAdminEnabled() || !isDiscordOwner(by, DISCORD_ZAAL_ID)) {
+    await appendAdminLog({ action: 'spam-button', ok: false, by, target: b?.userId, refused: 'not owner, unknown server, or flag off' });
+    await i.reply({ content: ADMIN_REFUSAL_LINE, flags: MessageFlags.Ephemeral });
+    return;
+  }
+  const key = `${b.guildId}:${b.userId}`;
+  const done = async (reply: string, action: string, ok: boolean): Promise<void> => {
+    await appendAdminLog({ action, ok, target: b.userId, by, guildId: b.guildId });
+    if (ok) featureRan('discord-spam', action);
+    await i.update({ content: `${i.message.content}
+
+${reply}`, components: [], allowedMentions: { parse: [] } });
+  };
+  if (b.action === 'ignore') {
+    pendingSpamKicks.delete(key);
+    await done('Ignored.', 'spam-ignore', true);
+    return;
+  }
+  if (b.action === 'kick') {
+    pendingSpamKicks.set(key, Date.now());
+    await i.update({
+      content: `${i.message.content}
+
+Kick them? They can rejoin with an invite.`,
+      components: [spamRow(b.guildId, b.userId, [['kickyes', 'Confirm kick', ButtonStyle.Danger], ['ignore', 'Cancel', ButtonStyle.Secondary]])],
+      allowedMentions: { parse: [] },
+    });
+    return;
+  }
+  if (b.action === 'kickyes') {
+    const at = pendingSpamKicks.get(key);
+    pendingSpamKicks.delete(key);
+    if (!at || Date.now() - at > KICK_CONFIRM_MS) {
+      await done('That confirmation expired. Use /kick in the server.', 'spam-kick', false);
+      return;
+    }
+    const r = await runAdminCommand({ kind: 'kick', userId: b.userId, confirmed: true, reason: 'Spam, flagged by ZOE, kicked by Zaal' }, discordAdminEnv(guild, null));
+    await done(r.reply, 'spam-kick', r.ok);
+    return;
+  }
+  const minutes = b.action === 'to60' ? 60 : 1440;
+  const r = await runAdminCommand({ kind: 'timeout', userId: b.userId, minutes }, discordAdminEnv(guild, null));
+  await done(r.reply, 'spam-timeout', r.ok);
+}
+
 /** Register the admin slash commands in every server ZOE is in. Guild commands appear at once. */
 async function registerAdminSlash(client: Client): Promise<void> {
   for (const guild of client.guilds.cache.values()) {
@@ -395,6 +516,11 @@ export async function bootDiscordClient(): Promise<Client | null> {
   client.on('messageCreate', async (message) => {
     try {
       if (message.author.bot || message.system) return;
+
+      // Spam watch: tells Zaal, never acts (discord-spam.ts). Fire and forget.
+      if (spamWatchEnabled() && message.inGuild()) {
+        void watchForSpam(message, client).catch((e) => console.error('[zoe/discord-spam]', (e as Error).message));
+      }
 
       const isOwnerDM = message.channel.isDMBased() && !!DISCORD_ZAAL_ID && message.author.id === DISCORD_ZAAL_ID;
 
@@ -620,6 +746,10 @@ export async function bootDiscordClient(): Promise<Client | null> {
     try {
       if (interaction.isChatInputCommand() && ADMIN_SLASH_NAMES.has(interaction.commandName)) {
         await handleAdminSlash(interaction);
+        return;
+      }
+      if (interaction.isButton() && interaction.customId.startsWith(SPAM_BUTTON_PREFIX)) {
+        await handleSpamButton(interaction, client);
         return;
       }
       if (interaction.isButton() && interaction.customId.startsWith('zadm_kick')) {

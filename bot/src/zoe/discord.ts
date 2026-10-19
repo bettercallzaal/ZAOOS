@@ -39,6 +39,7 @@ import {
   type Message,
   type TextBasedChannel,
 } from 'discord.js';
+import { discordIcmEnabled, zaoGroundingFor } from './brand-brain';
 import { runConciergeTurn } from './concierge';
 import { buildMemoryBlocks } from './memory';
 import {
@@ -372,9 +373,16 @@ export async function bootDiscordClient(): Promise<Client | null> {
       // Telegram; everyone else gets the community wording and a 'discord' row.
       const gapLog: boolean | 'community' = gapLogEnabled() ? (scope === 'private' ? true : 'community') : false;
 
+      // ZAO background (brand-brain.ts): The ZAO's ICM box, plus any brand the
+      // message names, so "what is ZABAL Gamez?" gets the canonical answer.
+      // A failed fetch leaves the turn as it was.
+      const grounding = discordIcmEnabled() ? await zaoGroundingFor(messageText).catch(() => undefined) : undefined;
+      if (grounding) featureRan('discord-icm', grounding.brands.join(', '));
+
       const result = await runConciergeTurn({
         message: channelContext + messageText,
         blocks,
+        brandContext: grounding?.context,
         context: {
           zaal_tg_id: DISCORD_ZAAL_ID ? Number(DISCORD_ZAAL_ID) : 0,
           current_date: currentDate,

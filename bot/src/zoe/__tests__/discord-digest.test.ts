@@ -2,7 +2,7 @@ import { mkdtempSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { buildDiscordDigest, claimDigestDay, type DigestChannel, type DigestMessage, discordDigestEnabled } from '../discord-digest';
+import { buildDiscordDigest, claimDigestDay, releaseDigestDay, TEXT_UNAVAILABLE_LINE, type DigestChannel, type DigestMessage, discordDigestEnabled } from '../discord-digest';
 
 let seq = 0;
 function msg(authorId: string, content: string, extra: Partial<DigestMessage> = {}): DigestMessage {
@@ -93,6 +93,23 @@ describe('buildDiscordDigest', () => {
     expect(text).not.toContain('mixz is down');
   });
 
+  it('when text is not readable it says so, instead of reporting nothing unanswered', () => {
+    const q = msg('a', 'when is the stream?');
+    const off = buildDiscordDigest('ZM', 'g', [ch('general', [q])], 'zaal', false) ?? '';
+    expect(off).toContain('ZM, last 24 hours: 1 messages');
+    expect(off).toContain(TEXT_UNAVAILABLE_LINE);
+    expect(off).not.toContain('Questions nobody answered');
+  });
+
+  it('every message empty is treated as unreadable even if the flag says readable', () => {
+    const text = buildDiscordDigest('ZM', 'g', [ch('general', [msg('a', ''), msg('b', '')])], 'zaal', true) ?? '';
+    expect(text).toContain(TEXT_UNAVAILABLE_LINE);
+  });
+
+  it('readable text never shows the unreadable line', () => {
+    expect(buildDiscordDigest('ZM', 'g', [ch('general', [msg('a', 'hello all')])], 'zaal')).not.toContain(TEXT_UNAVAILABLE_LINE);
+  });
+
   it('snippets are cleaned and cut, so the DM cannot ping or carry markup', () => {
     const text = buildDiscordDigest('ZM', 'g', [ch('general', [msg('a', `<@123> @everyone ${'x'.repeat(300)}?`)])], 'zaal') ?? '';
     const line = text.split('\n').find((l) => l.startsWith('- #general')) ?? '';
@@ -110,6 +127,15 @@ describe('claimDigestDay', () => {
     expect(await claimDigestDay('g2', evening, dir)).toBe(true);
     expect(await claimDigestDay('g1', new Date('2026-10-19T22:00:00Z'), dir)).toBe(true);
   });
+
+  it('a released day can be claimed again; a missing one is fine', async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'zoe-digest-'));
+    const now = new Date('2026-10-18T22:00:00Z');
+    expect(await claimDigestDay('g1', now, dir)).toBe(true);
+    await releaseDigestDay('g1', now, dir);
+    expect(await claimDigestDay('g1', now, dir)).toBe(true);
+    await expect(releaseDigestDay('nope', now, dir)).resolves.toBeUndefined();
+  });
 });
 
 describe('wiring in discord.ts', () => {
@@ -124,7 +150,9 @@ describe('wiring in discord.ts', () => {
 
   it('reads only channels ZOE may read, claims the day first, and sends only to Zaal without pings', () => {
     expect(run).toContain('PermissionFlagsBits.ViewChannel, PermissionFlagsBits.ReadMessageHistory');
+    expect(run).toContain('buildDiscordDigest(guild.name, guild.id, channels, DISCORD_ZAAL_ID, CHANNEL_READ)');
     expect(run.indexOf('claimDigestDay(guild.id)')).toBeLessThan(run.indexOf('client.users.fetch(DISCORD_ZAAL_ID)'));
+    expect(run).toContain('await releaseDigestDay(guild.id);');
     expect(run.match(/\.send\(/g)).toHaveLength(1);
     expect(run).toContain('zaal.send({ content: chunk, allowedMentions: { parse: [] } })');
     expect(run).not.toMatch(/channel\.send|ch\.send|\.reply\(/);

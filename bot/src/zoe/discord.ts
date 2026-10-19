@@ -86,6 +86,7 @@ import {
   DIGEST_WINDOW_MS,
   type DigestChannel,
   discordDigestEnabled,
+  releaseDigestDay,
 } from './discord-digest';
 import { ADMIN_SLASH_COMMANDS, ADMIN_SLASH_NAMES, KICK_CONFIRM_PREFIX, slashToAdminCommand } from './discord-slash';
 import { config as loadEnv } from 'dotenv';
@@ -344,7 +345,7 @@ async function runDiscordDigest(client: Client): Promise<void> {
         console.error(`[zoe/discord-digest] could not read #${ch.name}: ${(err as Error).message}`);
       }
     }
-    const text = buildDiscordDigest(guild.name, guild.id, channels, DISCORD_ZAAL_ID);
+    const text = buildDiscordDigest(guild.name, guild.id, channels, DISCORD_ZAAL_ID, CHANNEL_READ);
     if (!text) {
       console.log(`[zoe/discord-digest] guild ${guild.id}: no messages in 24h, nothing sent`);
       continue;
@@ -356,6 +357,7 @@ async function runDiscordDigest(client: Client): Promise<void> {
       featureRan('discord-digest', guild.id);
     } catch (err) {
       console.error(`[zoe/discord-digest] could not DM Zaal: ${(err as Error).message}`);
+      await releaseDigestDay(guild.id);
     }
   }
 }

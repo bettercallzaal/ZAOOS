@@ -94,8 +94,23 @@ function openMentions(ch: DigestChannel, ownerId: string): DigestMessage[] {
   return out;
 }
 
+/**
+ * Without the Message Content intent (DISCORD_CHANNEL_READ=0) Discord sends
+ * members' messages with empty text and no mentions, so "nobody asked" and
+ * "could not read" would look the same. The digest then says it could not
+ * check rather than reporting nothing (evaluator note, #4029).
+ */
+export const TEXT_UNAVAILABLE_LINE =
+  'Message text was not readable (DISCORD_CHANNEL_READ is off), so unanswered questions and mentions of you were not checked.';
+
 /** The digest text, or null when nobody posted in the window. */
-export function buildDiscordDigest(guildName: string, guildId: string, channels: DigestChannel[], ownerId: string): string | null {
+export function buildDiscordDigest(
+  guildName: string,
+  guildId: string,
+  channels: DigestChannel[],
+  ownerId: string,
+  textReadable = true,
+): string | null {
   const active = channels
     .map((c) => ({ c, people: c.messages.filter((m) => !m.bot) }))
     .filter((x) => x.people.length > 0)
@@ -111,6 +126,13 @@ export function buildDiscordDigest(guildName: string, guildId: string, channels:
     ...active.slice(0, MAX_LISTED).map((x) => `#${x.c.name}: ${x.people.length}${x.c.capped ? '+' : ''}`),
   ];
   if (active.length > MAX_LISTED) lines.push(`and ${active.length - MAX_LISTED} more`);
+
+  // Backstop for the flag: if every person's message came back empty, the text
+  // was not readable whatever the setting says.
+  if (!textReadable || active.every((x) => x.people.every((m) => m.content.trim() === ''))) {
+    lines.push('', TEXT_UNAVAILABLE_LINE);
+    return lines.join('\n');
+  }
 
   const questions = active.flatMap((x) => unansweredQuestions(x.c).map((m) => ({ c: x.c, m })));
   if (questions.length > 0) {
@@ -130,14 +152,21 @@ export function buildDiscordDigest(guildName: string, guildId: string, channels:
   return lines.join('\n');
 }
 
+const sentinel = (dir: string, guildId: string, now: Date): string =>
+  join(dir, `discord-digest-${guildId}-${now.toLocaleDateString('en-CA', { timeZone: 'America/New_York' })}`);
+
 /** One send per server per day, across restarts. False when today's already went. */
 export async function claimDigestDay(guildId: string, now: Date = new Date(), dir: string = join(ZOE_PATHS.home, 'sentinels')): Promise<boolean> {
-  const day = now.toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
   await fs.mkdir(dir, { recursive: true });
   try {
-    await fs.writeFile(join(dir, `discord-digest-${guildId}-${day}`), now.toISOString(), { flag: 'wx' });
+    await fs.writeFile(sentinel(dir, guildId, now), now.toISOString(), { flag: 'wx' });
     return true;
   } catch {
     return false;
   }
+}
+
+/** Give the day back after a failed DM, so a later run that day can send (evaluator note, #4029). */
+export async function releaseDigestDay(guildId: string, now: Date = new Date(), dir: string = join(ZOE_PATHS.home, 'sentinels')): Promise<void> {
+  await fs.unlink(sentinel(dir, guildId, now)).catch(() => undefined);
 }

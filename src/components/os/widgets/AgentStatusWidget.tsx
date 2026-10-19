@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { AgentStatus } from '@/components/admin/agents/constants';
+import { useVisibleInterval } from '@/hooks/useVisibleInterval';
 import type { WidgetProps } from '@/lib/os/types';
 
 const DEFAULT_AGENTS: { name: string; label: string; status: 'active' | 'idle' }[] = [
@@ -16,38 +17,32 @@ export default function AgentStatusWidget({ onExpand }: WidgetProps) {
     useState<{ name: string; label: string; status: string }[]>(DEFAULT_AGENTS);
   const [activeCount, setActiveCount] = useState(1);
 
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadStatus() {
-      try {
-        const res = await fetch('/api/agents/status?view=squad');
-        if (res.ok && !cancelled) {
-          const data = await res.json();
-          const squad = (data.agents || []) as AgentStatus[];
-          if (squad.length > 0) {
-            setAgents(
-              squad.slice(0, 4).map((a) => ({
-                name: a.name,
-                label: a.label,
-                status: a.status,
-              })),
-            );
-            setActiveCount(squad.filter((a) => a.status === 'active').length);
-          }
+  const loadStatus = useCallback(async () => {
+    try {
+      const res = await fetch('/api/agents/status?view=squad');
+      if (res.ok) {
+        const data = await res.json();
+        const squad = (data.agents || []) as AgentStatus[];
+        if (squad.length > 0) {
+          setAgents(
+            squad.slice(0, 4).map((a) => ({
+              name: a.name,
+              label: a.label,
+              status: a.status,
+            })),
+          );
+          setActiveCount(squad.filter((a) => a.status === 'active').length);
         }
-      } catch {
-        // Fallback to default
       }
+    } catch {
+      // Fallback to default
     }
-
-    loadStatus();
-    const timer = setInterval(loadStatus, 30_000);
-    return () => {
-      cancelled = true;
-      clearInterval(timer);
-    };
   }, []);
+
+  useEffect(() => {
+    loadStatus();
+  }, [loadStatus]);
+  useVisibleInterval(loadStatus, 30_000);
 
   return (
     <button

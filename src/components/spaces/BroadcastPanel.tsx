@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useVisibleInterval } from '@/hooks/useVisibleInterval';
 import type { BroadcastState } from '@/lib/spaces/rtmpManager';
 
 interface BroadcastPanelProps {
@@ -47,7 +48,6 @@ export function BroadcastPanel({
   const [uptime, setUptime] = useState('00:00');
   const [viewerCounts, setViewerCounts] = useState<Record<string, number>>({});
   const uptimeRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const viewerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Uptime timer — tick every second
   useEffect(() => {
@@ -75,17 +75,9 @@ export function BroadcastPanel({
   }, [roomId]);
 
   useEffect(() => {
-    let cancelled = false;
-    const poll = async () => {
-      if (!cancelled) await fetchViewers();
-    };
-    void poll();
-    viewerRef.current = setInterval(fetchViewers, 10_000);
-    return () => {
-      cancelled = true;
-      if (viewerRef.current) clearInterval(viewerRef.current);
-    };
+    void fetchViewers();
   }, [fetchViewers]);
+  useVisibleInterval(fetchViewers, 10_000);
 
   const targets = state.targets || [];
   const activeCount = targets.filter(

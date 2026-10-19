@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { useVisibleInterval } from '@/hooks/useVisibleInterval';
 
 interface Participant {
   user_id?: string;
@@ -215,12 +216,10 @@ export function LiveFractalDashboard() {
 
   useEffect(() => {
     fetchData();
+  }, [fetchData]);
 
-    // 10s when a session is live, 60s otherwise (saves API calls between Mondays)
-    const interval = setInterval(fetchData, data?.has_active ? 10_000 : 60_000);
-
-    return () => clearInterval(interval);
-  }, [fetchData, data?.has_active]);
+  // 10s when a session is live, 60s otherwise (saves API calls between Mondays)
+  useVisibleInterval(fetchData, data?.has_active ? 10_000 : 60_000);
 
   if (loading) {
     return (

@@ -2,6 +2,7 @@
 
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import { useVisibleInterval } from '@/hooks/useVisibleInterval';
 import { OverlayBar } from './OverlayBar';
 import { OverlayCard } from './OverlayCard';
 import { OverlayFullscreen } from './OverlayFullscreen';
@@ -53,9 +54,8 @@ function OverlayInner() {
 
   useEffect(() => {
     fetchNowPlaying();
-    const interval = setInterval(fetchNowPlaying, 5000);
-    return () => clearInterval(interval);
   }, [fetchNowPlaying]);
+  useVisibleInterval(fetchNowPlaying, 5000);
 
   if (!fid) {
     return (

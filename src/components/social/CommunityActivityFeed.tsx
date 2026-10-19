@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
+import { useVisibleInterval } from '@/hooks/useVisibleInterval';
 import { timeAgo } from '@/lib/format/timeAgo';
 
 interface ActivityItem {
@@ -48,15 +49,11 @@ export function CommunityActivityFeed() {
     const controller = new AbortController();
     fetchFeed(controller.signal);
 
-    const interval = setInterval(() => {
-      fetchFeed();
-    }, 60_000);
-
     return () => {
       controller.abort();
-      clearInterval(interval);
     };
   }, [fetchFeed]);
+  useVisibleInterval(fetchFeed, 60_000);
 
   if (loading) {
     return (

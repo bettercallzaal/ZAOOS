@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { useVisibleInterval } from '@/hooks/useVisibleInterval';
 
 interface TwitchStreamData {
   isLive: boolean;
@@ -29,9 +30,8 @@ export function TwitchStreamInfo() {
 
   useEffect(() => {
     fetchStreamInfo();
-    const interval = setInterval(fetchStreamInfo, POLL_INTERVAL);
-    return () => clearInterval(interval);
   }, [fetchStreamInfo]);
+  useVisibleInterval(fetchStreamInfo, POLL_INTERVAL);
 
   // Hide entirely if not connected or not live
   if (!stream?.isLive) return null;

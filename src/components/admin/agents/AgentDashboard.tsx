@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { useVisibleInterval } from '@/hooks/useVisibleInterval';
 import { getSupabaseBrowser } from '@/lib/db/supabase';
 import type { AgentEvent, AgentStatus } from './constants';
 import PipelineFlow from './PipelineFlow';
@@ -87,10 +88,8 @@ export default function AgentDashboard() {
   // Initial fetch and relaxed fallback interval
   useEffect(() => {
     fetchData();
-    const intervalTime = isRealtime ? 60_000 : 30_000;
-    const interval = setInterval(fetchData, intervalTime);
-    return () => clearInterval(interval);
-  }, [fetchData, isRealtime]);
+  }, [fetchData]);
+  useVisibleInterval(fetchData, isRealtime ? 60_000 : 30_000);
 
   if (loading) {
     return (

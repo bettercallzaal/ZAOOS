@@ -26,7 +26,7 @@ const BRAND_BRAINS: Record<string, string> = {
   WaveWarZ: 'icm_RxT9r-_IjG1U9kxOniSzFQ', // owned
   'The ZAO': 'icm_ohb0F_XOYDz9Tw_w4yX3PA', // owned, verified live
   BetterCallZaal: 'icm_r1ZHKeAdS9UNt4oz7n6HRA', // owned, filled 2026-07-12 (was empty)
-  // Magnetiq: retired 2026-07-31 (Zaal). Its ICM box id stays in git history only.
+  // A brand retired 2026-07-31 (Zaal) had a box here; its id stays in git history only.
   ZAOstock: 'icm_lda7p0d9o_Ysg-SYZOIWjw', // owned, minted 2026-07-12
   ZAOlingo: 'icm_47k0vjXyDz23p8qi4spyJA', // owned, minted 2026-07-12
 };
@@ -104,21 +104,32 @@ export async function fetchIcmBrain(boxId: string): Promise<string | null> {
  * Partners Zaal retired (2026-07-31 and 2026-10-05) must never be named on a
  * ZOE surface. Some ICM boxes still name them, so every line that does is
  * dropped before the box text reaches a turn. The names are kept as short
- * sha256 prefixes so this public file does not repeat them: single words and
- * two-word phrases are hashed lowercase, and one all-caps token is hashed as
- * written (lowercase it is an ordinary English word).
+ * sha256 prefixes so this public file does not repeat them.
+ *
+ * Four names are matched as SUBSTRINGS of the line with everything but letters
+ * removed and lowercased, so joined and re-spaced forms are caught too: a
+ * ZAO-prefixed repo name, "<name>Fund" or "<name> AI", a URL ending in the name,
+ * an @handle, the two-word name written as one, or a name split by a space or
+ * dash. The evaluator found the whole-word version missed all of these (#4027).
+ * The fifth is an all-caps token that is an ordinary English word in lower
+ * case, so it stays an exact word, plural included.
  */
-const RETIRED_LOWER = new Set(['a7ff96ecc7d73c96', '449083280bd1794a', '97bdc87ae440aeb1', 'b0cd31ac7f61781e']);
+const RETIRED_JOINED = new Set(['a7ff96ecc7d73c96', '28ed369e16e63944', '97bdc87ae440aeb1', 'b0cd31ac7f61781e']);
+/** The lengths of those four names, letters only. */
+const RETIRED_JOINED_LENGTHS = [7, 8, 12];
 const RETIRED_EXACT = new Set(['5e62b11d8fa80e15']);
 const shortHash = (s: string): string => createHash('sha256').update(s).digest('hex').slice(0, 16);
 
 /** True when a line names a retired partner. */
 export function namesRetiredPartner(line: string): boolean {
-  const words = line.split(/[^A-Za-z0-9]+/).filter(Boolean);
-  for (let i = 0; i < words.length; i++) {
-    if (RETIRED_EXACT.has(shortHash(words[i]))) return true;
-    if (RETIRED_LOWER.has(shortHash(words[i].toLowerCase()))) return true;
-    if (i + 1 < words.length && RETIRED_LOWER.has(shortHash(`${words[i]} ${words[i + 1]}`.toLowerCase()))) return true;
+  for (const word of line.split(/[^A-Za-z0-9]+/)) {
+    if (word && RETIRED_EXACT.has(shortHash(word.replace(/(?:'?s)$/, '')))) return true;
+  }
+  const letters = line.toLowerCase().replace(/[^a-z]/g, '');
+  for (const n of RETIRED_JOINED_LENGTHS) {
+    for (let i = 0; i + n <= letters.length; i++) {
+      if (RETIRED_JOINED.has(shortHash(letters.slice(i, i + n)))) return true;
+    }
   }
   return false;
 }

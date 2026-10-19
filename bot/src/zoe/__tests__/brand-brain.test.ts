@@ -139,6 +139,22 @@ describe('retired partner filter', () => {
     expect(namesRetiredPartner(`signups run through ${name.toLowerCase()} today`)).toBe(name !== b64('U0FORw=='));
   });
 
+  // The forms the whole-word version missed (evaluator, #4027), base64 for the same reason.
+  it.each([
+    'WkFPYXJ0aXplbg==',
+    'QXJ0aXplbkZ1bmQ=',
+    'QXJ0aXplbiBBSQ==',
+    'aHR0cHM6Ly9naXRodWIuY29tL2JldHRlcmNhbGx6YWFsL1pBT2FydGl6ZW4=',
+    'QWNhZGlhUmlzaW5n',
+    'QGFjYWRpYXJpc2luZw==',
+    'TWFnbmV0IGlx',
+    'U29uZy1KYW0=',
+    'U0FOR3M=',
+    'YWNhZGlhLXJpc2luZy5vcmc=',
+  ])('a joined, re-spaced or plural form is caught (%#)', (encoded) => {
+    expect(namesRetiredPartner(`see ${b64(encoded)} for details`)).toBe(true);
+  });
+
   it('catches a name inside a domain', () => {
     expect(namesRetiredPartner(`- Signup: ${b64('YXBwLm1hZ25ldGlxLnh5eg==')} (ZABAL brand)`)).toBe(true);
   });
@@ -147,6 +163,8 @@ describe('retired partner filter', () => {
     expect(namesRetiredPartner('a town that every car heading to Acadia passes through.')).toBe(false);
     expect(namesRetiredPartner('She sang the closing set.')).toBe(false);
     expect(namesRetiredPartner('ZABAL Games is The ZAO\'s 3-month build-a-thon.')).toBe(false);
+    expect(namesRetiredPartner('Artists sang at the parklet; Acadia is an hour away.')).toBe(false);
+    expect(namesRetiredPartner('Magnets, art, zen gardens and a rising tide.')).toBe(false);
   });
 
   it('drops only the naming lines and keeps the rest in order', () => {

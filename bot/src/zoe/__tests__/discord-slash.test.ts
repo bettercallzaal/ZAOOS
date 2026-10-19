@@ -14,8 +14,8 @@ function opts(sub: string | null, values: Record<string, string | number>): Slas
 }
 
 describe('command definitions', () => {
-  it('the nine admin commands, each hidden from non-admins and not in DMs', () => {
-    expect([...ADMIN_SLASH_NAMES].sort()).toEqual(['category', 'channel', 'kick', 'nick', 'pin', 'role', 'thread', 'timeout', 'unpin'].sort());
+  it('the eleven admin commands, each hidden from non-admins and not in DMs', () => {
+    expect([...ADMIN_SLASH_NAMES].sort()).toEqual(['category', 'channel', 'event', 'kick', 'nick', 'pin', 'role', 'roles', 'thread', 'timeout', 'unpin'].sort());
     for (const c of ADMIN_SLASH_COMMANDS) {
       expect(c.default_member_permissions).toBe(String(PermissionFlagsBits.Administrator));
       expect(c.dm_permission).toBe(false);
@@ -47,6 +47,18 @@ describe('slashToAdminCommand', () => {
     ['timeout', null, { user: 'u1', minutes: 15 }, { kind: 'timeout', userId: 'u1', minutes: 15 }],
     ['kick', null, { user: 'u1', reason: 'spam' }, { kind: 'kick', userId: 'u1', confirmed: false, reason: 'spam' }],
     ['kick', null, { user: 'u1' }, { kind: 'kick', userId: 'u1', confirmed: false }],
+    [
+      'event',
+      'new',
+      { name: 'Listening party', date: '2026-10-23', time: '8pm', minutes: 90, channel: 'v1', description: 'new MixZ' },
+      { kind: 'event', name: 'Listening party', date: '2026-10-23', time: '8pm', minutes: 90, channelId: 'v1', description: 'new MixZ' },
+    ],
+    [
+      'event',
+      'new',
+      { name: 'Parklet set', date: '2026-10-23', time: '20:00', location: 'Franklin St Parklet' },
+      { kind: 'event', name: 'Parklet set', date: '2026-10-23', time: '20:00', minutes: 60, location: 'Franklin St Parklet' },
+    ],
   ] as const)('/%s %s', (command, sub, values, want) => {
     expect(slashToAdminCommand(command, opts(sub, values))).toEqual(want);
   });
@@ -61,6 +73,7 @@ describe('slashToAdminCommand', () => {
     ['pin', null, { link: 'https://evil.example/channels/1/2/3' }],
     ['role', 'give', { user: 'u1' }],
     ['timeout', null, { user: 'u1' }],
+    ['event', 'new', { name: 'x', date: '2026-10-23' }],
   ] as const)('bad input becomes "unknown": /%s %s', (command, sub, values) => {
     expect(slashToAdminCommand(command, opts(sub, values))?.kind).toBe('unknown');
   });

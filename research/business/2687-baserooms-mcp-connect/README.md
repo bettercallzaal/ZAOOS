@@ -141,7 +141,7 @@ Zaal's steps (his hands; settings edits stay his):
 
 4. Start Claude in that folder and approve the `baserooms` project server when asked.
 
-Checked so far: the `headersHelper` string, taken from the JSON block above and run through `sh` with a stub `security` that prints `STUBKEY`, produced `{'Authorization': 'Bearer STUBKEY'}`, valid JSON. Not checked: the whole chain against Base Rooms. That needs Zaal's new key, and it is the first thing to run once he has done steps 1 to 4.
+Checked so far: the `headersHelper` string, taken from the JSON block above and run through `sh` with a stub `security` that prints `STUBKEY`, printed `{"Authorization":"Bearer STUBKEY"}`, which parses as JSON. Not checked: the whole chain against Base Rooms. That needs Zaal's new key, and it is the first thing to run once he has done steps 1 to 4.
 
 **Simpler alternative if the OAuth bug gets fixed:** OAuth needs no key and no file. A note to Slava naming the redirect-port bug is the only outbound step, and it is Zaal's call.
 
@@ -205,7 +205,7 @@ All fetched 2026-10-19 with `curl` and a browser User-Agent. Raw text, no WebFet
 |---|---|---|
 | https://baserooms.io/ | curl, HTML stripped to text | FULL (190,389 bytes): token figures, "AI AGENT / PAIR IT", X and Telegram links |
 | https://baserooms.io/mcp | curl GET and POST `initialize` | FULL: 405 on GET; 401 with `-32001 missing or malformed agent key` on POST |
-| https://baserooms.io/agent.md | curl | FULL (24,019 bytes): connect methods, key origin "Base Rooms OS → Buddies → Agent", 71 tools |
+| https://baserooms.io/agent.md | curl | FULL (24,019 bytes): connect methods, key origin "Base Rooms OS, then Buddies, then Agent", 71 tools |
 | https://baserooms.io/agent/tools?format=mcp | curl, parsed JSON | FULL: 58 tools plus the `scopes` map |
 | https://baserooms.io/agent/tools?format=openai | curl | FULL: 58 tools |
 | https://baserooms.io/agent/openapi.json and `?set=chat` | curl | FULL: 58 and 30 operations |

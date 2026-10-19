@@ -14,8 +14,8 @@ function opts(sub: string | null, values: Record<string, string | number>): Slas
 }
 
 describe('command definitions', () => {
-  it('the ten admin commands, each hidden from non-admins and not in DMs', () => {
-    expect([...ADMIN_SLASH_NAMES].sort()).toEqual(['category', 'channel', 'event', 'kick', 'nick', 'pin', 'role', 'thread', 'timeout', 'unpin'].sort());
+  it('the eleven admin commands, each hidden from non-admins and not in DMs', () => {
+    expect([...ADMIN_SLASH_NAMES].sort()).toEqual(['category', 'channel', 'event', 'kick', 'nick', 'pin', 'role', 'roles', 'thread', 'timeout', 'unpin'].sort());
     for (const c of ADMIN_SLASH_COMMANDS) {
       expect(c.default_member_permissions).toBe(String(PermissionFlagsBits.Administrator));
       expect(c.dm_permission).toBe(false);

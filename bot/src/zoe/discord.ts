@@ -45,6 +45,7 @@ import {
   type ButtonInteraction,
   type ChatInputCommandInteraction,
   type Guild,
+  type GuildMember,
   type GuildTextBasedChannel,
   type Message,
   type TextBasedChannel,
@@ -67,6 +68,20 @@ import { appendGap, extractGap, gapLogEnabled } from './capability-gaps';
 import { featureRan } from './feature-ran';
 import { markAsked, NAME_SAVED_PUBLIC_LINE, peopleLogEnabled, recordPersonTurn } from './people';
 import { MEMBER_DM_LIMIT_LINE, newMemberDmLimiter } from './member-dm';
+import {
+  appendJoinLog,
+  inRows,
+  inviteUsed,
+  parseRoleButton,
+  ROLE_BUTTON_PREFIX,
+  ROLE_PICKER_TEXT,
+  roleButtonId,
+  safeSelfRole,
+  selfRoleNames,
+  welcomeChannelName,
+  welcomeEnabled,
+  welcomeText,
+} from './discord-welcome';
 import {
   allowFeedbackCard,
   buildFeedbackCard,
@@ -327,6 +342,11 @@ async function handleAdminSlash(i: ChatInputCommandInteraction): Promise<void> {
     await i.reply({ content: ADMIN_REFUSAL_LINE, flags: MessageFlags.Ephemeral });
     return;
   }
+  if (i.commandName === 'roles') {
+    await i.deferReply({ ephemeral: true });
+    await postRolePicker(i);
+    return;
+  }
   const cmd = slashToAdminCommand(i.commandName, {
     sub: i.options.getSubcommand(false),
     string: (n) => i.options.getString(n),
@@ -379,6 +399,91 @@ async function handleKickButton(i: ButtonInteraction): Promise<void> {
   console.log(`[zoe/discord-admin] kick ${result.ok ? 'ok' : 'failed'} in guild ${i.guildId}`);
   if (result.ok) featureRan('discord-admin', 'kick');
   await i.update({ content: result.reply, components: [], allowedMentions: { parse: [] } });
+}
+
+/**
+ * The self-role buttons (discord-welcome.ts): one per role named in
+ * ZOE_DISCORD_SELF_ROLES that exists here and sits below ZOE's role. Empty
+ * when none qualify.
+ */
+function roleRows(guild: Guild): ActionRowData<ButtonComponentData>[] {
+  const wanted = new Set(selfRoleNames().map((n) => n.toLowerCase()));
+  const roles = [...guild.roles.cache.values()]
+    .filter((r) => wanted.has(r.name.toLowerCase()) && r.editable && safeSelfRole(r.permissions) && r.id !== guild.roles.everyone.id)
+    .sort((a, b) => b.position - a.position);
+  return inRows(roles).map((row) => ({
+    type: ComponentType.ActionRow,
+    components: row.map((r) => ({ type: ComponentType.Button, customId: roleButtonId(r.id), label: r.name.slice(0, 80), style: ButtonStyle.Secondary })),
+  }));
+}
+
+/** /roles post: Zaal puts the picker in the channel he ran it in. */
+async function postRolePicker(i: ChatInputCommandInteraction<'cached'>): Promise<void> {
+  const rows = roleRows(i.guild);
+  const here = i.channel;
+  if (rows.length === 0 || !here?.isTextBased()) {
+    await i.editReply({ content: 'No roles to offer. Set ZOE_DISCORD_SELF_ROLES to role names that sit below my role.' });
+    return;
+  }
+  await here.send({ content: ROLE_PICKER_TEXT, components: rows, allowedMentions: { parse: [] } });
+  await appendAdminLog({ action: '/roles post', ok: true, by: i.user.id, guildId: i.guildId, target: here.id });
+  featureRan('discord-roles', 'post');
+  await i.editReply({ content: 'Posted the role picker.' });
+}
+
+/**
+ * Anyone's press on a role button: add or remove that role for THEMSELVES.
+ * Only a role still named in ZOE_DISCORD_SELF_ROLES and still below ZOE's role,
+ * so an old button cannot hand out a role that was taken off the list.
+ */
+async function handleRoleButton(i: ButtonInteraction): Promise<void> {
+  const roleId = parseRoleButton(i.customId);
+  if (!roleId || !i.inCachedGuild()) {
+    await i.reply({ content: 'That button does not work here.', flags: MessageFlags.Ephemeral });
+    return;
+  }
+  const role = i.guild.roles.cache.get(roleId);
+  const allowed = new Set(selfRoleNames().map((n) => n.toLowerCase()));
+  if (!role || !allowed.has(role.name.toLowerCase()) || !role.editable || !safeSelfRole(role.permissions)) {
+    await i.reply({ content: 'That role is not one you can pick yourself any more.', flags: MessageFlags.Ephemeral });
+    return;
+  }
+  const member: GuildMember = i.member;
+  const has = member.roles.cache.has(role.id);
+  await (has ? member.roles.remove(role, 'Picked by the member') : member.roles.add(role, 'Picked by the member'));
+  featureRan('discord-roles', has ? 'remove' : 'add');
+  await i.reply({ content: has ? `Removed ${role.name}.` : `Added ${role.name}.`, flags: MessageFlags.Ephemeral });
+}
+
+/** Invite use counts per server, to tell which invite a new member used. */
+const inviteUses = new Map<string, Map<string, number>>();
+
+async function readInvites(guild: Guild): Promise<Map<string, number> | null> {
+  try {
+    const invites = await guild.invites.fetch();
+    return new Map([...invites.values()].map((v) => [v.code, v.uses ?? 0]));
+  } catch (err) {
+    console.error(`[zoe/discord-welcome] could not read invites in ${guild.id}: ${(err as Error).message}`);
+    return null;
+  }
+}
+
+/** A new member (ZOE_DISCORD_WELCOME=1): record the invite privately, then greet them with the role buttons. */
+async function welcomeMember(member: GuildMember): Promise<void> {
+  const guild = member.guild;
+  const after = await readInvites(guild);
+  const code = after ? inviteUsed(inviteUses.get(guild.id) ?? new Map(), after) : null;
+  if (after) inviteUses.set(guild.id, after);
+  const inviter = code ? (await guild.invites.fetch(code).catch(() => null))?.inviterId ?? undefined : undefined;
+  await appendJoinLog({ guildId: guild.id, userId: member.id, invite: code, ...(inviter ? { inviter } : {}) });
+  const channel = guild.channels.cache.find((c) => c.type === ChannelType.GuildText && c.name.toLowerCase() === welcomeChannelName());
+  if (!channel || channel.type !== ChannelType.GuildText) {
+    console.warn(`[zoe/discord-welcome] no #${welcomeChannelName()} channel in ${guild.id}; joined ${member.id}, not greeted`);
+    return;
+  }
+  // Pings only the new member.
+  await channel.send({ content: welcomeText(`<@${member.id}>`), components: roleRows(guild), allowedMentions: { users: [member.id] } });
+  featureRan('discord-welcome', guild.id);
 }
 
 /**
@@ -509,6 +614,9 @@ export async function bootDiscordClient(): Promise<Client | null> {
       GatewayIntentBits.GuildMessages,
       GatewayIntentBits.DirectMessages,
       ...(CHANNEL_READ ? [GatewayIntentBits.MessageContent] : []),
+      // Welcome on join needs the members intent (a Developer Portal switch)
+      // and invite events for attribution. Only asked for when it is on.
+      ...(welcomeEnabled() ? [GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildInvites] : []),
     ],
   });
 
@@ -520,6 +628,13 @@ export async function bootDiscordClient(): Promise<Client | null> {
     );
     // Slash commands only exist while admin is on (ZOE_DISCORD_ADMIN=1).
     if (discordAdminEnabled()) void registerAdminSlash(client);
+    if (welcomeEnabled()) {
+      for (const g of client.guilds.cache.values()) {
+        void readInvites(g).then((m) => {
+          if (m) inviteUses.set(g.id, m);
+        });
+      }
+    }
     // Feedback capture reads message text; without the intent every post is
     // empty and nothing would be carded, silently (same trap as #4029).
     if (feedbackChannels().size > 0 && !CHANNEL_READ) {
@@ -769,12 +884,28 @@ export async function bootDiscordClient(): Promise<Client | null> {
    * Stage 1b: handle button clicks on community-ask approval messages.
    * Only Zaal can approve/skip/regen. Other users get an ephemeral "not authorized".
    */
+  if (welcomeEnabled()) {
+    client.on('guildMemberAdd', (member) => {
+      void welcomeMember(member).catch((e) => console.error('[zoe/discord-welcome]', (e as Error).message));
+    });
+    client.on('inviteCreate', (inv) => {
+      if (inv.guild) inviteUses.get(inv.guild.id)?.set(inv.code, inv.uses ?? 0);
+    });
+    client.on('inviteDelete', (inv) => {
+      if (inv.guild) inviteUses.get(inv.guild.id)?.delete(inv.code);
+    });
+  }
+
   client.on('interactionCreate', async (interaction) => {
     // Admin slash commands and the kick confirmation come first; the zask_
     // approval buttons below ignore everything else (first-handler-wins.md).
     try {
       if (interaction.isChatInputCommand() && ADMIN_SLASH_NAMES.has(interaction.commandName)) {
         await handleAdminSlash(interaction);
+        return;
+      }
+      if (interaction.isButton() && interaction.customId.startsWith(ROLE_BUTTON_PREFIX)) {
+        await handleRoleButton(interaction);
         return;
       }
       if (interaction.isButton() && interaction.customId.startsWith('zadm_kick')) {

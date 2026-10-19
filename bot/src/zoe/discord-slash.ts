@@ -97,6 +97,9 @@ export const ADMIN_SLASH_COMMANDS = [
   admin(new SlashCommandBuilder().setName('kick').setDescription('Kick someone; asks you to confirm first (Zaal only)'))
     .addUserOption((o) => o.setName('user').setDescription('Who').setRequired(true))
     .addStringOption((o) => o.setName('reason').setDescription('Shown in the audit log').setMaxLength(200)),
+  admin(new SlashCommandBuilder().setName('roles').setDescription('Post the role picker here (Zaal only)')).addSubcommand((s) =>
+    s.setName('post').setDescription('Post buttons members use to add or remove their own roles'),
+  ),
 ].map((c) => c.toJSON());
 
 export const ADMIN_SLASH_NAMES: ReadonlySet<string> = new Set(ADMIN_SLASH_COMMANDS.map((c) => c.name));

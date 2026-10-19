@@ -1,16 +1,20 @@
 import { chmodSync, mkdtempSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { PermissionFlagsBits, PermissionsBitField } from 'discord.js';
 import { describe, expect, it } from 'vitest';
 import {
   ADMIN_REFUSAL_LINE,
   type AdminEnv,
   appendAdminLog,
   ARCHIVE_CATEGORY,
+  ARCHIVE_POST_PERMS,
+  archivePerms,
   cleanChannelName,
   cleanLabel,
   discordAdminEnabled,
   isDiscordOwner,
+  overridesToClear,
   parseAdminCommand,
   runAdminCommand,
 } from '../discord-admin';
@@ -214,6 +218,40 @@ describe('runAdminCommand on a fake guild', () => {
   });
 });
 
+describe('archive permissions', () => {
+  const bits = ARCHIVE_POST_PERMS.map((p) => PermissionFlagsBits[p]);
+  const ow = (id: string, allow: bigint[] = [], deny: bigint[] = []) => ({
+    id,
+    allow: new PermissionsBitField(allow),
+    deny: new PermissionsBitField(deny),
+  });
+
+  it('denies private threads as well as posting and public threads', () => {
+    expect(archivePerms(false)).toEqual({
+      SendMessages: false,
+      SendMessagesInThreads: false,
+      CreatePublicThreads: false,
+      CreatePrivateThreads: false,
+    });
+    expect(Object.values(archivePerms(null)).every((v) => v === null)).toBe(true);
+  });
+
+  it('clears only overrides that ALLOW a posting permission, never @everyone', () => {
+    const list = [
+      ow('everyone', [PermissionFlagsBits.SendMessages]),
+      ow('poster', [PermissionFlagsBits.SendMessages]),
+      ow('private-threader', [PermissionFlagsBits.CreatePrivateThreads]),
+      ow('deny-only', [], [PermissionFlagsBits.SendMessages]),
+      ow('viewer', [PermissionFlagsBits.ViewChannel]),
+    ];
+    expect(overridesToClear(list, 'everyone', bits)).toEqual(['poster', 'private-threader']);
+  });
+
+  it('a deny-only SendMessages override is left alone', () => {
+    expect(overridesToClear([ow('muted', [], [PermissionFlagsBits.SendMessages])], 'everyone', bits)).toEqual([]);
+  });
+});
+
 describe('appendAdminLog', () => {
   it('writes one owner-only JSON line per call', async () => {
     const path = join(mkdtempSync(join(tmpdir(), 'zoe-admin-')), 'discord-admin.jsonl');
@@ -259,9 +297,10 @@ describe('wiring in discord.ts', () => {
 
   it('archive clears role and member overrides that allow posting, never @everyone', () => {
     const env = d.slice(d.indexOf('async archiveChannel('), d.indexOf('async createThread('));
-    expect(env).toContain('if (ow.id === guild.roles.everyone.id) continue;');
-    expect(env).toContain('SendMessages: null, SendMessagesInThreads: null, CreatePublicThreads: null');
-    expect(env).toContain('return { cleared };');
+    expect(env).toContain('archivePerms(false)');
+    expect(env).toContain('overridesToClear(ch.permissionOverwrites.cache.values(), guild.roles.everyone.id, postBits)');
+    expect(env).toContain('archivePerms(null)');
+    expect(env).toContain('return { cleared: toClear.length };');
   });
 
   it('every branch logs, and the reply can ping nobody', () => {

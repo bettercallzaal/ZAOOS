@@ -15,7 +15,7 @@
  * slashToAdminCommand is pure: it reads options through a small getter so the
  * tests can drive it without discord.js.
  */
-import { PermissionFlagsBits, SlashCommandBuilder } from 'discord.js';
+import { ChannelType, PermissionFlagsBits, SlashCommandBuilder } from 'discord.js';
 import {
   type AdminCommand,
   cleanChannelName,
@@ -97,6 +97,20 @@ export const ADMIN_SLASH_COMMANDS = [
   admin(new SlashCommandBuilder().setName('kick').setDescription('Kick someone; asks you to confirm first (Zaal only)'))
     .addUserOption((o) => o.setName('user').setDescription('Who').setRequired(true))
     .addStringOption((o) => o.setName('reason').setDescription('Shown in the audit log').setMaxLength(200)),
+  admin(new SlashCommandBuilder().setName('event').setDescription('Create a server event (Zaal only)')).addSubcommand((s) =>
+    s
+      .setName('new')
+      .setDescription('Create a members-only event; times are New York time')
+      .addStringOption((o) => o.setName('name').setDescription('Event name').setRequired(true).setMaxLength(100))
+      .addStringOption((o) => o.setName('date').setDescription('YYYY-MM-DD').setRequired(true).setMinLength(10).setMaxLength(10))
+      .addStringOption((o) => o.setName('time').setDescription('New York time, like 20:00 or 8pm').setRequired(true).setMaxLength(8))
+      .addIntegerOption((o) => o.setName('minutes').setDescription('Length, default 60').setMinValue(15).setMaxValue(1440))
+      .addChannelOption((o) =>
+        o.setName('channel').setDescription('Voice or stage channel').addChannelTypes(ChannelType.GuildVoice, ChannelType.GuildStageVoice),
+      )
+      .addStringOption((o) => o.setName('location').setDescription('If no channel: a place or a link').setMaxLength(100))
+      .addStringOption((o) => o.setName('description').setDescription('What it is').setMaxLength(1000)),
+  ),
 ].map((c) => c.toJSON());
 
 export const ADMIN_SLASH_NAMES: ReadonlySet<string> = new Set(ADMIN_SLASH_COMMANDS.map((c) => c.name));
@@ -160,6 +174,25 @@ export function slashToAdminCommand(command: string, o: SlashOptions): AdminComm
       const userId = o.id('user');
       const reason = o.string('reason') ?? undefined;
       return userId ? { kind: 'kick', userId, confirmed: false, ...(reason ? { reason } : {}) } : bad();
+    }
+    case 'event': {
+      const name = o.string('name');
+      const date = o.string('date');
+      const time = o.string('time');
+      if (o.sub !== 'new' || !name || !date || !time) return bad();
+      const channelId = o.id('channel');
+      const location = o.string('location');
+      const description = o.string('description');
+      return {
+        kind: 'event',
+        name,
+        date,
+        time,
+        minutes: o.integer('minutes') ?? 60,
+        ...(channelId ? { channelId } : {}),
+        ...(location ? { location } : {}),
+        ...(description ? { description } : {}),
+      };
     }
     default:
       return null;

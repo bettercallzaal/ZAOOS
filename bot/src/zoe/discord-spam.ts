@@ -107,14 +107,26 @@ export function allowAlert(state: AlertLimiter, userId: string, nowMs: number): 
   return true;
 }
 
-/** The DM text. Member text is cleaned so it cannot ping or carry markup. */
+/**
+ * Make every link in member text dead: the scheme becomes hxxp and every dot
+ * in the link becomes [.], so Discord neither links nor previews it in Zaal's
+ * DM (evaluator, #4031: a flagged scam URL arrived clickable).
+ */
+export function defangLinks(text: string): string {
+  return text.replace(/\b(?:https?:\/\/|www\.)\S+|\b(?:[\w-]+\.)+(?:com|gg|gift|xyz|io|ru|net|org|app|link|me|co|to|ly|sh)(?:\/\S*)?/gi, (u) =>
+    u.replace(/^http/i, 'hxxp').replace(/\./g, '[.]'),
+  );
+}
+
+/** The DM text. Member text is cleaned so it cannot ping or carry markup, and its links are dead. */
 export function spamAlertText(p: { authorName: string; channelName: string; content: string; url: string; verdict: SpamVerdict }): string {
   const t = p.content
     .replace(/[\u0000-\u001f\u007f]/g, ' ')
     .replace(/[@<>`]/g, '')
     .replace(/\s+/g, ' ')
     .trim();
-  const snippet = t.length > 200 ? `${t.slice(0, 197)}...` : t;
+  const cut = t.length > 200 ? `${t.slice(0, 197)}...` : t;
+  const snippet = defangLinks(cut);
   return [
     `Possible spam in #${p.channelName} from ${p.authorName.replace(/[@<>`]/g, '')}:`,
     `"${snippet}"`,

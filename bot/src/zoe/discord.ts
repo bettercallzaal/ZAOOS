@@ -359,7 +359,8 @@ async function watchForSpam(message: Message<true>, client: Client): Promise<voi
       ]
     : [];
   const zaal = await client.users.fetch(DISCORD_ZAAL_ID);
-  await zaal.send({ content: text, components, allowedMentions: { parse: [] } });
+  // SuppressEmbeds as well as the defanged text: no preview of anything in it.
+  await zaal.send({ content: text, components, allowedMentions: { parse: [] }, flags: MessageFlags.SuppressEmbeds });
   console.log(`[zoe/discord-spam] alerted Zaal, score ${verdict.score}: ${message.url}`);
   featureRan('discord-spam', String(verdict.score));
 }
@@ -501,6 +502,9 @@ export async function bootDiscordClient(): Promise<Client | null> {
     );
     // Slash commands only exist while admin is on (ZOE_DISCORD_ADMIN=1).
     if (discordAdminEnabled()) void registerAdminSlash(client);
+    if (spamWatchEnabled() && !CHANNEL_READ) {
+      console.warn('[zoe/discord-spam] ZOE_DISCORD_SPAM_WATCH is on but DISCORD_CHANNEL_READ is off: no message text, so only cross-posts can be seen');
+    }
   });
 
   /**

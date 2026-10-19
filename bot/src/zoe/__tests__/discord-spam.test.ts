@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   allowAlert,
+  defangLinks,
   newAlertLimiter,
   newRecentPosts,
   parseSpamButton,
@@ -107,6 +108,27 @@ describe('alert text and buttons', () => {
     expect(t).toContain('Why: a link that imitates Discord or Steam.');
   });
 
+  it('member links in the alert are dead, and the message link stays live', () => {
+    const url = 'https://discord.com/channels/1/2/3';
+    const t = spamAlertText({
+      authorName: 'x',
+      channelName: 'general',
+      content: 'claim at https://discorcl-nitro.gift/claim or www.steamgift.ru now, also dlscord.gift/x',
+      url,
+      verdict: { score: 9, reasons: ['r'] },
+    });
+    const quoted = t.split('\n')[1];
+    expect(quoted).toContain('hxxps://discorcl-nitro[.]gift/claim');
+    expect(quoted).toContain('www[.]steamgift[.]ru');
+    expect(quoted).toContain('dlscord[.]gift/x');
+    expect(quoted).not.toMatch(/https?:\/\/|www\.|\w\.(?:gift|ru|com)\b/);
+    expect(t.split('\n')[2]).toBe(url);
+  });
+
+  it('defangLinks leaves ordinary words alone', () => {
+    expect(defangLinks('see you at 8. bring snacks.')).toBe('see you at 8. bring snacks.');
+  });
+
   it('button ids round-trip and reject anything else', () => {
     const id = spamButtonId('to60', '111111', '222222');
     expect(parseSpamButton(id)).toEqual({ action: 'to60', guildId: '111111', userId: '222222' });
@@ -132,7 +154,8 @@ describe('wiring in discord.ts', () => {
   it('the watcher only DMs Zaal: no delete, timeout, kick or post in the server', () => {
     expect(watch).not.toMatch(/\.delete\(|\.timeout\(|\.kick\(|runAdminCommand|message\.reply|channel\.send/);
     expect(watch.match(/\.send\(/g)).toHaveLength(1);
-    expect(watch).toContain('zaal.send({ content: text, components, allowedMentions: { parse: [] } })');
+    expect(watch).toContain('zaal.send({ content: text, components, allowedMentions: { parse: [] }, flags: MessageFlags.SuppressEmbeds })');
+    expect(d).toContain('if (spamWatchEnabled() && !CHANNEL_READ) {');
     expect(watch).toContain('if (perms?.has(PermissionFlagsBits.Administrator) || perms?.has(PermissionFlagsBits.ManageMessages)) return;');
     expect(watch).toContain('const components = discordAdminEnabled()');
   });

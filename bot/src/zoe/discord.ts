@@ -66,6 +66,15 @@ import { featureRan } from './feature-ran';
 import { markAsked, NAME_SAVED_PUBLIC_LINE, peopleLogEnabled, recordPersonTurn } from './people';
 import { MEMBER_DM_LIMIT_LINE, newMemberDmLimiter } from './member-dm';
 import {
+  allowFeedbackCard,
+  buildFeedbackCard,
+  feedbackChannels,
+  feedbackProject,
+  newFeedbackLimiter,
+  shouldCaptureFeedback,
+} from './discord-feedback';
+import { addTeamTask } from './team-tracker';
+import {
   ADMIN_REFUSAL_LINE,
   ARCHIVE_POST_PERMS,
   type AdminEnv,
@@ -99,6 +108,39 @@ const COMMUNITY_ASKS_ENABLED = process.env.DISCORD_COMMUNITY_ASKS_ENABLED === '1
 const CHANNEL_READ = discordChannelRead();
 
 const turnLimiter = newMemberDmLimiter();
+const feedbackLimiter = newFeedbackLimiter();
+
+/**
+ * A post in a feedback channel (discord-feedback.ts) becomes a board card.
+ * Runs alongside the normal handler and never replies in the channel; a cap or
+ * a board failure is logged, not shown.
+ */
+async function captureFeedback(message: Message<true>): Promise<void> {
+  const name = 'name' in message.channel ? message.channel.name : '';
+  if (!shouldCaptureFeedback({ channelName: name, bot: message.author.bot, content: message.content }, feedbackChannels())) return;
+  if (!allowFeedbackCard(feedbackLimiter, message.author.id, Date.now())) {
+    console.log(`[zoe/discord-feedback] cap reached, not carded: ${message.url}`);
+    return;
+  }
+  const card = buildFeedbackCard(
+    {
+      guildName: message.guild.name,
+      channelName: name,
+      authorName: message.member?.displayName ?? message.author.username,
+      content: message.content,
+      url: message.url,
+      postedAt: message.createdAt,
+    },
+    feedbackProject(),
+  );
+  const res = await addTeamTask(card);
+  if (res.ok) {
+    console.log(`[zoe/discord-feedback] carded ${message.url}`);
+    featureRan('discord-feedback', name);
+  } else {
+    console.error(`[zoe/discord-feedback] board write failed for ${message.url}: ${res.error}`);
+  }
+}
 
 // Maximum message length for Discord (2000 chars).
 const DISCORD_MAX = 1990;
@@ -446,6 +488,11 @@ export async function bootDiscordClient(): Promise<Client | null> {
     );
     // Slash commands only exist while admin is on (ZOE_DISCORD_ADMIN=1).
     if (discordAdminEnabled()) void registerAdminSlash(client);
+    // Feedback capture reads message text; without the intent every post is
+    // empty and nothing would be carded, silently (same trap as #4029).
+    if (feedbackChannels().size > 0 && !CHANNEL_READ) {
+      console.warn('[zoe/discord-feedback] ZOE_DISCORD_FEEDBACK_CHANNELS is set but DISCORD_CHANNEL_READ is off: no message text, so no cards');
+    }
     // Daily digest to Zaal, 18:00 ET (ZOE_DISCORD_DIGEST=1, default off).
     if (discordDigestEnabled()) {
       cron.schedule(DIGEST_CRON, () => void runDiscordDigest(client).catch((e) => console.error('[zoe/discord-digest]', (e as Error).message)), {
@@ -467,6 +514,10 @@ export async function bootDiscordClient(): Promise<Client | null> {
   client.on('messageCreate', async (message) => {
     try {
       if (message.author.bot || message.system) return;
+
+      // Feedback channels to the board. Fire and forget: it never replies and
+      // never stops the normal handling below (first-handler-wins.md).
+      if (message.inGuild()) void captureFeedback(message).catch((e) => console.error('[zoe/discord-feedback]', (e as Error).message));
 
       const isOwnerDM = message.channel.isDMBased() && !!DISCORD_ZAAL_ID && message.author.id === DISCORD_ZAAL_ID;
 

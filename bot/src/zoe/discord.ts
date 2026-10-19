@@ -40,6 +40,8 @@ import {
   type ApplicationCommandDataResolvable,
   type ButtonComponentData,
   ComponentType,
+  GuildScheduledEventEntityType,
+  GuildScheduledEventPrivacyLevel,
   type ButtonInteraction,
   type ChatInputCommandInteraction,
   type Guild,
@@ -253,6 +255,36 @@ function discordAdminEnv(guild: Guild, here: GuildTextBasedChannel | null): Admi
     // Reached only from a confirmed kick (runAdminCommand's kick case).
     async kick(userId, reason) {
       await (await guild.members.fetch(userId)).kick(reason);
+    },
+    async voiceChannel(id) {
+      const ch = await guild.channels.fetch(id).catch(() => null);
+      return ch && (ch.type === ChannelType.GuildVoice || ch.type === ChannelType.GuildStageVoice) ? { name: ch.name } : null;
+    },
+    // Members-only (GuildOnly); Administrator covers Manage Events.
+    async createEvent(e) {
+      const base = {
+        name: e.name,
+        scheduledStartTime: e.start,
+        scheduledEndTime: e.end,
+        privacyLevel: GuildScheduledEventPrivacyLevel.GuildOnly,
+        reason: ADMIN_AUDIT_REASON,
+        ...(e.description ? { description: e.description } : {}),
+      } as const;
+      const ev = e.channelId
+        ? await guild.scheduledEvents.create({
+            ...base,
+            entityType:
+              (await guild.channels.fetch(e.channelId))?.type === ChannelType.GuildStageVoice
+                ? GuildScheduledEventEntityType.StageInstance
+                : GuildScheduledEventEntityType.Voice,
+            channel: e.channelId,
+          })
+        : await guild.scheduledEvents.create({
+            ...base,
+            entityType: GuildScheduledEventEntityType.External,
+            entityMetadata: { location: e.location ?? '' },
+          });
+      return { id: ev.id, url: ev.url };
     },
   };
 }

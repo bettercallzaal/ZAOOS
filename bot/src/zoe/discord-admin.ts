@@ -54,7 +54,64 @@ export type AdminCommand =
   | { kind: 'nick'; userId: string; nick: string }
   | { kind: 'timeout'; userId: string; minutes: number }
   | { kind: 'kick'; userId: string; reason?: string; confirmed: boolean }
+  | {
+      kind: 'event';
+      name: string;
+      date: string;
+      time: string;
+      minutes: number;
+      channelId?: string;
+      location?: string;
+      description?: string;
+    }
   | { kind: 'unknown'; text: string };
+
+/**
+ * A New York wall-clock date and time to the UTC instant, handling EDT and
+ * EST. date is YYYY-MM-DD; time is "20:00", "8pm" or "8:30 pm". null when
+ * either does not parse or the date does not exist.
+ */
+export function nyTimeToUtc(date: string, time: string): Date | null {
+  const d = date.trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  const t = time.trim().toLowerCase().match(/^(\d{1,2})(?::(\d{2}))?\s*(am|pm)?$/);
+  if (!d || !t) return null;
+  let hour = Number(t[1]);
+  const minute = Number(t[2] ?? '0');
+  if (t[3]) {
+    if (hour < 1 || hour > 12) return null;
+    hour = (hour % 12) + (t[3] === 'pm' ? 12 : 0);
+  }
+  if (hour > 23 || minute > 59) return null;
+  const [y, mo, da] = [Number(d[1]), Number(d[2]), Number(d[3])];
+  const wall = Date.UTC(y, mo - 1, da, hour, minute);
+  const check = new Date(wall);
+  if (check.getUTCFullYear() !== y || check.getUTCMonth() !== mo - 1 || check.getUTCDate() !== da) return null;
+  // The New York offset at that moment: read the wall clock New York shows for
+  // a UTC guess, and correct by the difference. Twice covers the DST edge.
+  const nyWall = (ms: number): number => {
+    const p = Object.fromEntries(
+      new Intl.DateTimeFormat('en-US', {
+        timeZone: 'America/New_York',
+        hourCycle: 'h23',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+        .formatToParts(new Date(ms))
+        .map((x) => [x.type, x.value]),
+    );
+    return Date.UTC(Number(p.year), Number(p.month) - 1, Number(p.day), Number(p.hour), Number(p.minute));
+  };
+  let guess = wall;
+  for (let i = 0; i < 2; i++) guess += wall - nyWall(guess);
+  return new Date(guess);
+}
+
+/** Events are 15 minutes to 24 hours long. */
+export const EVENT_MIN_MINUTES = 15;
+export const EVENT_MAX_MINUTES = 24 * 60;
 
 /** Discord's longest timeout: 28 days. 0 minutes lifts a timeout. */
 export const MAX_TIMEOUT_MINUTES = 28 * 24 * 60;
@@ -188,7 +245,7 @@ export const ADMIN_HELP = [
   'admin: new thread <name>',
   'admin: pin <message link>  (or reply to a message with "admin: pin")',
   'admin: unpin <message link>',
-  'Members and roles: the /role, /nick, /timeout and /kick slash commands.',
+  'Members and roles: the /role, /nick, /timeout and /kick slash commands. Events: /event new.',
 ].join('\n');
 
 /** What runAdminCommand needs from the guild. discord.ts builds it from discord.js. */
@@ -207,6 +264,8 @@ export interface AdminEnv {
   createThread(name: string): Promise<{ id: string; name: string }>;
   /** channelId undefined means the channel the command was sent in. */
   setPinned(channelId: string | undefined, messageId: string, pin: boolean): Promise<void>;
+  /** Clock, for tests. */
+  now?: () => number;
   /** Zaal's id and ZOE's own: member commands never touch either. */
   ownerId?: string;
   selfId?: string;
@@ -223,6 +282,17 @@ export interface AdminEnv {
   /** null lifts the timeout. */
   timeout(userId: string, ms: number | null): Promise<void>;
   kick(userId: string, reason: string): Promise<void>;
+  /** A voice or stage channel of this server, or null. */
+  voiceChannel(id: string): Promise<{ name: string } | null>;
+  /** A scheduled event, members-only. channelId for a voice or stage event, else location. */
+  createEvent(e: {
+    name: string;
+    start: Date;
+    end: Date;
+    channelId?: string;
+    location?: string;
+    description?: string;
+  }): Promise<{ id: string; url: string }>;
 }
 
 export interface AdminResult {
@@ -371,6 +441,45 @@ export async function runAdminCommand(cmd: AdminCommand, env: AdminEnv): Promise
         };
       } catch (err) {
         return fail(cmd.userId, err);
+      }
+    case 'event':
+      try {
+        const start = nyTimeToUtc(cmd.date, cmd.time);
+        if (!start) return { reply: 'Date is YYYY-MM-DD and time is like 20:00 or 8pm, New York time.', ok: false, action: cmd.kind };
+        if (start.getTime() <= (env.now?.() ?? Date.now())) return { reply: 'That time has already passed.', ok: false, action: cmd.kind };
+        if (!Number.isInteger(cmd.minutes) || cmd.minutes < EVENT_MIN_MINUTES || cmd.minutes > EVENT_MAX_MINUTES) {
+          return { reply: `Length is ${EVENT_MIN_MINUTES} to ${EVENT_MAX_MINUTES} minutes.`, ok: false, action: cmd.kind };
+        }
+        const name = cleanLabel(cmd.name);
+        const location = cleanLabel(cmd.location ?? '');
+        const description = (cmd.description ?? '').replace(/[\u0000-\u0009\u000b-\u001f\u007f]/g, ' ').trim().slice(0, 1000);
+        if (!name) return { reply: 'The event needs a name.', ok: false, action: cmd.kind };
+        if (cmd.channelId) {
+          if (!(await env.voiceChannel(cmd.channelId))) {
+            return { reply: 'Pick a voice or stage channel in this server, or leave the channel empty and give a location.', ok: false, action: cmd.kind };
+          }
+        } else if (!location) {
+          return { reply: 'Give a voice channel or a location (a place or a link).', ok: false, action: cmd.kind };
+        }
+        const ev = await env.createEvent({
+          name,
+          start,
+          end: new Date(start.getTime() + cmd.minutes * 60_000),
+          ...(cmd.channelId ? { channelId: cmd.channelId } : { location }),
+          ...(description ? { description } : {}),
+        });
+        const when = start.toLocaleString('en-US', {
+          timeZone: 'America/New_York',
+          weekday: 'short',
+          month: 'short',
+          day: 'numeric',
+          hour: 'numeric',
+          minute: '2-digit',
+          timeZoneName: 'short',
+        });
+        return { reply: `Created the event "${name}" for ${when}, ${cmd.minutes} minutes. ${ev.url}`, ok: true, action: cmd.kind, target: ev.id };
+      } catch (err) {
+        return fail(cmd.name, err);
       }
     case 'kick':
       try {

@@ -77,6 +77,16 @@ import {
   parseAdminCommand,
   runAdminCommand,
 } from './discord-admin';
+import cron from 'node-cron';
+import {
+  buildDiscordDigest,
+  claimDigestDay,
+  DIGEST_CRON,
+  DIGEST_FETCH_LIMIT,
+  DIGEST_WINDOW_MS,
+  type DigestChannel,
+  discordDigestEnabled,
+} from './discord-digest';
 import { ADMIN_SLASH_COMMANDS, ADMIN_SLASH_NAMES, KICK_CONFIRM_PREFIX, slashToAdminCommand } from './discord-slash';
 import { config as loadEnv } from 'dotenv';
 
@@ -296,6 +306,60 @@ async function handleKickButton(i: ButtonInteraction): Promise<void> {
   await i.update({ content: result.reply, components: [], allowedMentions: { parse: [] } });
 }
 
+/**
+ * The daily digest (discord-digest.ts): read the last 24 hours of every text
+ * channel ZOE can read, and DM Zaal the summary. Read-only on the server; the
+ * one send is a DM to DISCORD_ZAAL_ID. A channel that fails to read is skipped.
+ */
+async function runDiscordDigest(client: Client): Promise<void> {
+  if (!DISCORD_ZAAL_ID) return;
+  const cutoff = Date.now() - DIGEST_WINDOW_MS;
+  for (const guild of client.guilds.cache.values()) {
+    if (!(await claimDigestDay(guild.id))) continue;
+    const me = guild.members.me;
+    const channels: DigestChannel[] = [];
+    for (const ch of guild.channels.cache.values()) {
+      if (ch.type !== ChannelType.GuildText) continue;
+      const perms = me ? ch.permissionsFor(me) : null;
+      if (!perms?.has([PermissionFlagsBits.ViewChannel, PermissionFlagsBits.ReadMessageHistory])) continue;
+      try {
+        const got = await ch.messages.fetch({ limit: DIGEST_FETCH_LIMIT });
+        const inWindow = [...got.values()].filter((m) => m.createdTimestamp >= cutoff && !m.system);
+        channels.push({
+          id: ch.id,
+          name: ch.name,
+          capped: got.size >= DIGEST_FETCH_LIMIT && inWindow.length === got.size,
+          messages: inWindow.reverse().map((m) => ({
+            id: m.id,
+            authorId: m.author.id,
+            authorName: m.member?.displayName ?? m.author.username,
+            bot: m.author.bot,
+            content: m.content,
+            createdAt: m.createdTimestamp,
+            replyToId: m.reference?.messageId,
+            mentionsOwner: m.mentions.users.has(DISCORD_ZAAL_ID),
+          })),
+        });
+      } catch (err) {
+        console.error(`[zoe/discord-digest] could not read #${ch.name}: ${(err as Error).message}`);
+      }
+    }
+    const text = buildDiscordDigest(guild.name, guild.id, channels, DISCORD_ZAAL_ID);
+    if (!text) {
+      console.log(`[zoe/discord-digest] guild ${guild.id}: no messages in 24h, nothing sent`);
+      continue;
+    }
+    try {
+      const zaal = await client.users.fetch(DISCORD_ZAAL_ID);
+      for (const chunk of chunkMessage(text)) await zaal.send({ content: chunk, allowedMentions: { parse: [] } });
+      console.log(`[zoe/discord-digest] guild ${guild.id}: sent, ${channels.length} channels read`);
+      featureRan('discord-digest', guild.id);
+    } catch (err) {
+      console.error(`[zoe/discord-digest] could not DM Zaal: ${(err as Error).message}`);
+    }
+  }
+}
+
 /** Register the admin slash commands in every server ZOE is in. Guild commands appear at once. */
 async function registerAdminSlash(client: Client): Promise<void> {
   for (const guild of client.guilds.cache.values()) {
@@ -380,6 +444,12 @@ export async function bootDiscordClient(): Promise<Client | null> {
     );
     // Slash commands only exist while admin is on (ZOE_DISCORD_ADMIN=1).
     if (discordAdminEnabled()) void registerAdminSlash(client);
+    // Daily digest to Zaal, 18:00 ET (ZOE_DISCORD_DIGEST=1, default off).
+    if (discordDigestEnabled()) {
+      cron.schedule(DIGEST_CRON, () => void runDiscordDigest(client).catch((e) => console.error('[zoe/discord-digest]', (e as Error).message)), {
+        timezone: 'America/New_York',
+      });
+    }
   });
 
   /**

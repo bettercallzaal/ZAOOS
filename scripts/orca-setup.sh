@@ -9,6 +9,18 @@
 #
 # Run it from the new workspace's root (Orca runs setup there).
 #
+# Install is OPT-IN (ZAOOS #4057). With no argument it installs nothing and
+# prints ORCA-SETUP SKIPPED, because most lanes are docs or research lanes and
+# a full install is about 2.9 GiB each (17 idle lanes held about 36 GiB on
+# 2026-10-20). A lane that needs node_modules runs
+#   bash scripts/orca-setup.sh --install
+# (or sets ORCA_SETUP_INSTALL=1), which does the seed clone below.
+#
+# Free-space floor: the full-copy fallback (no seed matched, or the clone
+# failed) refuses with exit 3 when the disk has less than
+# ORCA_SETUP_MIN_FREE_GIB free (default 8). A free figure that cannot be read
+# is UNKNOWN and refused the same way. ORCA_SETUP_MIN_FREE_GIB=0 turns it off.
+#
 # Seed choice: the newest LIVE workspace whose package-lock.json is
 # byte-identical to this one's. Live = it has node_modules/.package-lock.json,
 # which npm writes at the end of a completed install. Newest = that file's
@@ -32,9 +44,13 @@
 #   ORCA-SETUP SEED:<dir>            - seed chosen
 #   ORCA-SETUP CLONED:<seconds>s     - clone finished
 #   ORCA-SETUP SKIP-CLONE:<reason>   - node_modules already present
+#   ORCA-SETUP SKIPPED:...           - no --install given; exits 0, installs
+#                                      nothing
 #   ORCA-SETUP REFUSED:...           - this workspace's node_modules is a
-#                                      symlink; exits 2 without installing
-# Exit status is npm install's, except for REFUSED.
+#                                      symlink (exit 2), or the full-copy
+#                                      fallback is below the free-space floor
+#                                      (exit 3); nothing installed
+# Exit status is npm install's, except for SKIPPED and REFUSED.
 
 set -u
 
@@ -44,6 +60,33 @@ skip() { echo "ORCA-SETUP SKIP-SEED: $*" >&2; }
 
 ws="$(pwd -P)"
 
+install=0
+[ "${1:-}" = --install ] && install=1
+[ "${ORCA_SETUP_INSTALL:-}" = 1 ] && install=1
+if [ "$install" -ne 1 ]; then
+  say "SKIPPED: no npm install (install is opt-in, ZAOOS #4057). If this lane needs node_modules, run: bash scripts/orca-setup.sh --install"
+  exit 0
+fi
+
+# full_install <reason>: the plain npm install fallback, about 2.9 GiB, so it
+# is the only path held to the free-space floor.
+full_install() {
+  local floor="${ORCA_SETUP_MIN_FREE_GIB:-8}" kib free
+  if [ "$floor" != 0 ]; then
+    kib="$(df -k "$ws" 2>/dev/null | awk 'NR==2{print $4}')"
+    case "$kib" in
+      ''|*[!0-9]*) free=UNKNOWN ;;
+      *) free=$((kib / 1048576)) ;;
+    esac
+    if [ "$free" = UNKNOWN ] || [ "$free" -lt "$floor" ]; then
+      echo "ORCA-SETUP REFUSED: full npm install needs about 2.9 GiB and $ws has ${free} GiB free (floor ${floor} GiB). Free disk first, or set ORCA_SETUP_MIN_FREE_GIB=0 to override." >&2
+      exit 3
+    fi
+  fi
+  loud "$1"
+  exec npm install
+}
+
 # A symlinked node_modules in the new workspace (live or dangling) would make
 # npm install write outside it. Refuse rather than install through it.
 if [ -L "$ws/node_modules" ]; then
@@ -52,8 +95,7 @@ if [ -L "$ws/node_modules" ]; then
 fi
 
 if [ ! -f "$ws/package-lock.json" ]; then
-  loud "no package-lock.json in $ws, so no seed can match. Running plain npm install."
-  exec npm install
+  full_install "no package-lock.json in $ws, so no seed can match. Running plain npm install."
 fi
 
 mtime() { stat -f %m "$1" 2>/dev/null || stat -c %Y "$1" 2>/dev/null || echo 0; }
@@ -104,17 +146,18 @@ pick_seed() {
   printf '%s' "$best"
 }
 
+fallback=""
 if [ -e "$ws/node_modules" ]; then
   say "SKIP-CLONE:node_modules already exists, left as it is"
 else
   seed="$(pick_seed)"
   if [ -z "$seed" ]; then
-    loud "no live workspace has a package-lock.json matching this one. Running plain npm install (full copy, about 2.9 GiB)."
+    fallback="no live workspace has a package-lock.json matching this one. Running plain npm install (full copy, about 2.9 GiB)."
   else
     say "SEED:$seed"
     tmp="$ws/.orca-setup-tmp"
     if [ -e "$tmp" ]; then
-      loud "$tmp already exists, probably from an earlier failed clone. Not touching it. Running plain npm install; delete $tmp by hand to let the next setup clone again."
+      fallback="$tmp already exists, probably from an earlier failed clone. Not touching it. Running plain npm install; delete $tmp by hand to let the next setup clone again."
     else
       mkdir "$tmp"
       start=$SECONDS
@@ -122,10 +165,11 @@ else
         rmdir "$tmp"
         say "CLONED:$((SECONDS - start))s"
       else
-        loud "cp -c clone from $seed failed. The partial copy is at $tmp/node_modules for a human to delete. Running plain npm install."
+        fallback="cp -c clone from $seed failed. The partial copy is at $tmp/node_modules for a human to delete. Running plain npm install."
       fi
     fi
   fi
 fi
 
+[ -n "$fallback" ] && full_install "$fallback"
 exec npm install

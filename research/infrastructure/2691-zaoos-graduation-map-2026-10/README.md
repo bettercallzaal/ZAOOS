@@ -15,6 +15,29 @@ tier: STANDARD
 
 All measurements below were taken 2026-10-20 between 10:30 and 11:01 EDT against `origin/main` at `b0b1f18a0`, unless a row says otherwise.
 
+## Revision 3 (2026-10-20, evening): Zaal's rulings and where wave 1 stands
+
+Source for the rulings: Zaal's decision round of 2026-10-20 (12:55 EDT), relayed to this lane by the seat. Status measured 2026-10-20 with `gh` and git.
+
+| # | Question | Ruling | Status |
+|---|---|---|---|
+| 1 | Publish the 21 ZAOresearch-only docs here | **Hold all.** Zaal: "lets hold off for now". Comes back 2026-11-03. | Nothing published. The 17 prepared copies are kept off any branch on GitHub. |
+| 2 | Finish the move to `zao-app` | **A, finish it.** Zaal sets the env vars on the zao-app project himself, then a preview, then he flips zaoos.com; the v1 removal follows. | Waiting on Zaal's env vars. Open before the flip: redirects for the 5 ZAOOS-only pages and the #4037 port (inventory section 1, below). |
+| 5 (Revision 1 numbering, "delete list") | Unused code | **Superseded** by Zaal: "lets move all this to another repo thats zaoostest and lets make zaoos the most simple it can be". Items 3, 4 and 6 fold into the simple-ZAOOS plan (Revision 2). | See below. |
+| repo | Name and visibility | **A, private `bettercallzaal/zaoostest`.** | Created 2026-10-20T16:56:08Z, PRIVATE. |
+| 3, 4, 6 | ZAO-STOCK, bot, streaming | Not ruled by Zaal one by one. Revision 2's calls stand as this lane's recommendation: ZAO-STOCK to `ZAODEVZ/ZAOstock`, the bot stays and later graduates to its own repo, streaming goes to zaoostest after the flip. | Open for Zaal to override. |
+
+### Wave 1: done, and what changed from the Revision 2 method
+
+- **Extracted.** `git filter-repo` over the 19 paths plus `capacitor.config.ts`, taken from ZAOOS `40562ad6617a8b551bb631412e09c519a365a1c4`. No wave-1 path changed between that commit and ZAOOS `7e7c95655`, the `origin/main` at extraction time. The result is 196 files and 37 commits, with authors and dates kept. One more commit adds a README and ZAOOS's MIT `LICENSE`, for 198 files.
+- **Scanned.** The secret scan over the whole filtered history found 0 keys or tokens. All 162 hits for the 64-hex pattern are on-chain transaction hashes in `data/ordaoawards.csv`, a file that is already public in ZAOOS. Control: `capacitor` matched 53 lines.
+- **Pushed, to a branch rather than `main`.** The estate's push guard refuses any agent push that targets `main`. Wave 1 therefore went to branch `ws/zaoostest-wave1-1020` at `44e2fee359ea3ac59ea6c6705760928ba9509778`. The repo was empty, so GitHub made that branch its default. zaoostest has no `main` yet. Creating one, or renaming the branch, is Zaal's call.
+- **Removal is Zaal's keystroke, not an agent's.** The no-recursive-delete guard (`no-rm-rf.md`) refused `git rm -r` in an agent worktree. The seat ruled that Zaal runs the removal himself, with no exception to the guard. A one-paste Terminal block is written and held until this revision is graded. Before it deletes anything, it checks each of the 20 paths: the path must exist in zaoostest at the commit above with the same file count as in ZAOOS. It also refuses to commit unless the result is exactly 196 deletions and nothing else. Its read-only precheck was dry-run against ZAOOS `origin/main` on 2026-10-20 and passed: 20 paths, 196 files. A path that is not in zaoostest (`research`) read 0, as it should. After Zaal pushes, the agent adds the two prose edits and opens the PR. Zaal merges it.
+- **Corrections to Revision 2:**
+  - `bot/REGISTRY.md` needs no edit. Its hit was `.claude/skills/fishbowlz`, which matched the pattern `skills/fishbowlz` as a substring.
+  - The `@capacitor/*` dependencies and the four `cap:*` scripts are **not** in the removal PR. Removing them changes `package-lock.json`, which needs an `npm install`, and this lane does not run installs. They are a follow-up for a lane that does. Leaving them changes nothing at runtime: `src/` imports `@capacitor` in 0 files.
+  - The exclude lines in tsconfig, eslint and vitest, the `.gitignore` lines and `.serena/project.yml` stay for now. Each names a path that will no longer exist, which is harmless. They go in the same follow-up.
+
 ## Revision 2 (2026-10-20 afternoon): the simple ZAOOS plan
 
 Zaal, 2026-10-20, relayed by the seat: "lets move all this to another repo thats zaoostest and lets make zaoos the most simple it can be". He then confirmed the repo: `bettercallzaal/zaoostest`, **private**. It was created 2026-10-20T16:56:08Z and was still empty when this was written (`gh repo view bettercallzaal/zaoostest`). This revision replaces the morning plan wherever the two disagree. The morning tables below stay as the record.

@@ -238,9 +238,11 @@ describe('Enable auto-merge (squash)', () => {
     expect(armed(r)).toBe(false);
   });
 
-  it('is also gated in its if: on the hold step saying exactly false', () => {
+  it('is also gated in its if: on the hold step saying exactly false and the nightly gate exactly true', () => {
     const cond = stepIf(AUTOMERGE, 'Enable auto-merge (squash)');
-    expect(cond).toMatch(/^if: \| steps\.hold\.outputs\.held == 'false' && \(/);
+    expect(cond).toMatch(
+      /^if: \| steps\.hold\.outputs\.held == 'false' && steps\.nightly\.outputs\.ok == 'true' && \(/,
+    );
     expect(cond.endsWith(')')).toBe(true);
   });
 });

@@ -3,9 +3,11 @@ import { describe, expect, it } from 'vitest';
 import {
   aggregateBuyers,
   blockChunks,
+  estimateStartBlock,
   type PurchaseLog,
   rawToUsdc,
   usdcToRaw,
+  WAVEZ_DEPLOY_BLOCK,
 } from '../lib/wavez-buyers';
 
 const A = '0x00000000000000000000000000000000000000aA' as const;
@@ -96,5 +98,28 @@ describe('blockChunks', () => {
   it('returns one chunk for a single block and refuses a zero size', () => {
     expect(blockChunks(5n, 5n, 100n)).toEqual([[5n, 5n]]);
     expect(() => blockChunks(0n, 1n, 0n)).toThrow();
+  });
+});
+
+describe('estimateStartBlock', () => {
+  const now = Date.parse('2026-10-20T16:00:00Z');
+  const latest = 60_000_000n;
+
+  it('starts a margin before a song created an hour ago', () => {
+    // 3600 s * 1.2 + 3600 s = 7920 s, / 2 s per block = 3960 blocks back.
+    expect(estimateStartBlock(latest, '2026-10-20T15:00:00Z', now)).toBe(latest - 3_960n);
+  });
+
+  it('falls back to the deploy block without a usable date', () => {
+    expect(estimateStartBlock(latest, undefined, now)).toBe(WAVEZ_DEPLOY_BLOCK);
+    expect(estimateStartBlock(latest, 'not a date', now)).toBe(WAVEZ_DEPLOY_BLOCK);
+  });
+
+  it('falls back to the deploy block for a date in the future', () => {
+    expect(estimateStartBlock(latest, '2027-01-01T00:00:00Z', now)).toBe(WAVEZ_DEPLOY_BLOCK);
+  });
+
+  it('never starts before the deploy block', () => {
+    expect(estimateStartBlock(latest, '2020-01-01T00:00:00Z', now)).toBe(WAVEZ_DEPLOY_BLOCK);
   });
 });

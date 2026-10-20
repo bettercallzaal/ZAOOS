@@ -89,3 +89,26 @@ export function blockChunks(from: bigint, to: bigint, size: bigint): [bigint, bi
   }
   return chunks;
 }
+
+/** Base produces a block every 2 seconds. */
+export const BASE_BLOCK_SECONDS = 2;
+
+/**
+ * The block to start scanning from for a song created at `createdAt` (ISO time),
+ * with a 20 percent margin plus one hour, never before the contract's deploy block.
+ * The margin stays small because free RPCs only serve recent blocks (about 10,000
+ * on publicnode as of 2026-10-20), so a scan of a new song must fit that window.
+ * Without a usable date it returns the deploy block, which is always safe.
+ */
+export function estimateStartBlock(
+  latest: bigint,
+  createdAt: string | undefined,
+  nowMs: number,
+): bigint {
+  const created = createdAt ? Date.parse(createdAt) : Number.NaN;
+  if (Number.isNaN(created) || created > nowMs) return WAVEZ_DEPLOY_BLOCK;
+  const ageSeconds = (nowMs - created) / 1000;
+  const back = BigInt(Math.ceil((ageSeconds * 1.2 + 3_600) / BASE_BLOCK_SECONDS));
+  const start = latest - back;
+  return start < WAVEZ_DEPLOY_BLOCK ? WAVEZ_DEPLOY_BLOCK : start;
+}

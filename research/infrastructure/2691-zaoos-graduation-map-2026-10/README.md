@@ -35,12 +35,12 @@ The "Monorepo as Lab" rule says a graduate's code is **deleted** from ZAOOS so t
 
 | Graduate | New home | Copy still in ZAOOS? | Drift measured |
 |---|---|---|---|
-| Research library | `ZAODEVZ/ZAOresearch` (private, README: "Graduated out of the `bettercallzaal/ZAOOS` monorepo on 2026-08-10") | Yes, and it is the live one | ZAOOS has **2,413** numbered doc folders, ZAOresearch **1,945**. **489** exist only in ZAOOS, **21** only in ZAOresearch (e.g. `business/1908-clipping-as-a-service`, `business/1911-grant-short-list-oct-2026`). Both received new docs on 2026-10-19. |
+| Research library | `ZAODEVZ/ZAOresearch` (private, README: "Graduated out of the `bettercallzaal/ZAOOS` monorepo on 2026-08-10") | Yes, and it is the live one | ZAOOS has **2,413** numbered doc folders, ZAOresearch **2,049**. **385** exist only in ZAOOS, **21** only in ZAOresearch (e.g. `business/1908-clipping-as-a-service`, `business/1911-grant-short-list-oct-2026`). Both received new docs on 2026-10-19. Method: folders matching `research/<topic>/<digit>*` in both trees (ZAOresearch via `gh api` recursive tree at `883cd32e`, not truncated), compared with `comm`. |
 | Farcaster client | `bettercallzaal/zao-app` (public, created 2026-10-16) | Yes, and it is the live one: zaoos.com serves ZAOOS-only pages | ZAOOS #4037 (2026-10-19, `useVisibleInterval`) is not in zao-app: its `src/hooks/` has no such file. |
 | ZAO XMTP | `bettercallzaal/zao-xmtp` | No (#4011) | None. **This is the pattern to copy.** |
 | ZAOstock app | `ZAODEVZ/ZAOstock` | No (#544) | None for the app. The bot is a separate story (below). |
 
-The same failure was found and ruled on once already: `bettercallzaal/zaostock-bot` forked from `ZAOOS/bot/src/`, and on 2026-09-23 Zaal ruled "it is a fork, not a spinout", to be reconciled back (vault `decisions/grill-2026-09-23-seat-evening.md` item 2; doc 2541).
+The same failure was found and ruled on once already: `bettercallzaal/zaostock-bot` forked from `ZAOOS/bot/src/`, and on 2026-09-23 Zaal ruled "it is a fork, not a spinout", to be reconciled back (a ruling by Zaal on 2026-09-23; doc 2541).
 
 **So the rule for every graduation below: the PR that makes the new repo live is followed by the PR that deletes the ZAOOS copy, and the graduation is not done until the second one merges.**
 
@@ -130,7 +130,7 @@ components spaces 58 files / 9,242 lines; `api/spaces` 24, `api/100ms` 12, `api/
 
 ### 11. Cards builder
 
-Spec doc 2690 (PR #4044), plan PR #4046, Phase A PR #4047, owned by the cards lane. v1 has no sign-in, no database, no middleware and no API route ("v1 saves nothing on the server, so it needs no session", plan #4046). This doc first suggested building it under `apps/zao-cards/`, as zao-xmtp was. The cards lane declined on 2026-10-20 and gave three reasons, which this doc accepts. (1) An `apps/` app brings its own `package.json`, lockfile and `node_modules` (`apps/zao-xmtp` in #4000 had both), and the Mac had 1.8 GiB free that day. (2) An `apps/` app has no URL until Zaal hosts it, while `/cards/create` ships on the existing zaoos.com deploy. (3) The coupling is small and enumerable. The code sits in three folders: `src/lib/cards` (pure logic), `src/components/cards` and `src/app/cards/create`. Its only outside imports are `@/hooks/useMiniApp` and the Inter font through the root layout's `--font-inter` variable (as reported by the cards lane; not re-read here). **Verdict: graduate later.** The cost is copying three folders and one hook, then adding `next/font` in the new layout. **Watch item:** once zao-app takes over zaoos.com (Decision 2), `/cards/create` would be served by whichever app holds that domain. Card placement is one of the questions step 4 has to answer.
+Spec doc 2690 (PR #4044), plan PR #4046, Phase A PR #4047, owned by the cards lane. v1 has no sign-in, no database, no auth gate and no API route (it still passes `src/middleware.ts` for security headers and the rate limit) ("v1 saves nothing on the server, so it needs no session", plan #4046). This doc first suggested building it under `apps/zao-cards/`, as zao-xmtp was. The cards lane declined on 2026-10-20 and gave three reasons, which this doc accepts. (1) An `apps/` app brings its own `package.json`, lockfile and `node_modules` (`apps/zao-xmtp` in #4000 had both), and the Mac had 1.8 GiB free that day. (2) An `apps/` app has no URL until Zaal hosts it, while `/cards/create` ships on the existing zaoos.com deploy. (3) The coupling is small and enumerable. The code sits in three folders: `src/lib/cards` (pure logic), `src/components/cards` and `src/app/cards/create`. Its only outside imports are `@/hooks/useMiniApp` and the Inter font through the root layout's `--font-inter` variable (as reported by the cards lane; not re-read here). **Verdict: graduate later.** The cost is copying three folders and one hook, then adding `next/font` in the new layout. **Watch item:** once zao-app takes over zaoos.com (Decision 2), `/cards/create` would be served by whichever app holds that domain. Card placement is one of the questions step 4 has to answer.
 
 ### 12. Research library
 
@@ -140,7 +140,7 @@ Spec doc 2690 (PR #4044), plan PR #4046, Phase A PR #4047, owned by the cards la
 
 | Path | Files | 60-day commits | Evidence |
 |---|---|---|---|
-| `packages/agents`, `config`, `db`, `publish` (`@zaoos/*`) | 15 / 4 / 4 / 15 | 0 | `git grep "@zaoos/<name>"` outside `packages/` and `package-lock.json`: 0 hits each. Control: the same grep for `heart-fleet` finds 26. |
+| `packages/agents`, `config`, `db`, `publish` (`@zaoos/*`) | 15 / 4 / 4 / 15 | 0 | `git grep "@zaoos/<name>" -- . ':!packages' ':!package-lock.json' ':!research'`: 0 hits each (without `:!research` the grep also finds research docs 405 and 414, which are not code). Control: the same grep for `heart-fleet` finds 26. |
 | `android/` | 53 | 0 | Capacitor shell; `capacitor.config.ts` is still at the root. Whether a store build exists was not checked. |
 | `ios/` | 19 | 0 | Same as android |
 | `apps/zabal-snap` | 14 | 0 | Doc 836 lists a live `zabalsnap1` Vercel project; whether it builds from here was not checked |
@@ -210,4 +210,4 @@ Cards (Decision 3) runs in parallel with all of it and is unaffected.
 - [FULL] `curl -sI` and status codes against https://zaoos.com, 2026-10-20 11:01 EDT, with a 404 control
 - [PARTIAL] `gh search code` in `ZAODEVZ/ZAOfractal` and `bettercallzaal/zao-fractal-bot`: empty, instrument not proven, treated as UNVERIFIED
 - [FULL] ZAOOS PRs #544, #1056 (closed unmerged: doc 836 was never renumbered, the 836 collision remains), #4000, #4011, #4044, #4046
-- [FULL] Vault `decisions/grill-2026-09-23-seat-evening.md` item 2; `decisions/grill-2026-09-15-morning.md`; `inbox/clips/clip-20261016-125116-zao-app-build-update-2026-10-16-v2.md`
+- [FULL] Zaal's 2026-09-23 ruling on the zaostock-bot fork and the 2026-10-16 zao-app build update, both read from his private notes

@@ -10,6 +10,8 @@ tier: STANDARD
 
 # 573 — Where AVAX Ecosystem Helps $ZABAL: The Arena, Music Royalties, Retro9000
 
+> **STALE (2026-10-20):** Retro9000 ended per the Avalanche Foundation ([@AvalancheFDN, 2026-08-20](https://x.com/AvalancheFDN/status/2090477228874444916): "Retro9000 applications are now closed and the program has concluded"), as of 2026-10-20, see [zao-avax #1](https://github.com/bettercallzaal/zao-avax/pull/1). The Retro9000 recommendations below are no longer actionable; the rest of this doc is unchanged.
+
 > **Goal:** Find Avalanche-native surfaces that benefit $ZABAL and the ZAO music economy WITHOUT launching a chain. Companion to Doc 572 (which said "don't launch a chain in 2026").
 
 ## Key Decisions (read first)

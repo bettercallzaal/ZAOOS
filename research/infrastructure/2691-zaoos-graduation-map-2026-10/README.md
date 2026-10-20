@@ -43,7 +43,7 @@ Doc 1025 (2026-07-10, docs-only ZAOOS) pointed this way and was never run. This 
 | `docs/daily`, `docs/weekly`, `docs/daily-briefs` | Written every night by ZOE (`scripts/zoe/nightly-dates.mjs`, `nightly-redact.mjs`); 52 commits in 60 days. | Until ZOE's writer is pointed elsewhere |
 | `scripts/` | 336 files and 41 commits in 60 days. Parts are wired into CI, ZOE and research tooling. Not triaged file by file in this pass. | Wave 2 triage |
 | `tools/estate-control-plane`, `tools/icp-primer` | `ci.yml` line 117 and `estate-health.yml` run them. | Until those workflows move |
-| `agents/` (DOCTRINE and personas) | `scripts/autopilot/doors.json` and `scripts/agents/zoe-drift.py` read `agents/DOCTRINE.md`. | Wave 2, together with a doors.json edit |
+| `agents/` (DOCTRINE and personas) | `scripts/autopilot/doors.json` names `agents/DOCTRINE.md` (lines 5 and 173); `scripts/agents/zoe-drift.py` refers to `agents/*/PERSONA.md` (lines 104, 114). | Wave 2, together with edits to both files |
 | `src/`, `public/`, `tenants/`, `tests/smoke`, the Next.js root config | zaoos.com is served from here today (morning section, finding 2). `tenants/` is read by `src/lib/dreamnet/tenant`; `tests/smoke` by `playwright.config.ts`. | Removed by the ZAOOS PR that follows the zaoos.com flip to `zao-app` (item 2, Zaal ruled A). Not moved to zaoostest, except the streaming cluster (item 6). |
 
 ### 2. What moves to `zaoostest`: wave 1, the unused set
@@ -54,7 +54,7 @@ Wave 1 is every path whose importer check found nothing outside the path itself,
 
 **Positive control, checked first.** The pattern `packages/heart-fleet` must find a known importer, and it found 19 files. The first control used `@zaoos/heart-fleet`, found 0, and was thrown out: `packages/heart-fleet` has no `package.json`, so that name does not exist. The first run's zeros were not trusted until the control fired.
 
-Every "0" in the table is a result from the fixed run. The script is in this PR's description.
+Every count names its patterns. For `tmp/`, `data/` and `security/`, a folder-name check was added after review, anchored so that `/tmp/` and `foo-data/` do not match. Each hit it found is listed as real or not, with the line. The script is in this PR's description.
 
 | Path | Files | Commits, 60 days | Importer check (patterns, result) | Edits in the ZAOOS removal PR |
 |---|---|---|---|---|
@@ -71,9 +71,9 @@ Every "0" in the table is a result from the fixed run. The script is in this PR'
 | `evals/` | 6 | 0 | `evals/`: 18. 17 are gstack's own `evals/` and `.claude/skills/meeting/evals`; 1 is a table row in `.claude/memory.md`. | memory.md row |
 | `.superpowers/` | 14 | 0 | 3: `.gitignore`, an eslint ignore, an archived skill | `.gitignore`, eslint |
 | `autoresearch-test-coverage/`, `build-log/` | 1, 4 | 0 | 1 each, `.gitignore` | `.gitignore` |
-| `tmp/` | 4 | 0 | **0** | `.gitignore` |
-| `data/` | 3 | 0 | **0** | `.gitignore` |
-| `security/` (one 2026-03-19 audit) | 8 | 0 | **0**. The `biome.json` hit is the word "security" in a rule name. | none |
+| `tmp/` | 4 | 0 | File patterns (`tmp/march-zols`, `tmp/socials-day`, `tmp/zaostock-failoften`): **0**. Folder pattern `(^|[^A-Za-z0-9_./-])(\./)?tmp/` (relative paths, not `/tmp/`): 5. Real: the newsletter skill writes `tmp/newsletter-day-[N].html` (`.claude/skills/newsletter/skill.md:122,190`), and `.gitignore:113` ignores `tmp/`. Not real: `bot/src/zoe/__tests__/transcribe.test.ts:213` (a Telegram file path in a mock), and `scripts/orca-setup.sh:121,125` (a `$tmp` shell variable). | **Keep** the `.gitignore` `tmp/` line so the newsletter output stays untracked. Only the 4 tracked files move. |
+| `data/` | 3 | 0 | File patterns (`data/missing-fids`, `data/ordaoawards`): **0**. Folder mentions: `scripts/import-fractal-history.ts:8,44` defaults to `./data/`, `package.json:25` runs it as `import:fractals`, and `README.md:412` documents `--dir ./data`. The script reads Airtable CSV exports passed in that folder, not the 3 tracked files. Other folder-pattern hits are `data/actions.json` in a different repo (cowork-zaodevz, meeting skill) and prose. | Moving the 3 tracked files does not change what the script reads, because whoever runs it supplies the CSVs. Edit `README.md:412` to say the user creates `./data` with the CSV exports. `.gitignore` has no `data` rule (line 86's "data" is prose in a comment). |
+| `security/` (one 2026-03-19 audit) | 8 | 0 | File pattern (`security/260319`): **0**. Folder mentions: the vendored `/autoresearch:security` skill writes each audit to `security/<stamp>-<slug>/` and reads the newest one as its incremental baseline (`.claude/skills/autoresearch/references/security-workflow.md:524,532`). `.claude/skills/zao-research/SKILL.md:71` names `security/` as a **research** topic folder (`research/security/`), which is not this path. The `biome.json` hit is the word "security" in a rule name. | After the move, the next `/autoresearch:security` run in ZAOOS finds no baseline and does a full audit instead of an incremental one, then recreates `security/`. Accepted, and recorded in the removal PR body. |
 | `skills/fishbowlz` | 1 | 0 | 1, a prose line in `bot/REGISTRY.md` | REGISTRY line |
 | `infra/n8n` | 5 | 0 | **0** | none |
 

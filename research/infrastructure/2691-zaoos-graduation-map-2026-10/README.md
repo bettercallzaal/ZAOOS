@@ -5,17 +5,116 @@ status: research-complete
 last-validated: 2026-10-20
 superseded-by:
 related-docs: 836, 1025, 1027, 1124, 2263, 2541, 2684, 2690, 692
-original-query: "this lane should be focused on what is in zaoos and splitting it up into different repos" (Zaal, 2026-10-20)
+original-query: "this lane should be focused on what is in zaoos and splitting it up into different repos" (Zaal, 2026-10-20); revision 2: "lets move all this to another repo thats zaoostest and lets make zaoos the most simple it can be" (Zaal, 2026-10-20)
 tier: STANDARD
 ---
 
-# 2691 - What lives in ZAOOS on 2026-10-20, and what graduates next
+# 2691 - What lives in ZAOOS on 2026-10-20, and how it becomes the simple ZAOOS
 
 > **Goal:** Map every product inside ZAOOS today, say for each one whether it stays, graduates now, graduates later or is deleted, and give an order of operations. Plan only. No code moves, no new repos, no deletes in this PR. New repos, domains, databases and deletions are Zaal's calls.
 
 All measurements below were taken 2026-10-20 between 10:30 and 11:01 EDT against `origin/main` at `b0b1f18a0`, unless a row says otherwise.
 
-## Key Decisions (recommendations, ranked)
+## Revision 2 (2026-10-20 afternoon): the simple ZAOOS plan
+
+Zaal, 2026-10-20, relayed by the seat: "lets move all this to another repo thats zaoostest and lets make zaoos the most simple it can be". He then confirmed the repo: `bettercallzaal/zaoostest`, **private**. It was created 2026-10-20T16:56:08Z and was still empty when this was written (`gh repo view bettercallzaal/zaoostest`). This revision replaces the morning plan wherever the two disagree. The morning tables below stay as the record.
+
+Measured 2026-10-20 at `origin/main` `40562ad66` with git only: `git ls-tree`, `git log --since=2026-08-21`, and `git grep`. No install, build or test was run.
+
+### Where ZAOOS ends up
+
+ZAOOS becomes **the research library plus the rules and CI that keep it honest**. Everything else leaves in one of three ways:
+
+- to its own product repo (the client to `zao-app`, ZAOstock to `ZAODEVZ/ZAOstock`);
+- to `zaoostest`, the private holding repo for code that has no product home;
+- out of git entirely, as a delete Zaal makes.
+
+Doc 1025 (2026-07-10, docs-only ZAOOS) pointed this way and was never run. This revision is its smaller, measured successor. The difference is that research **stays** in ZAOOS: it has 473 of the repo's commits in the last 60 days, and its CI guards (doc-collision, research-index, docs auto-merge) live in `.github/`.
+
+### 1. The minimum that stays in ZAOOS
+
+| Path | Why it stays | Until |
+|---|---|---|
+| `research/` | The library: 3,204 files, 473 commits in 60 days. CLAUDE.md: "Research stays in ZAOOS forever". | Permanent |
+| `.claude/` (rules, hooks, project skills) | Every session working in ZAOOS loads these rules. Research CI and the skills cite them. | Permanent |
+| `.github/` | Docs auto-merge, doc-collision guard, research-index, claims, and the CI for whatever code is still here. | Permanent; shrinks as code leaves |
+| Root docs: `README.md`, `CLAUDE.md`, `AGENTS.md`, `LICENSE`, `SECURITY.md`, `CONTRIBUTING.md`, `RESEARCH.md` | The front door and the policy. | Permanent; rewritten to the new scope |
+| `bot/` + `packages/heart-fleet` + `infra/bus` + `infra/vps` + `deploy/pi` | ZOE is live and deploys from a ZAOOS clone: `scripts/zoe-autodeploy.sh` runs `git fetch origin main`. Importers: `packages/heart-fleet` is referenced by 19 files across bot, scripts, src and deploy/pi; `infra/bus` by `bot/src/zoe/bus-bridge.ts` and `ci.yml`; `infra/vps` by `bot/src/hermes/claude-health.ts`. | Stays now. Graduates later to its **own** repo, not zaoostest, because it is production (item 4 below). |
+| `docs/daily`, `docs/weekly`, `docs/daily-briefs` | Written every night by ZOE (`scripts/zoe/nightly-dates.mjs`, `nightly-redact.mjs`); 52 commits in 60 days. | Until ZOE's writer is pointed elsewhere |
+| `scripts/` | 336 files and 41 commits in 60 days. Parts are wired into CI, ZOE and research tooling. Not triaged file by file in this pass. | Wave 2 triage |
+| `tools/estate-control-plane`, `tools/icp-primer` | `ci.yml` line 117 and `estate-health.yml` run them. | Until those workflows move |
+| `agents/` (DOCTRINE and personas) | `scripts/autopilot/doors.json` names `agents/DOCTRINE.md` (lines 5 and 173); `scripts/agents/zoe-drift.py` refers to `agents/*/PERSONA.md` (lines 104, 114). | Wave 2, together with edits to both files |
+| `src/`, `public/`, `tenants/`, `tests/smoke`, the Next.js root config | zaoos.com is served from here today (morning section, finding 2). `tenants/` is read by `src/lib/dreamnet/tenant`; `tests/smoke` by `playwright.config.ts`. | Removed by the ZAOOS PR that follows the zaoos.com flip to `zao-app` (item 2, Zaal ruled A). Not moved to zaoostest, except the streaming cluster (item 6). |
+
+### 2. What moves to `zaoostest`: wave 1, the unused set
+
+Wave 1 is every path whose importer check found nothing outside the path itself, except `.gitignore` lines, lint/tsconfig excludes, and prose mentions. All of those are edited in the same removal PR.
+
+**Importer check.** Command: `git grep -l -F <patterns> 40562ad66 -- . ':!<own path>' ':!research' ':!docs' ':!package-lock.json'`.
+
+**Positive control, checked first.** The pattern `packages/heart-fleet` must find a known importer, and it found 19 files. The first control used `@zaoos/heart-fleet`, found 0, and was thrown out: `packages/heart-fleet` has no `package.json`, so that name does not exist. The first run's zeros were not trusted until the control fired.
+
+Every count names its patterns. For `tmp/`, `data/` and `security/`, a folder-name check was added after review, anchored so that `/tmp/` and `foo-data/` do not match. Each hit it found is listed as real or not, with the line. The script is in this PR's description.
+
+| Path | Files | Commits, 60 days | Importer check (patterns, result) | Edits in the ZAOOS removal PR |
+|---|---|---|---|---|
+| `packages/agents` | 15 | 0 | `@zaoos/agents`, `packages/agents`: **0** | none |
+| `packages/config` | 4 | 0 | `@zaoos/config`, `packages/config`: **0** | none |
+| `packages/db` | 4 | 0 | `@zaoos/db`, `packages/db`: **0** | none |
+| `packages/publish` | 15 | 0 | `@zaoos/publish`, `packages/publish`: **0** | none |
+| `android/` | 53 | 0 | `android/`, `capacitor`: 7, all mobile-shell config. `src/` imports `@capacitor`: **0** files. | drop `capacitor.config.ts`, the 4 `cap:*` scripts and 5 `@capacitor/*` deps in `package.json`, and the `.gitignore` lines (a dependency change, so it is Zaal's merge) |
+| `ios/` | 19 | 0 | `ios/App`, `ios/`: 3 (`.gitignore`, `.serena/project.yml`, a prose inventory) | `.gitignore`, `.serena/project.yml` |
+| `apps/zabal-snap` | 14 | 0 | `zabal-snap`: 1 (`tsconfig.json` exclude) | tsconfig exclude |
+| `plugins/` | 20 | 0 | `plugins/`: 6. The 4 android files move with it; `bot/src/zoe/attention.ts:21` is a comment citing elizaOS's own `plugins/` (false positive); `eslint.config.mjs` ignore. | eslint, tsconfig, vitest excludes |
+| `mcp/` (only `hindsight-mcp-server`, 3 files) | 3 | 0 | `mcp/`: 3. Two are substring hits on the bot's own `bot/src/zoe/mcp/` (false positives), and one is a prose inventory. | tsconfig exclude |
+| `infra/hindsight` (docker-compose, `.env.example`) | 2 | 0 | `infra/hindsight`: 1, a prose inventory. `src/lib/hindsight.ts` uses the npm client `@vectorize-io/hindsight-client`, not these files. Moving the files does not stop a running server. | none |
+| `evals/` | 6 | 0 | `evals/`: 18. 17 are gstack's own `evals/` and `.claude/skills/meeting/evals`; 1 is a table row in `.claude/memory.md`. | memory.md row |
+| `.superpowers/` | 14 | 0 | 3: `.gitignore`, an eslint ignore, an archived skill | `.gitignore`, eslint |
+| `autoresearch-test-coverage/`, `build-log/` | 1, 4 | 0 | 1 each, `.gitignore` | `.gitignore` |
+| `tmp/` | 4 | 0 | File patterns (`tmp/march-zols`, `tmp/socials-day`, `tmp/zaostock-failoften`): **0**. Folder pattern `(^|[^A-Za-z0-9_./-])(\./)?tmp/` (relative paths, not `/tmp/`): 5. Real: the newsletter skill writes `tmp/newsletter-day-[N].html` (`.claude/skills/newsletter/skill.md:122,190`), and `.gitignore:113` ignores `tmp/`. Not real: `bot/src/zoe/__tests__/transcribe.test.ts:213` (a Telegram file path in a mock), and `scripts/orca-setup.sh:121,125` (a `$tmp` shell variable). | **Keep** the `.gitignore` `tmp/` line so the newsletter output stays untracked. Only the 4 tracked files move. |
+| `data/` | 3 | 0 | File patterns (`data/missing-fids`, `data/ordaoawards`): **0**. Folder mentions: `scripts/import-fractal-history.ts:8,44` defaults to `./data/`, `package.json:25` runs it as `import:fractals`, and `README.md:412` documents `--dir ./data`. The script reads Airtable CSV exports passed in that folder, not the 3 tracked files. Other folder-pattern hits are `data/actions.json` in a different repo (cowork-zaodevz, meeting skill) and prose. | Moving the 3 tracked files does not change what the script reads, because whoever runs it supplies the CSVs. Edit `README.md:412` to say the user creates `./data` with the CSV exports. `.gitignore` has no `data` rule (line 86's "data" is prose in a comment). |
+| `security/` (one 2026-03-19 audit) | 8 | 0 | File pattern (`security/260319`): **0**. Folder mentions: the vendored `/autoresearch:security` skill writes each audit to `security/<stamp>-<slug>/` and reads the newest one as its incremental baseline (`.claude/skills/autoresearch/references/security-workflow.md:524,532`). `.claude/skills/zao-research/SKILL.md:71` names `security/` as a **research** topic folder (`research/security/`), which is not this path. The `biome.json` hit is the word "security" in a rule name. | After the move, the next `/autoresearch:security` run in ZAOOS finds no baseline and does a full audit instead of an incremental one, then recreates `security/`. Accepted, and recorded in the removal PR body. |
+| `skills/fishbowlz` | 1 | 0 | 1, a prose line in `bot/REGISTRY.md` | REGISTRY line |
+| `infra/n8n` | 5 | 0 | **0** | none |
+
+That is 19 paths, 195 files (plus `capacitor.config.ts`), and no commits in 60 days. Counted with `git ls-tree -r` and `git log --since=2026-08-21` over the 19 paths passed as one bash array; the same `ls-tree` on `packages/heart-fleet` returns 11, so the counter reads. (A first count with an unquoted zsh variable returned 0 files and was thrown out.) After wave 1, `packages/` holds only `heart-fleet`, and `pnpm-workspace.yaml` still matches it.
+
+### 2b. Wave 2: moves that need an edit first, each its own PR
+
+| Path | What holds it | Call |
+|---|---|---|
+| `BRAIN/` (7 files) | `scripts/zoe-learning-pings/random_tip.py` globs `BRAIN/projects/*.md`, so moving it silently shrinks ZOE's tip pool; `scripts/brain-to-digest.js`; `infra/portal` prompts | Move, with the glob edited in the same PR |
+| `content/` (4 files) | Meeting-skill text says not to use `content/bonfire-ingest/` (a backfill pipeline) | Move after confirming nothing runs the backfill |
+| `infra/portal` (38 files) | `.claude/rules/secret-hygiene.md` names its path; `infra/bus/deploy/deploy.sh` | Check whether it runs on the VPS before deciding (an `ssh vps` read) |
+| `docs/` outside the ZOE-written folders (`docs/superpowers` 100 files, `adr`, `specs`, root notes) | Cited by `tools/*` READMEs, the research skill, `README.md` | Move with link edits, or fold into `research/` |
+| `scripts/` | Mixed | One file-by-file importer pass |
+
+### 3. Items 3, 4 and 6 folded in
+
+| Item | Call | Why |
+|---|---|---|
+| 3. `ZAO-STOCK/` (28 files, 1 commit in 60 days) | **Move to `ZAODEVZ/ZAOstock`**, its product's home, not zaoostest. Fallback: zaoostest if that repo should not take docs. | Importers: 4. Two skills (`onepager`, `zao-stock`) cite the path and get edited; two are archived SQL files that stay as history. |
+| 4. ZOE and the bot (`bot/`, 604 files, 150 commits in 60 days) | **Stay** for now. It graduates later to its own repo through its own plan. | It is the live production system, and the VPS deploys from a ZAOOS clone. A move is a deploy-path change with a restart, which is not lab overflow. |
+| 6. Live audio and streaming (`src/app/spaces`, `live`, `juke`, `juke-status`, `src/components/spaces`) | **Move to zaoostest, frozen, in the same PR that removes the v1 client** after the zaoos.com flip. Not before: `/juke-status` answered 200 on zaoos.com at 11:01 EDT on 2026-10-20. | The v1 scope in `zao-app`'s README (sign-in, feed, casting, replies, player, notifications, settings, miniapp) has none of these routes, so after the flip they have no other home. |
+
+### 4. Method: history kept, one removal PR
+
+1. **Build zaoostest from a fresh clone, never the working clone.** Run `git clone --no-local <ZAOOS> /tmp/zt` and then `git filter-repo --path <p1> --path <p2> ...` with the wave-1 list. Every commit that touched those paths is kept with its author and date. `git subtree split` handles only one prefix per run, so it would mean 19 branches to merge; filter-repo does it in one pass. ZAOOS's MIT `LICENSE` and a README naming ZAOOS as the source go in one commit on top.
+2. **Check before pushing.** Run `git ls-files | wc -l` in the filtered clone; it must equal the wave-1 file count at the source SHA. Do a `git log --follow` spot-check on two files, and run the case-insensitive secret scan (`secret-hygiene.md` steps 2 and 3) over the whole filtered history, because zaoostest is private but its history is new. Then push to `bettercallzaal/zaoostest` `main`.
+3. **One ZAOOS removal PR.** `git rm -r` the wave-1 paths, plus the config edits listed in the table, on a branch off the same source SHA. The PR body cites the zaoostest commit that holds each path. It opens ready, with the `hold` label (it is not docs-only, so auto-merge does not apply anyway). **Zaal merges it.**
+4. **Verify after merge:** run the importer check again on the new `origin/main` (still 0 for each path), check that CI is green, and confirm `zaoostest` `main` has the files.
+
+### 5. Order
+
+1. This plan PR passes the evaluator.
+2. Build and push zaoostest (wave 1).
+3. The ZAOOS removal PR, merged by Zaal.
+4. `ZAO-STOCK/` to ZAOstock.
+5. Wave 2, one PR per row.
+6. After the zaoos.com flip: the client-removal PR, with streaming going to zaoostest.
+7. The bot's own graduation plan.
+
+## Revision 1 key decisions (morning of 2026-10-20; superseded where Revision 2 differs)
 
 | # | Candidate | Recommendation | Gate |
 |---|---|---|---|

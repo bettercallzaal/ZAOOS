@@ -8,4 +8,6 @@ Banned without exception in autonomous/loop work: `rm -rf` / `rm -r` / `rm -fr` 
 
 Narrow carve-outs: a single temp file the agent itself created this session under `/tmp` or the scratchpad, removed by exact path; `git worktree remove <path>` for a worktree the agent created. Do not stretch these - more than one self-created file, or anything under a user home dir, means STOP and surface it.
 
+Regenerable paths (Zaal, seat grill 2026-10-20, option A): an agent may delete ONLY what a tool rebuilds on its own. That means a project's `node_modules`, `.next`, `.turbo`, `dist`, `build`, `coverage` (next to a `package.json`, not a symlink, nothing inside tracked by git), `$TMPDIR/zao-eval` and mktemp `tmp.*` dirs, and the package caches listed by exact path in zaal-dotfiles `claude/policy/destructive.json` (`~/.npm` and similar). The target must be written literally: no glob, no `$VAR`, no `..`. `node_modules_backup`, `~/Documents` and a `node_modules` that is a symlink are all still refused. The destructive-guard hook enforces this list. Adding a name is a policy change, made by a PR Zaal merges.
+
 Enforcement: deny rules block the command PATTERN across every OS path form, not an enumerated path list. A genuinely needed delete in a pipeline is a Zaal-gated step.

@@ -20,7 +20,7 @@ Binding for any autonomous /loop or agent building or deploying in this repo (Cl
 
    Which store wins on conflict: `handoff-discipline.md` rule 7.
 7. **Subagents for bounded research/isolation; inline for the hot path.** Code, verify, commit stays inline. Don't grow one giant prompt.
-8. **PR-only + human gate is the circuit breaker.** Never push to main or force-push. Autonomous work opens PRs; a human merges. Outbound (posts/DMs), on-chain and spend stay human-gated. Research docs and internal pings can be autonomous.
+8. **PR-only + a gated merge is the circuit breaker.** Never push to main or force-push. Autonomous work opens PRs. Since 2026-10-20 (Zaal, seat grill, option A) an agent may merge any PR with `zao-merge`, in any repo, when zao-merge's agent gate passes. That means an evaluator verdict that is CLEAN at the exact head with `Reserved: none`, CI green, mergeable state clean, and no reserved path. Reserved for Zaal: DB migrations and schema, settings and permissions, hooks, the merge gate itself, money, on-chain, DNS, and outbound/publishing actions (posts, DMs, sends). Spend stays human-gated. Research docs and internal pings can be autonomous.
 9. **One instance per resource.** Only one process polls a given bot token or holds a given lock. Check liveness by PROCESS, not tmux session name.
 10. **Learn online periodically.** Every several cycles, pull fresh best practice and fold behavior-changing items back into these rules.
 11. **Git hygiene on a shared clone.** Never leave uncommitted changes across sequential commands; commit before switching branches; after merging, `git reset --hard origin/main`; verify a fix is on origin/main before claiming it landed.

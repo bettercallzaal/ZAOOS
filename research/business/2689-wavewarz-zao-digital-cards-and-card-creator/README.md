@@ -2,7 +2,7 @@
 topic: business
 type: build-spec-research
 status: research-complete, awaiting Zaal approval before any build
-last-validated: 2026-10-19
+last-validated: 2026-10-20
 related-docs: 2529, 1692
 original-query: "lets open a lane on wavewarz and zao trading cards digital and i want to eventually make a card design creator" (Zaal, 2026-10-19)
 tier: STANDARD
@@ -43,7 +43,7 @@ WaveWarZ already has fighter cards as data. `tools/fighter-cards.py` (wavewarz-p
 
 - **109 artists** carry a card; **35 are ranked**, **74 are provisional** (fewer than 10 ranked battles, the tool's `provisional_below: 10`).
 - Battles counted: **1,237 ranked of 1,643 total** - "settled on chain AND a judged result_winner, Zaal 2026-10-10". Self-battles are included (319), per Zaal 2026-09-12.
-- Fields per card: `eligible_battles`, `sport_wins`, `sport_losses`, `sport_win_rate`, `market_wins`, `market_losses`, `longest_win_streak`, `upset_wins`, `upset_losses`, `opponents_faced`, `self_battles`, `first_battle`, `last_battle`, `volume_of_battles_sol`, `elo`, `provisional`.
+- Fields per card: `eligible_battles`, `sport_wins`, `sport_losses`, `sport_win_rate`, `market_wins`, `market_losses`, `longest_win_streak`, `upset_wins`, `upset_losses`, `opponents_faced`, `self_battles`, `first_battle`, `last_battle`, `volume_of_battles_sol`, `elo`, `provisional`, `self_battle_share`, and the key `artist_wallet`.
 - Identity is the artist wallet ("1:1 with an Audius handle across 28 artists checked"). **The card file holds no artist name or image.** A display name comes from the catalogue import (`spec/CATALOGUE-EXPORT.md`, `artist_name` "the display name. Never an identifier"), and the image must come from the artist.
 
 The PRD in the same repo already sketches the card (`spec/WBS-1-PRD-v1.0.md` section 35, "Global Artist Record ... This is the portable fighter card for music") and section 37 sets a rule the card should keep: "Money and competitive skill should not be collapsed into one metric."
@@ -74,7 +74,7 @@ Prior card-adjacent work: doc [1692](../../technology/1692-wavewarz-farcaster-mi
 
 **The line already exists, and 2529 missed it.** 2529 found the ZAO-CHELLA cards (December 2024) but not this earlier set:
 
-- `https://zao.cards` redirects (HTTP 200, fetched 2026-10-20) to a Manifold page by `@the-zao`, titled "ZAO CARDS - ZAO-PALOOZA EDITION | THE ZAO", described as "ZAO CARDS - FROM ZAO-PALOOZA 4/3/24".
+- `https://zao.cards` redirects (a 307, then HTTP 200 at the end of the chain, fetched 2026-10-20) to a Manifold page by `@the-zao`, titled "ZAO CARDS - ZAO-PALOOZA EDITION | THE ZAO", described as "ZAO CARDS - FROM ZAO-PALOOZA 4/3/24".
 - The archived ZAO Nexus link lists carried a per-artist subdomain pattern. Two examples are "Mint Attabotty ZAO-PALOOZA Card" at `https://attabotty.zao.cards` and "ZAO-PALOOZA Artist Cards" at `https://zao.cards` (`research/_archive/nexus-versions/ZAONEXUS-current/links.ts`).
 - Doc 231 credits ZAO-PALOOZA (April 2024) with "Trading card design" (`research/_archive/231-community-profiles-tyler-candy-swarthy-dcoop`).
 - Per Zaal, the collection sits under the ZAO wallet.
@@ -113,7 +113,7 @@ Physical stays as 2529 left it: UPrinting, re-quote at the real quantity, only a
 | fabricjs/fabric.js | MIT | 31,505 | 2026-10-17 | Full canvas object model. Strong, but more editor than v1 needs. |
 | konvajs/konva + react-konva | MIT (both; konva's API field reads NOASSERTION, its LICENSE file reads MIT) | 14,876 / 6,436 | 2026-10-15 | Best upgrade path: React bindings, made for "design editors". |
 | salgum1114/react-design-editor | MIT | 1,710 | 2026-10-11 | A general design editor; heavy to strip down to one card. |
-| layerhub-io/layerhub-io | MIT | 106 | 2026-07-06 | Small, Canva-style; low adoption. |
+| layerhub-io/layerhub-io | MIT | 106 | 2023-10-23 | Small, Canva-style; low adoption and no push in three years. |
 | Polotno SDK | npm: "SEE LICENSE IN LICENSE.md"; pricing page: "One commercial license ... from low hundreds to 20-30k+" | n/a | n/a | Commercial. Out: money is Zaal's and it is not open source. |
 | tldraw/tldraw | tldraw license: free in development, production needs a licence key | 50,994 | 2026-10-19 | Out for a public tool: production terms. |
 | excalidraw/excalidraw | MIT | 134,199 | 2026-10-19 | A hand-drawn whiteboard. Wrong shape. |
@@ -180,4 +180,5 @@ Inventory before recommending this: a GitHub code search of the `bettercallzaal`
 - GitHub REST API `repos/<owner>/<repo>` for each project in the survey table (stars, licence SPDX id, last push, archived) and `repos/<owner>/<repo>/license` for konva and tldraw [FULL - method: `gh api`, raw JSON and raw LICENSE text, 2026-10-19]
 - npm registry `latest` for fabric 7.4.0, konva 10.9.0, react-konva 19.3.2, html-to-image 1.11.13, satori 0.63.0, @resvg/resvg-js 2.6.2 (licence fields) [FULL - registry JSON]
 - `polotno.com/docs/license` [FAILED - HTTP 404]
+- Zaal's answer on which cards come first: his reply to this lane in the Orca cards terminal, 2026-10-20, quoted verbatim in (b)
 - Zaal's rulings cited: no AI-made public design (2026-10-08, vault decisions item 53 and item 61), no co-ownership of ZAO IP (2026-10-14, item 217), ranked-battle and self-battle rules (2026-10-10, 2026-09-12, as quoted inside `tools/fighter-cards.py`)

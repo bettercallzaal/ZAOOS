@@ -19,7 +19,7 @@ All measurements below were taken 2026-10-20 between 10:30 and 11:01 EDT against
 
 | # | Candidate | Recommendation | Gate |
 |---|---|---|---|
-| 1 | **Research library (fork with ZAODEVZ/ZAOresearch)** | **Fix first.** Keep ZAOOS `research/` canonical, port the 21 docs that exist only in ZAOresearch, then freeze ZAOresearch. | Archiving the repo is Zaal's |
+| 1 | **Research library (ZAOOS public, ZAODEVZ/ZAOresearch private)** | **Keep ZAOOS `research/` canonical and public; keep ZAOresearch as the private working library it now is.** Publish each ZAOresearch-only doc into ZAOOS by its own PR, only once cleared. Of the 21: 17 look publishable, 2 are held as not cleared (1912 leads, 2300 sponsor board), 1 is already here under another number (1659 = 2372), 1 was deliberately reverted (2260). | Publishing is Zaal's |
 | 2 | **Farcaster client -> `bettercallzaal/zao-app`** | **Graduate now: finish the move that already started.** zao-app exists (2026-10-16) but zaoos.com is still served by ZAOOS. | Vercel env vars, DNS flip: Zaal |
 | 3 | **ZAO card builder (plan PR #4046, Phase A #4047)** | **Stay in `src/app/cards/` for v1. Graduate later.** The cards lane chose this on 2026-10-20 and the reasons hold (section 11). The lift-out is three folders plus one hook. | None now |
 | 4 | **`ZAO-STOCK/` folder (28 planning files)** | **Graduate now** into `ZAODEVZ/ZAOstock` docs. The app left in May; this is residue. | Docs-only move |
@@ -35,7 +35,7 @@ The "Monorepo as Lab" rule says a graduate's code is **deleted** from ZAOOS so t
 
 | Graduate | New home | Copy still in ZAOOS? | Drift measured |
 |---|---|---|---|
-| Research library | `ZAODEVZ/ZAOresearch` (private, README: "Graduated out of the `bettercallzaal/ZAOOS` monorepo on 2026-08-10") | Yes, and it is the live one | ZAOOS has **2,413** numbered doc folders, ZAOresearch **2,049**. **385** exist only in ZAOOS, **21** only in ZAOresearch (e.g. `business/1908-clipping-as-a-service`, `business/1911-grant-short-list-oct-2026`). Both received new docs on 2026-10-19. Method: folders matching `research/<topic>/<digit>*` in both trees (ZAOresearch via `gh api` recursive tree at `883cd32e`, not truncated), compared with `comm`. |
+| Research library | `ZAODEVZ/ZAOresearch` (private, README: "Graduated out of the `bettercallzaal/ZAOOS` monorepo on 2026-08-10") | Yes, and it is the live one | ZAOOS has **2,413** numbered doc folders, ZAOresearch **2,049**. **385** exist only in ZAOOS, **21** only in ZAOresearch (e.g. `business/1908-clipping-as-a-service`, `business/1911-grant-short-list-oct-2026`). Both received new docs on 2026-10-19. ZAOresearch is written by IMan's desk and, by its doc 1306 (approved 2026-10-19), only some of its docs are meant to go public, so part of this gap is by design. Method: folders matching `research/<topic>/<digit>*` in both trees (ZAOresearch via `gh api` recursive tree at `883cd32e`, not truncated), compared with `comm`. |
 | Farcaster client | `bettercallzaal/zao-app` (public, created 2026-10-16) | Yes, and it is the live one: zaoos.com serves ZAOOS-only pages | ZAOOS #4037 (2026-10-19, `useVisibleInterval`) is not in zao-app: its `src/hooks/` has no such file. |
 | ZAO XMTP | `bettercallzaal/zao-xmtp` | No (#4011) | None. **This is the pattern to copy.** |
 | ZAOstock app | `ZAODEVZ/ZAOstock` | No (#544) | None for the app. The bot is a separate story (below). |
@@ -159,7 +159,7 @@ Spec doc 2690 (PR #4044), plan PR #4046, Phase A PR #4047, owned by the cards la
 
 Each step is one PR or one Zaal action, and each is reversible until its delete PR merges.
 
-1. **Research fork** (Decision 1). Port the 21 ZAOresearch-only docs into ZAOOS on their own numbers, with credit to their authors. Stop new writes to ZAOresearch (its CI writes index rows on its own). Zaal archives the repo, or keeps it as a read-only mirror. Fix whichever writer still targets ZAOresearch, or step 1 repeats.
+1. **Research split** (Decision 1). ZAOresearch is not stale: IMan's desk writes there, and ZAOresearch doc 1306 (original-query: "IMan, approved by Zaal 2026-10-19") sets the rule that a doc goes public only when someone opens a ZAOOS PR copying it, because some docs "were not cleared to go public". So the step is not "freeze ZAOresearch", it is: publish the 17 cleared ZAOresearch-only docs into ZAOOS (on Zaal's publish OK, with two redactions: the six personal POIDH handles in 1903 and a retired-partner mention in 1911), hold 1912 and 2300, skip 1659 (already `events/2372`) and 2260 (reverted in #3036 as "wrong recording"). Fix the ZAOresearch README line "Graduated out of ... ZAOOS", which now misdescribes a two-library setup.
 2. **zao-app goes live** (Decision 2). Zaal adds env vars to a new Vercel project for zao-app, smoke-tests it on a preview URL (`scripts/smoke-live.sh` exists in zao-app), then flips zaoos.com. Rollback: point the domain back at the ZAOOS project.
 3. **Port the drift** (ZAOOS commits after 2026-10-16 that touch v1 scope, starting with #4037) into zao-app before or right after the flip.
 4. **Delete the v1-scope copy from ZAOOS** (the zao-xmtp step). What stays in ZAOOS `src/` afterwards is the lab: DMs, governance, publish, spaces, agents, admin. It then needs its own non-production URL, which is Zaal's call.
@@ -177,7 +177,7 @@ Cards (Decision 3) runs in parallel with all of it and is unaffected.
 | zaoos.com outage at the flip | Step 2 | Preview URL first; domain moves back in one change |
 | Session and data breakage: both apps read one Supabase project and one `SESSION_SECRET` | Step 2 to 4 | zao-app keeps the same Supabase project for v1 (doc 2660 already says the app stays on Supabase); a separate database is a later, separate decision |
 | VPS bots run from a ZAOOS clone | Any change to repo layout | Nothing in this plan moves `bot/` |
-| Losing the 21 ZAOresearch-only docs | Step 1 | Port before archive; archive is reversible on GitHub |
+| Publishing a doc that was not cleared | Step 1 | Every ported doc read in full and PII-scanned first; 1912 and 2300 held; a PR on public ZAOOS publishes its diff, so the branch is not pushed before the OK |
 | Deleting a shell something still builds from | Step 6 | Check store builds and Vercel projects first |
 
 ## Also See
@@ -193,8 +193,8 @@ Cards (Decision 3) runs in parallel with all of it and is unaffected.
 
 | Action | Owner | Type | Gate |
 |---|---|---|---|
-| Pick canonical research home (A: ZAOOS, B: ZAOresearch) | @Zaal | Decision | Gated |
-| Port the 21 ZAOresearch-only docs into ZAOOS | zaoos-split lane | PR | After the pick |
+| OK to publish the 17 cleared ZAOresearch-only docs in public ZAOOS | @Zaal | Decision | Gated (public) |
+| Port the 17 (branch prepared locally, not pushed) | zaoos-split lane | PR | After the OK |
 | Add env vars to a zao-app Vercel project, preview, then flip zaoos.com | @Zaal | Manual | Gated (Vercel, DNS) |
 | Port post-2026-10-16 v1-scope ZAOOS commits into zao-app | zao-app lane | PR | Before the flip |
 | Delete the v1-scope copy from ZAOOS | zaoos-split lane | PR | After 24h live on zao-app |

@@ -331,6 +331,49 @@ jobs:
           done <<< "$newdirs"
           echo "collision=$collision" >> "$GITHUB_OUTPUT"
 
+      # NIGHTLY FILES ARE CHECKED BEFORE ARMING, not only by nightly-check.yml.
+      # --auto waits only on the REQUIRED checks, and nightly-check is not one
+      # (making it required is a settings change, Zaal's). So a nightly PR that
+      # failed it still merged: #4005 was armed here and landed in 8 minutes one
+      # day ahead (evaluator-e2 on #4041). This step runs the same script and,
+      # on any failure, does not arm and takes off an earlier arming, the way
+      # the hold step does. It fails closed: exit 2 (could not check) holds too,
+      # and the arm step below needs ok == 'true' exactly, so a step that never
+      # ran or wrote nothing does not arm.
+      - name: Gate nightly docs/daily files
+        id: nightly
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          set -uo pipefail
+          if git fetch origin "${{ github.base_ref }}" --quiet; then
+            node scripts/zoe/nightly-check.mjs \
+              --instant "${{ github.event.pull_request.created_at }}" \
+              --base "origin/${{ github.base_ref }}"
+            rc=$?
+          else
+            echo "::error title=nightly::git fetch failed - holding this PR rather than auto-merging it"
+            rc=2
+          fi
+          if [ "$rc" -eq 0 ]; then
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "ok=false" >> "$GITHUB_OUTPUT"
+          echo "::error title=nightly::nightly-check exited $rc - not arming auto-merge"
+          # Same evidence as the hold step: the re-read, not --disable-auto's status.
+          off=$(gh api "repos/$REPO/pulls/$PR" --jq '.auto_merge == null') || off=unknown
+          if [ "$off" != "true" ]; then
+            gh pr merge "$PR" --repo "$REPO" --disable-auto || true
+            off=$(gh api "repos/$REPO/pulls/$PR" --jq '.auto_merge == null') || off=unknown
+          fi
+          if [ "$off" != "true" ]; then
+            echo "::error title=nightly::auto-merge could not be confirmed off - turn it off by hand"
+            exit 1
+          fi
+
       # Only a PR whose ONLY obstacle is the licence hold is handed to the
       # reviewer queue. A doc-number collision still needs a renumber, not a
       # licence review, so it does not get the label.
@@ -390,7 +433,7 @@ jobs:
       # merge call, so a label added while the steps above were running is seen.
       - name: Enable auto-merge (squash)
         if: |
-          steps.hold.outputs.held == 'false' && (
+          steps.hold.outputs.held == 'false' && steps.nightly.outputs.ok == 'true' && (
           (steps.classify.outputs.category == 'docs' && steps.collide.outputs.collision != 'true' && steps.licence.outputs.hold == 'false') ||
           steps.classify.outputs.category == 'tests' ||
           steps.classify.outputs.category == 'scripts')

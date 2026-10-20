@@ -11,6 +11,8 @@ parent-doc: 706
 
 # 706e - Avalanche Grants & Funding Programs (2026)
 
+> **STALE (2026-10-20):** Retro9000 ended per the Avalanche Foundation ([@AvalancheFDN, 2026-08-20](https://x.com/AvalancheFDN/status/2090477228874444916): "Retro9000 applications are now closed and the program has concluded"), as of 2026-10-20, see [zao-avax #1](https://github.com/bettercallzaal/zao-avax/pull/1). The Retro9000 recommendations below are no longer actionable; the rest of this doc is unchanged.
+
 > Goal: Map every Avalanche funding avenue ZAO (188-member web3 music community) can realistically access and win, with specific dollar amounts, eligibility, and next-steps.
 
 ## Key Findings (read first)

@@ -325,6 +325,18 @@ describe('TERMINAL_VERDICT_RE - the verdict forms measured on the live board', (
     expect(TERMINAL_VERDICT_RE.test('context above\n  GRILL 2026-08-19 (Zaal): mid-notes.')).toBe(true);
   });
 
+  it('matches a verdict behind the [timestamp] zao-tracker stamps on each note (card 0f2eb6c3)', () => {
+    const note = '[2026-10-13 18:49] GRILL 2026-10-13 (terminal): parked - waits on the venue reply.';
+    expect(TERMINAL_VERDICT_RE.test(note)).toBe(true);
+    expect(TERMINAL_VERDICT_RE.test(`[2026-10-12 09:00] earlier note\n${note}`)).toBe(true);
+    expect(TERMINAL_VERDICT_RE.test('[2026-10-14 08:00] ZAAL VERDICT 2026-10-14: keep.')).toBe(true);
+  });
+
+  it('a [timestamp] alone, or one followed by prose about the grill, is not a verdict', () => {
+    expect(TERMINAL_VERDICT_RE.test('[2026-10-13 18:49] add this to the grill queue')).toBe(false);
+    expect(TERMINAL_VERDICT_RE.test('[2026-10-13 18:49] asked in GRILL 2026-10-13 batch')).toBe(false);
+  });
+
   it('does not fire on prose that merely mentions the grill', () => {
     expect(TERMINAL_VERDICT_RE.test('add this to the grill queue later')).toBe(false);
     expect(TERMINAL_VERDICT_RE.test('the GRILL ran on some date')).toBe(false);

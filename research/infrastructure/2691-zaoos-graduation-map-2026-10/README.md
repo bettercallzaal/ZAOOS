@@ -21,7 +21,7 @@ All measurements below were taken 2026-10-20 between 10:30 and 11:01 EDT against
 |---|---|---|---|
 | 1 | **Research library (fork with ZAODEVZ/ZAOresearch)** | **Fix first.** Keep ZAOOS `research/` canonical, port the 21 docs that exist only in ZAOresearch, then freeze ZAOresearch. | Archiving the repo is Zaal's |
 | 2 | **Farcaster client -> `bettercallzaal/zao-app`** | **Graduate now: finish the move that already started.** zao-app exists (2026-10-16) but zaoos.com is still served by ZAOOS. | Vercel env vars, DNS flip: Zaal |
-| 3 | **ZAO card builder (plan PR #4046)** | **Build it graduation-ready**: under `apps/zao-cards/` the way zao-xmtp was built, not in `src/app/cards/`. v1 has no sign-in and no server store, so nothing ties it to ZAOOS. | Cards lane agrees |
+| 3 | **ZAO card builder (plan PR #4046, Phase A #4047)** | **Stay in `src/app/cards/` for v1. Graduate later.** The cards lane chose this on 2026-10-20 and the reasons hold (section 11). The lift-out is three folders plus one hook. | None now |
 | 4 | **`ZAO-STOCK/` folder (28 planning files)** | **Graduate now** into `ZAODEVZ/ZAOstock` docs. The app left in May; this is residue. | Docs-only move |
 | 5 | **ZOE + bot fleet (`bot/`)** | **Stay. Graduate later.** It is the hottest code in the repo and the 2026-09-23 ruling moved the other way (pull the zaostock-bot fork back in). | None now |
 | 6 | **Dead code (4 packages, mobile shells, zabal-snap, plugins, mcp)** | **Delete list for Zaal.** Zero consumers or zero commits in 60 days. | Deletion is Zaal's |
@@ -130,7 +130,7 @@ components spaces 58 files / 9,242 lines; `api/spaces` 24, `api/100ms` 12, `api/
 
 ### 11. Cards builder
 
-Not built yet. Spec doc 2690 (PR #4044), plan PR #4046 (open), owned by the cards lane. The plan targets `/cards/create` in ZAOOS and records: "v1 has no sign-in... v1 saves nothing on the server, so it needs no session." **A product with no ZAOOS auth and no ZAOOS database is the easiest graduate there will ever be**, if it is built the zao-xmtp way: self-contained under `apps/zao-cards/`, importing nothing from `src/`, so `git filter-repo` can lift it out with history when it is ready. Built inside `src/app/cards/` it would pick up `@/` imports, the root layout and the auth middleware, and graduating it later would mean untangling them. **Verdict: graduate later, built ready.** The cards lane has been told; nothing moves without it.
+Spec doc 2690 (PR #4044), plan PR #4046, Phase A PR #4047, owned by the cards lane. v1 has no sign-in, no database, no middleware and no API route ("v1 saves nothing on the server, so it needs no session", plan #4046). This doc first suggested building it under `apps/zao-cards/`, as zao-xmtp was. The cards lane declined on 2026-10-20 and gave three reasons, which this doc accepts. (1) An `apps/` app brings its own `package.json`, lockfile and `node_modules` (`apps/zao-xmtp` in #4000 had both), and the Mac had 1.8 GiB free that day. (2) An `apps/` app has no URL until Zaal hosts it, while `/cards/create` ships on the existing zaoos.com deploy. (3) The coupling is small and enumerable. The code sits in three folders: `src/lib/cards` (pure logic), `src/components/cards` and `src/app/cards/create`. Its only outside imports are `@/hooks/useMiniApp` and the Inter font through the root layout's `--font-inter` variable (as reported by the cards lane; not re-read here). **Verdict: graduate later.** The cost is copying three folders and one hook, then adding `next/font` in the new layout. **Watch item:** once zao-app takes over zaoos.com (Decision 2), `/cards/create` would be served by whichever app holds that domain. Card placement is one of the questions step 4 has to answer.
 
 ### 12. Research library
 
@@ -198,7 +198,7 @@ Cards (Decision 3) runs in parallel with all of it and is unaffected.
 | Add env vars to a zao-app Vercel project, preview, then flip zaoos.com | @Zaal | Manual | Gated (Vercel, DNS) |
 | Port post-2026-10-16 v1-scope ZAOOS commits into zao-app | zao-app lane | PR | Before the flip |
 | Delete the v1-scope copy from ZAOOS | zaoos-split lane | PR | After 24h live on zao-app |
-| Agree `apps/zao-cards/` placement | cards lane | Reply | Before Phase A code lands |
+| Re-check the card builder coupling (3 folders + `useMiniApp`) before step 4 | zaoos-split lane | Check | Before the v1 copy is deleted |
 | Move `ZAO-STOCK/` docs to the ZAOstock repo | zaoos-split lane | PR | Zaal's yes |
 | Delete-list PR (section 13) | zaoos-split lane | PR | Zaal's word |
 | Mark docs 1025, 1124, 2263 `superseded-by: 2691` | zaoos-split lane | PR | Zaal's yes |

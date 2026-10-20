@@ -195,6 +195,16 @@ make_ws "$R14" new LOCK-B
 run "$R14/new" DF_AVAIL_KIB=1024 ORCA_SETUP_MIN_FREE_GIB=0
 if grep -q "^npm install in .*/case14/new$" "$NPM_LOG"; then pass "case14 floor 0 installs"; else fail "case14 err: $(cat "$T/err")"; fi
 
+# --- Case 15 (RED CONTROL): a floor that is not a whole number -> REFUSED -
+# On the first cut of #4057 each of these made the -lt test error, and npm ran.
+for bad in abc 8.5 -1; do
+  R15="$T/case15-$bad"
+  make_ws "$R15" new LOCK-B
+  : > "$NPM_LOG"
+  run "$R15/new" DF_AVAIL_KIB=1048576 ORCA_SETUP_MIN_FREE_GIB="$bad"; rc=$?
+  if [ "$rc" -eq 3 ] && grep -q "^ORCA-SETUP REFUSED: ORCA_SETUP_MIN_FREE_GIB='$bad' is not a whole number" "$T/err" && [ ! -s "$NPM_LOG" ]; then pass "case15 floor '$bad' refused, npm not run"; else fail "case15 floor '$bad' rc=$rc err: $(cat "$T/err") npm: $(cat "$NPM_LOG")"; fi
+done
+
 echo "fixtures left at $T (not removed, no-rm-rf.md)"
 if [ "$fails" -gt 0 ]; then echo "$fails FAILED" >&2; exit 1; fi
 echo "all passed"

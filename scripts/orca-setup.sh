@@ -72,6 +72,13 @@ fi
 # is the only path held to the free-space floor.
 full_install() {
   local floor="${ORCA_SETUP_MIN_FREE_GIB:-8}" kib free
+  # A floor that is not a whole number (abc, 8.5, -1) would make the -lt test
+  # below error and fall through to the install, so it is refused instead.
+  case "$floor" in
+    ''|*[!0-9]*)
+      echo "ORCA-SETUP REFUSED: ORCA_SETUP_MIN_FREE_GIB='$floor' is not a whole number of GiB (0 turns the floor off). Not installing." >&2
+      exit 3 ;;
+  esac
   if [ "$floor" != 0 ]; then
     kib="$(df -k "$ws" 2>/dev/null | awk 'NR==2{print $4}')"
     case "$kib" in

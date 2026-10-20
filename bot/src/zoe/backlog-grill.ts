@@ -432,9 +432,17 @@ export function verdictNote(v: Verdict, date: string, time?: string): string {
  * stamps "(Telegram)") or "ZAAL VERDICT <date>". The Telegram variant only
  * ever lands on tasks this runner ALREADY answered, so matching it here is
  * harmless - reconcile only looks at unanswered entries.
+ *
+ * The line may start with a "[YYYY-MM-DD HH:MM]" stamp, which is how
+ * zao-tracker appends notes: card 0f2eb6c3 reads "[2026-10-13 18:49] GRILL
+ * 2026-10-13 (terminal): parked - ...". Without the optional stamp the regex
+ * missed every such verdict; the VPS journal read "0 verdict-synced, 32 still
+ * unanswered" every 10 minutes on 2026-10-20, 16 of the 32 carrying one
+ * (grill-sweep lane). Only one bracketed stamp directly before the verdict is
+ * allowed, so prose that mentions a grill later in a line still does not fire.
  */
 export const TERMINAL_VERDICT_RE =
-  /(^|\n)\s*(GRILL \d{4}-\d{2}-\d{2}|ZAAL VERDICT \d{4}-\d{2}-\d{2})/;
+  /(^|\n)\s*(\[[^\]\n]*\]\s*)?(GRILL \d{4}-\d{2}-\d{2}|ZAAL VERDICT \d{4}-\d{2}-\d{2})/;
 
 /**
  * A card a lane owns, so the phone must not ask Zaal about it.

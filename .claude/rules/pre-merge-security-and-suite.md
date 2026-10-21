@@ -10,5 +10,6 @@ Typecheck-clean is not auth-clean, and touched-file-green is not suite-green. In
    - Zod on input, sanitized errors, no server secrets in the response.
    - Applies hardest to subagent-built code: "typecheck clean / renders" says nothing about authorization. When in doubt, run `/security-review`.
 2. **Run the FULL test suite** (`npm run test` / the bot's `vitest run`), not only touched files.
+3. **A repo behind the merge gate has CI that can run** (ZAOOS#4058). Before a repo is gated, show its CI start and finish on one PR. A gate whose CI cannot start says why, naming the missing runner ("no runner registered for <repo>"); it never says "CI on the HEAD has not finished" for a run that will never begin. On 2026-10-20 wavewarz-protocol had 0 runners and every PR read as pending. The suites job carries a timeout. Tests on a shared runner wait on events, not wall-clock thresholds: four unrelated timing tests went red under load the same day, and one PR failed three times on three of them.
 
 A genuinely public endpoint says so explicitly in the PR; silence is a fail.

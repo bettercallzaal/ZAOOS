@@ -2,7 +2,7 @@
 topic: farcaster
 type: decision
 status: research-complete
-last-validated: 2026-08-25
+last-validated: 2026-10-21
 superseded-by:
 related-docs: "304, 309, 489, 586, 587, 588, 589, 597, 643, 823"
 original-query: "STANDARD on hypersnap, Cassie's fork of Farcaster. Zaal plans the ZAO social on it (async Respect Game in-feed, ZID identity, member-run nodes) and it has zero documentation on this machine. The doc must answer: 1) what hypersnap is - repo, author, relation to Farcaster protocol and snapchain, divergence; 2) state - last commit, activity, production users; 3) LICENSE read from the file, never the API field; 4) node requirements - hardware, ops, cost; 5) ZAO feasibility and the fallback if unsuitable (vanilla hub, snapchain, custom)."
@@ -12,6 +12,39 @@ tier: STANDARD
 # 2418 - Hypersnap: what it actually is, what state it is in, and whether ZAO social can stand on it
 
 > **Goal:** Answer the five hypersnap questions blocking L4 of the decentralization scale, with every claim traced to a file, an API response, or a live node.
+
+## UPDATE 2026-10-21: Zaal runs a node now, and the "stopped tracking upstream" reading is out of date
+
+Re-researched on 2026-10-21 after the B and Z Build stream, where Zaal walked Ohnahji through Hypersnap. **Sections 1 to 5 below are the 2026-08-25 text.** Where this update disagrees with them, this update wins.
+
+**What Zaal said on stream** (timestamps from the mlx-whisper transcript of https://www.youtube.com/watch?v=uEIT4rvgsNo):
+
+- [0:13:37] "i did get a node up and running of uh of hypersnap i uh i've created it as a private one right now... i'm just rocking it on my desktop". He has "successfully queried stuff", and next is "a couple API calls that I can allow our users to use".
+- [0:14:30] "snapchain is the official farcaster tech stack and cassie of equilibrium created quorum and quorum is the client that uses... hypersnap". ("equilibrium" is Whisper's spelling of Quilibrium.)
+- [0:16:22] "I'm a validator of the network". **UNVERIFIED.** Running a node that syncs and serves reads does not make it a validator. Snapchain's whitepaper describes a separate validator set. Nothing in this pass shows Zaal's node in a validator set.
+- [0:59:15] "it's supposed to earn snap tokens to be honest with you i have not researched that yet".
+- [0:59:48] Ohnahji: "hypersnap is not censored correct".
+
+**Measured 2026-10-21:**
+
+| Question | Answer | Read from |
+|---|---|---|
+| Does running a node earn tokens? | **No, not now.** The install script makes the operator agree, and writes `AGREE_NO_REWARDS_FOR_ME=true`: "The network has not yet released a token. Running a node at this time will not earn tokens." | `scripts/hypersnap.sh` lines 145 to 196, the only "reward" hit in the repo |
+| Is hypersnap still tracking upstream? | **Yes. The 2026-08-25 reading is out of date.** Commit `183213c0` on 2026-10-17, "v20 support + fix metrics endpoint for retention", changed 18 files (+3,024 / -71). Upstream snapchain is at v0.14.3 (2026-10-15). | `commits`, `releases` |
+| Who maintains it? | **Two people now, not one.** CassOnMars wrote 3 of the last 5 commits. **martinvr** wrote the other 2 (2026-08-28 and 2026-10-17, PRs #38 and #39). | `commits?per_page=5` |
+| Repo size | 66 stars, 24 forks, 13 open issues, last push 2026-10-17 | repo record |
+| Releases | Still v0.11.8 (2026-05-07). The October work is untagged. | `releases` |
+| haatz live node | Version still **0.13.5**, 914,291,718 messages, 3,356,279 FID registrations, 3 shards | `GET https://haatz.quilibrium.com/v1/info` |
+| Is Quorum a hypersnap client? | **Yes.** "hypersnap" appears in 23 code files in `QuilibriumNetwork/quorum-shared` and 96 in `quorum-mobile`. `quorum-desktop` was not counted (code search rate-limited). | GitHub code search |
+| Can it be censored? | **Partly, by a validator supermajority.** Hypersnap's whitepaper is Snapchain's, with small wording edits. It says "if more than 2/3rd of a validators shards collude they can censor a user, and governance action is needed". It also says censorship "will be challenging with as few as ten globally distributed validators" and "is provable by observing transactions". So the honest answer to "not censored, correct?" is: harder to censor, not uncensorable. | `site/docs/pages/whitepaper.mdx` lines 111, 112, 170, 171 |
+
+**Revised decisions (they add to the Key Decisions below):**
+
+| # | Decision | Why |
+|---|---|---|
+| U1 | **Do not tell members that a ZAO node earns tokens.** | The installer's own terms say it does not, until a token is released. |
+| U2 | **USE Zaal's desktop node for ZAO reads only after `FARCASTER_READ_API_BASE` can point at it with failover kept.** The code path exists (`src/lib/farcaster/neynar.ts`, section 5). A desktop is not uptime, so the Neynar failover stays on. | Zaal's plan [0:14:01] is "API calls that I can allow our users to use". The proxy wiring already exists. haatz stays the default until his node has uptime he trusts. |
+| U3 | **Keep the node private until the security pass Zaal asked for is done.** | His words [0:13:44]: "i don't really fully understand all the security things". |
 
 ## THE PREMISE OF THIS RESEARCH WAS WRONG - READ THIS FIRST
 
@@ -345,6 +378,8 @@ probably to ask Cassie directly rather than self-host.
 | Decide and record: is the paused Hetzner purchase cancelled or deferred? It has sat unresolved since 2026-05-04 and is silently blocking L7 in everyone's mental model. Shipped when written into the decision note either way. | @Zaal | Decision | 2026-08-28 |
 | Verify whether `FARCASTER_READ_API_BASE` is set in production and record the answer in the vault. BUILT and WIRED is confirmed; LIVE is not. Shipped when the note says which. | @Zaal | Verification | 2026-08-27 |
 | Specify the async Respect Game's settlement inputs (L3), then check them against canonical Farcaster retention limits. This is the one input that could reopen the hypersnap decision. Shipped when the retention answer is written into the L3 section. | @Zaal | Spec | 2026-09-15 |
+| Record whether Zaal's desktop hypersnap node is in any validator set, or is a read node only, so the stream's "I'm a validator" can be confirmed or corrected. Shipped when the answer is a line in this doc | Zaal | Verification | 2026-10-28 |
+| Point a staging `FARCASTER_READ_API_BASE` at Zaal's node with Neynar failover on, and log one week of uptime. Shipped when the uptime note is in the vault | Zaal | Ops test | 2026-11-11 |
 | Re-validate this doc - hypersnap has a single maintainer and one commit could change the verdict. Shipped when `last-validated` is bumped or a superseding doc exists. | @Zaal | Re-research | 2026-09-25 |
 
 ## Sources
@@ -363,4 +398,7 @@ no claim here rests on a WebFetch summary.
 - Hacker News Algolia (`hn.algolia.com/api/v1/search`) - **[FULL]** via `curl` (raw JSON, keyless). `hypersnap`: 11,999 hits, **zero relevant**. `snapchain farcaster`: 3 hits, none substantive. A real negative result, not a failed fetch.
 - [Hetzner AX41-NVMe](https://www.hetzner.com/dedicated-rootserver/ax41-nvme/) - **[PARTIAL - price not in static HTML]** via `curl` + tag strip: HTTP 200, 105,406 bytes, only 4,325 chars of visible text and no price string; pricing is JS-rendered. Not escalated to Playwright because the cost figure is not load-bearing for the recommendation, which is "do not buy". Dated 2026-05-04 quote used instead and labelled as such.
 - Reddit - **[FAILED - not attempted]** Reddit is fully walled from this machine per doc 2282 and `.claude/rules`. No snippet substituted.
+- **Added 2026-10-21:** `farcasterorg/hypersnap` commits, releases, repo record, `scripts/hypersnap.sh` and `site/docs/pages/whitepaper.mdx` [FULL - gh api, raw file bytes]; `farcasterxyz/snapchain` releases and whitepaper (for the diff) [FULL]; `https://haatz.quilibrium.com/v1/info` [FULL - curl]; GitHub code search over `QuilibriumNetwork/quorum-shared` and `quorum-mobile` [FULL - counts only], `quorum-desktop` [FAILED - code-search rate limit, not retried]; the B and Z Build transcript windows 0:13:20 to 0:16:50 and 0:58:50 to 1:01:00 [FULL]
+
+**What this means for The ZAO (2026-10-21):** Zaal's node is useful as our own read API and as a hedge against Neynar. It is not a source of income, because the installer says no tokens are paid yet. And hypersnap is no longer a one-person fork that stopped tracking upstream.
 - Local: `research/` (19 matching directories), `memory/project_hypersnap_node_install.md`, `src/lib/env.ts`, `src/lib/farcaster/neynar.ts`, `~/zao-vault/notes/zao-decentralization-scale.md`, `~/zao-vault/people/Cassie.md` - **[FULL]** read from disk.

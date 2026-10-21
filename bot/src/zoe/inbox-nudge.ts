@@ -22,7 +22,11 @@
  *          whose files cannot be read is still counted, marked "files
  *          unread", never silently dropped. On 2026-10-21 the old count
  *          said 24 when most of those were agent merges.
- * total = lanes + page + board + prs. Mail is not counted: inbox-ingest.ts
+ *   held   open non-draft PRs with a hold label (hold, hold:licence): parked
+ *          for his tap, so on his hand too, on their own line "On hold for
+ *          you". Both PR lines name the PRs, not only a count (seat,
+ *          2026-10-21), so he can act from the phone.
+ * total = lanes + page + board + prs + held. Mail is not counted: inbox-ingest.ts
  * folds mail into context and keeps no pending number (IngestResult has
  * ingested, skipped, scanned only), so a mail count would be invented.
  *
@@ -93,6 +97,8 @@ export interface Totals {
   /** Which sources could not be read; their count is 0 and the message says so. */
   failed: string[];
   prList: HandPR[];
+  /** Open non-draft PRs carrying a hold label (hold, hold:licence, ...): parked for his tap. In the total. */
+  holdList?: ReviewPR[];
 }
 
 /** A PR on his hand, with why: the reserved classes it touches, or "files unread". */
@@ -154,11 +160,24 @@ export function decide(
   return { action: 'send', nth: state.sends.length + 1 };
 }
 
-const holdLabel = (pr: ReviewPR): boolean => (pr.labels ?? []).some((l) => l.toLowerCase() === 'hold');
+// Any label starting "hold" (hold, hold:licence) parks a PR for his tap.
+const holdLabel = (pr: ReviewPR): boolean => (pr.labels ?? []).some((l) => l.toLowerCase().startsWith('hold'));
 
-/** The PRs that wait on his hand: open, not draft, not labelled hold. */
+/** The PRs that may wait on his hand: open, not draft, not on hold. */
 export function waitingPrs(prs: ReviewPR[]): ReviewPR[] {
   return prs.filter((p) => !p.draft && !holdLabel(p));
+}
+
+/** The PRs on hold for him: open, not draft, with a hold label. */
+export function heldPrs(prs: ReviewPR[]): ReviewPR[] {
+  return prs.filter((p) => !p.draft && holdLabel(p));
+}
+
+/** "ZAOOS #4066, zaal-dotfiles #592", at most `max`, then "+N more". Numbers he can act on from the phone. */
+export function prRefs(prs: ReviewPR[], max = 8): string {
+  const refs = prs.slice(0, max).map((p) => `${p.repo.split('/')[1] ?? p.repo} #${p.number}`);
+  if (prs.length > max) refs.push(`+${prs.length - max} more`);
+  return refs.join(', ');
 }
 
 export function ageDays(createdAt: string | null, now: Date): string {
@@ -192,8 +211,10 @@ export function formatTotals(t: Totals, nth: number, now: Date): { text: string;
     `Lanes asking: ${t.lanes}`,
     `Seat page: ${t.page}`,
     `Board: ${t.board}`,
-    t.agentPrs ? `PRs on your hand: ${t.prs} (${t.agentPrs} more are agent merges)` : `PRs on your hand: ${t.prs}`,
+    `PRs on your hand: ${t.prs}${t.prs ? `: ${prRefs(t.prList)}` : ''}${t.agentPrs ? ` (${t.agentPrs} more are agent merges)` : ''}`,
   ];
+  const held = t.holdList ?? [];
+  if (held.length) lines.push(`On hold for you: ${held.length}: ${prRefs(held)}`);
   if (t.failed.length) lines.push(`Could not read: ${t.failed.join(', ')} (counted as 0)`);
   lines.push('', 'It repeats while this is above zero and stops the day it hits zero.');
   const buttons: Button[][] = [];
@@ -304,9 +325,12 @@ export async function readTotals(src: Sources = defaultSources): Promise<Totals>
   };
   const [lanes, page, board] = await Promise.all([num('lanes', src.lanes), num('page', src.page), num('board', src.board)]);
   let prList: HandPR[] = [];
+  let holdList: ReviewPR[] = [];
   let agentPrs = 0;
   try {
-    const split = await handPrs(waitingPrs(await src.prs()), src.prFiles);
+    const all = await src.prs();
+    holdList = heldPrs(all);
+    const split = await handPrs(waitingPrs(all), src.prFiles);
     prList = split.hand;
     agentPrs = split.agent;
   } catch (e) {
@@ -314,7 +338,8 @@ export async function readTotals(src: Sources = defaultSources): Promise<Totals>
     failed.push('prs');
   }
   const prs = prList.length;
-  return { lanes, page, board, prs, agentPrs, total: lanes + page + board + prs, failed, prList };
+  const held = holdList.length;
+  return { lanes, page, board, prs, agentPrs, total: lanes + page + board + prs + held, failed, prList, holdList };
 }
 
 export type TickResult = Decision['action'] | 'off';

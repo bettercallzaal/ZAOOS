@@ -12,7 +12,7 @@ tier: STANDARD
 
 > **Goal:** A shortlist of open, remote hackathons that pay cash and fit work Zaal already has, with one or two recommended picks. Zaal picks; nothing here registers, posts or contacts anyone.
 
-> **Status, 2026-10-21: Zaal skipped this round.** He closed tracker card 10431 the same day: "can we skip i have too much on my plate currently anyways". The picks below are kept as options for a later window, not commitments.
+> **Status, 2026-10-21: Zaal skipped this round.** His words, relayed by the seat lane (orchestrator2-3d) on 2026-10-21 and quoted in the 09:18 note on tracker card 10431: "can we skip i have too much on my plate currently anyways". The board-burn lane closed the card as skipped on that relay. The picks below are kept as options for a later window, not commitments.
 
 ## Key Decisions / Recommendations
 

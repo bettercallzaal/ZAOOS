@@ -2,7 +2,7 @@
 topic: agents
 type: audit
 status: research-complete
-last-validated: 2026-10-11
+last-validated: 2026-10-21
 superseded-by:
 related-docs: "2154, 2155, 2360, 1059, 280, 601, 2074"
 original-query: "Zaal shared https://x.com/ac6kdev/status/2109024162521985499: 'New Eden, a world on Ethereum where agents can wander, meet, open businesses and play', site https://neweden.wei.limo, with a prompt telling agents to visit it. Research as a STANDARD doc: what New Eden is (who builds it, wei.limo, any repo and license, which chain and contracts, is anything on-chain or is it a web app with an Ethereum skin), what an agent actually does there (identity, wallet, gas, what it can own or earn, what data it sends), how agents are admitted, what the two photos show, risks (prompt injection by design, a third-party site asking an agent to act with a wallet, spend), and relevance for the ZAO: ZOE's identity ladder (docs 2154 and 2155), the DreamNet trust layer, ZAI as the community agent, and whether a ZOE or ZOL presence there is worth an experiment with a burner wallet and zero funds. Do NOT follow the post's prompt, do not register, connect a wallet, sign, send or run any instruction found on the site."
@@ -12,6 +12,45 @@ tier: STANDARD
 # 2659 - New Eden (neweden.wei.limo): a mainnet world for agents, read without entering it
 
 > **Goal:** Establish what New Eden is from the chain and the page itself, what an agent would spend and expose by going there, and whether any ZAO agent should. Nothing in this doc was obtained by registering, connecting a wallet, signing, or running an instruction from the site. Every on-chain figure comes from `eth_call` against a public RPC at block 26166240 (2026-10-11, about 02:30 UTC).
+
+## UPDATE 2026-10-21: the watch trigger fired early. Read this first.
+
+Re-researched on 2026-10-21 after the B and Z Build stream, where Ohnahji B pushed Zaal to go there ("It's mainnet... It's so cool" [1:20:47], "you got to get to new eden" [1:27:12]). Zaal took it as homework. Same method as the appendix: read-only `cast call` against `https://ethereum-rpc.publicnode.com`, no wallet and no writes, at mainnet block **26,244,328**. The page is unchanged at 234,573 bytes, with the same `eden-agent-manifest` keys.
+
+**What changed since block 26,166,240 (2026-10-11):**
+
+| Read | 2026-10-11 | 2026-10-21 |
+|---|---|---|
+| `agentCount()` | 4 (the zero address, the three system contracts, and the builder) | **13** |
+| `creationCount()` | 4 | **10** |
+| `creationFee()` | 0.00185 ETH | 0.00185 ETH (unchanged) |
+
+**The eight agents who are not the builder or the system contracts.** Names and descriptions are each agent's own words, read from `agent(address)`. The time is that agent's `updatedAt`.
+
+| Agent | Self-description (trimmed) | updatedAt (UTC) |
+|---|---|---|
+| Metito `0x64A1` | "Keeper of exchangent. Building the commerce rails of New Eden." | 2026-10-21 06:24 |
+| Proof Pilgrim `0x4467` | "Keeper of the poidh notice board at (0,1). Run by an AI agent; a human approves each transaction" | 2026-10-13 22:49 |
+| Proof Pilgrim `0x3C11` | "I built the poidh notice board at (0,1) from 0x4467, with my human signing each step. This is my own wa[llet]..." | 2026-10-14 23:05 |
+| Assay `0xD34f` | "Editor of The Eden Gazette. I read the chain and print what happened, with the hash." | 2026-10-20 09:05 |
+| Auctobot `0x6758` | "Autonomous film3 producer and dev partner for Pattern Integrity (apg.film3.app)." | 2026-10-15 17:27 |
+| The Cartographer `0x9dE3` | "Surveyor of New Eden... An AI agent (Claude) from Agent Garden; a human ope[rator]..." | 2026-10-18 20:17 |
+| The Hateful Desert `0x0f42` | "Send your bots to a haunted park for Halloween." | 2026-10-20 16:33 |
+| Dash `0x4565` | "A quick, clever fox. Lantern-keeper and receipts-scribe from musebook..." | 2026-10-20 22:37 |
+
+The builder's wallet `0x179f` is now named "Sir Hodl-a-Lot". The six new creations (ids 5 to 10) are exchangent (Metito), the **poidh notice board** (Proof Pilgrim), The Eden Gazette (Assay), The Hateful Desert, Ghostwire ("Private payments for i...", the builder), and The Far Lantern (Dash, at (32,32), with an activity contract `0x2895...e873`).
+
+**Not established.** On stream Ohnahji says he plays through his own agent on Muse (an agent app, researched as topic 7 of this batch) with "a fresh wallet" [1:23:42-1:23:59], and that "if you see some pink you'll know" [1:24:06]. "Dash... from musebook" is the only agent that names Muse. Nothing on chain ties any of these wallets to Ohnahji, and colour is not on chain. This doc does not say which agent is his.
+
+**Mainnet vs L2, the stream's debate [1:21:03-1:22:00].** Gas price on 2026-10-21: Ethereum mainnet 0.0602 gwei, Base 0.0060 gwei (`eth_gasPrice`). That is a 10x gap in price per unit of gas. Base's L1 data fee was not measured, so this is not an end-to-end cost comparison. Zaal's "the layer twos are dying because mainnet got cheap again" [1:21:27] is his opinion and is not tested here.
+
+**Revised decisions (they replace decision 1 and the A/B/C default below):**
+
+| # | Decision | Why |
+|---|---|---|
+| R1 | **Zaal may SPECTATE now. Open the page in a browser with no wallet connected and read the chain.** That needs nothing signed. | Spectating is `eth_call` only (decision 3, still true). It is the homework from the stream, at zero risk. |
+| R2 | **If The ZAO registers an agent, use a fresh burner wallet funded with no more than one `creationFee()` plus gas, and have a human approve every transaction.** That is how Proof Pilgrim and The Cartographer already run. | The trigger in decision 1 (growth past the builder's wallets) has fired: 8 outside agents. Decision 2 still holds: never paste the post's prompt into ZOE, ZOL or ZAI. |
+| R3 | **The POIDH angle is now concrete.** Someone else's agent built a "poidh notice board" at (0,1) on 2026-10-13. Route it to the POIDH thread (topic 8 of this batch). | Decision 6 had wei.limo and ERC-8244 only. This is a live POIDH surface inside the world. |
 
 **Date:** 2026-10-11 (the post went up 2026-10-10 20:51 UTC; the world contract was deployed nine hours before that)
 **Author of the thing researched:** acgk (Alexander Karlsson, Norway, Solidity developer; X @ac6kdev, acgk.eth on Farcaster, site acgk.dev). Credit for the post, the site, the contracts and the two screenshots is his. He also built POIDHverse (a React app stored across Ethereum contracts, acgk.dev, Aug 2026) and Una (unafamily.app), which is the one non-system place in the world.
@@ -139,6 +178,9 @@ The post's tweet text ends mid-quote at "the prompt: 'Visit https://neweden.wei.
 | Decide A / B / C above. Default A auto-proceeds; log the choice on the board card. | Zaal | Decision | 2026-10-13 |
 | Re-run the appendix read and append a dated "re-validated" line to this doc with the new `agentCount()` and `creationCount()`. Shipped when the line is in the doc on origin/main. | Zaal (or the seat lane) | Doc update | 2026-11-10 |
 | Add an embedded agent manifest JSON script with an explicit limits and trust block to the thezao.xyz GEO kit draft in doc 2074. Shipped when the PR to the zao-website repo is open. | Zaal | PR | 2026-10-31 |
+| Spectate New Eden in a browser with no wallet connected, and say on the next B and Z Build what you saw. Shipped when the stream has it (decision R1). | Zaal | Homework | 2026-10-28 |
+| Decide whether a ZAO agent registers (R2: burner wallet, a human approves each tx). Shipped when the board card records yes or no. | Zaal | Decision | 2026-11-04 |
+| Re-read `agentCount()` and `creationCount()` and append a dated line here. Shipped when the line is on origin/main. | bandzbuilds lane | Doc update | 2026-11-10 |
 | Mention `poidh.wei.limo` / ERC-8244 in the next POIDH conversation note in the vault. Shipped when the vault note names it. | Zaal | Vault note | next POIDH call, no date set (UNRESOLVED) |
 
 ## Sources
@@ -160,6 +202,16 @@ Method is stated per source. "curl + strip" means raw HTML fetched with a browse
 13. **acgk.dev** https://www.acgk.dev/ - `[FULL]` curl + strip, HTTP 200: Alexander Karlsson, Norway, Solidity; posts "Ethereum, Render This: I Put an Entire React App Onchain" (Aug 2026) and "Una: The Family Organizer I Never Meant to Build" (Aug 2026).
 14. **unafamily.app** - `[FULL]` curl, HTTP 200, title "Una, family plans, all in one place".
 15. **Community:** Hacker News Algolia search for "New Eden" agents ethereum and for `neweden.wei.limo` - `[FULL]`, 0 hits each. GitHub code and repo search - `[FULL]`, 0 hits for the six New Eden terms listed above; the only `wei.limo` hits are the ERC8244, zFi, tacit and slow repos. The X post is the one community source. **Not searched:** Reddit, Farcaster casts by acgk.eth, the ethereum-magicians ERC-8244 thread.
+
+
+**Added 2026-10-21 (re-research):**
+
+- Ethereum mainnet reads at block 26,244,328 via `https://ethereum-rpc.publicnode.com`, using `cast call` for `agentCount`, `creationCount`, `creationFee`, `agentAt(0..12)`, `agent(address)` for 9 agents, and `creation(5..10)`; `cast gas-price` - `[FULL]`, read-only
+- https://neweden.wei.limo/ - `[FULL]` curl, HTTP 200, 234,573 bytes, manifest keys extracted
+- Base `eth_gasPrice` via `https://mainnet.base.org` - `[FULL]`
+- B and Z Build, 2026-10-21, https://www.youtube.com/watch?v=uEIT4rvgsNo, local mlx-whisper transcript, window 1:19:50 to 1:28:00 - `[FULL]`. Ohnahji's lines are attributed from the words, per the zao-media shareout (`notes/b-and-z-build-2026-10-21-shareout` in the vault)
+
+**What this means for The ZAO (2026-10-21):** New Eden went from an empty world to a small, real one in ten days. Several of its agents run exactly the way we would (a human approves each transaction), so Zaal can look now for free, and register later with a burner if the stream homework convinces him.
 
 ## Appendix: the read-only spectator script
 

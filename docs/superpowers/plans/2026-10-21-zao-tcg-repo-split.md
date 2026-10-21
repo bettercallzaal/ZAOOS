@@ -15,11 +15,11 @@ Everything below is on ZAOOS main at 759a44137. It came in through 4 squash comm
 | `src/lib/tcg/` | `drop.ts`, 1 test |
 | `scripts/` | `cards-buyer-snapshot.ts`, `lib/wavez-buyers.ts`, `__tests__/wavez-buyers.test.ts` |
 
-That is 35 files.
+That is 34 files (the count `git filter-repo` kept).
 
 ## 2. What it imports from ZAOOS, and what happens to each
 
-I took the list from a `git grep` of every `from '...'` in the 35 files at origin/main 759a44137. These are the only imports from outside the moved set:
+I took the list from a `git grep` of every `from '...'` in the 34 files at origin/main 759a44137. These are the only imports from outside the moved set:
 
 | Import | Used for | Standalone answer |
 |---|---|---|
@@ -28,7 +28,7 @@ I took the list from a `git grep` of every `from '...'` in the 35 files at origi
 | `@/hooks/useMiniApp` (219 lines) | Prefilling the artist's FID in the editor when it runs inside the Farcaster mini app | **Drop the prefill in v1.** The artist types the FID instead. Auto-proceeded; override anytime. It comes back with `@farcaster/miniapp-sdk` if the repo becomes a mini app |
 | App shell: `src/app/providers.tsx` and `RainbowKitWrapper.tsx` (wagmi, RainbowKit, react-query), the `--font-inter` variable from the root layout, and the Tailwind v4 setup | The /tcg connect button, and fonts in the editor | **Write a small new shell**: Optimism-only wagmi config, `next/font` Inter exposed as `--font-inter`, and Tailwind v4 |
 
-Login and data: none of the 35 files uses a session, iron-session, Supabase, Neynar or a ZAOOS API route. Sign-in on /tcg checks a wallet signature in the browser only. So the split needs no login or database, and nothing calls back into ZAOOS.
+Login and data: none of the 34 files uses a session, iron-session, Supabase, Neynar or a ZAOOS API route. Sign-in on /tcg checks a wallet signature in the browser only. So the split needs no login or database, and nothing calls back into ZAOOS.
 
 The later buyer dashboard will need private data: buyer emails and wallets. When it is built, it gets its own Supabase project with row-level security behind Zaal's login, not calls to ZAOOS. Creating that project is Zaal's (new DB), and it is not part of this move.
 
@@ -43,16 +43,20 @@ This is the same method `bettercallzaal/zaoostest` used: a private repo, with th
      - next 16, react and react-dom 19.2.3;
      - wagmi, viem, @rainbow-me/rainbowkit, @tanstack/react-query, zod;
      - konva 10.9.0 and react-konva 19.2.7 (still approved);
-     - dev: vitest, jsdom, @testing-library/react, typescript, biome, tailwind v4, and tsx (it is the repo's own script runner here).
+     - dev: vitest, jsdom, @testing-library/react, typescript, biome and tailwind v4. tsx is not added; the buyer snapshot keeps running through `npx tsx`.
    - `tsconfig` with the `@/` alias, `next.config`, `vitest.config`, `biome.json`;
    - the new shell from section 2, the copied Respect helper and config, `README` with credits, `LICENSE` (MIT, as zaoostest), and `.env.example`.
 4. Copy-port the Respect helper as a separate commit, so it stays reviewable.
 5. Create `bettercallzaal/zao-tcg` as a private repo and push `main`.
-6. Before anything else touches the repo, check it: install, typecheck, the full vitest run (the 13 moved test files, 105 tests, pass on ZAOOS 759a44137 today and must pass there too), biome, and `next build` in the new repo only. Then open a PR there for evaluator-e2.
+6. Before anything else touches the repo, check it: install, typecheck, the full vitest run (the 13 moved test files, 105 tests, pass on ZAOOS 759a44137 today and must pass there too), and biome. No local production build: those are not run on this Mac, so Vercel's first build is the build check. Then open a PR there for evaluator-e2.
+
+## Status, 2026-10-21
+
+Done: `bettercallzaal/zao-tcg` was created private, and its `main` is at 4b47d46, a cut built by `git filter-repo` from ZAOOS 759a44137. On top of the 4 kept commits it adds 2 commits: the Respect port, then the scaffold with a home page built around card 001 by Cannon Jones. Checks there: 14 test files and 108 tests pass, the typecheck shows 0 errors, and biome is clean. Vercel and the ZAOOS removal are still Zaal's.
 
 ## 4. What is Zaal's
 
-- The Vercel project and domain for zao-tcg. Lanes never touch Vercel. It needs one new env var, `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID`, which is the same value ZAOOS uses, and Zaal sets it in Vercel.
+- The Vercel project and domain for zao-tcg. Lanes never touch Vercel. It needs one new env var, `NEXT_PUBLIC_WC_PROJECT_ID` (the name ZAOOS reads), which is the same value ZAOOS uses, and Zaal sets it in Vercel.
 - **Removing the code from ZAOOS is a Zaal paste, the same as wave 1.** It happens only after zao-tcg is serving. ZAOOS then keeps redirects from `/tcg` and `/cards/create` to the new domain. The cards lane prepares that PR and Zaal merges it.
 - When the repo becomes public.
 

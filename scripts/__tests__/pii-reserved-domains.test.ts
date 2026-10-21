@@ -43,4 +43,22 @@ describe('git-pii-scan: reserved test domains (card 10451)', () => {
     ]);
     for (const [addr, hit] of Object.entries(got)) expect(hit, addr).toBe(true);
   });
+
+  // evaluator-e2 on #4078: two bypasses that this PR would otherwise widen.
+  it('blocks a real address chained behind a reserved one (more than one @)', () => {
+    const got = emailHits(['user@example.com@gmail.com', 'a@b.com@example.com', 'user@@gmail.com']);
+    for (const [addr, hit] of Object.entries(got)) expect(hit, addr).toBe(true);
+  });
+
+  it('blocks Cyrillic and mixed-script addresses, and reads a full-width @ as @', () => {
+    const got = emailHits([
+      'zaal@thez\u0430o.com',                 // Cyrillic a in an allowlisted domain
+      'te\u0455t@example.invalid',            // Cyrillic s in a reserved address
+      '\u0438\u0432\u0430\u043d@\u043f\u0440\u0438\u043c\u0435\u0440.\u0440\u0444', // all-Cyrillic
+      'jane\uff20somecompany.com',            // full-width @
+    ]);
+    for (const [addr, hit] of Object.entries(got)) expect(hit, addr).toBe(true);
+    // NFKC is not a bypass the other way: a full-width @ on a reserved address still passes
+    expect(emailHits(['test\uff20example.invalid'])['test\uff20example.invalid']).toBe(false);
+  });
 });

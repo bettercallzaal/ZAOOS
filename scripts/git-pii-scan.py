@@ -39,6 +39,7 @@ from __future__ import annotations
 import re
 import subprocess
 import sys
+import unicodedata
 
 # From pii-hygiene.md's "Email allowlist" section. These are already public.
 EMAIL_ALLOW = {
@@ -97,7 +98,13 @@ HEX_RE = re.compile(r"0x[0-9a-fA-F]{16,}|\b[0-9a-fA-F]{32,}\b")
 
 PATTERNS: dict[str, tuple[str, bool]] = {
     # name: (regex, skip_on_uuid_or_url)
-    "email": (r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}", False),
+    # Unicode-aware (\w), and a chain of @-parts is ONE candidate. Both close
+    # bypasses evaluator-e2 found on #4078 (card 10451): the old ASCII pattern
+    # read `user@example.com@gmail.com` as the allowed `user@example.com` and
+    # never reached the Gmail half, and it did not see a Cyrillic address at
+    # all. Lines are NFKC-normalised before this runs (see scan), so a
+    # full-width @ is an @.
+    "email": (r"[\w.%+\-]+@[\w.\-@]+\.[^\W\d_]{2,}", False),
     # NANP: neither the area code nor the exchange code may begin with 0 or 1.
     # The old pattern allowed any digits, so a bare 10-digit run matched - and
     # bare 10-digit runs in this repo are overwhelmingly Unix timestamps. It
@@ -130,7 +137,17 @@ def venue_addr_allowed(addr: str) -> bool:
 
 
 def email_allowed(addr: str) -> bool:
-    a = addr.lower()
+    """True only for one plain ASCII address on an allowlist.
+
+    More than one @ is never allowed: the part a reader trusts can hide the
+    part that delivers. Non-ASCII is never allowed either: every allowlist entry
+    is ASCII, and a look-alike such as zaal@thez\u0430o.com (Cyrillic a) or an
+    address mixing scripts in its local or domain part must be shown, not
+    passed. Checked after NFKC, so compatibility forms cannot dodge it.
+    """
+    a = unicodedata.normalize("NFKC", addr).lower()
+    if a.count("@") != 1 or not a.isascii():
+        return False
     if a in EMAIL_ALLOW:
         return True
     domain = a.rsplit("@", 1)[-1]
@@ -239,10 +256,11 @@ def scan(rows: list[tuple[str, str]]) -> list[tuple[str, str, str, str]]:
         skip_numeric = bool(
             UUID_RE.search(line) or URL_RE.search(line) or HEX_RE.search(line)
         )
+        norm = unicodedata.normalize("NFKC", line)
         for kind, (pat, guarded) in PATTERNS.items():
             if guarded and skip_numeric:
                 continue
-            for m in re.findall(pat, line):
+            for m in re.findall(pat, norm if kind == "email" else line):
                 text = m if isinstance(m, str) else m[0]
                 if kind == "email" and email_allowed(text):
                     continue

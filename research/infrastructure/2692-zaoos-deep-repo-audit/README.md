@@ -11,7 +11,7 @@ tier: DEEP
 
 # 2692 - ZAOOS, measured top to bottom: what holds each piece in, and the simple ZAOOS
 
-> **Goal:** Give Zaal the evidence to decide what ZAOOS becomes. He has already said "keep ZAOOS as simple as possible", "unused code goes to private `bettercallzaal/zaoostest`", "finish zao-app", and "hold the 21 ZAOresearch docs until 2026-11-03" (vault decision note `grill-2026-10-20-seat-afternoon`). This doc measures what is left and settles the three open calls from [doc 2691](../2691-zaoos-graduation-map-2026-10/): `ZAO-STOCK/`, ZOE and the bot, and streaming. Research only: nothing is moved, deleted or created here. Wave 1 (the move to zaoostest) is the zaoos-split lane's and is not repeated.
+> **Goal:** Give Zaal the evidence to decide what ZAOOS becomes. He has already said "keep ZAOOS as simple as possible", "unused code goes to private `bettercallzaal/zaoostest`", "finish zao-app", and "hold the 21 ZAOresearch docs until 2026-11-03" (Zaal's ruling of 2026-10-20). This doc measures what is left and settles the three open calls from [doc 2691](../2691-zaoos-graduation-map-2026-10/): `ZAO-STOCK/`, ZOE and the bot, and streaming. Research only: nothing is moved, deleted or created here. Wave 1 (the move to zaoostest) is the zaoos-split lane's and is not repeated.
 
 All repo measurements: `origin/main` at `5c13b4e49`, 2026-10-20 between 14:00 and 14:40 EDT, with `git ls-tree`, `git log`, `git grep` and two small scripts named in the Method section. VPS measurements: `ssh vps`, read-only, 2026-10-20 18:35 UTC. No install, build or test was run.
 

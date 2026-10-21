@@ -72,6 +72,13 @@ VENUE_ADDR_ALLOW = {
 # Public role-addresses on ZAO-controlled domains, per the same section.
 ROLE_PREFIXES = ("contact@", "team@", "info@", "hello@", "support@", "press@", "zoe@")
 ZAO_DOMAINS = ("thezao.com", "bettercallzaal.com", "zabalgamez.com", "zaofestivals.com")
+# Reserved for documentation and tests (RFC 2606, RFC 6761): no real mailbox can
+# exist at these, so an address there is never a person's. Card 10451: the hook
+# blocked test@example.invalid in a test fixture on 2026-10-16. Matched on the
+# whole domain, or the last label for the reserved TLDs, so a real domain that
+# merely contains "example" (example.co.uk, myexample.com) still blocks.
+RESERVED_DOMAINS = ("example.com", "example.org", "example.net")
+RESERVED_TLDS = ("invalid", "test", "example", "localhost")
 
 # Lines that produced every observed false positive. A UUID is not a phone number.
 UUID_RE = re.compile(r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}", re.I)
@@ -125,6 +132,11 @@ def venue_addr_allowed(addr: str) -> bool:
 def email_allowed(addr: str) -> bool:
     a = addr.lower()
     if a in EMAIL_ALLOW:
+        return True
+    domain = a.rsplit("@", 1)[-1]
+    if domain in RESERVED_DOMAINS or domain.endswith(tuple("." + r for r in RESERVED_DOMAINS)):
+        return True
+    if domain.rsplit(".", 1)[-1] in RESERVED_TLDS:
         return True
     return a.startswith(ROLE_PREFIXES) and a.endswith(ZAO_DOMAINS)
 

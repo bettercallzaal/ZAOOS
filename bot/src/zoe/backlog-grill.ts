@@ -440,9 +440,11 @@ export function verdictNote(v: Verdict, date: string, time?: string): string {
  * unanswered" every 10 minutes on 2026-10-20, 16 of the 32 carrying one
  * (grill-sweep lane). Only one bracketed stamp directly before the verdict is
  * allowed, so prose that mentions a grill later in a line still does not fire.
+ * The stamp must open with a date: "[ ] GRILL ..." (a checkbox) or
+ * "[todo] GRILL ..." is a note about a grill, not a verdict.
  */
 export const TERMINAL_VERDICT_RE =
-  /(^|\n)\s*(\[[^\]\n]*\]\s*)?(GRILL \d{4}-\d{2}-\d{2}|ZAAL VERDICT \d{4}-\d{2}-\d{2})/;
+  /(^|\n)\s*(\[\d{4}-\d{2}-\d{2}[^\]\n]*\]\s*)?(GRILL \d{4}-\d{2}-\d{2}|ZAAL VERDICT \d{4}-\d{2}-\d{2})/;
 
 /**
  * A card a lane owns, so the phone must not ask Zaal about it.

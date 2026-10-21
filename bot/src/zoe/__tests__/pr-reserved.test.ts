@@ -51,6 +51,30 @@ describe('reservedClassOf', () => {
   });
 });
 
+describe('the VPS deploy path in ZAOOS (#4066, verbatim)', () => {
+  it('#4066 is his: autodeploy and staleness check are deploy-host', () => {
+    const files = ['scripts/__tests__/zoe-autodeploy-refresh.test.ts', 'scripts/vps-staleness-check.sh', 'scripts/zoe-autodeploy.sh'];
+    expect(reservedClasses(files, 'bettercallzaal/ZAOOS')).toEqual(['deploy-host']);
+  });
+  it('scripts/zoe-deploy.sh is deploy-host; any other script is not', () => {
+    expect(reservedClassOf('scripts/zoe-deploy.sh', 'bettercallzaal/ZAOOS')).toBe('deploy-host');
+    expect(reservedClasses(['scripts/foo.sh'], 'bettercallzaal/ZAOOS')).toEqual([]);
+  });
+  it('the rest of the seat-ruled deploy-host set', () => {
+    expect(reservedClassOf('infra/bus/deploy/deploy.sh', 'bettercallzaal/ZAOOS')).toBe('deploy-host');
+    expect(reservedClassOf('tools/deploy.sh', 'bettercallzaal/ZAOOS')).toBe('deploy-host');
+    expect(reservedClassOf('infra/portal/bin/bots/zoe.sh', 'bettercallzaal/ZAOOS')).toBe('deploy-host');
+    expect(reservedClassOf('deploy/pi/zoe.service', 'bettercallzaal/ZAOOS')).toBe('deploy-host');
+    expect(reservedClassOf('pi/start-fleet.sh', 'bettercallzaal/zaal-dotfiles')).toBe('deploy-host');
+    expect(reservedClassOf('bin/vps/loop.sh', 'bettercallzaal/zaal-dotfiles')).toBe('deploy-host');
+    expect(reservedClassOf('infra/portal/README.md', 'bettercallzaal/ZAOOS')).toBeNull();
+  });
+  it('dotfiles cron/ and codex/hooks.json are his', () => {
+    expect(reservedClassOf('cron/vps.cron', 'bettercallzaal/zaal-dotfiles')).toBe('deploy-host');
+    expect(reservedClassOf('codex/hooks.json', 'bettercallzaal/zaal-dotfiles')).toBe('hooks');
+  });
+});
+
 describe('reservedClasses', () => {
   it('lists each class once, in first-seen order', () => {
     expect(reservedClasses(['.github/workflows/a.yml', 'x.sql', 'README.md', '.github/workflows/b.yml'])).toEqual(['ci', 'db/schema']);

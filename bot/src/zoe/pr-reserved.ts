@@ -67,6 +67,8 @@ const RESERVED_PATHS: Rule[] = [
   ['deploy-host', '*.service'],
   ['deploy-host', '*.timer'],
   ['deploy-host', '*.plist'],
+  ['deploy-host', 'deploy.sh'],
+  ['deploy-host', 'infra/portal/bin/'],
   ['trading', 'src/lib/agents/'],
 ];
 
@@ -83,7 +85,24 @@ const DOTFILES_HOOK_SCRIPTS = [
 const RESERVED_BY_REPO: Record<string, Rule[]> = {
   // vps/ holds scripts that run on the VPS once installed: deploy-host, per the
   // seat on 2026-10-21 (zaal-dotfiles #592). Not in #587.
-  'bettercallzaal/zaal-dotfiles': [...DOTFILES_HOOK_SCRIPTS.map((p): Rule => ['hooks', p]), ['deploy-host', 'vps/']],
+  // cron/ schedules what runs on each host; codex/hooks.json is Codex's hook
+  // wiring. Neither is in #587 (evaluator-e2 on #4072).
+  'bettercallzaal/zaal-dotfiles': [
+    ...DOTFILES_HOOK_SCRIPTS.map((p): Rule => ['hooks', p]),
+    ['deploy-host', 'vps/'],
+    ['deploy-host', 'cron/'],
+    ['deploy-host', 'pi/'],
+    ['deploy-host', 'bin/vps/'],
+    ['hooks', 'codex/hooks.json'],
+  ],
+  // The VPS deploy path: the autodeploy loop, the manual deploy and the
+  // staleness check. Their names do not start "deploy-script" or
+  // "staleness-check", so they need entries (evaluator-e2 on #4072: #4066).
+  'bettercallzaal/zaoos': [
+    ['deploy-host', 'scripts/zoe-autodeploy.sh'],
+    ['deploy-host', 'scripts/zoe-deploy.sh'],
+    ['deploy-host', 'scripts/vps-staleness-check.sh'],
+  ],
   'bettercallzaal/zao-vault': [
     ['hooks', 'scripts/guard-no-secrets.sh'],
     ['hooks', 'scripts/guard-not-for-sharing.sh'],

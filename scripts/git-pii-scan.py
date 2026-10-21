@@ -98,12 +98,8 @@ HEX_RE = re.compile(r"0x[0-9a-fA-F]{16,}|\b[0-9a-fA-F]{32,}\b")
 
 PATTERNS: dict[str, tuple[str, bool]] = {
     # name: (regex, skip_on_uuid_or_url)
-    # Unicode-aware (\w), and a chain of @-parts is ONE candidate. Both close
-    # bypasses evaluator-e2 found on #4078 (card 10451): the old ASCII pattern
-    # read `user@example.com@gmail.com` as the allowed `user@example.com` and
-    # never reached the Gmail half, and it did not see a Cyrillic address at
-    # all. Lines are NFKC-normalised before this runs (see scan), so a
-    # full-width @ is an @.
+    # Kept for reference and for readers of this table; scan() finds emails
+    # with email_candidates() below, which uses EMAIL_RE on one token at a time.
     "email": (r"[\w.%+\-]+@[\w.\-@]+\.[^\W\d_]{2,}", False),
     # NANP: neither the area code nor the exchange code may begin with 0 or 1.
     # The old pattern allowed any digits, so a bare 10-digit run matched - and
@@ -136,16 +132,56 @@ def venue_addr_allowed(addr: str) -> bool:
     return " ".join(addr.split()).lower() in VENUE_ADDR_ALLOW
 
 
+# Email finding, card 10451 and evaluator-e2's two grades of #4078.
+#
+# A run of address characters is ONE token, so `user@example.com@gmail.com` is
+# one candidate (the old pattern read only its allowed first half). \w is
+# Unicode, so a Cyrillic or mixed-script address is a candidate at all. Each
+# token is matched once, anchored, so the cost is linear in the line: a
+# findall of the whole pattern restarted at every position and was quadratic
+# on repeated `a@a.` (3.7 s at 40k characters).
+#
+# Normalization DETECTS, it never allows. The allowlist and the reserved-domain
+# pass are decided on the raw text only. NFKC folding is run as a second pass,
+# and any candidate it produces that the raw pass did not see is flagged as is:
+# `user@gmail.com` + U+FF0E + `test` folds to `user@gmail.com.test`, which a
+# folded allowlist check would have passed as a reserved TLD.
+EMAIL_TOKEN_RE = re.compile(r"[\w.%+\-@]+")
+EMAIL_RE = re.compile(r"[\w.%+\-]+@[\w.\-@]+\.[^\W\d_]{2,}")
+
+
+def email_candidates(line: str) -> list[str]:
+    out = []
+    for tok in EMAIL_TOKEN_RE.findall(line):
+        if "@" not in tok:
+            continue
+        m = EMAIL_RE.match(tok.lstrip("@"))
+        if m:
+            out.append(m.group(0))
+    return out
+
+
+def email_hits(line: str) -> list[str]:
+    """Candidates to report: raw ones not allowed, plus anything NFKC alone reveals."""
+    raw = email_candidates(line)
+    hits = [a for a in raw if not email_allowed(a)]
+    folded = unicodedata.normalize("NFKC", line)
+    if folded != line:
+        seen = set(raw)
+        hits += [a for a in email_candidates(folded) if a not in seen]
+    return hits
+
+
 def email_allowed(addr: str) -> bool:
-    """True only for one plain ASCII address on an allowlist.
+    """True only for one plain ASCII address on an allowlist, judged on the RAW text.
 
     More than one @ is never allowed: the part a reader trusts can hide the
     part that delivers. Non-ASCII is never allowed either: every allowlist entry
     is ASCII, and a look-alike such as zaal@thez\u0430o.com (Cyrillic a) or an
     address mixing scripts in its local or domain part must be shown, not
-    passed. Checked after NFKC, so compatibility forms cannot dodge it.
+    passed. Never call this on normalized text (see email_hits).
     """
-    a = unicodedata.normalize("NFKC", addr).lower()
+    a = addr.lower()
     if a.count("@") != 1 or not a.isascii():
         return False
     if a in EMAIL_ALLOW:
@@ -256,14 +292,15 @@ def scan(rows: list[tuple[str, str]]) -> list[tuple[str, str, str, str]]:
         skip_numeric = bool(
             UUID_RE.search(line) or URL_RE.search(line) or HEX_RE.search(line)
         )
-        norm = unicodedata.normalize("NFKC", line)
         for kind, (pat, guarded) in PATTERNS.items():
             if guarded and skip_numeric:
                 continue
-            for m in re.findall(pat, norm if kind == "email" else line):
+            if kind == "email":
+                for text in email_hits(line):
+                    found.append((kind, path, text, line.strip()[:100]))
+                continue
+            for m in re.findall(pat, line):
                 text = m if isinstance(m, str) else m[0]
-                if kind == "email" and email_allowed(text):
-                    continue
                 if kind == "street_address" and venue_addr_allowed(text):
                     continue
                 found.append((kind, path, text, line.strip()[:100]))

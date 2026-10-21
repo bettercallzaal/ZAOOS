@@ -58,7 +58,23 @@ describe('git-pii-scan: reserved test domains (card 10451)', () => {
       'jane\uff20somecompany.com',            // full-width @
     ]);
     for (const [addr, hit] of Object.entries(got)) expect(hit, addr).toBe(true);
-    // NFKC is not a bypass the other way: a full-width @ on a reserved address still passes
-    expect(emailHits(['test\uff20example.invalid'])['test\uff20example.invalid']).toBe(false);
+  });
+
+  // evaluator-e2's second grade: NFKC folding must only DETECT. A full-width or
+  // one-dot leader before "test" folds a real Gmail address into a reserved TLD.
+  it('blocks an address that only normalization turns into a reserved one', () => {
+    const got = emailHits([
+      'user@gmail.com\uff0etest',            // FULLWIDTH FULL STOP
+      'user@gmail.com\u2024test',            // ONE DOT LEADER
+      'user@gmail.com\u2026example',         // HORIZONTAL ELLIPSIS
+      'test\uff20example.invalid',           // full-width @: raw and folded differ, so it is shown
+    ]);
+    for (const [addr, hit] of Object.entries(got)) expect(hit, addr).toBe(true);
+  });
+
+  it('stays linear on a long run of a@a. (was 3.7 s at 40k characters)', () => {
+    const t0 = Date.now();
+    emailHits(['a@a.'.repeat(10_000)]);
+    expect(Date.now() - t0).toBeLessThan(2_000);
   });
 });

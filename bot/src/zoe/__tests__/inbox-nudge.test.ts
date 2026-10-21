@@ -259,8 +259,8 @@ describe('PRs on his hand under the 2026-10-20 merge rule', () => {
   it('only reserved PRs stay; the rest are counted as agent merges', async () => {
     const { hand, agent } = await handPrs([pr(1), pr(2), pr(3), pr(4)], prFiles);
     expect(hand.map((p) => [p.number, p.reserved])).toEqual([
-      [3, ['db-schema']],
-      [4, ['settings', 'merge-guard']],
+      [3, ['db/schema']],
+      [4, ['settings', 'ci']],
     ]);
     expect(agent).toBe(2);
   });
@@ -285,7 +285,7 @@ describe('PRs on his hand under the 2026-10-20 merge rule', () => {
     expect(t).toMatchObject({ prs: 2, agentPrs: 2, total: 2, failed: [] });
     expect(formatTotals(t, 1, new Date()).text).toContain('PRs on your hand: 2 (2 more are agent merges)');
     const list = formatPrList(t.prList, new Date('2026-10-14T12:00:00Z'));
-    expect(list.text).toContain('[settings, merge-guard]: PR 4');
-    expect(list.text).toContain('[db-schema]: PR 3');
+    expect(list.text).toContain('[settings, ci]: PR 4');
+    expect(list.text).toContain('[db/schema]: PR 3');
   });
 });

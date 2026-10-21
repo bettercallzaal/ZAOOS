@@ -283,7 +283,7 @@ export async function handPrs(
       hand.push({ ...p, reserved: ['files unread'] });
       return;
     }
-    const cls = reservedClasses(r.value);
+    const cls = reservedClasses(r.value, p.repo, p.labels ?? []);
     if (cls.length) hand.push({ ...p, reserved: cls });
     else agent++;
   });

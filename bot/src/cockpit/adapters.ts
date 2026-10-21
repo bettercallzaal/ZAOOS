@@ -125,32 +125,44 @@ export function filterReviewPRs(rows: RawPR[]): ReviewPR[] {
  * (authenticated on the VPS - the bot has no GITHUB_TOKEN env; git.ts relies on
  * gh auth). One search call across the review owners. Best-effort: [] on failure.
  */
-export async function fetchReviewPRs(): Promise<ReviewPR[]> {
-  const q = `is:pr is:open ${REVIEW_OWNERS.map((o) => `user:${o}`).join(' ')}`;
-  // gh is installed at ~/.local/bin on the VPS, which is NOT on the zoe-bot
-  // systemd service PATH - so bare 'gh' fails with ENOENT. Prepend ~/.local/bin
-  // (and the common user-local bins) so execFile resolves it regardless of the
-  // service PATH. Override with GH_BIN_PATH if gh lives elsewhere.
+// gh is installed at ~/.local/bin on the VPS, which is NOT on the zoe-bot
+// systemd service PATH - so bare 'gh' fails with ENOENT. Prepend ~/.local/bin
+// (and the common user-local bins) so execFile resolves it regardless of the
+// service PATH. Override with GH_BIN_PATH if gh lives elsewhere.
+function ghEnv(): NodeJS.ProcessEnv {
   const home = process.env.HOME ?? '';
-  const ghPath = [
-    process.env.GH_BIN_PATH,
-    home && `${home}/.local/bin`,
-    '/usr/local/bin',
-    process.env.PATH,
-  ]
+  const ghPath = [process.env.GH_BIN_PATH, home && `${home}/.local/bin`, '/usr/local/bin', process.env.PATH]
     .filter(Boolean)
     .join(':');
+  return { ...process.env, PATH: ghPath };
+}
+
+export async function fetchReviewPRs(): Promise<ReviewPR[]> {
+  const q = `is:pr is:open ${REVIEW_OWNERS.map((o) => `user:${o}`).join(' ')}`;
   try {
     const { stdout } = await execFileAsync(
       'gh',
       ['api', '-X', 'GET', 'search/issues', '-f', `q=${q}`, '-F', 'per_page=40', '--jq', '.items'],
-      { timeout: REQUEST_TIMEOUT_MS, maxBuffer: 1_000_000, env: { ...process.env, PATH: ghPath } },
+      { timeout: REQUEST_TIMEOUT_MS, maxBuffer: 1_000_000, env: ghEnv() },
     );
     const rows = JSON.parse(stdout || '[]') as RawPR[];
     return Array.isArray(rows) ? filterReviewPRs(rows) : [];
   } catch {
     return [];
   }
+}
+
+/**
+ * The paths a PR changes. Throws when gh fails, unlike fetchReviewPRs: the
+ * caller must tell "changes nothing reserved" from "could not read it".
+ */
+export async function fetchPrFiles(repo: string, number: number): Promise<string[]> {
+  const { stdout } = await execFileAsync(
+    'gh',
+    ['api', '--paginate', `repos/${repo}/pulls/${number}/files?per_page=100`, '--jq', '.[].filename'],
+    { timeout: REQUEST_TIMEOUT_MS, maxBuffer: 4_000_000, env: ghEnv() },
+  );
+  return stdout.split('\n').map((l) => l.trim()).filter(Boolean);
 }
 
 // ---- pure logic (unit-testable, no network) ----

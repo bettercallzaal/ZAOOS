@@ -12,6 +12,7 @@ import {
   emptyState,
   formatPrList,
   formatTotals,
+  handPrs,
   mergeCommand,
   nudgeConfig,
   parsePrCallback,
@@ -240,5 +241,51 @@ describe('runInboxNudgeTick - sources, state file, sends', () => {
     const t = await readTotals(sources());
     expect(t).toMatchObject({ lanes: 3, page: 2, board: 1, prs: 1, total: 7, failed: [] });
     expect(t.prList.map((p) => p.number)).toEqual([1]);
+  });
+});
+
+describe('PRs on his hand under the 2026-10-20 merge rule', () => {
+  // 2026-10-21 05:30: "PRs on your hand: 24", most of them agent merges.
+  const files: Record<number, string[]> = {
+    1: ['research/agents/2700-x/README.md'],
+    2: ['bot/src/zoe/inbox-nudge.ts', 'bot/src/zoe/__tests__/inbox-nudge.test.ts'],
+    3: ['supabase/migrations/20261021_x.sql'],
+    4: ['.claude/settings.json', '.github/workflows/ci.yml'],
+  };
+  const prFiles = async (p: ReviewPR): Promise<string[]> => {
+    if (p.number === 5) throw new Error('HTTP 502');
+    return files[p.number] ?? [];
+  };
+  it('only reserved PRs stay; the rest are counted as agent merges', async () => {
+    const { hand, agent } = await handPrs([pr(1), pr(2), pr(3), pr(4)], prFiles);
+    expect(hand.map((p) => [p.number, p.reserved])).toEqual([
+      [3, ['db-schema']],
+      [4, ['settings', 'merge-guard']],
+    ]);
+    expect(agent).toBe(2);
+  });
+  it('a PR whose files cannot be read stays on his hand, marked, never dropped', async () => {
+    const { hand, agent } = await handPrs([pr(1), pr(5)], prFiles);
+    expect(hand.map((p) => [p.number, p.reserved])).toEqual([[5, ['files unread']]]);
+    expect(agent).toBe(1);
+  });
+  it('no files source at all counts every PR as unread, not as agent merges', async () => {
+    const { hand, agent } = await handPrs([pr(1), pr(2)]);
+    expect(hand).toHaveLength(2);
+    expect(agent).toBe(0);
+  });
+  it('the totals and list say how many are his and why', async () => {
+    const t = await readTotals({
+      lanes: async () => 0,
+      page: async () => 0,
+      board: async () => 0,
+      prs: async () => [pr(1), pr(2), pr(3), pr(4)],
+      prFiles,
+    });
+    expect(t).toMatchObject({ prs: 2, agentPrs: 2, total: 2, failed: [] });
+    expect(formatTotals(t, 1, new Date()).text).toContain('PRs on your hand: 2 (2 more are agent merges)');
+    const list = formatPrList(t.prList, new Date('2026-10-14T12:00:00Z'));
+    expect(list.text).toContain('[settings, merge-guard]: PR 4');
+    expect(list.text).toContain('[db-schema]: PR 3');
   });
 });

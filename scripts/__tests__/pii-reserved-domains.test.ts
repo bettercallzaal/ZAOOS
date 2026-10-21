@@ -72,6 +72,16 @@ describe('git-pii-scan: reserved test domains (card 10451)', () => {
     for (const [addr, hit] of Object.entries(got)) expect(hit, addr).toBe(true);
   });
 
+  // evaluator-e2's third grade: the same bypass in ASCII, through an empty label.
+  it('blocks a real address whose domain has an empty label before a reserved TLD', () => {
+    const got = emailHits([
+      'user@gmail.com..test', 'user@gmail.com...test', 'user@gmail.com...example', 'user@gmail.com..invalid',
+      // and the well-formed version of the same trick: a real domain spelled inside a reserved one
+      'user@gmail.com.test', 'user@gmail.com.example.com', 'user@outlook.co.uk.invalid',
+    ]);
+    for (const [addr, hit] of Object.entries(got)) expect(hit, addr).toBe(true);
+  });
+
   it('stays linear on a long run of a@a. (was 3.7 s at 40k characters)', () => {
     const t0 = Date.now();
     emailHits(['a@a.'.repeat(10_000)]);

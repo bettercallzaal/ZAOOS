@@ -147,6 +147,10 @@ def venue_addr_allowed(addr: str) -> bool:
 # `user@gmail.com` + U+FF0E + `test` folds to `user@gmail.com.test`, which a
 # folded allowlist check would have passed as a reserved TLD.
 EMAIL_TOKEN_RE = re.compile(r"[\w.%+\-@]+")
+# A domain that may be allowed at all: non-empty labels of letters, digits and
+# inner hyphens. Without it `user@gmail.com..test` (an empty label) passed as
+# the reserved TLD .test (evaluator-e2, third grade of #4078).
+DOMAIN_OK_RE = re.compile(r"[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)+")
 EMAIL_RE = re.compile(r"[\w.%+\-]+@[\w.\-@]+\.[^\W\d_]{2,}")
 
 
@@ -184,12 +188,18 @@ def email_allowed(addr: str) -> bool:
     a = addr.lower()
     if a.count("@") != 1 or not a.isascii():
         return False
+    if not DOMAIN_OK_RE.fullmatch(a.rsplit("@", 1)[-1]):
+        return False
     if a in EMAIL_ALLOW:
         return True
     domain = a.rsplit("@", 1)[-1]
-    if domain in RESERVED_DOMAINS or domain.endswith(tuple("." + r for r in RESERVED_DOMAINS)):
+    labels = domain.split(".")
+    # At most ONE label in front of the reserved part: `mail.example.com` and
+    # `foo.test` pass, `gmail.com.example.com` and `gmail.com.test` do not,
+    # because those spell a real address inside a reserved one.
+    if domain in RESERVED_DOMAINS or (len(labels) == 3 and ".".join(labels[1:]) in RESERVED_DOMAINS):
         return True
-    if domain.rsplit(".", 1)[-1] in RESERVED_TLDS:
+    if len(labels) == 2 and labels[-1] in RESERVED_TLDS:
         return True
     return a.startswith(ROLE_PREFIXES) and a.endswith(ZAO_DOMAINS)
 

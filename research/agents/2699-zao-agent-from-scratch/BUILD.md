@@ -1,4 +1,6 @@
-# 2699 BUILD log - the from-scratch ZAO agent
+# 2699 BUILD log - ZAO Agent, the from-scratch agent
+
+**Name: ZAO Agent** (Zaal, picker round 2, recorded in the vault seat status at 07:07 EDT 22 Oct 2026). The repo stays `bettercallzaal/zao-agent`.
 
 One line per PR, newest last, so the agent's state can be read at any moment. A build log, not
 a research doc: the research, sources and options are in [README.md](./README.md).
@@ -10,7 +12,7 @@ token exists. Runs locally on the Mac only, when it runs at all. ZOE is untouche
 
 | # | Choice | Why |
 |---|---|---|
-| 1 | **Repo `bettercallzaal/zao-agent` (private), not `hermes`** | The vault decision `decisions/hermes-agent-is-the-nous-program-zaalcommand-rename.md` (2026-09-09) reserves "Hermes" for the Nous Research program, and that program is installed on this Mac (`~/.hermes`, the `hermes` command at `~/.local/bin/hermes`). A second thing called hermes here collides with both. GitHub keeps redirects on rename, so the grill's answer costs nothing to apply. |
+| 1 | **Repo `bettercallzaal/zao-agent` (private), not `hermes`** (Zaal confirmed 22 Oct: name ZAO Agent, no rename) | The vault decision `decisions/hermes-agent-is-the-nous-program-zaalcommand-rename.md` (2026-09-09) reserves "Hermes" for the Nous Research program, and that program is installed on this Mac (`~/.hermes`, the `hermes` command at `~/.local/bin/hermes`). A second thing called hermes here collides with both. GitHub keeps redirects on rename, so the grill's answer costs nothing to apply. |
 | 2 | **One bootstrap commit to main** (README only, `822385e`) | An empty repo has no base for a PR. Every change after it is a PR. |
 | 3 | **No CI** | Actions minutes on a private repo are a spend. Verification is local typecheck with a planted-error control, the full test run, and evaluator-b2 on each PR. |
 | 4 | **Same toolchain ranges as the ZAOOS bot package** (TypeScript ^5.6.0, vitest ^3.2.6, @types/node ^22.7.0) | No new dependency enters the estate. |
@@ -72,6 +74,8 @@ agents" and "Effective context engineering for AI agents" via curl and an HTML s
 | # | Repo PR | Head | What | Lines (core total) | Verdict |
 |---|---|---|---|---|---|
 | 1 | zao-agent #1 | 3c5bdc4c | `src/core/loop.ts`: one turn, tool calls gated first, fail closed with no gate; scaffold and line-budget script | 140 (140 / 2,500) | pending evaluator-b2 |
+| - | zao-agent #2 | ef13e173 | README: name is ZAO Agent | 0 | pending evaluator-b2 |
+| 2 | not opened yet, branch `pr2-gates` at 4aed564f | 4aed564f | `src/core/gates.ts`: eight gated kinds never run, argument scan, frozen table; 34 both-direction tests | 102 (242 / 2,500) | opens after #1 merges (zao-pr-open refuses stacked PRs) |
 
 ## Sources
 

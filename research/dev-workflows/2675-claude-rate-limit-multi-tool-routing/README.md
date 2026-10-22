@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: decision
 status: research-complete
-last-validated: 2026-10-14
+last-validated: 2026-10-21
 superseded-by:
 related-docs: "2672, 2353, 2188"
 original-query: "check out the next best practices to keep coding even when at rate limit for claude since im down to 2 [price withheld] plans now we gotta make best use of the other tools"
@@ -39,6 +39,17 @@ From the Claude help center, fetched raw on 2026-10-14:
 - **Past the limit**: wait for the reset, or turn on usage credits.
 
 What `/usage` in Claude Code shows on a subscription (Claude Code docs, costs): plan usage bars, plus a breakdown of recent usage by skill, subagent, plugin and MCP server, flags such as long context or cache misses when one is 10% or more of usage, and the heaviest `/loop` tasks. Press `d` or `w` for 24 hours or 7 days. **It reads local session history on this machine only**, so other devices and claude.ai chat are not in it. Doc 2672 found the same thing in our transcripts: on 12 and 13 Oct, **85% and 89%** of spend was context being re-read or rewritten into the cache.
+
+**Added 2026-10-21: what each plan includes, from claude.com/pricing** (fetched raw with curl at 2026-10-22 02:59 UTC, text stripped):
+
+| Item | Free | Pro | Max 5x | Max 20x |
+|---|---|---|---|---|
+| Monthly API credits ("New", marked with a dagger on the page) | No | No | **$100/month** | **$200/month** |
+| Usage multiplier | n/a | baseline | 5x Pro | 20x Pro |
+
+- The plan card says "$100 to $200/month in API credits to build on the Claude Platform".
+- The FAQ ties the multiplier to the session limit only: "choose from 5x or 20x the usage of Pro per 5-hour session". The page publishes no multiplier for the weekly limit.
+- **Why it matters here:** with two Max plans (section 2), the estate has $200 to $400 a month in Claude Platform API credit. That is a third overflow path besides usage credits and the other tools in section 3. Whether these credits can be spent through Claude Code's API-key login, and not only on the Claude Platform, was not checked. **UNVERIFIED.**
 
 ## 2. Running two plans on one Mac
 
@@ -90,6 +101,7 @@ What `/usage` in Claude Code shows on a subscription (Claude Code docs, costs): 
 
 | Action | Owner | Type | By When |
 |---|---|---|---|
+| Check whether a Max plan's monthly API credits can be used from Claude Code (API-key login) or only on the Claude Platform. Shipped when section 1's UNVERIFIED line is resolved | bandzbuilds lane | Re-research | 2026-11-04 |
 | Decide which lanes go on zao and which on zaalp (decision 2) | Zaal | Decision | Before the next weekly reset |
 | Install Gemini CLI and sign in with the Google AI account | Zaal (needs his Google login) | Setup | When convenient |
 | Read Anthropic's consumer terms on running two personal plans | repo-refresh lane | Research | Before change 3 ships |
@@ -98,6 +110,8 @@ What `/usage` in Claude Code shows on a subscription (Claude Code docs, costs): 
 | Change 3: `account:` frontmatter plus boot launch | vault and dotfiles lanes | PR | After decision 2 |
 
 ## Sources
+
+- [FULL] https://claude.com/pricing, fetched raw with curl and a browser user agent at 2026-10-22 02:59 UTC: the plan comparison table (Monthly API credits row), the Max plan card and the FAQ. Added 2026-10-21.
 
 - [Claude Code docs: authentication, "Log in with multiple accounts"](https://code.claude.com/docs/en/iam.md) [FULL - raw markdown with curl, sections read: multiple accounts, credential storage]
 - [Claude Code docs: costs and `/usage`](https://code.claude.com/docs/en/costs.md) [FULL - raw markdown with curl]

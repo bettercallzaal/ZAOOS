@@ -2,7 +2,7 @@
 topic: xmtp
 type: guide
 status: research-complete
-last-validated: 2026-05-21
+last-validated: 2026-10-21
 related-docs: [013-xmtp-overview, 450-xmtp-production-setup]
 original-query: "What changed in XMTP since v7.0.0 (MLS encryption, payer wallets, history sync), and how should ZAO OS update its integration? (reconstructed)"
 tier: STANDARD
@@ -21,7 +21,7 @@ tier: STANDARD
 
 | Priority | Action | Why |
 |----------|--------|-----|
-| **Critical** | Register a ZAO payer wallet on XMTP Funding Portal, fund with USDC on Base | Mainnet transition (March 2026) introduces ~$0.001/message fees — without a payer wallet, message sending will fail |
+| **Critical** | Register a ZAO payer wallet on XMTP Funding Portal, fund with USDC on Base | Paid messaging starts at XMTP's mainnet cutover, at about $5 per 100,000 messages ($0.00005 a message, XMTP blog 2026-01-06). Without a payer wallet, sending fails after the cutover. As of 2026-10-21 no XMTP source announces that the cutover has happened (doc `farcaster/2684-zao-xmtp-standalone-app`, `xmtp-fee-status.md`). Corrected 2026-10-21: this row said "~$0.001/message" from March 2026, 20x XMTP's own figure |
 | **High** | Implement history sync using `sendSyncRequest()` / `sendSyncArchive(pin)` | v7.0.0 removed automatic history sync — new device/browser = no message history |
 | **Medium** | Update doc 13 to reference `@xmtp/browser-sdk` instead of `@xmtp/xmtp-js` + `@xmtp/mls-client` | Doc 13 references obsolete packages |
 | **Medium** | Add user warning about localStorage key loss | ZAO burner key lives in localStorage — clearing it = losing XMTP identity |
@@ -124,7 +124,7 @@ ZAO OS does **not** implement history sync — this is a gap but not breaking si
 XMTP mainnet expected complete by March 2026 (now):
 
 - **Phase 1:** 7 permissioned node operators, quantum-resistant storage, 60-day message retention
-- **Network fees:** ~$0.001/message, paid in USDC on Base
+- **Network fees:** about $5 per 100,000 messages, i.e. $0.00005 a message, paid in USDC on Base by the app's payer wallet, not by each user. Source: XMTP blog, Shane Mac, 2026-01-06, "It costs about $5 per 100k messages". (Corrected 2026-10-21 from "~$0.001/message".)
 - **Payer wallet required:** Developers must create a payer wallet, fund with USDC, route messages through XMTP Gateway Service
 - **L3 appchain:** Settles to Base/Ethereum for metadata ordering
 - **V2 deprecated:** V2 network deprecated June 23, 2025 — V2 messages read-only
@@ -168,6 +168,8 @@ The `as any` cast on line 126 of `client.ts` (`} as any`) suggests the `dbEncryp
 ---
 
 ## Sources
+
+- [FULL] XMTP blog, "XMTP Network Metrics: Jan 6th, 2026", Shane Mac: https://blog.xmtp.org/xmtp-network-metrics-jan-6th-2026/ (WebFetch, 2026-10-21; the fee quote above). Added 2026-10-21.
 
 - [XMTP Browser SDK - npm](https://www.npmjs.com/package/@xmtp/browser-sdk) [FULL] - Current npm package
 - [Get started with XMTP Browser SDK - docs.xmtp.org](https://docs.xmtp.org/chat-apps/sdks/browser) [FULL] - Official guide

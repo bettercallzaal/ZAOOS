@@ -56,6 +56,8 @@ export async function GET(req: NextRequest) {
         params.set('channel_id', channel);
       }
 
+      // Stays on Neynar: Hypersnap's cast/search ignores channel_id (http.rs 1130-1132),
+      // so it would return casts from outside this channel
       const res = await fetch(`${NEYNAR_BASE}/cast/search?${params}`, {
         headers: {
           'Content-Type': 'application/json',

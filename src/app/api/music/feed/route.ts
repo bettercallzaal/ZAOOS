@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { ENV } from '@/lib/env';
+import { neynarRead } from '@/lib/farcaster/neynar';
 import { logger } from '@/lib/logger';
 import { isMusicUrl } from '@/lib/music/isMusicUrl';
 import type { TrackType } from '@/types/music';
@@ -85,6 +86,8 @@ async function searchMusicCasts(
       });
       if (cursor) params.set('cursor', cursor);
 
+      // Stays on Neynar: Hypersnap's cast/search ignores the cursor (http.rs 1130-1132,
+      // next is always null), and haatz returned 0 casts for "soundcloud" on 2026-10-22
       const res = await fetch(`${NEYNAR_BASE}/cast/search?${params}`, {
         headers: neynarHeaders(),
         signal: AbortSignal.timeout(10000),
@@ -135,8 +138,7 @@ async function getChannelMusicCasts(
   });
   if (cursor) params.set('cursor', cursor);
 
-  const res = await fetch(`${NEYNAR_BASE}/feed/channels?${params}`, {
-    headers: neynarHeaders(),
+  const res = await neynarRead(`/feed/channels?${params}`, {
     signal: AbortSignal.timeout(10000),
   });
   if (!res.ok) {

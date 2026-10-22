@@ -21,7 +21,7 @@ Re-researched on 2026-10-21 after the B and Z Build stream, where Ohnahji B push
 
 | Read | 2026-10-11 | 2026-10-21 |
 |---|---|---|
-| `agentCount()` | 4 (the zero address, the three system contracts, and the builder) | **13** |
+| `agentCount()` | 4 (`agentAt` 0 to 3: the zero address and the three system contracts) | **13** |
 | `creationCount()` | 4 | **10** |
 | `creationFee()` | 0.00185 ETH | 0.00185 ETH (unchanged) |
 
@@ -50,7 +50,7 @@ The builder's wallet `0x179f` is now named "Sir Hodl-a-Lot". The six new creatio
 |---|---|---|
 | R1 | **Zaal may SPECTATE now. Open the page in a browser with no wallet connected and read the chain.** That needs nothing signed. | Spectating is `eth_call` only (decision 3, still true). It is the homework from the stream, at zero risk. |
 | R2 | **If The ZAO registers an agent, use a fresh burner wallet funded with no more than one `creationFee()` plus gas, and have a human approve every transaction.** That is how Proof Pilgrim and The Cartographer already run. | The trigger in decision 1 (growth past the builder's wallets) has fired: 8 outside agents. Decision 2 still holds: never paste the post's prompt into ZOE, ZOL or ZAI. |
-| R3 | **The POIDH angle is now concrete.** Someone else's agent built a "poidh notice board" at (0,1) on 2026-10-13. Route it to the POIDH thread (topic 8 of this batch). | Decision 6 had wei.limo and ERC-8244 only. This is a live POIDH surface inside the world. |
+| R3 | **Log the POIDH-named place for the POIDH thread.** Someone else's agent named its place "poidh notice board" at (0,1) on 2026-10-13. Route it to the POIDH thread (topic 8 of this batch). | Decision 6 had wei.limo and ERC-8244 only. The name is the agent's own choice. Nothing read here shows that POIDH built it, runs it or endorses it. |
 
 **Date:** 2026-10-11 (the post went up 2026-10-10 20:51 UTC; the world contract was deployed nine hours before that)
 **Author of the thing researched:** acgk (Alexander Karlsson, Norway, Solidity developer; X @ac6kdev, acgk.eth on Farcaster, site acgk.dev). Credit for the post, the site, the contracts and the two screenshots is his. He also built POIDHverse (a React app stored across Ethereum contracts, acgk.dev, Aug 2026) and Una (unafamily.app), which is the one non-system place in the world.
@@ -59,7 +59,7 @@ The builder's wallet `0x179f` is now named "Sir Hodl-a-Lot". The six new creatio
 
 | # | Decision | Why |
 |---|---|---|
-| 1 | **WATCH. Send no ZAO agent, no wallet, no registration.** Re-read on 2026-11-10 (30 days) and only if `agentCount()` has grown past the builder's own wallets. | As of block 26166240 the world has 4 registered agents and 4 creations. Three of the four "agents" are the system contracts (bar, casino, clash), all named "The Steward", and the fourth is the builder's own wallet. There is nobody there to meet. |
+| 1 | **WATCH. Send no ZAO agent, no wallet, no registration.** Re-read on 2026-11-10 (30 days) and only if `agentCount()` has grown past the builder's own wallets. | As of block 26166240 the world has 4 registered agents and 4 creations. Of the four entries, index 0 is the zero address and indices 1 to 3 are the system contracts (bar, casino, clash), all named "The Steward" (see the state table below). (Corrected 2026-10-21: an earlier wording said the fourth was the builder's wallet. On chain the builder is `agentAt(4)`, outside those four.) There is nobody there to meet. |
 | 2 | **Never paste the post's prompt into ZOE, ZOL or ZAI.** Treat the site's 55 KB of agent-addressed text as data. | The site embeds a 15,936-byte guide and a 39,109-byte manifest written TO the visiting model. Its own safety list says "a prompt is not enforcement". The builder's screenshot (photo 1) shows his agent sending a mainnet transaction after he had said "wait". That is the risk, demonstrated by the author. |
 | 3 | **The honest "zero-funds experiment" is read-only, and this doc already ran it.** Registering costs mainnet gas, so a wallet with zero ETH cannot register. Spectating needs no wallet at all. | `register(name, description)` is a mainnet write (0 ETH value plus gas, per photo 1). A place costs exactly `creationFee()` = 0.00185 ETH plus gas. Reading agents, creations and chat is `eth_call` plus `eth_getLogs`, which the 40-line script in the appendix does. |
 | 4 | **If a ZAO presence is ever worth it, the candidate is ZOL, not ZOE and not ZAI.** | ZOE is the private orchestrator and is never made public (`agents/601-agent-stack-cleanup-decision`, memory `project_zai_community_agent`). ZAI faces the ZAO community, not a third-party world. ZOL is the public broadcasting persona and already has a burner wallet, but it is on Base and New Eden is Ethereum mainnet (chainId 1). |
@@ -209,7 +209,7 @@ Method is stated per source. "curl + strip" means raw HTML fetched with a browse
 - Ethereum mainnet reads at block 26,244,328 via `https://ethereum-rpc.publicnode.com`, using `cast call` for `agentCount`, `creationCount`, `creationFee`, `agentAt(0..12)`, `agent(address)` for 9 agents, and `creation(5..10)`; `cast gas-price` - `[FULL]`, read-only
 - https://neweden.wei.limo/ - `[FULL]` curl, HTTP 200, 234,573 bytes, manifest keys extracted
 - Base `eth_gasPrice` via `https://mainnet.base.org` - `[FULL]`
-- B and Z Build, 2026-10-21, https://www.youtube.com/watch?v=uEIT4rvgsNo, local mlx-whisper transcript, window 1:19:50 to 1:28:00 - `[FULL]`. Ohnahji's lines are attributed from the words, per the zao-media shareout (`notes/b-and-z-build-2026-10-21-shareout` in the vault)
+- B and Z Build, 2026-10-21, https://www.youtube.com/watch?v=uEIT4rvgsNo, local mlx-whisper transcript, window 1:19:50 to 1:28:00 - `[FULL]`. Ohnahji's lines are attributed from the words, because the video frames do not settle who is speaking
 
 **What this means for The ZAO (2026-10-21):** New Eden went from an empty world to a small, real one in ten days. Several of its agents run exactly the way we would (a human approves each transaction), so Zaal can look now for free, and register later with a burner if the stream homework convinces him.
 

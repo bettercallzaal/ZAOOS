@@ -30,8 +30,8 @@ Re-researched on 2026-10-21 after the B and Z Build stream, where Zaal walked Oh
 | Question | Answer | Read from |
 |---|---|---|
 | Does running a node earn tokens? | **No, not now.** The install script makes the operator agree, and writes `AGREE_NO_REWARDS_FOR_ME=true`: "The network has not yet released a token. Running a node at this time will not earn tokens." | `scripts/hypersnap.sh` lines 145 to 196, the only "reward" hit in the repo |
-| Is hypersnap still tracking upstream? | **Yes. The 2026-08-25 reading is out of date.** Commit `183213c0` on 2026-10-17, "v20 support + fix metrics endpoint for retention", changed 18 files (+3,024 / -71). Upstream snapchain is at v0.14.3 (2026-10-15). | `commits`, `releases` |
-| Who maintains it? | **Two people now, not one.** CassOnMars wrote 3 of the last 5 commits. **martinvr** wrote the other 2 (2026-08-28 and 2026-10-17, PRs #38 and #39). | `commits?per_page=5` |
+| Is hypersnap still tracking upstream? | **Yes. The 2026-08-25 reading is out of date.** Commit `183213c0`, authored 2026-08-18 and landed on main 2026-10-17, "v20 support + fix metrics endpoint for retention", changed 18 files (+3,024 / -71). Upstream snapchain is at v0.14.3 (2026-10-15). | `commits`, `releases` |
+| Who maintains it? | **Still one maintainer, now with an outside contributor.** CassOnMars authored 3 of the last 5 commits and merged the other 2. Those two are martinvr's PRs #38 (merged 2026-08-28) and #39 (merged 2026-10-17). The repo has no CODEOWNERS file. The bus factor is still 1, but outside PRs now get merged. | `commits?per_page=5`, `pulls/38`, `pulls/39`, CODEOWNERS 404 |
 | Repo size | 66 stars, 24 forks, 13 open issues, last push 2026-10-17 | repo record |
 | Releases | Still v0.11.8 (2026-05-07). The October work is untagged. | `releases` |
 | haatz live node | Version still **0.13.5**, 914,291,718 messages, 3,356,279 FID registrations, 3 shards | `GET https://haatz.quilibrium.com/v1/info` |
@@ -85,7 +85,7 @@ The correction to the vault note is Next Action 1.
 
 | # | Decision | Why |
 |---|---|---|
-| 1 | **Do NOT build ZAO social on a self-run hypersnap node in 2026.** | Bus factor 1 (CassOnMars is the sole committer on all 12 most-recent commits), no tagged release since v0.11.8 on 2026-05-07, outside PRs unreviewed for 3+ months, and a 2026-08-09 commit message that reads `final snapchain version for parity`. |
+| 1 | **Do NOT build ZAO social on a self-run hypersnap node in 2026.** | Bus factor 1 (CassOnMars is the sole committer on all 12 most-recent commits), no tagged release since v0.11.8 on 2026-05-07, outside PRs unreviewed for 3+ months, and a 2026-08-09 commit message that reads `final snapchain version for parity`. **2026-10-21:** still bus factor 1 (Cass merges everything). Outside PRs are now merged (#38, #39). The "final version" reading is out of date (v20 support landed 2026-10-17). The decision stands for building ZAO social on it. A private read node, as in U2 above, is a different and smaller thing. |
 | 2 | **DO keep using haatz as a free read proxy. It already works and ZAO already ships the code.** | `src/lib/farcaster/neynar.ts` has proxy support with Neynar failover built and merged. Live `/v1/info` answered in one request on 2026-08-25. This is the 80% of the value at 0% of the ops. |
 | 3 | **If ZAO ever self-hosts, run vanilla `farcasterxyz/snapchain`, not hypersnap.** | Same GPL-3.0 license, same 16GB/4-core/1.5TB floor, same wire protocol - but 20 contributors instead of 1, releases through v0.14.2 on 2026-08-13, and it is the canonical implementation ZAO's bots already read from. |
 | 4 | **L4 does not require running any node at all.** | ZAO social needs an app on Farcaster, not infrastructure under it. Node ownership is L7's problem, and L7 explicitly depends on L4's stack choice, not the reverse. |
@@ -380,7 +380,7 @@ probably to ask Cassie directly rather than self-host.
 | Specify the async Respect Game's settlement inputs (L3), then check them against canonical Farcaster retention limits. This is the one input that could reopen the hypersnap decision. Shipped when the retention answer is written into the L3 section. | @Zaal | Spec | 2026-09-15 |
 | Record whether Zaal's desktop hypersnap node is in any validator set, or is a read node only, so the stream's "I'm a validator" can be confirmed or corrected. Shipped when the answer is a line in this doc | Zaal | Verification | 2026-10-28 |
 | Point a staging `FARCASTER_READ_API_BASE` at Zaal's node with Neynar failover on, and log one week of uptime. Shipped when the uptime note is in the vault | Zaal | Ops test | 2026-11-11 |
-| Re-validate this doc - hypersnap has a single maintainer and one commit could change the verdict. Shipped when `last-validated` is bumped or a superseding doc exists. | @Zaal | Re-research | 2026-09-25 |
+| DONE 2026-10-21 (the UPDATE section at the top). Re-validate this doc - hypersnap has a single maintainer and one commit could change the verdict. Shipped when `last-validated` is bumped or a superseding doc exists. | @Zaal | Re-research | 2026-09-25 |
 
 ## Sources
 

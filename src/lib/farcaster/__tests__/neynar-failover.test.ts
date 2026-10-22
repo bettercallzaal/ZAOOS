@@ -14,14 +14,23 @@ vi.mock('@/lib/logger', () => ({
   logger: { warn, error: vi.fn(), info: vi.fn(), debug: vi.fn() },
 }));
 
-import { getUsersByFids } from '../neynar';
+import { getTrendingTopics, getUsersByFids } from '../neynar';
 
-function res(status: number, body: unknown) {
+interface FakeResponse {
+  ok: boolean;
+  status: number;
+  json: () => Promise<unknown>;
+  text: () => Promise<string>;
+  clone: () => FakeResponse;
+}
+
+function res(status: number, body: unknown): FakeResponse {
   return {
     ok: status >= 200 && status < 300,
     status,
     json: async () => body,
     text: async () => JSON.stringify(body),
+    clone: () => res(status, body),
   };
 }
 
@@ -87,5 +96,46 @@ describe('fetchWithFailover with a read base set', () => {
     await expect(getUsersByFids([1])).rejects.toThrow('Neynar bulk user error 500');
     expect(fetchMock).toHaveBeenCalledTimes(2);
     expect(warn).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('fetchWithFailover with a list key (empty 200)', () => {
+  const READ_TOPICS = 'https://read.example/v2/farcaster/topic/trending?limit=10';
+  const NEYNAR_TOPICS = 'https://api.neynar.com/v2/farcaster/topic/trending?limit=10';
+
+  it('falls back to Neynar when the read base answers 200 with an empty topics list', async () => {
+    // Verbatim haatz body for topic/trending, 2026-10-22 (doc 2418)
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(res(200, { next: { cursor: null }, topics: [] }))
+      .mockResolvedValueOnce(res(200, { topics: [{ topic: 'music' }] }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    expect(await getTrendingTopics()).toEqual({ topics: [{ topic: 'music' }] });
+    expect(fetchMock.mock.calls[0][0]).toBe(READ_TOPICS);
+    expect(fetchMock.mock.calls[1][0]).toBe(NEYNAR_TOPICS);
+    expect(fetchMock.mock.calls[1][1].headers['x-api-key']).toBe('test-neynar-key');
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(warn.mock.calls[0][0]).toBe(
+      '[neynar/failover] /topic/trending read base returned an empty "topics" list, falling back to Neynar',
+    );
+  });
+
+  it('keeps a non-empty topics list from the read base', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(res(200, { topics: [{ topic: 'zao' }] }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    expect(await getTrendingTopics()).toEqual({ topics: [{ topic: 'zao' }] });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(warn).not.toHaveBeenCalled();
+  });
+
+  it('does not fail over on an empty list for a call without a list key', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(res(200, { users: [] }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    expect(await getUsersByFids([1])).toEqual([]);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(warn).not.toHaveBeenCalled();
   });
 });

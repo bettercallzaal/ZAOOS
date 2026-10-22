@@ -87,6 +87,32 @@ describe('cleanWant', () => {
     expect(out).not.toContain(phone);
     expect(out).toContain('email');
   });
+
+  // Card 10396 (Codex finding): redactPii has no secret patterns, so an API
+  // key in a want reached the gap log as written. Keys are built at run time
+  // so no secret-shaped literal sits in the repo.
+  it('drops a want that carries an API key or a bot token', () => {
+    const key = ['sk', 'ant', 'a'.repeat(24)].join('-');
+    const bot = `${'1'.repeat(10)}:${'B'.repeat(35)}`;
+    expect(cleanWant(`use this key ${key} to call the model`)).toBe('');
+    expect(cleanWant(`post with token ${bot} please`)).toBe('');
+  });
+
+  it('drops a key that straddles the length cap, not only one inside it', () => {
+    const key = ['sk', 'ant', 'b'.repeat(40)].join('-');
+    expect(cleanWant(`${'x '.repeat(70)}${key}`)).toBe('');
+  });
+
+  it('keeps an ordinary want that only mentions a key', () => {
+    expect(cleanWant('rotate the API key for the bot')).toBe('rotate the API key for the bot');
+  });
+
+  it('an extracted GAP line carrying a key logs no want', () => {
+    const key = ['sk', 'ant', 'c'.repeat(24)].join('-');
+    const out = extractGap(`Here you go.\nGAP: call the API with ${key}`);
+    expect(out.gap).toBeNull();
+    expect(out.reply).not.toContain(key);
+  });
 });
 
 describe('summarizeGaps', () => {

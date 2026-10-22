@@ -121,7 +121,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ user
       .order('event_date', { ascending: false, nullsFirst: false })
       .limit(20);
 
-    // Fetch Neynar live data (follower count, power badge)
+    // Fetch Neynar live data (follower count, power badge). Stays on Neynar:
+    // Hypersnap does not return power_badge (doc 2418 D6 PR 3)
     let neynarProfile = null;
     if (user.fid) {
       try {
@@ -219,7 +220,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ user
             .then((d) => d?.data?.attestations || [])
         : Promise.resolve([]),
 
-      // Neynar score
+      // Neynar score. Stays on Neynar: Hypersnap does not fill `experimental`
       memberFid
         ? fetch(`https://api.neynar.com/v2/farcaster/user/bulk?fids=${memberFid}`, {
             headers: { api_key: process.env.NEYNAR_API_KEY || '' },

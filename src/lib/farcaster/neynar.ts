@@ -622,3 +622,14 @@ export async function getRelevantFrames(fid: number, limit = 20) {
   if (!res.ok) throw new Error(`Neynar relevant frames error: ${res.status}`);
   return res.json();
 }
+
+/**
+ * Read through the seam from a route: READ_BASE first, Neynar on failover.
+ * Only for calls whose fields the read base serves. Hypersnap omits
+ * `viewer_context`, `power_badge` and a cast's `root_parent_url`, and returns
+ * followers/following as flat users, so check the fields a caller reads first
+ * (doc 2418 D6 PR 3).
+ */
+export function neynarRead(path: string, init: RequestInit = {}): Promise<Response> {
+  return fetchWithFailover(path, { ...init, headers: readHeaders() });
+}

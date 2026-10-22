@@ -121,7 +121,7 @@ ZAO OS does **not** implement history sync — this is a gap but not breaking si
 
 ### Mainnet Transition (Critical)
 
-XMTP mainnet expected complete by March 2026 (now):
+XMTP's mainnet was expected by March 2026. As of 2026-10-21 no XMTP source announces that the cutover has happened (doc `farcaster/2684-zao-xmtp-standalone-app`, `xmtp-fee-status.md`). The plan as XMTP described it:
 
 - **Phase 1:** 7 permissioned node operators, quantum-resistant storage, 60-day message retention
 - **Network fees:** about $5 per 100,000 messages, i.e. $0.00005 a message, paid in USDC on Base by the app's payer wallet, not by each user. Source: XMTP blog, Shane Mac, 2026-01-06, "It costs about $5 per 100k messages". (Corrected 2026-10-21 from "~$0.001/message".)

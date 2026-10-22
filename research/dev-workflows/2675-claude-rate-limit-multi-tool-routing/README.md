@@ -49,7 +49,7 @@ What `/usage` in Claude Code shows on a subscription (Claude Code docs, costs): 
 
 - The plan card says "$100 to $200/month in API credits to build on the Claude Platform".
 - The FAQ ties the multiplier to the session limit only: "choose from 5x or 20x the usage of Pro per 5-hour session". The page publishes no multiplier for the weekly limit.
-- **Why it matters here:** with two Max plans (section 2), the estate has $200 to $400 a month in Claude Platform API credit. That is a third overflow path besides usage credits and the other tools in section 3. Whether these credits can be spent through Claude Code's API-key login, and not only on the Claude Platform, was not checked. **UNVERIFIED.**
+- **Why it matters here:** each Max plan carries $100 (Max 5x) or $200 (Max 20x) a month in Claude Platform API credit. This doc does not state which tier the zao and zaalp plans are, so the estate's total is **UNVERIFIED** (between $200 and $400 a month for two Max plans, depending on their tiers; the tiers are Zaal's fact). That is a third overflow path besides usage credits and the other tools in section 3. Whether these credits can be spent through Claude Code's API-key login, and not only on the Claude Platform, was not checked. **UNVERIFIED.**
 
 ## 2. Running two plans on one Mac
 

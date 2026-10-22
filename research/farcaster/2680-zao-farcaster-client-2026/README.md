@@ -2,7 +2,7 @@
 topic: farcaster
 type: decision
 status: research-complete
-last-validated: 2026-10-15
+last-validated: 2026-10-21
 related-docs: "1501, 2313, 2385, 2489, 2498, 2666"
 original-query: "Stop everything highest priority build a working farcaster client for the zao for people to use recent news networks Tate acquired farcaster lots happening imma be afk for an hour please do research with as much as you can and prep our zao client using everything we are working towards with zao v3 (Zaal, relayed by the seat 2026-10-15; this lane owns the research half, a sibling lane owns the build)"
 tier: DEEP
@@ -13,6 +13,36 @@ tier: DEEP
 > **Goal:** Confirm from primary sources what changed for Farcaster on 15 Oct 2026, read the client stack as it stands today, and say what a ZAO client should reuse, build and avoid in 30 days.
 
 Written Thu 15 Oct 2026, 16:2x to 17:3x EDT (clock from `date`), in one hour, by the research lane. Every claim below was fetched this run unless marked UNVERIFIED or carried from a named earlier doc.
+
+## UPDATE 2026-10-21: the vote happened. Decision 7 is resolved by Balaji's own posts
+
+Re-researched on 2026-10-21 (overnight lane run, QUICK) after the B and Z Build stream. There, Ohnahji B said "the homies the ogs was getting banned off there", that he "voted no", and that "the whole like oh we're gonna mention an nft was the way that you vote... it was just out of the blue" [0:03:55-0:04:27, mlx-whisper transcript of https://www.youtube.com/watch?v=uEIT4rvgsNo; "mention" is likely Whisper for "mint"]. Everything below was read from Balaji's casts (FID 37, via the Haatz hub API) or from Base itself.
+
+**What Network School did, in Balaji's words:**
+
+| Date (UTC) | Cast | What it says |
+|---|---|---|
+| 2026-10-15 22:38 | `0x83c734e1` | "Network School is acquiring Farcaster." Four steps: "institute law-and-order, create a decentralized democracy, publish a written social smart contract, and then hold an ongoing series of meetups". Repeat offenders were "moderated out" by "both humans and AI", with an appeals process. Voting is at `farcaster.xyz/~/vote`, "with your crypto wallet, your onchain ballot". "we're at 92.9% support". The ballots are on Base at `0x4ecfed276c566aeb49da1f3a888e8dbb7263028d`. Meetup "admission will be at least partially token-gated to those who voted for the new social smart contract." Naming rule: you "can't use Farcaster, Warpcast, Neynar, Network State, or Network School-related names to launch any coin, token, or commercial project." The client is open-sourced at `github.com/farcasterxyz/client` |
+| 2026-10-17 02:00 | `0xf454b8d3` | "With 10,000+ votes counted, we're at 94.4% support." Dylan (dylanb.eth) gets a $1,024 "Farcaster Prize" for a vote visualisation |
+| 2026-10-21 17:03 | `0xcd34bb74` | "26,000+ onchain votes... representing ~95% of all accounts that voted". "prior to the election on October 17, we moderated out only 271 abusive accounts... we received 85 appeals and have accepted ~67% of them." "another ~4% who chose to opt out." Tally at fc.dylanbrodeur.org |
+
+**The ballot, read from Base on 2026-10-21 (block 52,923,438):**
+
+| Read | Value |
+|---|---|
+| `name()` / `symbol()` | "Network School Farcaster client" / `VOTE` |
+| Standard | ERC-721 (`supportsInterface(0x80ac58cd)` = true). It does **not** declare ERC-5192 soulbound (`0xb45a3c0e` = false) |
+| `totalSupply()` | **26,720**, which matches "26,000+" |
+| Transferable? | **No.** Simulated as the owner of tokens 1 and 2 (a read-only `eth_call`, nothing sent), both `transferFrom` and `approve` revert with `0xa24e573d` = `TransferDisabled()`. So the token is soulbound in practice, even though it does not declare the standard. Ohnahji's "soulbound NFT" is right in substance |
+| Proxy? | EIP-1967 implementation slot is zero |
+
+**Not measured, Balaji's own figures:** the ~95% share, the 271 moderated accounts, the 85 appeals and ~67% accepted, and the ~4% opt-out. The VOTE supply counts only "yes" ballots, so the total turnout is not on chain in this read.
+
+**The ZAO's accounts, read 2026-10-21:** `balanceOf` on every custody and verified address. Zaal (FID 19640): **1 VOTE** (on `0xb79c...`). @thezao (997289), @zao (444196) and @wavewarz (1118020): **0** on all of their addresses. None of those three has cast since 2026-10-17 (latest: @thezao on 2026-10-03), so whether non-voting accounts can still post in the reference client is **not tested**. The reporting says accounts that decline keep read-only access in the main app (Cointelegraph, 2026-10-16). Whether "did not vote" counts as "declined" is UNVERIFIED.
+
+**Orb and Lens [0:04:35].** Ohnahji says he has seen "gm lens" notifications and that Farcaster people coming over get "a new special badge". One web search found no source for a badge or an onboarding campaign. **UNVERIFIED.**
+
+**Revised decision 7:** the rules are now public from the primary source (the 2026-10-15 cast). The rename to "Network State Protocol" is still from press only, because Balaji's casts read here do not use that name. **New decision 8:** before any ZAO org account posts through the reference client, test whether @thezao can cast. If it cannot, voting with it is Zaal's call (an onchain action). **New decision 9:** do not use "Farcaster" in the name of any ZAO token or product (the naming rule above). The ZAO client in section 4 is named for The ZAO, which fits.
 
 ## Key Decisions
 
@@ -113,8 +143,12 @@ Neynar's CEO, today: "opus 5.5 one shots a client with docs.neynar". Building a 
 | Ask Neynar (their Slack) whether the API, signer sponsorship and plans continue under Network School | Zaal or the seat | message (outbound, his tap) | this week |
 | Create the Neynar webhook doc 2498 says is missing | Zaal | dashboard tap | before notifications ship |
 | Decide the zingfisher membership API (FID to ZID and roles) | V3 lane | spec | week 1 |
+| Test whether @thezao can still cast in the farcaster.xyz client without a VOTE token. If not, decide whether to vote with @thezao and @wavewarz. Shipped when the answer is a line in this doc | Zaal | Test + onchain decision | 2026-10-24 |
+| Check that no ZAO product or token name uses "Farcaster" (decision 9). Shipped when a grep of ZAOOS and the brand list is noted here | bandzbuilds lane | Check | 2026-10-28 |
 
 ## Sources
+
+- **Added 2026-10-21:** [FULL] Balaji's casts `0x83c734e1985a`, `0xf454b8d3e5ee` and `0xcd34bb7404d8` (FID 37), read raw from `https://haatz.quilibrium.com/v2/farcaster/feed/user/casts?fid=37`. [FULL] Base RPC `https://mainnet.base.org`: `name`, `symbol`, `totalSupply`, `supportsInterface`, `ownerOf`, simulated `transferFrom` and `approve`, `balanceOf` for ZAO accounts, and the EIP-1967 slot on `0x4ecfed276c566aeb49da1f3a888e8dbb7263028d`; `cast 4byte` for the revert. [FULL] https://cointelegraph.com/news/balajis-singapore-of-social-media-begins-with-a-wave-of-bans (2026-10-16). [FULL] https://bitcoinworld.co.in/balajis-farcaster-takeover-triggers-retroactive-account-bans/ (2026-10-16; cites the 92.9% figure). [FAILED] https://farcaster.xyz/~/contract and https://farcaster.xyz/~/vote (an app shell with no text; Balaji's casts replaced them). [FULL] B and Z Build transcript, window 0:03:00 to 0:07:30.
 
 - [FULL] Hub casts, read raw from https://haatz.quilibrium.com/v1 (`castById`, `castsByFid`): Neynar CEO FID 194 casts 0x5d4797540c (17:47 UTC), 0x585d0d50, 0xc433d9db, 0x0bca8224 and its parent from FID 230238; Dan Romero FID 3 casts 0x9579611f, 0xccd7b68b; Balaji FID 37 casts 0xb0c7ccbe, 0xb1152158, 0x544f1bc5; @neynar FID 6131 cast 0x3a4612cc. Method: curl, JSON.
 - [FULL] Balaji's last 10 posts on X via https://api.fxtwitter.com/2/profile/balajis/statuses (newest 12:48 UTC; no mention of the deal). Method: FxTwitter JSON.

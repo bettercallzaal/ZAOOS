@@ -2,7 +2,7 @@
 topic: infrastructure
 type: decision
 status: research-complete
-last-validated: 2026-05-21
+last-validated: 2026-10-22
 original-query: Should ZAO run its own Hypersnap node, cost vs benefit analysis (reconstructed)
 related-docs: 309, 489, 597
 tier: STANDARD
@@ -15,7 +15,9 @@ source: zaal-forwarded-url-2026-05-11
 
 ## Recommendation (FIRST)
 
-**SKIP for now — cost-benefit doesn't close.** Hypersnap is legit infrastructure (not an airdrop farm), but ZAO gets full utility today for free via haatz.quilibrium.com with Neynar fallback. Running our own node opens future benefits (data sovereignty, custom indexing, private queries via Quilibrium privacy layer) but only if ZAO needs to operate independently from any third party. Current state: 188-member community, no token rewards, and a strong dual-provider setup already in place. Revisit Oct 2026 when ZAOstock wind-down analysis happens.
+**Updated 2026-10-22: REVISIT URGENTLY.** haatz.quilibrium.com (ZAO's live Hypersnap fallback) is failing DNS resolution as of this run. The official site hypersnap.org is also down. ZAO may currently have no working Hypersnap endpoint. Immediate action: verify Neynar-only fallback is functioning and find a replacement Hypersnap node or confirm haatz is transient outage. See Updated findings below.
+
+**Prior recommendation (2026-05-21): SKIP for now — cost-benefit doesn't close.** Hypersnap is legit infrastructure (not an airdrop farm), but ZAO gets full utility today for free via haatz.quilibrium.com with Neynar fallback. Running our own node opens future benefits (data sovereignty, custom indexing, private queries via Quilibrium privacy layer) but only if ZAO needs to operate independently from any third party. Current state: 188-member community, no token rewards, and a strong dual-provider setup already in place. Revisit Oct 2026 when ZAOstock wind-down analysis happens.
 
 ## What Hypersnap Actually Is
 
@@ -91,10 +93,31 @@ Hypersnap exists in political tension: **Neynar (centralized efficiency) vs farc
 
 | Action | Owner | Type | By when | Notes |
 |--------|-------|------|---------|-------|
-| Monitor farcasterorg roadmap for node-operator incentive programs | research session | Watch | Oct 2026 | If a rewards program launches, this doc auto-reverses to REVISIT |
+| Monitor farcasterorg roadmap for node-operator incentive programs | research session | Watch | ongoing | FIP #19 proposes rewards -- open draft as of 2026-10-22; check every 60 days |
 | Document Tantivy search endpoint (doc 598) | research session | Doc | May 18 | Could be independent ZAO contribution to hypersnap-docs-web |
-| Validate haatz.quilibrium.com uptime SLA (if any) | research session | Check | Jun 2026 | If haatz becomes flaky, this cost-benefit changes to INSTALL |
-| Re-check this doc Oct 2026 (ZAOstock debrief) | @Zaal | Decision | Oct 10 | Bundle with "do we need data sovereignty post-festival?" discussion |
+| Validate haatz.quilibrium.com uptime SLA (if any) | research session | Check | Jun 2026 | DONE (Oct 2026): haatz is not resolving; see Updated section |
+| Re-check this doc Oct 2026 (ZAOstock debrief) | @Zaal | Decision | Oct 10 | DONE: revalidated 2026-10-22; haatz down is the new blocker |
+| Check haatz.quilibrium.com from VPS (not cloud proxy) | @Zaal or agent w/ VPS access | Verify | ASAP | If VPS also fails DNS, haatz is confirmed down; find replacement |
+| Find alternative public Hypersnap nodes | research session | Research | If haatz confirmed down | Check farcasterorg community, Discord, GitHub discussions |
+| Track FIP #19 adoption status | research session | Watch | every 60 days | Adoption = cost-benefit reversal; run-a-node becomes financially viable |
+
+## Updated 2026-10-22
+
+Zaal requested this revalidation via email (thread "Anything to research today? 2026-10-22"). The Next Actions table above had flagged Oct 2026 as the planned revisit date.
+
+**What changed (fetched 2026-10-22):**
+
+- **ALERT: haatz.quilibrium.com is not resolving.** DNS lookup returned ENOTFOUND on this run. This is ZAO's live Hypersnap fallback in `src/lib/farcaster/neynar.ts`. If permanent, ZAO is currently running Neynar-only with no Hypersnap fallback. Source: direct DNS check this run [VERIFIED].
+- **ALERT: hypersnap.org is not resolving.** The official Hypersnap project domain returned ENOTFOUND. The GitHub repo (farcasterorg/hypersnap) is still live with 693 commits and shows "Snapchain is in migration phase." It is unclear whether the project is still active, moved to a new domain, or winding down. Source: DNS check + GitHub fetch [PARTIAL].
+- **Node operator rewards: still no live program, but FIP #19 proposes one.** FIP #19 "Proof of Work Tokenization" (by CassOnMars, posted March 24, 2026) is an open GitHub Discussion proposing 50% of token emission to validators/read nodes via challenge-response PoW proofs. As of 2026-10-22 it is an open draft with 31 comments; not adopted or rejected. The old "no current token rewards" stance has relaxed at the proposal level but no live program exists. Source: https://github.com/orgs/farcasterorg/discussions/19 [PARTIAL].
+- **SNAP token: conflicting data, price not confirmed.** Two different Ethereum contract addresses appear in sources for "SNAP (Hypersnap)": 0x23105496a52082fc5f2646ee24955cea9a7e1110 (1B max supply, Etherscan) and 0x49b5a631f54927c0007232844f06fe18cbf69786 (1.91M supply, price ~$0.20 on DexRabbit). These do not match; the correct contract is UNVERIFIED. The May 2026 price of ~$0.019 cannot be confirmed against today's data.
+- **quilcast.com also not resolving.** Quilcast was a Farcaster client built on Hypersnap; its domain is also down. Suggests possible broader ecosystem contraction.
+- **Revised recommendation:** The May 2026 "SKIP" was based on haatz being a free working alternative. If haatz is genuinely down (not a transient DNS issue), ZAO loses its Hypersnap data-sovereignty option entirely. The calculus shifts: (a) verify haatz status before any decision; (b) if haatz is permanently gone, either find another public node or seriously reconsider running our own.
+
+**Immediate next actions added (see Next Actions table):**
+1. Check haatz.quilibrium.com from VPS directly to confirm DNS failure is not cloud-proxy-local.
+2. If haatz is down: find alternative public Hypersnap nodes in the farcasterorg community.
+3. Monitor FIP #19 for adoption -- if rewards go live, the cost-benefit reversal Zaal flagged in May becomes concrete.
 
 ## Sources
 
@@ -105,3 +128,12 @@ Hypersnap exists in political tension: **Neynar (centralized efficiency) vs farc
 - [Doc 309 - Snapchain vs Hypersnap Protocol Deep Dive](../309-snapchain-hypersnap-protocol-deep-dive/) - technical context
 - [Doc 597 - Hypersnap Install Reality Check](../../farcaster/597-hypersnap-install-prep/) - hardware/cost analysis
 - Memory: [project_zao_os.md](~/.claude/projects/-Users-zaalpanthaki-Documents-ZAO-OS-V1/memory/project_zao_os.md) - ZAO infrastructure status
+
+### Sources added 2026-10-22
+
+- [farcasterorg/hypersnap GitHub repo](https://github.com/farcasterorg/hypersnap) [PARTIAL] - live, 693 commits, "migration phase" noted on 2026-10-22
+- [FIP #19: Proof of Work Tokenization](https://github.com/orgs/farcasterorg/discussions/19) [PARTIAL] - open draft, March 24 2026, proposes node rewards, 31 comments, not adopted
+- [SNAP token on Etherscan](https://etherscan.io/token/0x23105496a52082fc5f2646ee24955cea9a7e1110) [UNVERIFIED - contract address not confirmed]
+- [SNAP on DexRabbit](https://dexrabbit.bitquery.io/eth/token/0x49b5a631f54927c0007232844f06fe18cbf69786) [UNVERIFIED - conflicting contract address]
+- haatz.quilibrium.com - DNS ENOTFOUND on 2026-10-22 [VERIFIED failure]
+- hypersnap.org - DNS ENOTFOUND on 2026-10-22 [VERIFIED failure]

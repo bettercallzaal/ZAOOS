@@ -1,4 +1,5 @@
 import { ENV } from '@/lib/env';
+import { logger } from '@/lib/logger';
 
 const NEYNAR_BASE = 'https://api.neynar.com/v2/farcaster';
 const READ_BASE = ENV.FARCASTER_READ_API_BASE
@@ -20,17 +21,25 @@ function readHeaders() {
   return headers();
 }
 
-/** Fetch with failover: try READ_BASE first, fall back to NEYNAR_BASE on error */
+/**
+ * Fetch with failover: try READ_BASE first, fall back to NEYNAR_BASE on error.
+ * Each failover logs one warn line (path without query, proxy status or error)
+ * so a read base that 404s or 503s is visible instead of silently paid for.
+ */
 async function fetchWithFailover(path: string, init: RequestInit): Promise<Response> {
   if (READ_BASE === NEYNAR_BASE) {
     return fetch(`${NEYNAR_BASE}${path}`, init);
   }
+  const route = path.split('?')[0];
   try {
     const res = await fetch(`${READ_BASE}${path}`, init);
     if (res.ok) return res;
-    // Non-OK from proxy — fall back to Neynar
-  } catch {
-    // Network error from proxy — fall back to Neynar
+    logger.warn(
+      `[neynar/failover] ${route} read base returned ${res.status}, falling back to Neynar`,
+    );
+  } catch (error: unknown) {
+    const reason = error instanceof Error ? error.message : String(error);
+    logger.warn(`[neynar/failover] ${route} read base threw (${reason}), falling back to Neynar`);
   }
   return fetch(`${NEYNAR_BASE}${path}`, {
     ...init,

@@ -49,7 +49,7 @@ Re-researched on 2026-10-21 after the B and Z Build stream, where Zaal walked Oh
 ## THE PREMISE OF THIS RESEARCH WAS WRONG - READ THIS FIRST
 
 The brief said hypersnap "has zero documentation on this machine," and
-`~/zao-vault/notes/zao-decentralization-scale.md` states it more strongly:
+an internal decentralization-scale note states it more strongly:
 
 > "**Hypersnap is not documented anywhere on disk** - no note, no repo, no
 > research doc mentions it. Before L4 anything, it needs a research pass...
@@ -62,7 +62,7 @@ The brief said hypersnap "has zero documentation on this machine," and
 |---|---|---|
 | Research doc directories on hypersnap / Cassie / haatz | **19** | `find research -type d` matching `hypersnap\|cassie\|haatz\|fip-live` |
 | Hypersnap-specific doc directories | **9** | `_archive/010`, `farcaster/304`, `309`, `489`, `586`, `587`, `589`, `597`, `infrastructure/643` |
-| A dedicated memory file | **1** | `memory/project_hypersnap_node_install.md`, ~200 lines, install playbook + Cassie engagement playbook |
+| A dedicated internal note | **1** | Zaal's hypersnap node install notes, ~200 lines, install playbook + Cassie engagement playbook |
 | Production ZAO code paths | **2** | `src/lib/env.ts:88`, `src/lib/farcaster/neynar.ts:4-32` |
 | Unmerged branch of stranded research | **1** | `ws/research-599-hypersnap-vps-options`, still on origin |
 
@@ -182,7 +182,7 @@ hypersnap's adoption.
 | blockDelay | 0-3 (node is caught up) |
 
 Against the same endpoint recorded on 2026-05-02 in
-`memory/project_hypersnap_node_install.md` (908M messages, 3.3M FIDs, 773 GB),
+Zaal's hypersnap node install notes (908M messages, 3.3M FIDs, 773 GB),
 over 115 days:
 
 - messages **+~5.4M (+0.6%)**
@@ -366,14 +366,14 @@ probably to ask Cassie directly rather than self-host.
 - [Doc 304](../304-quilibrium-hypersnap-free-neynar-api/) / [Doc 309](../309-snapchain-hypersnap-protocol-deep-dive/) / [Doc 489](../489-hypersnap-farcaster-node-cassonmars/) - earlier passes
 - [Doc 643](../../infrastructure/643-hypersnap-run-a-node/) - run-a-node angle
 - [Doc 823](../../dev-workflows/823-farcaster-fetch-haatz-free/) - the keyless fetch path in daily use
-- `~/zao-vault/notes/zao-decentralization-scale.md` L4/L7 - the decision this feeds
-- `~/zao-vault/people/Cassie.md` - relationship context
+- The internal decentralization-scale note, L4/L7 - the decision this feeds
+- Zaal's notes on Cassie - relationship context
 
 ## Next Actions
 
 | Action | Owner | Type | By When |
 |--------|-------|------|---------|
-| Correct `zao-decentralization-scale.md`: replace "Hypersnap is not documented anywhere on disk" with a link to this doc + the 9 prior docs; change L4's gate from "hypersnap research pass done" to "async settlement retention requirement specified". Shipped when the vault commit is pushed to main. | @Zaal | Vault commit | 2026-08-26 |
+| Correct the internal decentralization-scale note: replace "Hypersnap is not documented anywhere on disk" with a link to this doc + the 9 prior docs; change L4's gate from "hypersnap research pass done" to "async settlement retention requirement specified". Shipped when the vault commit is pushed to main. | @Zaal | Vault commit | 2026-08-26 |
 | Recover `ws/research-599-hypersnap-vps-options`: renumber to the next free doc number (599 collides with four docs on main), add the index row, PR it. Shipped when the PR merges. Branch will otherwise be pruned. | @Zaal | PR | 2026-08-29 |
 | Decide and record: is the paused Hetzner purchase cancelled or deferred? It has sat unresolved since 2026-05-04 and is silently blocking L7 in everyone's mental model. Shipped when written into the decision note either way. | @Zaal | Decision | 2026-08-28 |
 | Verify whether `FARCASTER_READ_API_BASE` is set in production and record the answer in the vault. BUILT and WIRED is confirmed; LIVE is not. Shipped when the note says which. | @Zaal | Verification | 2026-08-27 |
@@ -401,4 +401,4 @@ no claim here rests on a WebFetch summary.
 - **Added 2026-10-21:** `farcasterorg/hypersnap` commits, releases, repo record, `scripts/hypersnap.sh` and `site/docs/pages/whitepaper.mdx` [FULL - gh api, raw file bytes]; `farcasterxyz/snapchain` releases and whitepaper (for the diff) [FULL]; `https://haatz.quilibrium.com/v1/info` [FULL - curl]; GitHub code search over `QuilibriumNetwork/quorum-shared` and `quorum-mobile` [FULL - counts only], `quorum-desktop` [FAILED - code-search rate limit, not retried]; the B and Z Build transcript windows 0:13:20 to 0:16:50 and 0:58:50 to 1:01:00 [FULL]
 
 **What this means for The ZAO (2026-10-21):** Zaal's node is useful as our own read API and as a hedge against Neynar. It is not a source of income, because the installer says no tokens are paid yet. And hypersnap is no longer a one-person fork that stopped tracking upstream.
-- Local: `research/` (19 matching directories), `memory/project_hypersnap_node_install.md`, `src/lib/env.ts`, `src/lib/farcaster/neynar.ts`, `~/zao-vault/notes/zao-decentralization-scale.md`, `~/zao-vault/people/Cassie.md` - **[FULL]** read from disk.
+- Local: `research/` (19 matching directories), `src/lib/env.ts`, `src/lib/farcaster/neynar.ts`, and three internal notes (Zaal's hypersnap node install notes, the decentralization-scale note, Zaal's notes on Cassie) - **[FULL]** read from disk. (Private note paths removed 2026-10-21; public repo.)

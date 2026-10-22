@@ -272,7 +272,7 @@ describe('the workflow wiring', () => {
   });
 
   it('licence-clear reads the labels after every other check and before its merge', () => {
-    const labels = CLEAR_RUN.indexOf("grep -Fxq 'hold'");
+    const labels = CLEAR_RUN.indexOf("grep -Eq '^hold(:.*)?$'");
     const files = CLEAR_RUN.indexOf('files outside research/ and docs/');
     const merge = CLEAR_RUN.indexOf('gh pr merge');
     expect(labels).toBeGreaterThan(files);
@@ -401,5 +401,63 @@ describe('arm-on-verdict: arms a judged head on its CLEAN verdict, and nothing e
     expect(cond).toContain('github.event.issue.pull_request');
     expect(cond).toContain("github.event.comment.user.login == 'bettercallzaal'");
     expect(cond).toContain("startsWith(github.event.comment.body, 'Seat evaluator')");
+  });
+});
+
+// ---- #4127 follow-up: the verdict is the first bold token, NEEDS_WORK anywhere wins,
+// a CLEAN with a condition is not a plain CLEAN; licence-clear refuses any hold:* but
+// the hold:licence it exists to clear.
+const line = (tail: string) => ({ user: { login: 'bettercallzaal' },
+  body: `Seat evaluator re-verdict (fresh-context zao-evaluator), head ${HEAD}: ${tail}\n\ndetail` });
+const MIXED = [
+  ['NEEDS_WORK in bold, CLEAN mentioned after', '**NEEDS_WORK** (was **CLEAN**)'],
+  ['NEEDS_WORK in plain text, CLEAN in bold', 'NEEDS_WORK (was **CLEAN**)'],
+  ['a CLEAN with a merge condition', '**CLEAN**, with a merge condition: merge with dotfiles #657'],
+  ['a CLEAN with a Condition, any case', '**CLEAN**. Condition: only after #4120'],
+] as const;
+
+describe('verdict parsing: the first bold token, NEEDS_WORK wins, conditions are not CLEAN', () => {
+  for (const [name, tail] of MIXED) {
+    it(`verdict step: not ok on ${name}`, () => {
+      expect(run(VERDICT, { comments: [line(tail)] }, { HEAD_SHA: HEAD }).output).toBe('ok=false\n');
+    });
+    it(`arm-on-verdict: does not arm on ${name}`, () => {
+      expect(armed(run(ON_VERDICT, { pr: openPr, labels: [], comments: [marker(HEAD), line(tail)] }))).toBe(false);
+    });
+  }
+  it('a plain CLEAN still counts, "pending CI green" included (auto-merge waits for CI anyway)', () => {
+    expect(run(VERDICT, { comments: [line('**CLEAN** pending CI green')] }, { HEAD_SHA: HEAD }).output).toBe('ok=true\n');
+    expect(armed(run(ON_VERDICT, { pr: openPr, labels: [], comments: [marker(HEAD), line('**CLEAN** pending CI green')] }))).toBe(true);
+  });
+  it('RED CONTROL: the old substring match armed on every mixed line', () => {
+    const old = ON_VERDICT.replace(
+      /token=\$\(printf[\s\S]*?not a plain CLEAN - not arming"; exit 0\n\s*fi\n/,
+      `case "$line" in *'**CLEAN**'*) ;; *) exit 0 ;; esac\n`,
+    );
+    expect(old).not.toBe(ON_VERDICT);
+    for (const [, tail] of MIXED) {
+      expect(armed(run(old, { pr: openPr, labels: [], comments: [marker(HEAD), line(tail)] }))).toBe(true);
+    }
+  });
+});
+
+describe('licence-clear: any hold:* refuses, except the hold:licence it clears', () => {
+  const lines = CLEAR_RUN.split('\n');
+  const at = lines.findIndex((l) => l.includes("grep -Eq '^hold(:.*)?$'"));
+  const check = lines.slice(at, at + 3).join('\n');
+  const refuses = (labels: string[]) => {
+    const r = spawnSync('bash', ['-e', '-c', `say() { echo "SAY $*"; }\nlabels="$L"\n${check}\necho PASSED`],
+      { encoding: 'utf8', env: { PATH: process.env.PATH ?? '', L: labels.join('\n') } });
+    return r.stdout.includes('not merging');
+  };
+  it('lifts the real check', () => {
+    expect(at).toBeGreaterThan(-1);
+    expect(check).toContain("grep -Fxv 'hold:licence'");
+  });
+  it('refuses hold and any other hold:*', () => {
+    for (const l of [['hold'], ['hold:zaal'], ['hold:licence', 'hold:review']]) expect(refuses(l)).toBe(true);
+  });
+  it('does not refuse the hold:licence it exists to clear, or near misses', () => {
+    for (const l of [['hold:licence'], ['documentation'], ['on-hold'], []]) expect(refuses(l)).toBe(false);
   });
 });

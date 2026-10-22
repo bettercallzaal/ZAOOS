@@ -131,9 +131,15 @@ jobs:
           else
             line=$(printf '%s\n' "$raw" | jq -r '.[] | select(.user.login == "bettercallzaal") | .body | split("\n")[0]' \
               | grep -E '^Seat evaluator (re-)?verdict' | grep -F "$HEAD_SHA" | tail -n 1 || true)
-            case "$line" in
-              *'**CLEAN**'*) ok=true ;;
-            esac
+            # The VERDICT is the first bold token on that line, and only a plain
+            # CLEAN counts: NEEDS_WORK anywhere on the line wins, and a CLEAN that
+            # carries a condition ("merge condition: ...") is not a plain CLEAN
+            # (evaluator on #4127: a substring match armed on both).
+            token=$(printf '%s' "$line" | grep -oE '\*\*[A-Z_]+\*\*' | head -n 1 | tr -d '*' || true)
+            if [ "$token" = "CLEAN" ] && ! printf '%s' "$line" | grep -q 'NEEDS_WORK' \
+               && ! printf '%s' "$line" | grep -qi 'condition'; then
+              ok=true
+            fi
           fi
           echo "ok=$ok" >> "$GITHUB_OUTPUT"
           if [ "$ok" = "true" ]; then
@@ -588,10 +594,13 @@ jobs:
           fi
           line=$(printf '%s\n' "$raw" | jq -r '.[] | select(.user.login == "bettercallzaal") | .body | split("\n")[0]' \
             | grep -E '^Seat evaluator (re-)?verdict' | grep -F "$head" | tail -n 1 || true)
-          case "$line" in
-            *'**CLEAN**'*) ;;
-            *) echo "::notice title=verdict::the newest verdict at $head is not CLEAN - not arming"; exit 0 ;;
-          esac
+          # Same parse as the automerge job: the first bold token must be CLEAN,
+          # with no NEEDS_WORK on the line and no condition attached.
+          token=$(printf '%s' "$line" | grep -oE '\*\*[A-Z_]+\*\*' | head -n 1 | tr -d '*' || true)
+          if [ "$token" != "CLEAN" ] || printf '%s' "$line" | grep -q 'NEEDS_WORK' \
+             || printf '%s' "$line" | grep -qi 'condition'; then
+            echo "::notice title=verdict::the newest verdict at $head is not a plain CLEAN - not arming"; exit 0
+          fi
           if ! printf '%s\n' "$raw" | jq -r '.[] | select(.user.login == "github-actions[bot]") | .body' \
                | grep -Fxq "AUTOMERGE_ELIGIBLE_HEAD=$head"; then
             echo "::notice title=verdict::$head was never judged eligible by the automerge job - not arming"; exit 0

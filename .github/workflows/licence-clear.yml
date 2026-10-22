@@ -121,8 +121,10 @@ jobs:
           if ! labels=$(gh api --paginate "repos/$REPO/issues/$PR/labels?per_page=100" --jq '.[].name'); then
             say "licence-clear: not merging - could not read the PR labels to check for a hold."; exit 0
           fi
-          if printf '%s\n' "$labels" | grep -Fxq 'hold'; then
-            say "licence-clear: not merging - this PR carries the hold label. Remove the label, then post the clearance line again."; exit 0
+          # `hold` or any `hold:*` label refuses (ZAOOS #4086 follow-up), except
+          # `hold:licence`, which is the hold this workflow exists to clear.
+          if printf '%s\n' "$labels" | grep -Fxv 'hold:licence' | grep -Eq '^hold(:.*)?$'; then
+            say "licence-clear: not merging - this PR carries a hold label. Remove the label, then post the clearance line again."; exit 0
           fi
 
           gh pr merge "$PR" --repo "$REPO" --squash --auto --match-head-commit "$head"

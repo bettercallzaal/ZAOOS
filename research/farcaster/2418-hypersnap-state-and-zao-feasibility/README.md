@@ -62,7 +62,7 @@ an internal decentralization-scale note states it more strongly:
 |---|---|---|
 | Research doc directories on hypersnap / Cassie / haatz | **19** | `find research -type d` matching `hypersnap\|cassie\|haatz\|fip-live` |
 | Hypersnap-specific doc directories | **9** | `_archive/010`, `farcaster/304`, `309`, `489`, `586`, `587`, `589`, `597`, `infrastructure/643` |
-| A dedicated internal note | **1** | Zaal's hypersnap node install notes, ~200 lines, install playbook + Cassie engagement playbook |
+| A dedicated internal note | **1** | Zaal's hypersnap node install notes, ~200 lines, install playbook + outreach notes |
 | Production ZAO code paths | **2** | `src/lib/env.ts:88`, `src/lib/farcaster/neynar.ts:4-32` |
 | Unmerged branch of stranded research | **1** | `ws/research-599-hypersnap-vps-options`, still on origin |
 
@@ -367,7 +367,6 @@ probably to ask Cassie directly rather than self-host.
 - [Doc 643](../../infrastructure/643-hypersnap-run-a-node/) - run-a-node angle
 - [Doc 823](../../dev-workflows/823-farcaster-fetch-haatz-free/) - the keyless fetch path in daily use
 - The internal decentralization-scale note, L4/L7 - the decision this feeds
-- Zaal's notes on Cassie - relationship context
 
 ## Next Actions
 
@@ -401,4 +400,4 @@ no claim here rests on a WebFetch summary.
 - **Added 2026-10-21:** `farcasterorg/hypersnap` commits, releases, repo record, `scripts/hypersnap.sh` and `site/docs/pages/whitepaper.mdx` [FULL - gh api, raw file bytes]; `farcasterxyz/snapchain` releases and whitepaper (for the diff) [FULL]; `https://haatz.quilibrium.com/v1/info` [FULL - curl]; GitHub code search over `QuilibriumNetwork/quorum-shared` and `quorum-mobile` [FULL - counts only], `quorum-desktop` [FAILED - code-search rate limit, not retried]; the B and Z Build transcript windows 0:13:20 to 0:16:50 and 0:58:50 to 1:01:00 [FULL]
 
 **What this means for The ZAO (2026-10-21):** Zaal's node is useful as our own read API and as a hedge against Neynar. It is not a source of income, because the installer says no tokens are paid yet. And hypersnap is no longer a one-person fork that stopped tracking upstream.
-- Local: `research/` (19 matching directories), `src/lib/env.ts`, `src/lib/farcaster/neynar.ts`, and three internal notes (Zaal's hypersnap node install notes, the decentralization-scale note, Zaal's notes on Cassie) - **[FULL]** read from disk. (Private note paths removed 2026-10-21; public repo.)
+- Local: `research/` (19 matching directories), `src/lib/env.ts`, `src/lib/farcaster/neynar.ts`, and three internal notes - **[FULL]** read from disk. (Private note paths removed 2026-10-21; public repo.)

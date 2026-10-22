@@ -100,6 +100,10 @@ describe('fetchWithFailover with a read base set', () => {
 });
 
 describe('fetchWithFailover with a list key (empty 200)', () => {
+  // Real Responses: their body reads once, so a check that skips clone() leaves the
+  // caller nothing to read (the fake res() above can be read twice and would hide that)
+  const real = (status: number, body: unknown) => new Response(JSON.stringify(body), { status });
+
   const READ_TOPICS = 'https://read.example/v2/farcaster/topic/trending?limit=10';
   const NEYNAR_TOPICS = 'https://api.neynar.com/v2/farcaster/topic/trending?limit=10';
 
@@ -107,8 +111,8 @@ describe('fetchWithFailover with a list key (empty 200)', () => {
     // Verbatim haatz body for topic/trending, 2026-10-22 (doc 2418)
     const fetchMock = vi
       .fn()
-      .mockResolvedValueOnce(res(200, { next: { cursor: null }, topics: [] }))
-      .mockResolvedValueOnce(res(200, { topics: [{ topic: 'music' }] }));
+      .mockResolvedValueOnce(real(200, { next: { cursor: null }, topics: [] }))
+      .mockResolvedValueOnce(real(200, { topics: [{ topic: 'music' }] }));
     vi.stubGlobal('fetch', fetchMock);
 
     expect(await getTrendingTopics()).toEqual({ topics: [{ topic: 'music' }] });
@@ -122,7 +126,7 @@ describe('fetchWithFailover with a list key (empty 200)', () => {
   });
 
   it('keeps a non-empty topics list from the read base', async () => {
-    const fetchMock = vi.fn().mockResolvedValue(res(200, { topics: [{ topic: 'zao' }] }));
+    const fetchMock = vi.fn().mockResolvedValue(real(200, { topics: [{ topic: 'zao' }] }));
     vi.stubGlobal('fetch', fetchMock);
 
     expect(await getTrendingTopics()).toEqual({ topics: [{ topic: 'zao' }] });
@@ -131,7 +135,7 @@ describe('fetchWithFailover with a list key (empty 200)', () => {
   });
 
   it('does not fail over on an empty list for a call without a list key', async () => {
-    const fetchMock = vi.fn().mockResolvedValue(res(200, { users: [] }));
+    const fetchMock = vi.fn().mockResolvedValue(real(200, { users: [] }));
     vi.stubGlobal('fetch', fetchMock);
 
     expect(await getUsersByFids([1])).toEqual([]);

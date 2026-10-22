@@ -63,6 +63,13 @@ const SECRET_PATTERNS: RegExp[] = [
   /github_pat_[A-Za-z0-9_]{60,}/,
   /-----BEGIN (?:RSA |EC |OPENSSH |ENCRYPTED |PGP )?PRIVATE KEY-----/,
   /\b0x[0-9a-fA-F]{64}\b/,
+  // A bare 64-hex string is how a raw private key is most often pasted (no 0x).
+  // It is also the shape of a sha256 digest, so it errs toward blocking: Bonfire
+  // is an external store and a refused emit costs nothing. A digest is let
+  // through only when labelled: "sha256:<hex>", or a digest/checksum/sha256
+  // field ("digest": "<hex>", checksum=<hex>). Matches secret-hygiene rule 2's
+  // [0-9a-fA-F]{64}.
+  /(?<!(?:sha256:|(?:sha256|digest|checksum|integrity)["']?\s{0,2}[:=]\s{0,2}["']?))\b[0-9a-fA-F]{64}\b/i,
   /\b\d{9,12}:[A-Za-z0-9_-]{30,}\b/, // telegram bot token
   /xox[bpaors]-[A-Za-z0-9-]{10,}/, // slack
   /\bAKIA[0-9A-Z]{16}\b/, // aws

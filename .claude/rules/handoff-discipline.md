@@ -2,7 +2,7 @@
 
 From doc 2319 (the handoff audit). The `lane_handoffs` Supabase table cited by older docs was never built; the vault is the system. History: `research/dev-workflows/2649-rules-history/archive/handoff-discipline.md`. Rule numbers are stable.
 
-1. **One living brief per lane at `~/zao-vault/handoffs/<lane>.md`.** Git history is the version layer; no dated copies. Frontmatter: `lane, machine (mac|windows|vps|pi), repo, status (unconsumed|consumed|ready), written, context-pct-at-write`. Template `zao-vault/handoffs/TEMPLATE.md`. Soft cap ~200 lines; link out for anything bigger. Embed the session-summary tail (tasks, files, decisions).
+1. **One living brief per lane at `~/zao-vault/handoffs/<lane>.md`.** Git history is the version layer; no dated copies. Frontmatter: `lane, machine (mac|windows|vps|pi), repo, status (unconsumed|consumed|ready|closed|superseded - the five in TEMPLATE.md, nothing else), written, context-pct-at-write`. Template `zao-vault/handoffs/TEMPLATE.md`. Soft cap ~200 lines; link out for anything bigger. Embed the session-summary tail (tasks, files, decisions).
 2. **Write the handoff by 75% context.** If compaction fires and no fresh brief exists, emergency-dump a minimal one (current tasks, git state, open threads, last user directive) before continuing.
 3. **Receiver flips `status: consumed` ON READ** and appends a 3-line "gaps found" note.
 4. **Boot is one command:** `zao-lane-boot` boots every unconsumed brief for this machine; `--list` shows age + status. Morning order: phone daily note -> boot wave -> first grill round. Evening: per-terminal `/handoff`.

@@ -29,10 +29,15 @@ name: Auto-merge safe PRs
 
 on:
   pull_request:
-    # labeled / unlabeled are here for the `hold` label only; the job `if` drops
-    # every other label event, so labelling a PR for any other reason does not
-    # re-run the judgement (which would re-post the licence hold comment).
+    # labeled / unlabeled are here for the `hold` labels only (`hold` and any
+    # `hold:*`); the job `if` drops every other label event, so labelling a PR
+    # for any other reason does not re-run the judgement (which would re-post
+    # the licence hold comment).
     types: [opened, synchronize, reopened, labeled, unlabeled]
+  # A seat evaluator verdict arrives as a comment AFTER the judgement above ran,
+  # so the `arm-on-verdict` job below is what arms a PR once its CLEAN lands.
+  issue_comment:
+    types: [created]
 
 permissions:
   contents: write
@@ -41,9 +46,10 @@ permissions:
 jobs:
   automerge:
     if: >-
+      github.event_name == 'pull_request' &&
       github.event.pull_request.head.repo.full_name == github.repository &&
       ((github.event.action != 'labeled' && github.event.action != 'unlabeled') ||
-      github.event.label.name == 'hold')
+      github.event.label.name == 'hold' || startsWith(github.event.label.name, 'hold:'))
     runs-on: ubuntu-latest
     steps:
       # FIRST, before checkout, so a held PR is disarmed even when a later step
@@ -64,11 +70,16 @@ jobs:
           REPO: ${{ github.repository }}
           PR: ${{ github.event.pull_request.number }}
         run: |
+          # `hold` or ANY `hold:*` label holds (ZAOOS #4086, instance 2: #4085 merged
+          # with a hold label on and no verdict). The one exception is
+          # `hold:licence`, which this workflow itself removes on every push
+          # ("Reset licence hold label" below) and re-judges in its own steps; the
+          # arm step re-reads the labels after that reset and refuses it there.
           held=false
           if ! names=$(gh api --paginate "repos/$REPO/issues/$PR/labels?per_page=100" --jq '.[].name'); then
             echo "::error title=hold::could not read the labels on this PR - treating it as held"
             held=true
-          elif printf '%s\n' "$names" | grep -Fxq 'hold'; then
+          elif printf '%s\n' "$names" | grep -Fxv 'hold:licence' | grep -Eq '^hold(:.*)?$'; then
             held=true
           fi
           echo "held=$held" >> "$GITHUB_OUTPUT"
@@ -88,6 +99,57 @@ jobs:
             exit 1
           fi
           echo "::notice title=hold::held by the hold label - auto-merge is off and stays off until the label is removed"
+
+      # A CLEAN SEAT VERDICT AT THIS EXACT HEAD, OR NO AUTO-MERGE (ZAOOS #4086).
+      # Before 2026-10-22 a docs PR auto-merged on green CI alone: #4085 merged
+      # at 23:52:10Z on 21 Oct with no verdict, and its NEEDS_WORK came 7 s
+      # later. A verdict counts only if the comment's author is `bettercallzaal`
+      # (the account every seat verdict is posted from; the same filter
+      # zao-merge and the zao-evaluate skill use) and its first line starts
+      # "Seat evaluator verdict" or "Seat evaluator re-verdict" and names this
+      # head's full SHA. The NEWEST such line decides, so a NEEDS_WORK after a
+      # CLEAN on the same head withdraws it. Comments are read as raw JSON and
+      # filtered here with jq, so the author filter is in the shell that ships.
+      #
+      # A verdict usually lands after this run, so a PR that passes every other
+      # gate gets a github-actions[bot] marker AUTOMERGE_ELIGIBLE_HEAD=<sha>
+      # (step "Mark eligible for a verdict"), and the `arm-on-verdict` job arms
+      # it when the CLEAN comment arrives. Without a verdict this step also takes
+      # off an earlier arming, so a push after a CLEAN cannot ride the old one.
+      # FAILS CLOSED: unreadable comments count as no verdict.
+      - name: Require a CLEAN verdict at this head
+        id: verdict
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          ok=false
+          if ! raw=$(gh api --paginate "repos/$REPO/issues/$PR/comments?per_page=100"); then
+            echo "::error title=verdict::could not read the comments on this PR - counting it as no verdict"
+          else
+            line=$(printf '%s\n' "$raw" | jq -r '.[] | select(.user.login == "bettercallzaal") | .body | split("\n")[0]' \
+              | grep -E '^Seat evaluator (re-)?verdict' | grep -F "$HEAD_SHA" | tail -n 1 || true)
+            case "$line" in
+              *'**CLEAN**'*) ok=true ;;
+            esac
+          fi
+          echo "ok=$ok" >> "$GITHUB_OUTPUT"
+          if [ "$ok" = "true" ]; then
+            echo "verdict: CLEAN at $HEAD_SHA"
+            exit 0
+          fi
+          off=$(gh api "repos/$REPO/pulls/$PR" --jq '.auto_merge == null') || off=unknown
+          if [ "$off" != "true" ]; then
+            gh pr merge "$PR" --repo "$REPO" --disable-auto || true
+            off=$(gh api "repos/$REPO/pulls/$PR" --jq '.auto_merge == null') || off=unknown
+          fi
+          if [ "$off" != "true" ]; then
+            echo "::error title=verdict::no CLEAN verdict at this head, and auto-merge could not be confirmed off - turn it off by hand"
+            exit 1
+          fi
+          echo "::notice title=verdict::no CLEAN seat verdict at $HEAD_SHA yet - not arming; arm-on-verdict arms it when one lands"
 
       # CHECKOUT IS WHAT MAKES THE COLLISION GATE CORRECT. This job had none, so
       # the gate could only ask the GitHub API "what files were added", and a
@@ -431,9 +493,34 @@ jobs:
       # step that never ran or wrote nothing leaves it empty, and empty is not
       # 'false'. The script then reads the labels AGAIN, immediately before the
       # merge call, so a label added while the steps above were running is seen.
+      # Every gate passed except the verdict: leave the bot's marker for this head,
+      # so `arm-on-verdict` can arm it when the CLEAN comment lands. The marker is
+      # the ENTIRE comment body and posted by github-actions[bot], which no lane
+      # can post as - the same trust model as LICENCE_HOLD_HEAD above. Posted once
+      # per head.
+      - name: Mark eligible for a verdict
+        if: |
+          steps.hold.outputs.held == 'false' && steps.nightly.outputs.ok == 'true' && steps.verdict.outputs.ok != 'true' && (
+          (steps.classify.outputs.category == 'docs' && steps.collide.outputs.collision != 'true' && steps.licence.outputs.hold == 'false') ||
+          steps.classify.outputs.category == 'tests' ||
+          steps.classify.outputs.category == 'scripts')
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          marker="AUTOMERGE_ELIGIBLE_HEAD=$HEAD_SHA"
+          if raw=$(gh api --paginate "repos/$REPO/issues/$PR/comments?per_page=100") && \
+             printf '%s\n' "$raw" | jq -r '.[] | select(.user.login == "github-actions[bot]") | .body' | grep -Fxq "$marker"; then
+            echo "marker already posted for $HEAD_SHA"
+            exit 0
+          fi
+          gh api -X POST "repos/$REPO/issues/$PR/comments" -f body="$marker" >/dev/null
+
       - name: Enable auto-merge (squash)
         if: |
-          steps.hold.outputs.held == 'false' && steps.nightly.outputs.ok == 'true' && (
+          steps.hold.outputs.held == 'false' && steps.nightly.outputs.ok == 'true' && steps.verdict.outputs.ok == 'true' && (
           (steps.classify.outputs.category == 'docs' && steps.collide.outputs.collision != 'true' && steps.licence.outputs.hold == 'false') ||
           steps.classify.outputs.category == 'tests' ||
           steps.classify.outputs.category == 'scripts')
@@ -451,8 +538,69 @@ jobs:
             echo "::error title=hold::could not re-read the labels on this PR - not arming auto-merge"
             exit 1
           fi
-          if printf '%s\n' "$names" | grep -Fxq 'hold'; then
-            echo "::notice title=hold::the hold label arrived during this run - not arming auto-merge"
+          # Here every hold label counts, `hold:licence` included: the reset above has
+          # already removed a stale one, so one present now was put back this run.
+          if printf '%s\n' "$names" | grep -Eq '^hold(:.*)?$'; then
+            echo "::notice title=hold::a hold label is on this PR now - not arming auto-merge"
             exit 0
           fi
           gh pr merge "$PR" --repo "$REPO" --squash --auto
+
+  # ARM ON A CLEAN VERDICT (ZAOOS #4086). The `automerge` job above judges a PR
+  # when it opens or moves, but the seat verdict is a comment that arrives later,
+  # and a comment re-runs nothing there. This job runs on that comment and arms
+  # the PR only when ALL of these hold, each read fresh from the API:
+  #   - the PR is open, from this repository;
+  #   - the NEWEST `bettercallzaal` verdict line naming the PR's CURRENT head
+  #     says **CLEAN** (a later NEEDS_WORK on the same head withdraws it);
+  #   - github-actions[bot] posted AUTOMERGE_ELIGIBLE_HEAD=<that head>, which the
+  #     `automerge` job writes only for a head that passed every other gate
+  #     (category, licence, doc collision, nightly, hold) - so this job never
+  #     decides safety itself;
+  #   - no `hold` or `hold:*` label is on the PR (unreadable labels count as held).
+  # The arm is pinned with --match-head-commit, so a push racing it is refused by
+  # GitHub. Any doubt: it does not arm, and says why.
+  arm-on-verdict:
+    if: >-
+      github.event_name == 'issue_comment' &&
+      github.event.issue.pull_request &&
+      github.event.comment.user.login == 'bettercallzaal' &&
+      startsWith(github.event.comment.body, 'Seat evaluator')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Arm a judged head on its CLEAN verdict
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.issue.number }}
+        run: |
+          if ! pr=$(gh api "repos/$REPO/pulls/$PR"); then
+            echo "::error title=verdict::could not read PR $PR - not arming"; exit 0
+          fi
+          state=$(printf '%s' "$pr" | jq -r '.state')
+          head=$(printf '%s' "$pr" | jq -r '.head.sha')
+          from=$(printf '%s' "$pr" | jq -r '.head.repo.full_name')
+          if [ "$state" != "open" ] || [ "$from" != "$REPO" ] || [ -z "$head" ] || [ "$head" = "null" ]; then
+            echo "::notice title=verdict::PR $PR is $state from $from - not arming"; exit 0
+          fi
+          if ! raw=$(gh api --paginate "repos/$REPO/issues/$PR/comments?per_page=100"); then
+            echo "::error title=verdict::could not read the comments - not arming"; exit 0
+          fi
+          line=$(printf '%s\n' "$raw" | jq -r '.[] | select(.user.login == "bettercallzaal") | .body | split("\n")[0]' \
+            | grep -E '^Seat evaluator (re-)?verdict' | grep -F "$head" | tail -n 1 || true)
+          case "$line" in
+            *'**CLEAN**'*) ;;
+            *) echo "::notice title=verdict::the newest verdict at $head is not CLEAN - not arming"; exit 0 ;;
+          esac
+          if ! printf '%s\n' "$raw" | jq -r '.[] | select(.user.login == "github-actions[bot]") | .body' \
+               | grep -Fxq "AUTOMERGE_ELIGIBLE_HEAD=$head"; then
+            echo "::notice title=verdict::$head was never judged eligible by the automerge job - not arming"; exit 0
+          fi
+          if ! names=$(gh api --paginate "repos/$REPO/issues/$PR/labels?per_page=100" --jq '.[].name'); then
+            echo "::error title=hold::could not read the labels - treating the PR as held, not arming"; exit 0
+          fi
+          if printf '%s\n' "$names" | grep -Eq '^hold(:.*)?$'; then
+            echo "::notice title=hold::a hold label is on this PR - not arming"; exit 0
+          fi
+          gh pr merge "$PR" --repo "$REPO" --squash --auto --match-head-commit "$head"
+          echo "::notice title=verdict::armed at $head on a CLEAN verdict"

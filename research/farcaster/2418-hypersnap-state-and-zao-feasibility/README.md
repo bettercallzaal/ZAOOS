@@ -156,7 +156,7 @@ The seat ruled that the D6 go/no-go question was not gated and auto-proceeded on
 | Gap on haatz | Read from | Consequence if a route were moved |
 |---|---|---|
 | Users carry no `viewer_context` (even with `viewer_fid`) and no `power_badge` | haatz `user/bulk?fids=3&viewer_fid=2` | follow-state and badge UI goes blank |
-| Casts carry no `root_parent_url` | 5 of 5 casts from haatz `feed?feed_type=filter` | channel clustering comes back empty |
+| Casts have `channel: null`, and `root_parent_url` is set to the cast's own `parent_url`, so a reply in a channel has none. (A first reading of 5 sampled casts with no channel said the field was missing. Hypersnap `src/api/http.rs` 2102 and 2116 corrected that, as evaluator-a3 found.) | Hypersnap `http.rs`; haatz `feed?feed_type=filter` | channel clustering misses replies |
 | Followers and following are flat users (`object: user`), while Neynar wraps each one as `Follower { object, user }` (spec line 9940) | haatz `/followers`, `/following` | `u.user.fid` reads undefined. Every existing seam caller already reads `item.user \|\| item`. |
 | `bulk-by-address` answers `{ users: [...] }`, not keyed by address | haatz, one address | `data[addr]` misses on every member |
 | `cast/search` reads only `q` and `limit`; `channel_id` and the cursor are ignored and `next` is always null | Hypersnap `src/api/http.rs` 1130-1132 | channel search returns all of Farcaster, and pages never advance |

@@ -40,7 +40,7 @@ Re-researched on 2026-10-21 after the B and Z Build stream, where Ohnahji B push
 
 The builder's wallet `0x179f` is now named "Sir Hodl-a-Lot". The six new creations (ids 5 to 10) are exchangent (Metito), the **poidh notice board** (Proof Pilgrim), The Eden Gazette (Assay), The Hateful Desert, Ghostwire ("Private payments for i...", the builder), and The Far Lantern (Dash, at (32,32), with an activity contract `0x2895...e873`).
 
-**Not established.** On stream Ohnahji says he plays through his own agent on Muse (an agent app, researched as topic 7 of this batch) with "a fresh wallet" [1:23:42-1:23:59], and that "if you see some pink you'll know" [1:24:06]. "Dash... from musebook" is the only agent that names Muse. Nothing on chain ties any of these wallets to Ohnahji, and colour is not on chain. This doc does not say which agent is his.
+**Established 2026-10-21 (corrected later the same night): Metito is Ohnahji's agent wallet.** The address `0x64a15b1d2de581097cb48e5d82619203e24bb3e1` is a verified ETH address of Farcaster FID 262222 (`ohnahji`), read from the Haatz hub (`/v2/farcaster/user/bulk?fids=262222`, the first of five verified addresses). On Ethereum mainnet (block 26,245,332) the same address is `agentAt(5)`, named "Metito" ("Keeper of exchangent. Building the commerce rails of New Eden."), and it owns creation 5, "exchangent". An earlier version of this paragraph said nothing on chain tied any agent to Ohnahji. That was wrong: the tie is public, through his own Farcaster verification. On stream he says he plays through his own agent on Muse (researched as topic 7 of this batch) with "a fresh wallet" [1:23:42-1:23:59]. A Farcaster-verified address is not a fresh, unlinked wallet, so either his Muse agent uses this verified address or Metito is driven another way. **Which of the two is UNVERIFIED.** "Dash... from musebook" is the only agent that names Muse. "If you see some pink you'll know" [1:24:06] cannot be checked, because colour is not on chain. `agentCount()` read 14 at block 26,245,332, one more than the 13 in the table above.
 
 **Mainnet vs L2, the stream's debate [1:21:03-1:22:00].** Gas price on 2026-10-21: Ethereum mainnet 0.0602 gwei, Base 0.0060 gwei (`eth_gasPrice`). That is a 10x gap in price per unit of gas. Base's L1 data fee was not measured, so this is not an end-to-end cost comparison. Zaal's "the layer twos are dying because mainnet got cheap again" [1:21:27] is his opinion and is not tested here.
 
@@ -205,6 +205,8 @@ Method is stated per source. "curl + strip" means raw HTML fetched with a browse
 
 
 **Added 2026-10-21 (re-research):**
+
+- Haatz hub `https://haatz.quilibrium.com/v2/farcaster/user/bulk?fids=262222` (verified ETH addresses) and mainnet `agentAt(5)`, `agent(0x64a1...)`, `creation(5)`, `agentCount()` at block 26,245,332 - `[FULL]`, read-only. Added for the Metito correction.
 
 - Ethereum mainnet reads at block 26,244,328 via `https://ethereum-rpc.publicnode.com`, using `cast call` for `agentCount`, `creationCount`, `creationFee`, `agentAt(0..12)`, `agent(address)` for 9 agents, and `creation(5..10)`; `cast gas-price` - `[FULL]`, read-only
 - https://neweden.wei.limo/ - `[FULL]` curl, HTTP 200, 234,573 bytes, manifest keys extracted

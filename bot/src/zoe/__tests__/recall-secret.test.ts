@@ -18,11 +18,12 @@ describe('containsSecret: bare 64-hex (raw private key without 0x)', () => {
   it('still catches the 0x form', () => {
     expect(containsSecret(`0x${hex64}`)).toBe(true);
   });
-  it('lets a labelled sha256 digest through', () => {
-    expect(containsSecret(`image sha256:${hex64}`)).toBe(false);
-    expect(containsSecret(`{"digest": "${hex64}"}`)).toBe(false);
-    expect(containsSecret(`checksum=${hex64}`)).toBe(false);
-    expect(containsSecret(`sha256: ${hex64}`)).toBe(false);
+  it('blocks a labelled digest too: no label is an exemption', () => {
+    expect(containsSecret(`image sha256:${hex64}`)).toBe(true);
+    expect(containsSecret(`digest: ${hex64}`)).toBe(true);
+    expect(containsSecret(`{"digest": "${hex64}"}`)).toBe(true);
+    expect(containsSecret(`checksum=${hex64}`)).toBe(true);
+    expect(containsSecret(`sha256: ${hex64}`)).toBe(true);
   });
   it('a digest label elsewhere on the line does not exempt an unlabelled key', () => {
     expect(containsSecret(`sha256:${hex64} and also ${'f0e1d2c3'.repeat(8)}`)).toBe(true);

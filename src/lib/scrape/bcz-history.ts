@@ -111,6 +111,8 @@ export async function paginateCasts(
   return { casts, truncated: true };
 }
 
+// Stays on Neynar (doc 2418 D6 PR 3): this archives whole cast objects, and
+// Hypersnap casts carry no root_parent_url or channel, so the archive would be thinner
 const NEYNAR_BASE = 'https://api.neynar.com/v2/farcaster';
 
 /**

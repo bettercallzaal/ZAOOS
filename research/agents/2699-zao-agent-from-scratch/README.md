@@ -208,8 +208,16 @@ turns each a day, 6,000 turns a month, about 8,000 input and 500 output tokens a
 | Measured turn cost in our own Claude Code fleet, for scale | Sonnet 5.5 $0.03, Haiku 5.5 $0.01 a turn (7 days to 2026-10-17) | `.claude/rules/agent-spend.md` |
 
 Recommended default: Haiku 5.5 for routing and short answers, Sonnet 5.5 for code requests,
-both on the API with a hard monthly cap, giving roughly **$20 to $60 a month** at the assumed
-volume. Whether a team-facing bot may run on Zaal's personal Max plan through the CLI is
+both on the API with a hard monthly cap. The split of turns between them is also an
+assumption; at the same 8,000 in / 500 out per turn:
+
+| Haiku / Sonnet split | Haiku turns, cost | Sonnet turns, cost | Monthly |
+|---|---|---|---|
+| 90 / 10 | 5,400: 43.2M x $0.10 + 2.7M x $0.50 = $5.67 | 600: 4.8M x $2 + 0.3M x $10 = $12.60 | **about $18** |
+| 80 / 20 | 4,800: $3.84 + $1.20 = $5.04 | 1,200: $19.20 + $6.00 = $25.20 | **about $30** |
+| 60 / 40 | 3,600: $2.88 + $0.90 = $3.78 | 2,400: $38.40 + $12.00 = $50.40 | **about $54** |
+
+So roughly **$18 to $54 a month** at the assumed volume. Whether a team-facing bot may run on Zaal's personal Max plan through the CLI is
 **UNVERIFIED**: I did not fetch the consumer terms for that use. That is Question 2.
 
 ## Also found (route to the seat, not built here)
@@ -219,6 +227,35 @@ volume. Whether a team-facing bot may run on Zaal's personal Max plan through th
 - The devz dual-bot runs a six-week-old clone (`~/zaostock-bot` at `a83ec3e`).
 - `hermes/runner.ts` has no success-path `featureRan`, so whether ZOE's fix pipeline ever runs
   cannot be read from logs.
+
+## Questions for Zaal
+
+The same three are in the lane's vault status file for the grill to ask. Each has a default
+the lane takes only if Zaal says so; none is auto-proceeded, because Q1 decides whether a bot
+exists, Q2 is money and Q3 is a fact only he knows.
+
+**Q1. Is the from-scratch agent a NEW bot, or ZOE's next core?** The no-new-bots rule needs
+this doc approved before anything runs, and "ZOE v2" is on the decommissioned list.
+- A (recommended): ZOE's next core. Built as `bot/src/zao-agent/`, later run behind the
+  existing `@zaoclaw_bot` identity. No new token, no new process. Next: PRs 1 to 6, library code only.
+- B: a separate new bot for the team. New Telegram token, its own process beside ZOE, two
+  agents to keep in sync. Next: Zaal approves this doc as the bot doc, then the same PRs plus a unit.
+- C: do not build; keep extending ZOE. Next: the lane closes and this doc stays as a record.
+
+**Q2. Which model plan pays for team use?** ZOE today calls the Claude CLI on Zaal's Max plan.
+Whether a team-facing bot may run on a personal Max plan is UNVERIFIED (terms not read).
+- A (recommended): API with a hard monthly cap, Haiku for routing and short answers, Sonnet
+  for code requests, about $18 to $54 a month at the assumed volume (table above). Next: Zaal
+  sets the cap; the key goes in through `/secret`.
+- B: the Max plan through the CLI, $0 marginal. Next: Zaal confirms the terms allow team use.
+- C: OpenRouter DeepSeek V3.2, about $15 a month, paid model only, never `:free` with team data.
+
+**Q3. Who is on the team roster for the first version?** The agent answers only Telegram ids
+on a roster file in the vault, with two roles: `zaal` (can approve gated cards) and `member`
+(can ask, capture, request PRs).
+- A (recommended): Zaal plus the 2 or 3 people who use the cowork board most; widen after a week.
+- B: everyone in the ZAO team Telegram group from day one; more cost and more noise to tune.
+- C: Zaal only for two weeks, then widen.
 
 ## Next Actions
 

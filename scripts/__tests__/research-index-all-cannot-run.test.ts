@@ -15,7 +15,7 @@ import { describe, expect, it } from 'vitest';
 const GUARD = resolve(__dirname, '..', 'check-research-index.sh');
 const run = (...args: string[]) => spawnSync('bash', [GUARD, ...args], { encoding: 'utf8' });
 
-describe('check-research-index.sh --all with no research/ tree', () => {
+describe('check-research-index.sh --all that audits nothing', () => {
   it('exits 2 and says nothing was audited', () => {
     const dir = mkdtempSync(join(tmpdir(), 'ridx-none-'));
     const r = run('--all', dir);
@@ -26,6 +26,22 @@ describe('check-research-index.sh --all with no research/ tree', () => {
   it('keeps exit 0 in the staged mode, which has nothing to judge there', () => {
     const dir = mkdtempSync(join(tmpdir(), 'ridx-none-'));
     expect(run(dir).status).toBe(0);
+  });
+
+  // evaluator-b2 on #4115: the first version tested only a MISSING research/.
+  it('exits 2 for an empty research/ dir', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'ridx-empty-'));
+    mkdirSync(join(dir, 'research'));
+    const r = run('--all', dir);
+    expect(r.status).toBe(2);
+    expect(r.stderr).toMatch(/examined 0/);
+  });
+
+  it('exits 2 when the only docs sit in a topic folder with no README.md', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'ridx-noreadme-'));
+    mkdirSync(join(dir, 'research', 'agents', '9002-orphan'), { recursive: true });
+    writeFileSync(join(dir, 'research', 'agents', '9002-orphan', 'README.md'), '# a doc\n');
+    expect(run('--all', dir).status).toBe(2);
   });
 
   it('still audits a real tree in --all mode: an indexed doc passes', () => {

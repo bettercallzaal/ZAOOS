@@ -131,7 +131,8 @@ export async function runProbe(base: string, fid: number, fetcher: Fetcher): Pro
     lines.push(`CANNOT RUN: /v1/info unreachable or not JSON (${reason})`);
     return { exitCode: 2, lines };
   }
-  if (info.version === undefined) {
+  // JSON.parse can return null or a non-object; neither is a hub answer
+  if (typeof info !== 'object' || info === null || info.version === undefined) {
     lines.push('CANNOT RUN: /v1/info has no "version" key, so this is not a hub');
     return { exitCode: 2, lines };
   }

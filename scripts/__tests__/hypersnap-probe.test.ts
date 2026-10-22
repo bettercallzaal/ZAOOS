@@ -42,6 +42,15 @@ describe('runProbe', () => {
     expect(report.lines.at(-1)).toMatch(/^CANNOT RUN: \/v1\/info unreachable/);
   });
 
+  it.each(['null', '42', '"text"'])('exits 2 when /v1/info is the JSON %s', async (body) => {
+    const report = await runProbe(
+      'https://node.example',
+      3,
+      tableFetcher({ '/v1/info': [200, body] }),
+    );
+    expect(report.exitCode).toBe(2);
+  });
+
   it('exits 2 when /v1/info is not a hub answer', async () => {
     const report = await runProbe(
       'https://node.example',

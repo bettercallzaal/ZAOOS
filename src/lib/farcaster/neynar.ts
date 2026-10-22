@@ -532,10 +532,16 @@ export async function deleteCast(signerUuid: string, castHash: string) {
   return res.json();
 }
 
+/**
+ * Conversation summary goes straight to Neynar. Hypersnap answers this path
+ * with HTTP 200 and a placeholder ("Conversation summaries require LLM
+ * integration which is not available on this node."), so fetchWithFailover
+ * would return the placeholder as the summary (doc 2418 D3).
+ */
 export async function getCastConversationSummary(castHash: string) {
   const params = new URLSearchParams({ identifier: castHash, type: 'hash' });
-  const res = await fetchWithFailover(`/cast/conversation/summary?${params}`, {
-    headers: readHeaders(),
+  const res = await fetch(`${NEYNAR_BASE}/cast/conversation/summary?${params}`, {
+    headers: headers(),
     signal: AbortSignal.timeout(10000),
   });
   if (!res.ok) {
@@ -556,7 +562,7 @@ export async function getPopularCasts(fid: number) {
 
 export async function getBestFriends(fid: number, limit = 10) {
   const params = new URLSearchParams({ fid: String(fid), limit: String(limit) });
-  const res = await fetchWithFailover(`/user/best-friends?${params}`, {
+  const res = await fetchWithFailover(`/user/best_friends?${params}`, {
     headers: readHeaders(),
     signal: AbortSignal.timeout(10000),
   });
@@ -566,7 +572,7 @@ export async function getBestFriends(fid: number, limit = 10) {
 
 export async function getTrendingTopics(limit = 10) {
   const params = new URLSearchParams({ limit: String(limit) });
-  const res = await fetchWithFailover(`/trending/topics?${params}`, {
+  const res = await fetchWithFailover(`/topic/trending?${params}`, {
     headers: readHeaders(),
     signal: AbortSignal.timeout(10000),
   });
@@ -584,7 +590,7 @@ export async function getAccountVerifications(fid: number) {
 
 export async function getFollowSuggestions(fid: number, limit = 20) {
   const params = new URLSearchParams({ fid: String(fid), limit: String(limit) });
-  const res = await fetchWithFailover(`/user/suggestions?${params}`, {
+  const res = await fetchWithFailover(`/following/suggested?${params}`, {
     headers: readHeaders(),
     signal: AbortSignal.timeout(10000),
   });

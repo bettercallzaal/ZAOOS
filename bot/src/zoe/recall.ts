@@ -63,6 +63,11 @@ const SECRET_PATTERNS: RegExp[] = [
   /github_pat_[A-Za-z0-9_]{60,}/,
   /-----BEGIN (?:RSA |EC |OPENSSH |ENCRYPTED |PGP )?PRIVATE KEY-----/,
   /\b0x[0-9a-fA-F]{64}\b/,
+  // The same 32-byte private key written without 0x (card 10396 follow-up,
+  // evaluator-b2 on #4110). Exactly 64 hex characters standing alone, so a
+  // 40-character git SHA never matches. A bare sha256 digest is also 64 hex
+  // and is caught too; dropping that write is the safe side of the trade.
+  /(?<![0-9A-Za-z])[0-9a-fA-F]{64}(?![0-9A-Za-z])/,
   /\b\d{9,12}:[A-Za-z0-9_-]{30,}\b/, // telegram bot token
   /xox[bpaors]-[A-Za-z0-9-]{10,}/, // slack
   /\bAKIA[0-9A-Z]{16}\b/, // aws

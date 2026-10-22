@@ -43,6 +43,15 @@ if [[ "${1:-}" == "--all" ]]; then MODE="all"; shift; fi
 
 REPO="${1:-$(git rev-parse --show-toplevel 2>/dev/null)}"
 if [[ -z "$REPO" || ! -d "$REPO/research" ]]; then
+  # A full audit that found no tree did not audit anything (card 10405). Exit 0
+  # read as "every doc is indexed" and an evaluator verdict rested on it
+  # (ZAOOS #3923, 2026-10-12). In --all mode it is a check that could not run,
+  # so it says so and exits 2. The staged (pre-commit) mode keeps exit 0: a
+  # commit in a tree with no research/ has nothing for this guard to judge.
+  if [[ "$MODE" == "all" ]]; then
+    echo "[research-index] CANNOT RUN: no research/ dir under '${REPO:-<no git toplevel>}'; nothing was audited, so this is not a pass" >&2
+    exit 2
+  fi
   echo "[research-index-guard] no research/ dir found, skipping" >&2
   exit 0
 fi

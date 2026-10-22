@@ -1,6 +1,6 @@
 # 2699 BUILD log - ZAO Agent, the from-scratch agent
 
-**Name: ZAO Agent** (Zaal, picker round 2, recorded in the vault seat status at 07:07 EDT 22 Oct 2026). The repo stays `bettercallzaal/zao-agent`.
+**Name: ZAO Agent** (Zaal confirmed 22 Oct 2026). The repo stays `bettercallzaal/zao-agent`.
 
 One line per PR, newest last, so the agent's state can be read at any moment. A build log, not
 a research doc: the research, sources and options are in [README.md](./README.md).
@@ -12,17 +12,14 @@ token exists. Runs locally on the Mac only, when it runs at all. ZOE is untouche
 
 | # | Choice | Why |
 |---|---|---|
-| 1 | **Repo `bettercallzaal/zao-agent` (private), not `hermes`** (Zaal confirmed 22 Oct: name ZAO Agent, no rename) | The vault decision `decisions/hermes-agent-is-the-nous-program-zaalcommand-rename.md` (2026-09-09) reserves "Hermes" for the Nous Research program, and that program is installed on this Mac (`~/.hermes`, the `hermes` command at `~/.local/bin/hermes`). A second thing called hermes here collides with both. GitHub keeps redirects on rename, so the grill's answer costs nothing to apply. |
+| 1 | **Repo `bettercallzaal/zao-agent` (private), not `hermes`** (Zaal confirmed 22 Oct: name ZAO Agent, no rename) | A 2026-09-09 naming decision reserves "Hermes" for the Nous Research program, and that program is installed on this Mac (`~/.hermes`, the `hermes` command at `~/.local/bin/hermes`). A second thing called hermes here collides with both. GitHub keeps redirects on rename, so the grill's answer costs nothing to apply. |
 | 2 | **One bootstrap commit to main** (README only, `822385e`) | An empty repo has no base for a PR. Every change after it is a PR. |
 | 3 | **No CI** | Actions minutes on a private repo are a spend. Verification is local typecheck with a planted-error control, the full test run, and evaluator-b2 on each PR. |
 | 4 | **Same toolchain ranges as the ZAOOS bot package** (TypeScript ^5.6.0, vitest ^3.2.6, @types/node ^22.7.0) | No new dependency enters the estate. |
 
 ## Ruling this build follows
 
-Zaal, 22 Oct 2026, relayed through the seat and recorded in the vault
-(`handoffs/status/orchestrator2.md`, 06:23 EDT entry): "honestly lets make a lane for making a
-new hermes agent i feel like we have spent way to much time on the ZOE and i just need to make a
-fresh". The seat's shape: private repo, TypeScript core under 2,500 lines, Telegram DM first with
+Zaal, 22 Oct 2026: build a fresh agent rather than keep extending ZOE. The build's shape: private repo, TypeScript core under 2,500 lines, Telegram DM first with
 a token Zaal enters through `/secret`, vault and board as memory, PR-only hands, hard-coded
 gates, local run only.
 
@@ -55,8 +52,7 @@ agents" and "Effective context engineering for AI agents" via curl and an HTML s
 | 11 | Set a home channel or the agent "has nowhere to send proactive messages" (Hermes, tips) | One home chat, Zaal's DM by default, until he names the team group |
 
 **Also found:** Nous Hermes Agent v0.21.7 (2026.9.24) is installed on this Mac, with OpenRouter
-`anthropic/claude-haiku-4.5` as the default model and a vault-owned `~/.hermes/SOUL.md`
-("You are ZOE's operational intelligence layer"). Its `agent.log` was last written 2026-10-12
+`anthropic/claude-haiku-4.5` as the default model and a persona file configured. Its `agent.log` was last written 2026-10-12
 (file mtime, so a proxy). The latest release is v0.22.4.
 
 ## Next actions

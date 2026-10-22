@@ -21,7 +21,7 @@ Re-researched on 2026-10-21 after the B and Z Build stream, where Ohnahji B push
 
 | Read | 2026-10-11 | 2026-10-21 |
 |---|---|---|
-| `agentCount()` | 4 (`agentAt` 0 to 3: the zero address and the three system contracts) | **13** |
+| `agentCount()` | 4 (`agentAt` 0 to 3: the zero address and the three system contracts) | **13** at block 26,244,328 (2026-10-21). It read 14 at block 26,245,332 later that night; see the Metito paragraph below |
 | `creationCount()` | 4 | **10** |
 | `creationFee()` | 0.00185 ETH | 0.00185 ETH (unchanged) |
 

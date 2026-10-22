@@ -55,7 +55,7 @@ Nothing in these three topics needs a new build. The Audius music path is alread
 - https://support.claude.com/en/articles/11014257-about-claude-s-max-plan-usage [FAILED - HTTP 404 to WebFetch and to curl; the pricing page replaced it]
 - https://one.google.com/about/plans [FULL - WebFetch]
 - https://antigravity.google/pricing [FULL - WebFetch]
-- https://audius.co/thezaodao/bettercallzaal-by-iman-afrikah [FULL - HTTP 200; the permalink returned by `/v1/tracks/mOdAE2`]
+- https://audius.co/thezaodao/bettercallzaal-by-iman-afrikah [FULL - the permalink returned by `/v1/tracks/mOdAE2`. Evidence it is real: `https://api.audius.co/v1/resolve?url=<that link>` returns HTTP 302 to `/v1/tracks/mOdAE2`, while the same call on a made-up path under /thezaodao returns 404 (checked 2026-10-22). A 200 on the audius.co page itself proves nothing, because audius.co is a single-page app that answers 200 for any path (corrected 2026-10-22 after review)]
 - https://api.audius.co (root, `/v1/tracks/search`, `/v1/tracks/mOdAE2`, `/v1/tracks/mOdAE2/stream`) [FULL - curl, raw JSON and the 302]
 - https://docs.audius.co/developers/api [PARTIAL - curl and strip, 1,656 characters of text; the intro line quoted, no key or rate-limit text found]
 - https://tubefilter.com/2023/10/17/twitch-hopes-its-new-story-feature-will-help-creators-audience-build-on-platform/ [PARTIAL - search result summary only; used only to date Stories to 2023]

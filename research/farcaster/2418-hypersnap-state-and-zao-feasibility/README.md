@@ -2,9 +2,9 @@
 topic: farcaster
 type: decision
 status: research-complete
-last-validated: 2026-10-21
+last-validated: 2026-10-22
 superseded-by:
-related-docs: "304, 309, 489, 586, 587, 588, 589, 597, 643, 823"
+related-docs: "304, 309, 489, 586, 587, 588, 589, 597, 643, 761, 762, 823, 2622"
 original-query: "STANDARD on hypersnap, Cassie's fork of Farcaster. Zaal plans the ZAO social on it (async Respect Game in-feed, ZID identity, member-run nodes) and it has zero documentation on this machine. The doc must answer: 1) what hypersnap is - repo, author, relation to Farcaster protocol and snapchain, divergence; 2) state - last commit, activity, production users; 3) LICENSE read from the file, never the API field; 4) node requirements - hardware, ops, cost; 5) ZAO feasibility and the fallback if unsuitable (vanilla hub, snapchain, custom)."
 tier: STANDARD
 ---
@@ -12,6 +12,128 @@ tier: STANDARD
 # 2418 - Hypersnap: what it actually is, what state it is in, and whether ZAO social can stand on it
 
 > **Goal:** Answer the five hypersnap questions blocking L4 of the decentralization scale, with every claim traced to a file, an API response, or a live node.
+
+## UPDATE 2026-10-22: a ZAO client on Hypersnap - what exists, what the node serves, and the build plan
+
+Extended on 2026-10-22 for lane (4) hypersnap. The brief: "ZAO client on Hypersnap", cover what Hypersnap is today, what Zaal's private desktop node runs, which API calls ZAO users need on top of the Farcaster client already in ZAOOS, and a build plan in small PRs. **Docs only: no code PR opens until Zaal has read this section.** Where this section disagrees with the 2026-10-21 update or sections 1 to 5, this section wins.
+
+### Key Decisions (2026-10-22)
+
+| # | Decision | Why |
+|---|---|---|
+| C1 | **BUILD the ZAO client as an extension of the ZAOOS Farcaster client, not a new app.** The seam is `src/lib/farcaster/neynar.ts`, which already routes 22 read functions through `fetchWithFailover()` to `FARCASTER_READ_API_BASE`. | Hypersnap serves a Neynar-shaped `/v2/farcaster/*` HTTP API (`src/api/http.rs` lines 619 to 737 at hypersnap commit `2e8733d0`). ZAOOS already speaks that shape. Swapping the base URL is the 80 percent; the gaps below are the 20 percent. |
+| C2 | **Reads move to Hypersnap first; writes stay on Neynar managed signers for v1.** | Hypersnap answers every Neynar write route with HTTP 501: "Write operations require submitting signed Farcaster messages via the gRPC SubmitMessage endpoint" (`src/api/http.rs` lines 875 to 921). ZAOOS writes use Neynar `signer_uuid`s (20 API route files reference one). Moving writes means app-held Ed25519 signers, which is a security design, not a URL swap. |
+| C3 | **Fix the four silent paths before pointing anything at a Hypersnap node.** Three ZAOOS paths 404 on Hypersnap and fail over to Neynar without a log line; one returns HTTP 200 with placeholder text that ZAOOS would show as a real summary. | Probed live on haatz 2026-10-22 (table D2). This is `.claude/rules/silent-failure-guard.md` rule 2, the same class as the `/user/bulk` score case already handled at `neynar.ts:188-210` (`getNeynarUserScore`). |
+| C4 | **Route the read calls in the 20 files that bypass `neynar.ts` through it before claiming "ZAO reads come from our node".** | 12 files define their own `NEYNAR_BASE` and 8 more call `api.neynar.com` by literal URL (list in D3), so `FARCASTER_READ_API_BASE` does not reach them. Some of the 20 are writes and stay as they are. |
+| C5 | **Do not tell anyone Zaal's node is a validator.** | Hypersnap's `validators.toml` names 8 keys run by three operators: Neynar (6), Uno (1), Degen (1). The current set on each of shards 0, 1 and 2 is 7 keys, 5 of them labelled Neynar. A desktop node joins only when a new `[[consensus.validator_sets]]` entry is appended there. |
+| C6 | **Say "harder to censor than one company's servers, not uncensorable".** | The whitepaper (line 111) says more than 2/3 of a shard's validators colluding can censor a user. On the current set, 5 of 7 keys (71 percent) carry the label Neynar in the file's own operator map. |
+| C7 | **Running a node still earns nothing; a $SNAP token does exist. Keep both facts straight.** | hypersnap.org/run-a-node: "the install script asks operators to acknowledge that the network has not released a token and running a node currently doesn't earn tokens." hypersnap.org/snap, fetched the same day: "$SNAP is live", an Ethereum contract, 200B supply, a 200M retro rewards allocation, 33M opened in phase 1 through Hypria. The installer text and the token page disagree on "has not released a token". The node-rewards answer is the same either way: none. |
+
+### D1. What Hypersnap is today (measured 2026-10-22)
+
+**From the 21 Oct B and Z Build stream** (mlx-whisper transcript, private file; timestamps from `transcript.tsv`; the transcript has no speaker labels, so lines are attributed only where the content makes the speaker plain):
+
+- [0:13:37 to 0:14:11] Zaal: "i did get a node up and running of uh of hypersnap i uh i've created it as a private one right now um just because i don't really fully understand all the security things and i'm just rocking it on my desktop ... we have successfully queried stuff. Now it's starting to create a couple API calls that I can allow our users to use essentially."
+- [0:15:33 to 0:16:19] Zaal: "Hypersnap is a hard fork off of SnapChain, which is the official Farcaster blockchain ... And Hypersnap gives you the ability to call APIs like you would with something like Nainar [Neynar] ... gives the power now for me to not have to be reliant on an external API".
+- [0:14:30 to 0:14:47] Zaal: "cassie of equilibrium [Quilibrium] created quorum and quorum is the client that uses ... hypersnap".
+- [0:59:15 to 0:59:39] Zaal: "i am running a hypersnap node hypothetically speaking it's supposed to earn snap tokens to be honest with you i have not researched that yet ... i want to create my own client".
+- [0:59:48] "hypersnap is not censored correct" (speaker not labelled in the transcript). **Correction to the 2026-10-21 update**, which attributed this line to a named guest; the transcript cannot show who said it.
+
+**From the repo, the site and the live node:**
+
+| Question | Answer | Read from |
+|---|---|---|
+| What is it? | A hard fork of Snapchain that its site calls "Snapchain, made hyperdimensional" (repo description) and "The evolution of Farcaster. Same posts, follows, and identities". It speaks the same wire format, so Farcaster apps and identities work on it. | `gh api repos/farcasterorg/hypersnap`; hypersnap.org home |
+| Who maintains it? | **CassOnMars** (Cassie Heart, Quilibrium) authors or merges the code: 4 of the last 6 commits are hers and she merged martinvr's #38 and #39. The site hypersnap.org is a separate solo contribution: "Hypersnap.org is made by Felirami". | `commits?per_page=6`; hypersnap.org/about |
+| Latest code | `2e8733d0`, 2026-10-17, "fix: feedgen, performance, search client-facing issues" (+3,262 / -278). It added `src/api/custody_index.rs` and `src/api/user_search_index.rs` and reworked `src/api/http.rs` (+475 / -83). The API layer is where the work is going. | `commits/2e8733d0` |
+| Releases | Still `v0.11.8` (2026-05-07). Nothing tagged since. | `releases` |
+| Activity | 66 stars, 25 forks, 14 open issues and PRs, last push 2026-10-17. Newest PR: #40 by backmeupplz, opened 2026-10-22, "feat: with_recasts flag on the following feed". | repo record; `issues?state=open` |
+| Live node | haatz `0.13.5`, 914,297,313 messages, 3,356,310 FID registrations, ~797 GB, block delay 0 to 1 | `curl https://haatz.quilibrium.com/v1/info` |
+| HTTP API | A Neynar-shaped `/v2/farcaster/*` surface: user, cast, feed, channel, reaction, notification, signer-list and storage reads. **The whole API is off by default** (`ApiConfig.enabled: false`), and social graph and search indexing are off by default too; conversations are on (`src/api/config.rs` lines 54 to 60 and the `test_default_config` test). With an index off, its routes answer HTTP 503, for example "Social graph indexing not enabled" (`http.rs` 1506, 1546) and "Channels indexing not enabled" (1585, 1632). | `src/api/config.rs`, `src/api/http.rs` at `2e8733d0` |
+| Writes | Every Neynar write route returns **501**. Writes are signed Farcaster messages submitted to the node. Mini-app, login, NFT and fungible routes return 501 "requires managed infrastructure not available on a self-hosted node" (`http.rs` 1394 to 1416). | same |
+| Quorum | Quorum is a Hypersnap client. `quorum-mobile/services/farcaster/hypersnapWrites.ts` says every protocol write (casts, deletes, likes, recasts, follows, profile fields) "is a message signed with the device's Hypersnap signer ... and submitted to Hypersnap's `/v1/submitMessage`. There is no farcaster.xyz fallback." Uploads, DMs, mutes and blocks, and Audio Spaces still go to farcaster.xyz. | `gh api` raw file |
+| Licences (files read) | hypersnap: GPL-3.0. quorum-mobile: GPL-3.0. quorum-desktop: AGPL-3.0. quorum-shared (`@quilibrium/quorum-shared` 2.1.0-45, the library Quorum signs with): **no LICENSE file in the repo root**; `package.json` says `"license": "MIT"`. Treat quorum-shared as UNVERIFIED for adoption until a LICENSE file exists. | `contents/LICENSE` per repo; quorum-shared root listing |
+| Node rewards and token | See C7. | hypersnap.org/run-a-node, /snap |
+| Censorship | See C5 and C6. Whitepaper lines 111 and 171 (unchanged from the 2026-10-21 read). | `site/docs/pages/whitepaper.mdx`; `validators.toml` |
+
+### D2. Zaal's private desktop node: UNVERIFIED from this Mac
+
+**What is known, and from where:**
+
+- Zaal's own words on stream (D1): private, on his desktop, not a VPS, "successfully queried stuff".
+- A read-only readiness prompt for "THIS Windows PC" was written on 2026-10-16 (a private vault clip; path withheld, public repo). It asks for RAM, disks, WSL, Docker, ports 2281 to 2283 and 3381 to 3383, Tailscale and sleep settings, and ends "nothing installs until you say go". A grep of the vault for its report header "HYPERSNAP PC CHECK" on 2026-10-22 found only the prompt itself, so its results are not in the vault.
+
+**How I looked, and what stopped me:** a vault grep for `hypersnap` (17 files, read the two that describe the desktop); then a read of `~/.ssh/config` host names and `tailscale status`, which was **denied by the permission gate** ("Permission to use Bash with command ... grep -n -i -E "^Host " ~/.ssh/config ... tailscale status ... has been denied"). Per `.claude/rules/blocks-are-results.md` I did not try another route. I did not query the node. **Not searched:** the PC itself, Docker on it, and the node's `/v1/info`.
+
+**So these are UNVERIFIED:** the version it runs; whether it is plain Snapchain-compatible mode or hyper mode (`docs/hyper.md`, default off); whether `[api] enabled = true` is set and which indexes (social graph, channels, search, feeds) are on; whether it is caught up; and its uptime. These decide what ZAOOS can call on it: with the defaults, most `/v2` routes answer 503 and ZAOOS would fail over to Neynar on every call. The question is in the QUESTIONS FOR ZAAL block of this lane's status file.
+
+### D3. The ZAO client that already exists in ZAOOS (inventory, 2026-10-22, origin/main `382e1d61`)
+
+**Read seam, built and wired:** `src/lib/env.ts:89` declares `FARCASTER_READ_API_BASE`. `src/lib/farcaster/neynar.ts:4-7` builds `READ_BASE` from it; `readHeaders()` (lines 16-21) drops the Neynar key; `fetchWithFailover()` (lines 24-38) tries the proxy, then Neynar on any non-OK or throw. Whether the variable is SET in production is still not verified (env reads are blocked in this session).
+
+**Each `neynar.ts` read against Hypersnap's route table** (the route table is `http.rs` `can_handle`, lines 483 to 738; the live column is a GET to haatz on 2026-10-22):
+
+| `neynar.ts` function (line) | Path | Hypersnap | Live on haatz | ZAOOS caller |
+|---|---|---|---|---|
+| `getTrendingFeed` (41), `getChannelFeed` (60), `getFollowingFeed` (86) | `/feed/trending`, `/feed/channels`, `/feed/following` | served | `feed/trending` 200 | chat and home feeds |
+| `getCastThread` (154), `getUserCasts` (229), `getPopularCasts` (548) | `/cast/conversation`, `/feed/user/casts`, `/feed/user/popular` | served | not probed | threads, profiles |
+| `getUserByFid` (173), `getUsersByFids` (213), `getUserByAddress` (243), `searchUsers` (297) | `/user/bulk`, `/user/bulk-by-address`, `/user/search` | served | `user/bulk` 200 | profiles, auth, members |
+| `getFollowers` (310), `getFollowing` (334), `getRelevantFollowers` (358) | `/followers`, `/following`, `/followers/relevant` | served, needs social graph index | not probed | social |
+| `getNotifications` (422), `getStorageUsage` (511) | `/notifications`, `/storage/usage` | served | not probed | notifications |
+| **`getBestFriends` (557)** | `/user/best-friends` | **404: Hypersnap has `/user/best_friends`** | 404, and `best_friends` 200 | `src/app/api/members/[username]/friends/route.ts:30` |
+| **`getTrendingTopics` (567)** | `/trending/topics` | **404: Hypersnap has `/topic/trending`** | 404 | `src/app/api/social/trending-topics/route.ts:15` |
+| **`getFollowSuggestions` (585)** | `/user/suggestions` | **404: Hypersnap has `/following/suggested`** | 404 | `src/app/api/social/suggestions/route.ts:80` |
+| **`getCastConversationSummary` (535)** | `/cast/conversation/summary` | **HTTP 200 with a placeholder** (`http.rs` 1142-1147) | 200: `{"summary":"Conversation summaries require LLM integration which is not available on this node."}` | `src/app/api/casts/summary/route.ts:27` |
+| `getFrameCatalog` (595), `searchFrames` (606), `getRelevantFrames` (616) | `/frame/*` | 501, managed | not probed | mini apps; fails over correctly |
+| `getNeynarUserScore` (197) | `/user/bulk` | bypasses the proxy on purpose (haatz does not fill `experimental`) | - | already handled |
+| `getAccountVerifications` (577) | `api.farcaster.xyz` | not Neynar, not Hypersnap | - | - |
+
+The three 404 rows work today only because failover catches them, so each call silently costs a Neynar request. The summary row is worse: a 200 is "ok", so failover never fires, and a user would see the placeholder sentence as the summary.
+
+**Writes:** `neynar.ts` `postCast` (107), `followUser`/`unfollowUser` (371, 385), `muteUser`/`blockUser` and their undo (450 to 483), `deleteCast` (524), `markNotificationsSeen` (439) and the signer functions (257 to 288) all call `NEYNAR_BASE` directly with a `signer_uuid`. Signers are created in `src/app/api/auth/signer/route.ts` and `src/app/api/auth/register/route.ts`. Client-side helpers in `src/lib/farcaster/neynarActions.ts` post to ZAOOS routes (`/api/neynar/cast`, `/like`, `/recast`, `/follow`, `/api/users/mute`, `/block`, `/api/casts/delete`).
+
+**Files that bypass the seam** (define their own `NEYNAR_BASE` or call `api.neynar.com` literally), read 2026-10-22 by grep over `src/`: `src/app/api/music/feed/route.ts` (88 `cast/search`, 138 `feed/channels`), `chat/search/route.ts:59`, `chat/react/route.ts` (38, 108 `reaction`, a write), `admin/backfill/route.ts:65`, `admin/member-fix/route.ts` (60, 121, 230), `admin/broadcast/route.ts:38` (write), `social/clusters/route.ts:63`, `social/compare/route.ts` (80, 131, 158), `social/community-graph/route.ts` (62, 91), `social/suggestions/route.ts` (24, 134), `social/engagement-heatmap/route.ts` (25, 47), `members/route.ts:66`, `members/profile/route.ts` (51, 78), `members/[username]/route.ts` (128, 224), `artists/[username]/route.ts:91`, `neynar/cast`, `like`, `recast`, `follow` route files (writes), and `src/lib/scrape/bcz-history.ts` (132, 160). The read-only ones are the work in PR 3.
+
+**Hub-level code already pointed at Hypersnap:** `src/lib/farcaster/signer-provenance.ts:37` sets `DEFAULT_HUB_URL = 'https://haatz.quilibrium.com'` and reads `GET /v1/castById` and `/v1/onChainSignersByFid`, asking two hubs and accepting only what both say (line 22, second hub at line 231). Zaal's node is a natural second hub there.
+
+**A Hypersnap write path already exists, in the bot, not the app:** `bot/src/zoe/farcaster/write.ts` signs a `CastAdd` with `@farcaster/hub-nodejs` and POSTs it to `${FARCASTER_WRITE_API_BASE}/v1/submitMessage` (line 77); `bot/src/zoe/farcaster/signer.ts` holds the Ed25519 signer in process (doc `farcaster/762-quilibrium-stack-verification`: Quilibrium's key store cannot sign Ed25519); `bot/src/zoe/farcaster/event-stream.ts` subscribes to a self-hosted Hypersnap node's gRPC stream on port 3383. `write.ts` line 2 says "the self-hosted Hypersnap node is read-only"; Quorum submits writes to Hypersnap's `/v1/submitMessage` (D1), so that comment is a claim to re-check against Zaal's node, not a fact. `package.json` declares `@farcaster/hub-nodejs` `^0.16.0`, so no new dependency is needed for signed writes.
+
+### D4. The API calls ZAO users need, and where each comes from
+
+| User action | Call today | On Hypersnap | Gap |
+|---|---|---|---|
+| Open the ZAO channel feeds (`zao`, `zabal`, `cocconcertz`, `wavewarz`, `community.config.ts:36`) | `getChannelFeed` | `/feed/channels`, needs channels index | none once indexed |
+| Home and Following feed | `getFollowingFeed`, `getTrendingFeed` | served | following needs social graph index |
+| Profile, casts, followers | `getUserByFid`, `getUserCasts`, `getFollowers` | served | none |
+| Search people and casts | `searchUsers`, `chat/search` (bypass) | `/user/search`, `/cast/search`, needs search index | route the bypass |
+| Notifications | `getNotifications` | served | none |
+| Best friends, topics, suggestions | 3 functions | different paths | PR 2 |
+| Thread summary | `getCastConversationSummary` | placeholder | PR 2 |
+| Cast, like, recast, follow, mute, block, delete | Neynar managed signers | 501; signed `/v1/submitMessage` | PR 6 and 7, gated |
+| Mini apps, login, NFT | Neynar | 501 managed | stays on Neynar |
+
+### D5. Options
+
+| Option | Reads | Writes | Cost | Risk | Verdict |
+|---|---|---|---|---|---|
+| A. haatz as `FARCASTER_READ_API_BASE` (status quo option) | free | Neynar | $0 | one public node, Cassie's | KEEP as the default and the failover tier |
+| B. Zaal's desktop node as the read base, haatz then Neynar behind it | free, ours | Neynar | power and disk | desktop uptime, exposure | USE on staging after PR 1 to 5 and the security pass |
+| C. B plus own signers writing to `/v1/submitMessage` (the Quorum model) | ours | ours | $0 per write | key custody for every member | DEFER to a separate design doc, Zaal-gated |
+| D. Neynar only | paid | paid | plan cost | vendor dependence | SKIP as the long-term answer |
+
+### D6. Build plan: small PRs (none opens until Zaal has read this)
+
+| PR | What it touches | How it is tested |
+|---|---|---|
+| 1. Read-base chain and logging | `src/lib/farcaster/neynar.ts` `fetchWithFailover`: accept an ordered list (`FARCASTER_READ_API_BASE` then a second base, then Neynar) and log one line per failover with path and status, so a 404 or 503 is visible. New env var is "ask first". | `src/lib/farcaster/__tests__/neynar.test.ts`: proxy 200, proxy 404, proxy 503, proxy throw, both down; assert the log line on each failover |
+| 2. Fix the four silent paths | `neynar.ts` lines 535, 557, 567, 585: use `/user/best_friends`, `/topic/trending`, `/following/suggested` on the Hypersnap base (keep Neynar's own paths on failover), and send `getCastConversationSummary` straight to Neynar, the same way `getNeynarUserScore` does | table tests with the verbatim haatz responses from D3, including the placeholder body, red before the change |
+| 3. Route the read-only bypass files through the seam | the read calls in the D3 bypass list, one domain per commit (social, members, music, chat search, scrape). Writes untouched. | each route's existing `__tests__`, plus a test that `api.neynar.com` is not fetched when the read base answers |
+| 4. Node probe | `scripts/hypersnap-probe.ts`: GETs `/v1/info` and one call per D4 row against a given base, prints status and a content check per row, exits 2 if it cannot run. Read-only by construction. | run against haatz in CI-free local mode; the output is the first table in the PR body |
+| 5. Staging on Zaal's node | env only: staging `FARCASTER_READ_API_BASE` to his node through whatever tunnel he picks. Vercel and env changes are his, so this PR is a runbook, not a change. | one week of probe output in the vault, failover count from PR 1 logs |
+| 6. Write design doc | a research doc, not code: app-held Ed25519 signers per member, key custody, the Quorum model, reuse of `bot/src/zoe/farcaster/write.ts` | evaluator review; Zaal decision |
+| 7. Signed writes behind a flag | only after PR 6 is decided. `src/lib/farcaster/` writer reusing `@farcaster/hub-nodejs`, behind a default-off flag, one action (cast) first | unit tests with a stub signer; `/security-review`; a refused request on staging |
+
+**Ordering:** 1 then 2 (2 depends on 1's logging to show the fix), 3 and 4 in parallel, 5 after 4, 6 any time, 7 last.
 
 ## UPDATE 2026-10-21: Zaal runs a node now, and the "stopped tracking upstream" reading is out of date
 
@@ -23,7 +145,7 @@ Re-researched on 2026-10-21 after the B and Z Build stream, where Zaal walked Oh
 - [0:14:30] "snapchain is the official farcaster tech stack and cassie of equilibrium created quorum and quorum is the client that uses... hypersnap". ("equilibrium" is Whisper's spelling of Quilibrium.)
 - [0:16:22] "I'm a validator of the network". **UNVERIFIED.** Running a node that syncs and serves reads does not make it a validator. Snapchain's whitepaper describes a separate validator set. Nothing in this pass shows Zaal's node in a validator set.
 - [0:59:15] "it's supposed to earn snap tokens to be honest with you i have not researched that yet".
-- [0:59:48] Ohnahji: "hypersnap is not censored correct".
+- [0:59:48] "hypersnap is not censored correct". (Corrected 2026-10-22: this line was first attributed to a named guest; the transcript has no speaker labels.)
 
 **Measured 2026-10-21:**
 
@@ -379,6 +501,11 @@ probably to ask Cassie directly rather than self-host.
 | Specify the async Respect Game's settlement inputs (L3), then check them against canonical Farcaster retention limits. This is the one input that could reopen the hypersnap decision. Shipped when the retention answer is written into the L3 section. | @Zaal | Spec | 2026-09-15 |
 | Record whether Zaal's desktop hypersnap node is in any validator set, or is a read node only, so the stream's "I'm a validator" can be confirmed or corrected. Shipped when the answer is a line in this doc | Zaal | Verification | 2026-10-28 |
 | Point a staging `FARCASTER_READ_API_BASE` at Zaal's node with Neynar failover on, and log one week of uptime. Shipped when the uptime note is in the vault | Zaal | Ops test | 2026-11-11 |
+| Read the 2026-10-22 section and say go or no-go on PRs 1 to 4 of the D6 build plan. Shipped when the answer is a line in the hypersnap lane status file | Zaal | Decision | 2026-10-29 |
+| Run the D2 checks on the desktop, read-only: `/v1/info` version and block delay, and whether `[api] enabled` plus the social graph, channels and search indexes are on. Shipped when the answers are in the vault | Zaal | Verification | 2026-10-29 |
+| PR 1 and PR 2 of D6 (failover logging, the four silent paths). Shipped when both PRs merge with the tests named in D6 | hypersnap lane | PR | after the go |
+| PR 6 of D6, the write design doc (member signers, custody, Quorum model). Shipped when the doc PR merges | hypersnap lane | Research doc | after the go |
+| Re-check the comment at `bot/src/zoe/farcaster/write.ts:2` ("the self-hosted Hypersnap node is read-only") against Zaal's node. Shipped when the comment is confirmed or corrected in a PR | hypersnap lane | Verification | after D2 |
 | DONE 2026-10-21 (the UPDATE section at the top). Re-validate this doc - hypersnap has a single maintainer and one commit could change the verdict. Shipped when `last-validated` is bumped or a superseding doc exists. | @Zaal | Re-research | 2026-09-25 |
 
 ## Sources
@@ -398,6 +525,19 @@ no claim here rests on a WebFetch summary.
 - [Hetzner AX41-NVMe](https://www.hetzner.com/dedicated-rootserver/ax41-nvme/) - **[PARTIAL - price not in static HTML]** via `curl` + tag strip: HTTP 200, 105,406 bytes, only 4,325 chars of visible text and no price string; pricing is JS-rendered. Not escalated to Playwright because the cost figure is not load-bearing for the recommendation, which is "do not buy". Dated 2026-05-04 quote used instead and labelled as such.
 - Reddit - **[FAILED - not attempted]** Reddit is fully walled from this machine per doc 2282 and `.claude/rules`. No snippet substituted.
 - **Added 2026-10-21:** `farcasterorg/hypersnap` commits, releases, repo record, `scripts/hypersnap.sh` and `site/docs/pages/whitepaper.mdx` [FULL - gh api, raw file bytes]; `farcasterxyz/snapchain` releases and whitepaper (for the diff) [FULL]; `https://haatz.quilibrium.com/v1/info` [FULL - curl]; GitHub code search over `QuilibriumNetwork/quorum-shared` and `quorum-mobile` [FULL - counts only], `quorum-desktop` [FAILED - code-search rate limit, not retried]; the B and Z Build transcript windows 0:13:20 to 0:16:50 and 0:58:50 to 1:01:00 [FULL]
+
+- **Added 2026-10-22** (method per source):
+  - [farcasterorg/hypersnap](https://github.com/farcasterorg/hypersnap) repo record, commits (6), `commits/2e8733d0` file stats, releases, newest open issues and PRs - **[FULL]** `gh api`, raw JSON.
+  - hypersnap `src/api/http.rs`, `src/api/config.rs`, `src/api/mod.rs`, `validators.toml`, `site/docs/pages/whitepaper.mdx`, `site/docs/pages/guides/running-a-node.mdx` at main `2e8733d0` - **[FULL]** `gh api contents` base64-decoded to disk, read with grep and sed; the validator set computed with Python `tomllib`.
+  - [hypersnap.org](https://hypersnap.org), [/about](https://hypersnap.org/about), [/run-a-node](https://hypersnap.org/run-a-node), [/snap](https://hypersnap.org/snap) - **[FULL]** `curl` with a browser user agent, all HTTP 200, script and tags stripped in Python, visible text read. Market figures on /snap move by the minute and are not used in any decision.
+  - `https://haatz.quilibrium.com/v1/info` and seven `/v2/farcaster/*` GETs (D3) - **[FULL]** `curl`, status codes and bodies read.
+  - [QuilibriumNetwork/quorum-mobile](https://github.com/QuilibriumNetwork/quorum-mobile) `services/farcaster/hypersnapWrites.ts` and LICENSE; quorum-desktop LICENSE; quorum-shared root listing and `package.json` - **[FULL]** `gh api`; `gh search code` for `submitMessage` and `haatz` in quorum-mobile **[FULL - paths only]**.
+  - B and Z Build transcript, `transcript.tsv` windows 0:13:21 to 0:16:55 and 0:58:52 to 1:00:18 - **[FULL]**, private local file.
+  - ZAOOS `src/lib/farcaster/*`, `src/lib/env.ts`, the `src/app/api` routes in D3, `bot/src/zoe/farcaster/{write,signer,event-stream}.ts`, `package.json`, `community.config.ts` at origin/main `382e1d61` - **[FULL]** grep and sed.
+  - Vault: the 2026-10-16 desktop readiness clip and a `hypersnap` grep over the vault - **[FULL]**, private, paths withheld. Zaal's desktop node, `~/.ssh/config`, Tailscale - **[FAILED - permission denied, not routed around]**.
+  - Community: the hypersnap GitHub issue tracker (PR #40, opened 2026-10-22) - **[FULL]**. HN and Reddit were not re-run this pass; the 2026-08-25 HN result stands.
+
+**What this means for The ZAO (2026-10-22):** the ZAO client is mostly built already. ZAOOS reads through one file that can point at a Hypersnap node today, and Hypersnap speaks the same API shape. Before members read from Zaal's node, four calls that quietly fall back or show a placeholder need fixing, and the reads in twenty files that skip that one file need routing through it. Posting from our own node is a bigger, separate decision about who holds members' signing keys.
 
 **What this means for The ZAO (2026-10-21):** Zaal's node is useful as our own read API and as a hedge against Neynar. It is not a source of income, because the installer says no tokens are paid yet. And hypersnap is no longer a one-person fork that stopped tracking upstream.
 - Local: `research/` (19 matching directories), `src/lib/env.ts`, `src/lib/farcaster/neynar.ts`, and three internal notes - **[FULL]** read from disk. (Private note paths removed 2026-10-21; public repo.)

@@ -135,6 +135,45 @@ The three 404 rows work today only because failover catches them, so each call s
 
 **Ordering:** 1 then 2 (2 depends on 1's logging to show the fix), 3 and 4 in parallel, 5 after 4, 6 any time, 7 last.
 
+## UPDATE 2026-10-22 (build): D6 PRs 1 to 4 are built, and what building them measured
+
+The seat ruled that the D6 go/no-go question was not gated and auto-proceeded on default A, which was logged in the hypersnap lane status file. PR states below were read with `gh pr view` at 2026-10-22T22:03:37Z. They move, so re-read them before citing.
+
+| D6 PR | ZAOOS PR | State |
+|---|---|---|
+| 1. Failover logging | #4133 | merged 2026-10-22. One `logger.warn` line per failover (path without its query, plus the status or error). The read-base chain was left out, because it needs a new env var. |
+| 2. The silent paths | #4134 | merged 2026-10-22 |
+| 4. Node probe | #4135 | merged 2026-10-22. `npx tsx scripts/hypersnap-probe.ts --base <url>`; exit 0, 1 or 2 |
+| 3. Bypass reads, social | #4138 | merged 2026-10-22. Adds `neynarRead()` to `src/lib/farcaster/neynar.ts` |
+| 3. Members | #4139 | merged 2026-10-22 |
+| 3. Music and chat search | #4140 | open, evaluator CLEAN pending CI |
+| 3. Admin and scrape | #4141 | open, comments only, in review |
+
+**Correction to D6 row 2.** D6 said to "keep Neynar's own paths on failover" for best friends, trending topics and follow suggestions. There are no separate Neynar paths. Neynar's own OpenAPI spec (`neynarxyz/OAS` `src/api/spec.yaml`, lines 3351, 6054 and 6276, read with `gh api`) names the same three paths Hypersnap serves: `/user/best_friends`, `/topic/trending` and `/following/suggested`. The old ZAOOS paths appear in neither spec. That they also failed on Neynar is inferred from the spec, not measured with a live Neynar call.
+
+**A 200 can carry less than Neynar sends, and failover never sees it.** `fetchWithFailover` falls back only on a non-OK status or a throw. Reads against haatz on 2026-10-22 found these gaps:
+
+| Gap on haatz | Read from | Consequence if a route were moved |
+|---|---|---|
+| Users carry no `viewer_context` (even with `viewer_fid`) and no `power_badge` | haatz `user/bulk?fids=3&viewer_fid=2` | follow-state and badge UI goes blank |
+| Casts have `channel: null`, and `root_parent_url` is set to the cast's own `parent_url`, so a reply in a channel has none. (A first reading of 5 sampled casts with no channel said the field was missing. Hypersnap `src/api/http.rs` 2102 and 2116 corrected that, as evaluator-a3 found.) | Hypersnap `http.rs`; haatz `feed?feed_type=filter` | channel clustering misses replies |
+| Followers and following are flat users (`object: user`), while Neynar wraps each one as `Follower { object, user }` (spec line 9940) | haatz `/followers`, `/following` | `u.user.fid` reads undefined. Every existing seam caller already reads `item.user \|\| item`. |
+| `bulk-by-address` answers `{ users: [...] }`, not keyed by address | haatz, one address | `data[addr]` misses on every member |
+| `cast/search` reads only `q` and `limit`; `channel_id` and the cursor are ignored and `next` is always null | Hypersnap `src/api/http.rs` 1130-1132 | channel search returns all of Farcaster, and pages never advance |
+| Channels carry no `image_url` | haatz `user/channels` | channel icons go blank |
+| `topic/trending` returned 200 with `topics: []`; `cast/search` returned 0 casts for `soundcloud` | haatz, live | a list renders empty and nothing falls back |
+
+So PR 3 follows one rule: **a read moves only when every field and parameter its route uses is served.** Nine calls are routed: six in social (#4138, merged), two in members (#4139, merged), and one in music (#4140, open when this was written). So eight are on main and one is pending. The rest stay on Neynar, each with a comment at the call site that says why.
+
+**Two existing bugs, found on the way. Both are read from the spec and not measured in production:**
+- compare's shared-following list read `u.fid` on Neynar's `{ user }` items, so it was probably always empty. Fixed in #4138.
+- The suggestions route asked Neynar for `/user/suggestions`, which is not in Neynar's spec. Fixed in #4138.
+
+**Gaps that remain** (rows added to Next Actions):
+1. A 200 with an empty list has no fallback. This predates the D6 work, and the evaluator noted it on #4138.
+2. On failover mid-pagination, a cursor issued by the read base is passed to Neynar, and the reverse. No PR handles mixed cursors yet.
+3. The probe has only run against haatz (PASS 11, EMPTY 1, FAIL 0 of 12; `/v1/info` version 0.13.5). Zaal's node is still unread, because ssh and tailscale reads were denied in this lane.
+
 ## UPDATE 2026-10-21: Zaal runs a node now, and the "stopped tracking upstream" reading is out of date
 
 Re-researched on 2026-10-21 after the B and Z Build stream, where Zaal walked Ohnahji through Hypersnap. **Sections 1 to 5 below are the 2026-08-25 text.** Where this update disagrees with them, this update wins.
@@ -501,9 +540,12 @@ probably to ask Cassie directly rather than self-host.
 | Specify the async Respect Game's settlement inputs (L3), then check them against canonical Farcaster retention limits. This is the one input that could reopen the hypersnap decision. Shipped when the retention answer is written into the L3 section. | @Zaal | Spec | 2026-09-15 |
 | Record whether Zaal's desktop hypersnap node is in any validator set, or is a read node only, so the stream's "I'm a validator" can be confirmed or corrected. Shipped when the answer is a line in this doc | Zaal | Verification | 2026-10-28 |
 | Point a staging `FARCASTER_READ_API_BASE` at Zaal's node with Neynar failover on, and log one week of uptime. Shipped when the uptime note is in the vault | Zaal | Ops test | 2026-11-11 |
-| Read the 2026-10-22 section and say go or no-go on PRs 1 to 4 of the D6 build plan. Shipped when the answer is a line in the hypersnap lane status file | Zaal | Decision | 2026-10-29 |
+| DONE 2026-10-22: the seat ruled this not gated and auto-proceeded on A (logged in the hypersnap lane status file). Read the 2026-10-22 section and say go or no-go on PRs 1 to 4 of the D6 build plan. | Zaal | Decision | 2026-10-29 |
 | Run the D2 checks on the desktop, read-only: `/v1/info` version and block delay, and whether `[api] enabled` plus the social graph, channels and search indexes are on. Shipped when the answers are in the vault | Zaal | Verification | 2026-10-29 |
-| PR 1 and PR 2 of D6 (failover logging, the four silent paths). Shipped when both PRs merge with the tests named in D6 | hypersnap lane | PR | after the go |
+| DONE 2026-10-22 (#4133, #4134 merged). PR 1 and PR 2 of D6 (failover logging, the four silent paths). Shipped when both PRs merge with the tests named in D6 | hypersnap lane | PR | after the go |
+| Fall back when the read base answers 200 with an empty list on a path Neynar fills (trending topics first), or show "no data from this node". Shipped when a PR with a red-before test merges | hypersnap lane | PR | 2026-11-05 |
+| Stop a read-base cursor reaching Neynar (and the reverse) on failover mid-pagination: tag the cursor's origin or restart the page on the base that issued it. Shipped when a PR with a test merges | hypersnap lane | PR | 2026-11-05 |
+| Run `scripts/hypersnap-probe.ts` against Zaal's node and paste the table into the vault. Shipped when the table is in the vault | Zaal | Verification | 2026-10-29 |
 | PR 6 of D6, the write design doc (member signers, custody, Quorum model). Shipped when the doc PR merges | hypersnap lane | Research doc | after the go |
 | Re-check the comment at `bot/src/zoe/farcaster/write.ts:2` ("the self-hosted Hypersnap node is read-only") against Zaal's node. Shipped when the comment is confirmed or corrected in a PR | hypersnap lane | Verification | after D2 |
 | DONE 2026-10-21 (the UPDATE section at the top). Re-validate this doc - hypersnap has a single maintainer and one commit could change the verdict. Shipped when `last-validated` is bumped or a superseding doc exists. | @Zaal | Re-research | 2026-09-25 |

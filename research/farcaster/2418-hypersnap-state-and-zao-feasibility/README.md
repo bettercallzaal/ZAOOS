@@ -137,7 +137,7 @@ The three 404 rows work today only because failover catches them, so each call s
 
 ## UPDATE 2026-10-22 (build): D6 PRs 1 to 4 are built, and what building them measured
 
-The seat ruled that the D6 go/no-go question was not gated and auto-proceeded on default A, which was logged in the hypersnap lane status file. PR states below were read with `gh pr view` on 2026-10-22.
+The seat ruled that the D6 go/no-go question was not gated and auto-proceeded on default A, which was logged in the hypersnap lane status file. PR states below were read with `gh pr view` at 2026-10-22T22:03:37Z. They move, so re-read them before citing.
 
 | D6 PR | ZAOOS PR | State |
 |---|---|---|
@@ -145,9 +145,9 @@ The seat ruled that the D6 go/no-go question was not gated and auto-proceeded on
 | 2. The silent paths | #4134 | merged 2026-10-22 |
 | 4. Node probe | #4135 | merged 2026-10-22. `npx tsx scripts/hypersnap-probe.ts --base <url>`; exit 0, 1 or 2 |
 | 3. Bypass reads, social | #4138 | merged 2026-10-22. Adds `neynarRead()` to `src/lib/farcaster/neynar.ts` |
-| 3. Members | #4139 | open, evaluator CLEAN |
-| 3. Music and chat search | #4140 | open |
-| 3. Admin and scrape | #4141 | open, comments only |
+| 3. Members | #4139 | merged 2026-10-22 |
+| 3. Music and chat search | #4140 | open, evaluator CLEAN pending CI |
+| 3. Admin and scrape | #4141 | open, comments only, in review |
 
 **Correction to D6 row 2.** D6 said to "keep Neynar's own paths on failover" for best friends, trending topics and follow suggestions. There are no separate Neynar paths. Neynar's own OpenAPI spec (`neynarxyz/OAS` `src/api/spec.yaml`, lines 3351, 6054 and 6276, read with `gh api`) names the same three paths Hypersnap serves: `/user/best_friends`, `/topic/trending` and `/following/suggested`. The old ZAOOS paths appear in neither spec. That they also failed on Neynar is inferred from the spec, not measured with a live Neynar call.
 
@@ -163,7 +163,7 @@ The seat ruled that the D6 go/no-go question was not gated and auto-proceeded on
 | Channels carry no `image_url` | haatz `user/channels` | channel icons go blank |
 | `topic/trending` returned 200 with `topics: []`; `cast/search` returned 0 casts for `soundcloud` | haatz, live | a list renders empty and nothing falls back |
 
-So PR 3 follows one rule: **a read moves only when every field and parameter its route uses is served.** Nine calls moved: six in social (#4138), two in members (#4139) and one in music (#4140). The rest stay on Neynar, each with a comment at the call site that says why.
+So PR 3 follows one rule: **a read moves only when every field and parameter its route uses is served.** Nine calls are routed: six in social (#4138, merged), two in members (#4139, merged), and one in music (#4140, open when this was written). So eight are on main and one is pending. The rest stay on Neynar, each with a comment at the call site that says why.
 
 **Two existing bugs, found on the way. Both are read from the spec and not measured in production:**
 - compare's shared-following list read `u.fid` on Neynar's `{ user }` items, so it was probably always empty. Fixed in #4138.

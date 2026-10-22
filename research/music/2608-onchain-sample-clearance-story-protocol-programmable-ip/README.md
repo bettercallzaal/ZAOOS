@@ -1,3 +1,28 @@
+## UPDATE 2026-10-21: a second standard, and an unidentified builder from the WaveWarZ community
+
+Added on 2026-10-21 (overnight lane run, QUICK) for stream topic 9 of the B and Z Build stream (https://www.youtube.com/watch?v=uEIT4rvgsNo, mlx-whisper transcript). There Zaal said [0:31:57-0:32:41]: "lto is jd true harmony i think on x and he shows up in the wave war spaces but he's built like ip like uh the copyright uh or licensing agreements essentially for music such that you can put your music on chain say like this is not licensed to anyone... or like actively hand that out license like to people right for specific things... it's really well built out".
+
+**LTO's project could not be identified. UNVERIFIED.** No web result for "True Harmony" with onchain music licensing. No Farcaster user under `jdtrueharmony`, `trueharmony`, `jd-trueharmony`, `lto`, `ltomusic` or `truharmony` (Haatz hub). No X account under `jdtrueharmony`, `JDTrueHarmony` or `trueharmony` (FxTwitter API). No ZAOOS research doc mentions "true harmony" or "LTO". The transcript's "stream vol" before it may be a product name Whisper misheard. LTO is named in internal notes as a listener in a WaveWarZ X Space on 2026-09-15, which matches "he shows up in the wave war spaces".
+
+**What Zaal described already exists as a standard, and this doc did not cover it: a16z's "Can't Be Evil" licences.** Read 2026-10-21:
+
+| Fact | Value | Source |
+|---|---|---|
+| Contract | `contracts/licenses/CantBeEvil.sol` in `a16z/a16z-contracts` (MIT LICENSE file, 288 stars, last push 2026-03-27). An NFT contract inherits it and declares one licence; `getLicenseURI()` and `getLicenseName()` read it back, and `supportsInterface` exposes `ICantBeEvil` | GitHub API, raw source |
+| The six licences | `PUBLIC`, `EXCLUSIVE`, `COMMERCIAL`, `COMMERCIAL_NO_HATE`, `PERSONAL`, `PERSONAL_NO_HATE` (the `LicenseVersion` enum) | same |
+| Where the text lives | `ar://zmc1WTspIhFyVY82bwfAIcIExLFH5lUcHHUN0wXg4W8/<n>`. Fetched through arweave.net: 0 is "CC0 ("CBE-PUBLIC")" (107,340-byte PDF), 1 is "EXCLUSIVE COMMERCIAL RIGHTS WITH NO CREATOR RETENTION ("CBE-EXCLUSIVE")", 2 is "NON-EXCLUSIVE COMMERCIAL RIGHTS ("CBE-COMMERCIAL")" | arweave.net, PDF text |
+
+**How the two standards answer Zaal's two cases:**
+
+| Case from the stream | Can't Be Evil | Story PIL (this doc) |
+|---|---|---|
+| "this is not licensed to anyone" | Partly. `PERSONAL` and `PERSONAL_NO_HATE` give the holder personal-use rights only; nothing in the enum means "no licence at all". **UNVERIFIED for that exact case**, because only the titles of 0 to 2 were read, not the full text of 4 and 5 | A PIL term set can switch off both: `PILTerms` has booleans `commercialUse` ("whether the work can be used commercially or not") and `derivativesAllowed` (`contracts/interfaces/modules/licensing/IPILicenseTemplate.sol`, read 2026-10-21 from `storyprotocol/protocol-core-v1`, which now redirects to `thedatafoundation/protocol-core-v1`) |
+| "hand out a license to people for specific things" | One licence per contract, fixed in the constructor, so not per person | Per-asset licence tokens with terms, which is the per-use case. That is why this doc picked PIL |
+
+**Revised reading of the decisions:** the PIL choice stands for remix and sample licensing, which is per use. Can't Be Evil is the simpler fit for a whole collection under one public licence, for example a ZAO TCG card set (doc 2694). Neither is a substitute for knowing what LTO built.
+
+**What this means for The ZAO:** artists in our own community are already building onchain music licences. Before picking a rail for WaveWarZ samples or ZAO cards, find out what LTO built and compare it with these two.
+
 ## Key Decisions
 
 | Decision | Selection | Alternative Considered | Rationale |
@@ -143,6 +168,13 @@ Modeling sample clearance economics across a typical 32-producer WaveWarZ tourna
 
 ## Sources
 
+- [FULL] B and Z Build, 2026-10-21, transcript window 0:30:40 to 0:34:30 (added 2026-10-21).
+- [FULL] `a16z/a16z-contracts`, `contracts/licenses/CantBeEvil.sol` and LICENSE file, via the GitHub API (added 2026-10-21).
+- [FULL] Can't Be Evil licence PDFs 0, 1 and 2 via `https://arweave.net/zmc1WTspIhFyVY82bwfAIcIExLFH5lUcHHUN0wXg4W8/<n>`, titles read (added 2026-10-21). PDFs 3 to 5 were not read.
+- [FULL] `PILTerms` struct in `contracts/interfaces/modules/licensing/IPILicenseTemplate.sol`, GitHub API (added 2026-10-21).
+- [FAILED, link rot] `https://docs.story.foundation/docs/pil-terms`, cited above as FULL, now returns HTTP 404 behind an expired TLS certificate (checked 2026-10-21). The struct above replaces it for the commercial-use and derivatives fields.
+- [FAILED] Identifying LTO / JD True Harmony: web search, the Haatz hub username lookup (6 handles) and the FxTwitter API (3 handles) all returned nothing (added 2026-10-21).
+
 - [FULL] Story Protocol Core SDK and Smart Contract Architecture (`https://docs.story.foundation/docs/core-sdk`). Verified IPAssetRegistry, LicensingModule, and RoyaltyModule interfaces.
 - [FULL] Programmable IP License (PIL) Legal Terms Specification (`https://docs.story.foundation/docs/pil-terms`). Audited commercial use parameters, royalty percentage ranges, and derivative attribution clauses.
 - [FULL] ZAOOS Repository Codebase (`src/lib/scrape/wavewarz-battles.ts`, `src/components/music/WaveformPlayer.tsx`, `src/lib/music/audioFilters.ts`). Analyzed battle metadata structures and player integration touchpoints.
@@ -157,3 +189,5 @@ Modeling sample clearance economics across a typical 32-producer WaveWarZ tourna
 | @zaal | 2026-10-22 | Configure Story Protocol SDK client wrapper in `src/lib/music/story.ts`. |
 | @zaal | 2026-10-30 | Add optional `ipAssetId` field to battle submission validation schema in `src/lib/scrape/wavewarz-battles.ts`. |
 | @zaal | 2026-11-10 | Design "Remix License" badge component in `src/components/music/WaveformPlayer.tsx` displaying parent stem attribution. |
+| @zaal | 2026-10-28 | Share LTO's (JD True Harmony) X or Farcaster handle and the project name, so his licensing work can be read and compared with PIL and Can't Be Evil here. Done when the UPDATE section names it. |
+| bandzbuilds lane | 2026-11-04 | Read the full text of CBE licences 4 and 5 (PERSONAL, PERSONAL_NO_HATE) and say whether either fits "not licensed to anyone". Done when the UNVERIFIED cell is resolved. |

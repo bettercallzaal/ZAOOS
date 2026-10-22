@@ -145,6 +145,7 @@ describe('fetchWithFailover with a list key (empty 200)', () => {
 });
 
 describe('fetchWithFailover keeps a page cursor on the base that issued it', () => {
+  const real = (status: number, body: unknown) => new Response(JSON.stringify(body), { status });
   const READ = 'https://read.example/v2/farcaster/feed/trending';
   const NEYNAR = 'https://api.neynar.com/v2/farcaster/feed/trending';
   const urls = (m: ReturnType<typeof vi.fn>) => m.mock.calls.map((c) => String(c[0]));
@@ -152,14 +153,16 @@ describe('fetchWithFailover keeps a page cursor on the base that issued it', () 
   it('tags a read-base next.cursor with rb.', async () => {
     vi.stubGlobal(
       'fetch',
-      vi.fn().mockResolvedValue(res(200, { casts: [{}], next: { cursor: 'abc' } })),
+      vi.fn().mockResolvedValue(real(200, { casts: [{}], next: { cursor: 'abc' } })),
     );
     const page = await getTrendingFeed();
     expect(page.next.cursor).toBe('rb.abc');
   });
 
   it('sends a tagged cursor to the read base, untagged, and not to Neynar', async () => {
-    const fetchMock = vi.fn().mockResolvedValue(res(200, { casts: [{}], next: { cursor: 'def' } }));
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue(real(200, { casts: [{}], next: { cursor: 'def' } }));
     vi.stubGlobal('fetch', fetchMock);
 
     const page = await getTrendingFeed(25, '24h', 'rb.abc');
@@ -168,7 +171,7 @@ describe('fetchWithFailover keeps a page cursor on the base that issued it', () 
   });
 
   it.each([
-    ['503', () => vi.fn().mockResolvedValue(res(503, 'down')), 'error 503'],
+    ['503', () => vi.fn().mockResolvedValue(real(503, 'down')), 'error 503'],
     ['a throw', () => vi.fn().mockRejectedValue(new Error('ECONNRESET')), 'error 502'],
   ])('fails instead of giving Neynar a read-base cursor when the read base answers %s', async (_n, make, msg) => {
     const fetchMock = make();
@@ -182,7 +185,7 @@ describe('fetchWithFailover keeps a page cursor on the base that issued it', () 
   });
 
   it('sends an untagged (Neynar) cursor straight to Neynar with the key', async () => {
-    const fetchMock = vi.fn().mockResolvedValue(res(200, { casts: [{}], next: { cursor: 'n2' } }));
+    const fetchMock = vi.fn().mockResolvedValue(real(200, { casts: [{}], next: { cursor: 'n2' } }));
     vi.stubGlobal('fetch', fetchMock);
 
     const page = await getTrendingFeed(25, '24h', 'n1');
@@ -194,8 +197,8 @@ describe('fetchWithFailover keeps a page cursor on the base that issued it', () 
   it('leaves a Neynar cursor untagged after a first-page failover', async () => {
     const fetchMock = vi
       .fn()
-      .mockResolvedValueOnce(res(503, 'down'))
-      .mockResolvedValueOnce(res(200, { casts: [{}], next: { cursor: 'n1' } }));
+      .mockResolvedValueOnce(real(503, 'down'))
+      .mockResolvedValueOnce(real(200, { casts: [{}], next: { cursor: 'n1' } }));
     vi.stubGlobal('fetch', fetchMock);
 
     const page = await getTrendingFeed();

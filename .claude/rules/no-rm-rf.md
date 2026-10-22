@@ -8,4 +8,6 @@ Banned without exception in autonomous/loop work: `rm -rf` / `rm -r` / `rm -fr` 
 
 Narrow carve-outs: a single temp file the agent itself created this session under `/tmp` or the scratchpad, removed by exact path; `git worktree remove <path>` for a worktree the agent created. Do not stretch these - more than one self-created file, or anything under a user home dir, means STOP and surface it.
 
+A test or tool may remove the exact temp dir it created this run, by exact path, at exit (seat ruling R1, 2026-10-22: test harnesses had been leaving their mkdtemp dirs in $TMPDIR because removing them read as a breach of this rule). Only the dir that run made, under the temp dir, never a path it was handed or inherited.
+
 Enforcement: deny rules block the command PATTERN across every OS path form, not an enumerated path list. A genuinely needed delete in a pipeline is a Zaal-gated step.

@@ -14,7 +14,7 @@ vi.mock('@/lib/logger', () => ({
   logger: { warn, error: vi.fn(), info: vi.fn(), debug: vi.fn() },
 }));
 
-import { getTrendingTopics, getUsersByFids } from '../neynar';
+import { getTrendingFeed, getTrendingTopics, getUsersByFids } from '../neynar';
 
 interface FakeResponse {
   ok: boolean;
@@ -137,5 +137,65 @@ describe('fetchWithFailover with a list key (empty 200)', () => {
     expect(await getUsersByFids([1])).toEqual([]);
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(warn).not.toHaveBeenCalled();
+  });
+});
+
+describe('fetchWithFailover keeps a page cursor on the base that issued it', () => {
+  const READ = 'https://read.example/v2/farcaster/feed/trending';
+  const NEYNAR = 'https://api.neynar.com/v2/farcaster/feed/trending';
+  const urls = (m: ReturnType<typeof vi.fn>) => m.mock.calls.map((c) => String(c[0]));
+
+  it('tags a read-base next.cursor with rb.', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(res(200, { casts: [{}], next: { cursor: 'abc' } })),
+    );
+    const page = await getTrendingFeed();
+    expect(page.next.cursor).toBe('rb.abc');
+  });
+
+  it('sends a tagged cursor to the read base, untagged, and not to Neynar', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(res(200, { casts: [{}], next: { cursor: 'def' } }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    const page = await getTrendingFeed(25, '24h', 'rb.abc');
+    expect(urls(fetchMock)).toEqual([`${READ}?limit=25&time_window=24h&cursor=abc`]);
+    expect(page.next.cursor).toBe('rb.def');
+  });
+
+  it.each([
+    ['503', () => vi.fn().mockResolvedValue(res(503, 'down')), 'error 503'],
+    ['a throw', () => vi.fn().mockRejectedValue(new Error('ECONNRESET')), 'error 502'],
+  ])('fails instead of giving Neynar a read-base cursor when the read base answers %s', async (_n, make, msg) => {
+    const fetchMock = make();
+    vi.stubGlobal('fetch', fetchMock);
+
+    await expect(getTrendingFeed(25, '24h', 'rb.abc')).rejects.toThrow(msg);
+    expect(urls(fetchMock).some((u) => u.startsWith(NEYNAR))).toBe(false);
+    expect(warn.mock.calls.at(-1)?.[0]).toBe(
+      '[neynar/failover] /feed/trending page cursor is from the read base, not sent to Neynar',
+    );
+  });
+
+  it('sends an untagged (Neynar) cursor straight to Neynar with the key', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(res(200, { casts: [{}], next: { cursor: 'n2' } }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    const page = await getTrendingFeed(25, '24h', 'n1');
+    expect(urls(fetchMock)).toEqual([`${NEYNAR}?limit=25&time_window=24h&cursor=n1`]);
+    expect(fetchMock.mock.calls[0][1].headers['x-api-key']).toBe('test-neynar-key');
+    expect(page.next.cursor).toBe('n2');
+  });
+
+  it('leaves a Neynar cursor untagged after a first-page failover', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(res(503, 'down'))
+      .mockResolvedValueOnce(res(200, { casts: [{}], next: { cursor: 'n1' } }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    const page = await getTrendingFeed();
+    expect(urls(fetchMock)[1]).toBe(`${NEYNAR}?limit=25&time_window=24h`);
+    expect(page.next.cursor).toBe('n1');
   });
 });

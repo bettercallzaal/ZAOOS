@@ -28,6 +28,11 @@ function readHeaders() {
  * With `listKey`, a 200 whose `listKey` is an empty array also fails over: a
  * read base can serve a path with nothing in it (haatz `topic/trending`
  * returned `topics: []`, doc 2418), and a 200 would otherwise hide that.
+ *
+ * Cursors are tied to the base that issued them (doc 2418): a `next.cursor`
+ * from the read base is returned tagged `rb.`. A tagged cursor goes only to
+ * the read base; if that fails, the call fails instead of handing Neynar a
+ * cursor it cannot read. An untagged cursor came from Neynar and goes there.
  */
 async function fetchWithFailover(
   path: string,
@@ -38,14 +43,24 @@ async function fetchWithFailover(
     return fetch(`${NEYNAR_BASE}${path}`, init);
   }
   const route = path.split('?')[0];
+  const query = new URLSearchParams(path.split('?')[1] ?? '');
+  const cursor = query.get('cursor');
+  if (cursor && !cursor.startsWith(READ_CURSOR_TAG)) {
+    return fetch(`${NEYNAR_BASE}${path}`, { ...init, headers: headers() });
+  }
+  if (cursor) query.set('cursor', cursor.slice(READ_CURSOR_TAG.length));
+  const readPath = cursor ? `${route}?${query}` : path;
+
+  let failed: Response | null = null;
   try {
-    const res = await fetch(`${READ_BASE}${path}`, init);
+    const res = await fetch(`${READ_BASE}${readPath}`, init);
     if (res.ok) {
-      if (!listKey || !(await isEmptyList(res, listKey))) return res;
+      if (!listKey || !(await isEmptyList(res, listKey))) return tagReadCursor(res);
       logger.warn(
         `[neynar/failover] ${route} read base returned an empty "${listKey}" list, falling back to Neynar`,
       );
     } else {
+      failed = res;
       logger.warn(
         `[neynar/failover] ${route} read base returned ${res.status}, falling back to Neynar`,
       );
@@ -54,10 +69,31 @@ async function fetchWithFailover(
     const reason = error instanceof Error ? error.message : String(error);
     logger.warn(`[neynar/failover] ${route} read base threw (${reason}), falling back to Neynar`);
   }
+  if (cursor) {
+    logger.warn(`[neynar/failover] ${route} page cursor is from the read base, not sent to Neynar`);
+    return failed ?? new Response(null, { status: 502 });
+  }
   return fetch(`${NEYNAR_BASE}${path}`, {
     ...init,
     headers: headers(),
   });
+}
+
+const READ_CURSOR_TAG = 'rb.';
+
+/** Tag a read-base `next.cursor` so the next page goes back to the base that issued it. */
+async function tagReadCursor(res: Response): Promise<Response> {
+  let body: unknown;
+  try {
+    body = await res.clone().json();
+  } catch {
+    return res;
+  }
+  if (typeof body !== 'object' || body === null) return res;
+  const next = (body as { next?: { cursor?: unknown } }).next;
+  if (!next || typeof next.cursor !== 'string' || next.cursor === '') return res;
+  next.cursor = `${READ_CURSOR_TAG}${next.cursor}`;
+  return new Response(JSON.stringify(body), { status: res.status, headers: res.headers });
 }
 
 /** True when the body's `key` is an empty array. Reads a clone, so the caller can still read `res`. */

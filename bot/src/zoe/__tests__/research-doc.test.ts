@@ -136,6 +136,22 @@ describe('commitResearchDoc', () => {
     expect(content).toContain('ZAO is a music DAO that');
     expect(content).toContain('topic: business'); // fallback topic
   });
+
+  // Card 9907: the frontmatter claimed STANDARD for every doc, whatever depth ran.
+  it('writes tier UNSET, not STANDARD, when the dispatch names no tier', async () => {
+    setupHappyPath();
+    await commitResearchDoc({ question: 'What is ZAO?', findings: 'ZAO is a music DAO that...' });
+    const content: string = mockWriteFile.mock.calls[0][1];
+    expect(content).toContain('\ntier: UNSET\n');
+    expect(content).not.toContain('tier: STANDARD');
+  });
+
+  it('writes the tier the dispatch names', async () => {
+    setupHappyPath();
+    await commitResearchDoc({ question: 'What is ZAO?', findings: 'ZAO is a music DAO that...', tier: 'DEEP' });
+    const content: string = mockWriteFile.mock.calls[0][1];
+    expect(content).toContain('\ntier: DEEP\n');
+  });
 });
 
 // -- assessFindings + the draft hold --

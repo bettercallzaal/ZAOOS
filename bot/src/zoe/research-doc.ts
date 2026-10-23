@@ -137,7 +137,17 @@ export function stripPreamble(findings: string): string {
   return findings.slice(m.index).trim();
 }
 
-export async function commitResearchDoc(opts: { question: string; findings: string; topic?: string }): Promise<ResearchDocResult> {
+/** The /zao-research depths. A dispatch that names none is written as UNSET (card 9907). */
+export type ResearchTier = 'QUICK' | 'STANDARD' | 'DEEP';
+
+export async function commitResearchDoc(opts: {
+  question: string;
+  findings: string;
+  topic?: string;
+  tier?: ResearchTier;
+}): Promise<ResearchDocResult> {
+  // Every doc used to be stamped STANDARD whatever depth ran; no caller knows the depth yet.
+  const tier = opts.tier ?? 'UNSET';
   try {
     const topic = pickTopic(opts.topic);
     const num = await nextDocNum();
@@ -150,7 +160,7 @@ export async function commitResearchDoc(opts: { question: string; findings: stri
     const ready = assessFindings(opts.findings);
     const status = ready.complete ? 'research-complete' : 'draft';
     const banner = ready.complete ? '' : `> **HELD AS DRAFT, not complete.** ${ready.reasons.join('; ')}. Sources: ${ready.full} FULL, ${ready.partial} PARTIAL, ${ready.failed} FAILED. Needs a person or a redispatch before it is cited.\n\n`;
-    const body = `---\ntopic: ${topic}\ntype: market-research\nstatus: ${status}\nlast-validated: ${today}\nsuperseded-by:\nrelated-docs:\noriginal-query: ${JSON.stringify(opts.question)}\ntier: STANDARD\n---\n\n# ${num} - ${title}\n\n> Drafted by ZOE's research-worker from "${opts.question}". ${ready.complete ? 'Auto-committed to main for durability; review + deepen as needed.' : 'Opened as a DRAFT pull request; it does not merge itself.'}\n\n${banner}${stripPreamble(opts.findings)}\n`;
+    const body = `---\ntopic: ${topic}\ntype: market-research\nstatus: ${status}\nlast-validated: ${today}\nsuperseded-by:\nrelated-docs:\noriginal-query: ${JSON.stringify(opts.question)}\ntier: ${tier}\n---\n\n# ${num} - ${title}\n\n> Drafted by ZOE's research-worker from "${opts.question}". ${ready.complete ? 'Auto-committed to main for durability; review + deepen as needed.' : 'Opened as a DRAFT pull request; it does not merge itself.'}\n\n${banner}${stripPreamble(opts.findings)}\n`;
 
     await git(['checkout', 'main']); await git(['pull', '--quiet']);
     const branch = `ws/zoe-research-${num}`;

@@ -26,6 +26,10 @@ name: Auto-merge safe PRs
 # Removing the label re-judges the PR from scratch. The label only ever STOPS a
 # merge, and an unreadable label list counts as held. licence-clear.yml refuses a
 # held PR too.
+#
+# THE REPO PAUSE SWITCH HOLDS EVERY PR AT ONCE (2026-10-23, ZAOOS #4059). With the
+# repository variable ZAO_MERGES_PAUSED set to true, every PR is treated as held,
+# whatever its labels, so a merge pause stops this bot too. See the hold step.
 
 on:
   pull_request:
@@ -63,9 +67,24 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
           PR: ${{ github.event.pull_request.number }}
+          # THE REPO PAUSE SWITCH (ZAOOS #4059, 2026-10-23). When merges are paused
+          # (the Vercel deploy limit), every PR counts as held, whatever its labels:
+          #   gh variable set ZAO_MERGES_PAUSED --body true -R <repo>   pause
+          #   gh variable delete ZAO_MERGES_PAUSED -R <repo>            resume
+          # A variable, not a file, so pausing needs no merge. Setting it fires no
+          # event: a PR armed BEFORE the pause stays armed until its next event, so
+          # pausing also needs the sweep in the PR that added this.
+          MERGES_PAUSED: ${{ vars.ZAO_MERGES_PAUSED }}
         run: |
           held=false
-          if ! names=$(gh api --paginate "repos/$REPO/issues/$PR/labels?per_page=100" --jq '.[].name'); then
+          case "$(printf '%s' "${MERGES_PAUSED:-}" | tr '[:upper:]' '[:lower:]')" in
+            true|1|yes) paused=true ;;
+            *) paused=false ;;
+          esac
+          if [ "$paused" = "true" ]; then
+            echo "::notice title=hold::merges are paused for this repo (variable ZAO_MERGES_PAUSED) - treating this PR as held"
+            held=true
+          elif ! names=$(gh api --paginate "repos/$REPO/issues/$PR/labels?per_page=100" --jq '.[].name'); then
             echo "::error title=hold::could not read the labels on this PR - treating it as held"
             held=true
           elif printf '%s\n' "$names" | grep -Fxq 'hold'; then
@@ -87,7 +106,11 @@ jobs:
             echo "::error title=hold::this PR is held but auto-merge could not be confirmed off - turn it off by hand"
             exit 1
           fi
-          echo "::notice title=hold::held by the hold label - auto-merge is off and stays off until the label is removed"
+          if [ "$paused" = "true" ]; then
+            echo "::notice title=hold::held by the repo merge pause - auto-merge is off and stays off until ZAO_MERGES_PAUSED is cleared and the PR has a new event"
+          else
+            echo "::notice title=hold::held by the hold label - auto-merge is off and stays off until the label is removed"
+          fi
 
       # CHECKOUT IS WHAT MAKES THE COLLISION GATE CORRECT. This job had none, so
       # the gate could only ask the GitHub API "what files were added", and a

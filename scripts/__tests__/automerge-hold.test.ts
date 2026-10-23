@@ -265,3 +265,42 @@ describe('the workflow wiring', () => {
     expect(CLEAR_RUN.match(/gh pr merge/g)).toHaveLength(1);
   });
 });
+
+describe('the repo pause switch (ZAOOS #4059)', () => {
+  it('ZAO_MERGES_PAUSED=true holds a PR with no hold label, and turns off an armed auto-merge', () => {
+    const r = run(HOLD, { labels: [], offBefore: 'false', offAfter: 'true' }, { MERGES_PAUSED: 'true' });
+    expect(r.status).toBe(0);
+    expect(r.output).toBe('held=true\n');
+    expect(disarmed(r)).toBe(true);
+    expect(r.log).toContain('merges are paused for this repo');
+    expect(r.log).toContain('held by the repo merge pause');
+  });
+
+  it('a paused repo holds a PR whatever its labels, without needing to read them', () => {
+    const r = run(HOLD, { labelsFail: true, labels: ['documentation'] }, { MERGES_PAUSED: 'TRUE' });
+    expect(r.status).toBe(0);
+    expect(r.output).toBe('held=true\n');
+    expect(r.calls.some((c) => c.includes('/labels?per_page=100'))).toBe(false);
+  });
+
+  it('1 and yes also pause', () => {
+    for (const v of ['1', 'yes']) {
+      expect(run(HOLD, { labels: [] }, { MERGES_PAUSED: v }).output).toBe('held=true\n');
+    }
+  });
+
+  it('control: unset, empty or false is not a pause, and an unlabelled PR is not held', () => {
+    for (const v of ['', 'false', '0', 'no']) {
+      const r = run(HOLD, { labels: [] }, { MERGES_PAUSED: v });
+      expect(r.output).toBe('held=false\n');
+      expect(disarmed(r)).toBe(false);
+    }
+  });
+
+  it('the variable reaches the step through env, never through ${{ }} in the shell', () => {
+    expect(stepLines(AUTOMERGE, 'Respect the hold label').join('\n')).toContain(
+      'MERGES_PAUSED: ${{ vars.ZAO_MERGES_PAUSED }}',
+    );
+    expect(HOLD).not.toContain('${{');
+  });
+});

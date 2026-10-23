@@ -104,7 +104,7 @@ def test_catches_a_card_number():
 
 
 def test_reports_the_file_it_found_it_in():
-    h = hits("mail bob@example.org", path="research/x/README.md")
+    h = hits("mail bob@somecompany.co.uk", path="research/x/README.md")  # example.org is reserved since card 10451
     assert h and h[0][1] == "research/x/README.md"
 
 

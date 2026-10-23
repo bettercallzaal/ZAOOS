@@ -65,22 +65,22 @@ What this does not try to verify: whether the lesson was good. That is what the 
 | **MetaGame** XP and Seeds | Contribution earns XP, tracked with SourceCred; "Seeds are awarded based on your XP earned per week through direct actions as well as the XP that flows to you for past contributions". "Seeds are only created through non-monetary contributions." | Credit that flows from contribution, not purchase, which is how Respect already works | A tradeable token: Seeds "can be bought & sold", which Respect deliberately is not (soulbound) |
 | **KERNEL** (Gitcoin) | A peer-learning fellowship run in "blocks"; by its April 2022 Gitcoin proposal it had run five blocks with "1,200 KERNEL fellows building 200+ web3 projects", and called itself a "lively gift economy". | Peer teaching as the core, and a gift framing for what mentors give | Paid fellowships and a treasury funded by project equity |
 | **Learning by teaching** (pedagogy) | Students "learn material and prepare lessons to teach it to the other students"; Jean-Pol Martin systematised it in the early 1980s as "Lernen durch Lehren"; teaching even an inanimate object is reported to improve "understanding and knowledge retention". | The mentor gains from the hour too, which is why a teaching floor is a reasonable price of membership | - |
-| **ZAO's own June 2026 prep month** | ZABAL Games June ran recorded specialist sessions from "ZAO teachers" and tool builders; one by yerbearzerker (Jordan) on Empire Builder was recorded, and recordings were posted at zabalgamez.com/recordings (doc `events/654-...`, update of 2026-08-07). | Proof the format already worked once inside ZAO: recorded hour-long sessions, watchable live or later | - |
+| **ZAO's own June 2026 prep month** | ZABAL Games June ran recorded specialist sessions from "ZAO teachers" and tool builders; one by yerbearserker (Jordan Oram) on Empire Builder was recorded, and recordings were posted at zabalgamez.com/recordings (doc `events/654-...`, update of 2026-08-07). | Proof the format already worked once inside ZAO: recorded hour-long sessions, watchable live or later | - |
 | **Community signal** (HN) | The one HN "Ask HN: Cohort based courses for computer science" thread (2021, item 29260905) drew a single reply pointing to a course listing site. | Nothing usable: no community evidence was found for or against a teach-to-stay rule | - |
 
 Not used: a search-result snippet claiming MetaGame set "20 XP" as the monthly minimum for an active player, and that members had to hold Seeds to stay in. Neither line was in the pages actually fetched, so neither is cited.
 
 ## Likely first mentors (from existing docs only)
 
-The only mentor list Zaal has confirmed is the eight ZABAL Games mentors in doc `community/758e-mentor-handbook-patterns` (its FABRICATION CORRECTION of 2026-05-26 says only that list is safe to use): Tyler Stambaugh, Arthur, kmac.eth, Jordan Oram, CannonJones, Shriyash Soni, yerbearzerker and deez. Of those, the library shows two who have already taught a ZAO session or were booked to:
+The only mentor list Zaal has confirmed is the ZABAL Games mentors in doc `community/758e-mentor-handbook-patterns` (its FABRICATION CORRECTION of 2026-05-26 says only that list is safe to use). It names eight: Tyler Stambaugh, Arthur, kmac.eth, Jordan Oram, CannonJones, Shriyash Soni, yerbearzerker and deez. Jordan Oram and yerbearserker are one person (below), so the list is seven people. Of those, the library shows two who have already taught a ZAO session or were booked to:
 
 | Candidate | Evidence in the library |
 |---|---|
-| **yerbearzerker (Jordan)** | Recorded an Empire Builder session for the June 2026 prep month (doc 654, update of 2026-08-07; decision 9 "Jordan signs up to record an Empire Builder session") |
+| **yerbearserker (Jordan Oram)** | Recorded an Empire Builder session for the June 2026 prep month (doc 654, update of 2026-08-07; decision 9 "Jordan signs up to record an Empire Builder session") |
 | **kmac.eth** | Booked with Zaal to "Record kmac.eth + Zaal session on zlank templates for June bootcamp" (doc 654, action table); an entry titled "kmac.eth Farcaster Snaps" with Zaal and kmac.eth on 2026-05-13 is logged in doc `dev-workflows/722-zao-claude-code-3-month-synthesis/722i-bonfire-kg-state` |
 | **Zaal** | Host and steward; co-booked on the zlank session above (the library does not say whether it was recorded) |
 
-A third mentor for the pilot is Zaal's pick from the remaining 758e names. **UNRESOLVED:** doc 758e lists "Jordan Oram" and "yerbearzerker" as two mentors, while doc 654 calls yerbearzerker "Jordan". The library does not settle whether these are one person or two; ask Zaal before naming both.
+A third mentor for the pilot is Zaal's pick from the remaining 758e names. **RESOLVED 2026-10-23: Jordan Oram and yerbearserker are one person.** The Farcaster account `yerbearserker` (fid 409857) has the bio "Jordan Oram - Empire Builder Co-founder", and `yerbearzerker` with a z has no FID (both read from client.warpcast.com `user-by-username`, 23 Oct). The grill already ruled the spelling: "Yerbearserker is the spelling" (vault `handoffs/status/grill.md` line 263). The year-end-opportunities lane found the same and listed docs 626, 630, 2158, 2287 and 654 as agreeing (vault status, 49a44d05). doc 758e's two entries are one mentor counted twice.
 
 Doc 1543's S2 roster (Empire Builder, Juke, Cherie Hu and others) is not used: every status there is TBD, and those are prospects, not people who agreed to teach.
 
@@ -90,7 +90,7 @@ Doc 1543's S2 roster (Empire Builder, Juke, Cherie Hu and others) is not used: e
 |---|---|
 | Length | One calendar month, which Zaal picks |
 | Channel | /zao on Farcaster only (recordings linked there) |
-| Mentors | Three: yerbearzerker (Jordan), kmac.eth, and one more Zaal names; Zaal hosts |
+| Mentors | Three: yerbearserker (Jordan Oram), kmac.eth, and one more Zaal names; Zaal hosts |
 | Proof | One link per mentor in a vault ledger, ticked by Zaal |
 | Reward | The doc 1543 set (doc credit, a ZAO post, alumni access) plus the normal Respect Game |
 | Success | All three lessons published in the month without a reminder beyond one nudge |
@@ -103,7 +103,6 @@ Nothing in the pilot needs code, a contract, a token or a bot. Asking the three 
 | Action | Owner | Type | Gate |
 |---|---|---|---|
 | Decide: run the pilot, and in which month | Zaal | decision | Zaal |
-| Resolve whether Jordan Oram and yerbearzerker are one person | Zaal | fact only Zaal knows | Zaal |
 | Name the third pilot mentor from the 758e list | Zaal | decision | Zaal |
 | Ask the three mentors | Zaal | outbound | Zaal |
 | Create the vault ledger table (mentor, month, link, minutes, topic, state) | a lane, after the go | vault note | none |

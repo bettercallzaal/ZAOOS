@@ -278,6 +278,30 @@ export class InMemorySchemaRegistry implements SchemaRegistry {
 /* ========== Signing & Verification ========== */
 
 /**
+ * The exact object an envelope's hash covers: the 7 required fields, plus each
+ * optional field only when it is defined. Create and verify both hash this, so
+ * an envelope carrying an extra key (or the id/hash/signature of a previous
+ * signing) verifies against its own hash instead of failing as tampered.
+ */
+export function unsignedHashInput(envelope: UnsignedSporeEnvelope): Record<string, unknown> {
+  const input: Record<string, unknown> = {
+    kind: envelope.kind,
+    nonce: envelope.nonce,
+    audience: envelope.audience,
+    issuer: envelope.issuer,
+    subject: envelope.subject,
+    issuedAt: envelope.issuedAt,
+    expiresAt: envelope.expiresAt,
+  };
+  if (envelope.schema !== undefined) input.schema = envelope.schema;
+  if (envelope.policyRef !== undefined) input.policyRef = envelope.policyRef;
+  if (envelope.privacyClass !== undefined) input.privacyClass = envelope.privacyClass;
+  if (envelope.parents !== undefined) input.parents = envelope.parents;
+  if (envelope.dependencies !== undefined) input.dependencies = envelope.dependencies;
+  return input;
+}
+
+/**
  * Create a signed envelope from an unsigned one.
  * Requires a private key in Ed25519 format (typically from generateKeyPairSync).
  */
@@ -286,7 +310,7 @@ export function createSignedEnvelope(
   privateKey: KeyObject,
   opts?: { id?: string; now?: string },
 ): SignedSporeEnvelope {
-  const hash = domainSeparatedHash(unsigned.kind, unsigned);
+  const hash = domainSeparatedHash(unsigned.kind, unsignedHashInput(unsigned));
   const id = opts?.id ?? `${unsigned.issuer.id}#${unsigned.nonce}`;
 
   // Ed25519 signature over the hash value (as bytes).
@@ -387,24 +411,8 @@ export async function verifyEnvelopeWithTrust(
     };
   }
 
-  // 2. Hash/contentId check
-  // Build unsigned envelope without undefined fields for hashing
-  const unsignedForHash: Record<string, unknown> = {
-    kind: envelope.kind,
-    nonce: envelope.nonce,
-    audience: envelope.audience,
-    issuer: envelope.issuer,
-    subject: envelope.subject,
-    issuedAt: envelope.issuedAt,
-    expiresAt: envelope.expiresAt,
-  };
-  if (envelope.schema !== undefined) unsignedForHash.schema = envelope.schema;
-  if (envelope.policyRef !== undefined) unsignedForHash.policyRef = envelope.policyRef;
-  if (envelope.privacyClass !== undefined) unsignedForHash.privacyClass = envelope.privacyClass;
-  if (envelope.parents !== undefined) unsignedForHash.parents = envelope.parents;
-  if (envelope.dependencies !== undefined) unsignedForHash.dependencies = envelope.dependencies;
-
-  const expectedHash = domainSeparatedHash(envelope.kind, unsignedForHash);
+  // 2. Hash/contentId check - same hash input as createSignedEnvelope
+  const expectedHash = domainSeparatedHash(envelope.kind, unsignedHashInput(envelope));
   const hashOk = envelope.hash === `sha256:rfc8785:${expectedHash}`;
   checks.push({
     type: 'HASH',

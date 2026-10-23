@@ -58,6 +58,10 @@ export interface OpenTask {
   title: string;
   /** legacy_source, e.g. "research-doc:2207" or "pr-auto:2867". */
   legacySource?: string | null;
+  /** tasks.created_at (ISO). Unknown means the task is never closed. */
+  createdAt?: string | null;
+  /** tasks.notes, read for an earlier AUTO-CLOSED stamp (see planAutoCloses). */
+  notes?: string | null;
 }
 
 /** What the caller must look up for us, gathered once for the whole batch. */
@@ -70,6 +74,9 @@ export interface RepoFacts {
   /** Doc numbers merged on main. Used ONLY for reporting vacuous reminders -
    *  never as a close condition, for the reason documented above. */
   mergedDocNums: Set<string>;
+  /** When each concluded PR merged or closed (ISO). A PR with no time here
+   *  closes nothing: its conclusion cannot be shown to follow the task. */
+  concludedAt: Map<string, string>;
 }
 
 export interface CloseVerdict {
@@ -98,20 +105,42 @@ export function trackedDocNum(task: OpenTask): string | null {
   return m ? m[1] : null;
 }
 
+/** True when this task's notes already carry an auto-close for this PR, i.e.
+ *  the machine closed it once and a person reopened it. */
+export function wasAutoClosedFor(task: OpenTask, pr: string): boolean {
+  return new RegExp(`AUTO-CLOSED \\d{4}-\\d{2}-\\d{2}: PR #${pr}\\b`).test(task.notes || '');
+}
+
 /**
  * Which of these tasks can be closed, and why.
  *
- * Closes ONLY on a state change that happened AFTER the task was created. A
- * condition that was already true at birth (see the doc-rule postmortem above)
- * is not evidence. Absence of evidence closes nothing - every branch defaults to
- * leaving the task open, so a stale repo or an unreachable API costs us a missed
- * close, never a wrong one.
+ * Closes ONLY on a state change that happened AFTER the task was created. Until
+ * 2026-10-23 this sentence was FALSE: the body closed on mergedPrNums.has(pr)
+ * with no timing check, so a pr-auto card a person reopened was closed again on
+ * the next run, and a card born after its PR merged closed at birth. Now:
+ *
+ * - the PR's merge or close time must be later than the task's created_at, and
+ *   either time unknown leaves the task open;
+ * - a task whose notes already hold an AUTO-CLOSED stamp for this PR was
+ *   reopened by a person after an earlier close, and is never closed again.
+ *   The tasks table has no reopened_at column that this repo reads (searched
+ *   2026-10-23), so the stamp this module writes is the reopen record.
+ *
+ * A condition that was already true at birth (see the doc-rule postmortem
+ * above) is not evidence. Absence of evidence closes nothing - every branch
+ * defaults to leaving the task open, so a stale repo or an unreachable API
+ * costs us a missed close, never a wrong one.
  */
 export function planAutoCloses(tasks: OpenTask[], facts: RepoFacts): CloseVerdict[] {
   const out: CloseVerdict[] = [];
   for (const t of tasks) {
     const pr = trackedPrNum(t);
     if (!pr) continue;
+
+    const born = Date.parse(t.createdAt ?? '');
+    const concluded = Date.parse(facts.concludedAt.get(pr) ?? '');
+    if (!Number.isFinite(born) || !Number.isFinite(concluded) || concluded <= born) continue;
+    if (wasAutoClosedFor(t, pr)) continue;
 
     if (facts.mergedPrNums.has(pr)) {
       out.push({

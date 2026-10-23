@@ -6,18 +6,31 @@ import {
   planAutoCloses,
   trackedDocNum,
   trackedPrNum,
+  wasAutoClosedFor,
   type OpenTask,
   type RepoFacts,
 } from '../done-work-detector';
 
-const facts = (over: Partial<RepoFacts> = {}): RepoFacts => ({
-  mergedPrNums: new Set<string>(),
-  closedUnmergedPrNums: new Set<string>(),
-  mergedDocNums: new Set<string>(),
-  ...over,
-});
+const BORN = '2026-10-01T00:00:00Z';
+const LATER = '2026-10-10T00:00:00Z';
 
-const task = (title: string, legacySource?: string, id = 't1'): OpenTask => ({ id, title, legacySource });
+// Every concluded PR gets a conclusion time LATER than BORN unless a test says
+// otherwise, so the timing rule is opt-out per test, never silently absent.
+const facts = (over: Partial<RepoFacts> = {}): RepoFacts => {
+  const f: RepoFacts = {
+    mergedPrNums: new Set<string>(),
+    closedUnmergedPrNums: new Set<string>(),
+    mergedDocNums: new Set<string>(),
+    concludedAt: new Map<string, string>(),
+    ...over,
+  };
+  if (!over.concludedAt) {
+    for (const pr of [...f.mergedPrNums, ...f.closedUnmergedPrNums]) f.concludedAt.set(pr, LATER);
+  }
+  return f;
+};
+
+const task = (title: string, legacySource?: string, id = 't1'): OpenTask => ({ id, title, legacySource, createdAt: BORN });
 
 describe('trackedPrNum / trackedDocNum - legacy_source only', () => {
   it('reads the PR from legacy_source', () => {
@@ -119,6 +132,46 @@ describe('planAutoCloses - closes only on a state change AFTER the task was born
   it('every verdict carries a reason - a close nobody can explain is untrustworthy', () => {
     const v = planAutoCloses([task('Test plan: PR #2867', 'pr-auto:2867')], facts({ mergedPrNums: new Set(['2867']) }));
     expect(v[0].reason.length).toBeGreaterThan(20);
+  });
+});
+
+describe('planAutoCloses - timing and reopened cards (2026-10-23 fix)', () => {
+  const pr = (over: Partial<OpenTask> = {}): OpenTask => ({ ...task('Test plan: PR #2867', 'pr-auto:2867'), ...over });
+
+  // The reported bug: ZOE auto-closed the card, a person reopened it, and the
+  // next run closed it again because the PR is still merged.
+  it('never re-closes a card a person reopened after an earlier auto-close', () => {
+    const reopened = pr({
+      notes: 'Run the test plan.\n\nAUTO-CLOSED 2026-10-11: PR #2867 is merged into main - this task tracked only that PR, which has concluded',
+    });
+    expect(planAutoCloses([reopened], facts({ mergedPrNums: new Set(['2867']) }))).toEqual([]);
+  });
+
+  it('never closes a card born after its PR had already merged', () => {
+    const late = pr({ createdAt: '2026-10-20T00:00:00Z' });
+    expect(planAutoCloses([late], facts({ mergedPrNums: new Set(['2867']) }))).toEqual([]);
+  });
+
+  it('a conclusion at the same instant as birth is not after it', () => {
+    const v = planAutoCloses([pr()], facts({ mergedPrNums: new Set(['2867']), concludedAt: new Map([['2867', BORN]]) }));
+    expect(v).toEqual([]);
+  });
+
+  it('an unknown birth time or conclusion time closes nothing', () => {
+    expect(planAutoCloses([pr({ createdAt: null })], facts({ mergedPrNums: new Set(['2867']) }))).toEqual([]);
+    expect(planAutoCloses([pr({ createdAt: 'not a date' })], facts({ mergedPrNums: new Set(['2867']) }))).toEqual([]);
+    expect(planAutoCloses([pr()], facts({ mergedPrNums: new Set(['2867']), concludedAt: new Map() }))).toEqual([]);
+  });
+
+  it('still closes a card whose PR merged after it was born and was never auto-closed', () => {
+    const v = planAutoCloses([pr({ notes: 'Run the test plan.' })], facts({ mergedPrNums: new Set(['2867']) }));
+    expect(v.map((x) => x.id)).toEqual(['t1']);
+  });
+
+  it('an auto-close stamp for a different PR does not count as a reopen', () => {
+    const t = pr({ notes: 'AUTO-CLOSED 2026-10-11: PR #28670 is merged into main' });
+    expect(wasAutoClosedFor(t, '2867')).toBe(false);
+    expect(planAutoCloses([t], facts({ mergedPrNums: new Set(['2867']) }))).toHaveLength(1);
   });
 });
 

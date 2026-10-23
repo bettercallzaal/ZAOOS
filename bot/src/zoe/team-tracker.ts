@@ -655,6 +655,7 @@ async function gatherRepoFacts(repoDir: string, prNums: string[]): Promise<RepoF
     mergedPrNums: new Set(),
     closedUnmergedPrNums: new Set(),
     mergedDocNums: new Set(),
+    concludedAt: new Map(),
   };
 
   try {
@@ -663,12 +664,16 @@ async function gatherRepoFacts(repoDir: string, prNums: string[]): Promise<RepoF
     await run('git', ['-C', repoDir, 'fetch', 'origin', 'main', '--quiet'], { timeout: 60_000 });
 
     const { stdout: log } = await run(
-      'git', ['-C', repoDir, 'log', 'origin/main', '--format=%s', '-n', '4000'],
+      'git', ['-C', repoDir, 'log', 'origin/main', '--format=%cI%x09%s', '-n', '4000'],
       { timeout: 60_000, maxBuffer: 16 * 1024 * 1024 },
     );
     for (const line of log.split('\n')) {
-      const m = /\(#(\d{1,6})\)\s*$/.exec(line.trim());
-      if (m) facts.mergedPrNums.add(m[1]);
+      // Committer date of a squash merge is the time it landed on main.
+      const tab = line.indexOf('\t');
+      const m = /\(#(\d{1,6})\)\s*$/.exec(line.slice(tab + 1).trim());
+      if (!m) continue;
+      facts.mergedPrNums.add(m[1]);
+      if (tab > 0 && !facts.concludedAt.has(m[1])) facts.concludedAt.set(m[1], line.slice(0, tab));
     }
 
     // ls-tree, not the working tree, so a dirty checkout cannot invent or hide a
@@ -691,12 +696,25 @@ async function gatherRepoFacts(repoDir: string, prNums: string[]): Promise<RepoF
     if (facts.mergedPrNums.has(pr)) continue;
     try {
       const { stdout } = await run(
-        'gh', ['api', `repos/bettercallzaal/ZAOOS/pulls/${pr}`, '--jq', '{state:.state,merged:.merged}'],
+        'gh',
+        [
+          'api',
+          `repos/bettercallzaal/ZAOOS/pulls/${pr}`,
+          '--jq',
+          '{state:.state,merged:.merged,merged_at:.merged_at,closed_at:.closed_at}',
+        ],
         { timeout: 20_000 },
       );
-      const info = JSON.parse(stdout) as { state?: string; merged?: boolean };
+      const info = JSON.parse(stdout) as {
+        state?: string;
+        merged?: boolean;
+        merged_at?: string | null;
+        closed_at?: string | null;
+      };
       if (info.state === 'closed' && info.merged === true) facts.mergedPrNums.add(pr);
       else if (info.state === 'closed') facts.closedUnmergedPrNums.add(pr);
+      const at = info.merged_at || info.closed_at;
+      if (info.state === 'closed' && at) facts.concludedAt.set(pr, at);
       // open -> record nothing, so the task stays open.
     } catch {
       // gh missing, unauthenticated, or the PR is from another repo. Unknown
@@ -727,7 +745,7 @@ export async function autoCloseFinishedTasks(
 
   try {
     const res = await fetch(
-      `${root}/rest/v1/tasks?status=eq.todo&archived_at=is.null&select=id,title,notes,legacy_source&limit=${limit}`,
+      `${root}/rest/v1/tasks?status=eq.todo&archived_at=is.null&select=id,title,notes,legacy_source,created_at&limit=${limit}`,
       { headers, cache: 'no-store' },
     );
     if (!res.ok) return { ok: false, ...empty, error: `read ${res.status}` };
@@ -736,8 +754,15 @@ export async function autoCloseFinishedTasks(
       title: string;
       notes?: string;
       legacy_source?: string;
+      created_at?: string;
     }>;
-    const tasks = rows.map((r) => ({ id: r.id, title: r.title, legacySource: r.legacy_source }));
+    const tasks = rows.map((r) => ({
+      id: r.id,
+      title: r.title,
+      legacySource: r.legacy_source,
+      createdAt: r.created_at,
+      notes: r.notes,
+    }));
 
     const prNums = [...new Set(tasks.map(trackedPrNum).filter((x): x is string => x !== null))];
     const facts = await gatherRepoFacts(repoDir, prNums);

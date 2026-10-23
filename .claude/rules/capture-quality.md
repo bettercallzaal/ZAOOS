@@ -1,5 +1,7 @@
 # Capture Quality - no card born without WHO / WHY / DONE-WHEN
 
+mechanism: none yet (since 2026-10-23, #4152)
+
 History (card b8cba711): `research/dev-workflows/2649-rules-history/archive/capture-quality.md`.
 
 1. **ZOE capture (phone end):** a DM capture with no why/who context does not board silently. ZOE holds it and asks ONE button question - "Add a why" / "Board it bare". The gate prompts, never blocks. Code: `splitCapturesByQuality` in `bot/src/zoe/team-tracker.ts` + the `capq:` callback in `bot/src/zoe/index.ts`.

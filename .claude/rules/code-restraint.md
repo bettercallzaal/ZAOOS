@@ -1,5 +1,7 @@
 # Code Restraint
 
+mechanism: none yet (since 2026-10-23, #4153)
+
 Before writing new code, run the ladder and stop at the first rung that works. Source (Ponytail, MIT) and rationale: `research/dev-workflows/2081-ponytail-agent-restraint/` and `research/dev-workflows/2649-rules-history/archive/code-restraint.md`.
 
 1. **Does this need to exist?** If not, skip it.

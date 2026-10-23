@@ -641,9 +641,10 @@ export async function getRelevantFrames(fid: number, limit = 20) {
 /**
  * Read through the seam from a route: READ_BASE first, Neynar on failover.
  * Only for calls whose fields the read base serves. Hypersnap omits
- * `viewer_context`, `power_badge` and a cast's `root_parent_url`, and returns
- * followers/following as flat users, so check the fields a caller reads first
- * (doc 2418 D6 PR 3).
+ * `viewer_context` and `power_badge`, leaves a cast's `channel` null, sets its
+ * `root_parent_url` to its own `parent_url` (so a reply in a channel has none),
+ * and returns followers/following as flat users, so check the fields a caller
+ * reads first (doc 2418 D6 PR 3).
  */
 export function neynarRead(path: string, init: RequestInit = {}): Promise<Response> {
   return fetchWithFailover(path, { ...init, headers: readHeaders() });

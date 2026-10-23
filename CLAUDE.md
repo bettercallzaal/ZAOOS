@@ -43,7 +43,7 @@ Seven stores, each owning one thing. When two disagree, the one higher in this t
 
 | Store | Where | Owns | Never holds |
 |---|---|---|---|
-| ICM boxes | useicm.com, bodies in `research/identity/icm-boxes/` | Brand truth - what a ZAO brand IS | Operational state |
+| ICM boxes | zao-icm repo `boxes/`, served at context.thezao.com (useicm.com is a frozen legacy copy) | Brand truth - what a ZAO brand IS | Operational state |
 | Rules | `.claude/rules/*.md` | Operating policy that binds every session | Facts, task state |
 | Skills | `~/.claude/skills/<name>/` | Repeatable procedures | Policy, one-off notes |
 | Research library | `research/<topic>/NNNN-slug/` | Findings, decisions, the why, with sources | Current task state |
@@ -202,12 +202,12 @@ ZAO operating surfaces collapsed from 12+ systems to 4. Hermes was adapted into 
 
 ## ICM Context Boxes (AI-readable ZAO context)
 
-The ZAO ecosystem has permanent AI-readable context boxes on useicm.com - fetch one to load grounded context on any project or person:
+The ZAO ecosystem has permanent AI-readable context boxes. Since Zaal's 2026-10-11 ruling the master copy is the `bettercallzaal/zao-icm` repo, folder `boxes/`, served at context.thezao.com; useicm.com is a frozen legacy copy (recorded in `research/identity/icm-boxes/README.md`). Fetch one to load grounded context on any project or person:
 
-- Fetch: `curl -s https://useicm.com/api/objects/<id>/llm.txt`
+- Fetch: `curl -s https://context.thezao.com/<name>` (for example `zao-assistant`; plain curl, no headers)
 - Human directory: https://thezao.xyz/list
-- Start here: **zao-assistant** (`icm_-hsPHePpqX01RovoB_SEqA`) - the operator layer; it links to the rest (thezao, bettercallzaal, zabalgamez, wavewarz, farcaster, fractal, poidh, zuke, zao-festivals, coc-concertz, zao-newsletter, loop-engineering, milk-road).
-- Source of truth for box content: `research/identity/icm-boxes/`. Owner keys live at `~/.zao/private/icm-keys.json` (never commit).
+- Start here: **zao-assistant** - the operator layer; it links to the rest (thezao, bettercallzaal, zabalgamez, wavewarz, farcaster, fractal, poidh, zuke, zao-festivals, coc-concertz, zao-newsletter, loop-engineering, milk-road).
+- Source of truth for box content: zao-icm `boxes/<name>.llm.txt`; change a box by PR there (public text, so Zaal's merge). `research/identity/icm-boxes/` here is a mirror, not the source. The legacy useicm owner keys live at `~/.zao/private/icm-keys.json` (never commit).
 
 ## Rules archive
 

@@ -304,3 +304,23 @@ describe('the repo pause switch (ZAOOS #4059)', () => {
     expect(HOLD).not.toContain('${{');
   });
 });
+
+describe('the repo pause switch also stops licence-clear (ZAOOS #4059)', () => {
+  it('licence-clear reads ZAO_MERGES_PAUSED through env, and refuses before its one merge call', () => {
+    expect(stepLines(CLEAR, 'Verify clearance and merge the verified head').join('\n')).toContain(
+      'MERGES_PAUSED: ${{ vars.ZAO_MERGES_PAUSED }}',
+    );
+    const pause = CLEAR_RUN.indexOf('merges are paused for this repo');
+    const merge = CLEAR_RUN.indexOf('gh pr merge');
+    expect(pause).toBeGreaterThan(-1);
+    expect(merge).toBeGreaterThan(pause);
+    expect(CLEAR_RUN.match(/gh pr merge/g)).toHaveLength(1);
+  });
+
+  it('every workflow that calls gh pr merge reads the pause switch', () => {
+    for (const wf of [AUTOMERGE, CLEAR]) {
+      expect(wf.includes('gh pr merge')).toBe(true);
+      expect(wf).toContain('vars.ZAO_MERGES_PAUSED');
+    }
+  });
+});

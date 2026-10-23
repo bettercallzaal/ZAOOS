@@ -38,7 +38,7 @@ Owners are the helpers' own Mission lines on vault origin/main (`handoffs/<helpe
 | Review a PR at a head | **evaluator** | `handoffs/evaluator.md`: "Independent, read-only verdicts" | Send repo, PR, head and checks |
 | Board cards: close with evidence, type, route; small fixes | **board-burn** | `handoffs/board-burn.md` | Forward the card ids |
 | A lane's brief, memory or boot context is weak | **lane-quality** | `handoffs/lane-quality.md` | Forward the lane name and the gap |
-| A rule, ruling or measured fix that must land in a skill, brief, the vault or a small tool, as a PR | **quidli** | quidli relaunch brief (rules into files, one PR at a time) | Forward the ruling with its stamped record |
+| A rule, ruling or measured fix that must land in a skill, brief, the vault or a small tool, as a PR | **quidli** | vault `handoffs/status/quidli.md` line 3: "takes research and audit jobs from orchestrator2, PR-only" (the "rules into files" scope is this doc's description of its queue on 22 to 23 Oct, not a quoted record) | Forward the ruling with its stamped record |
 | Work inside a project (finance, cards, wavewarz, newsletter, ZAOstock and the rest) | **the numbered lane that owns the project** | `LANE-POLICY.md` "Slots in his focus order" | Through the messenger, which hands the lane its next item |
 | A process failure | **the seat** files it with `/agentic-issue`, then dispatches the fix to the owner above | seat brief `handoffs/orchestrator2.md`, "Main job" | The one thing the seat does itself, besides deciding |
 | Zaal talking (an idea, a goal, a priority) | **the seat** | `LANE-POLICY.md` "Three surfaces only" | Record it (`zao-status-append`), then route each piece by the rows above |
@@ -94,7 +94,7 @@ Doc 2641 measured a seat holding "roughly ten lanes plus Zaal", over the inciden
 | completed | 50 | 0 |
 | todo | 12 | 0 |
 
-(Method: `orca worktree list --json` against each `claude` process's working directory from `lsof -d cwd`; 25 live cwds, every one inside a worktree.)
+(Method: `orca worktree list --json` against each `claude` process's working directory from `lsof -d cwd`; 25 live cwds, every one inside a worktree. The table counts linked worktrees only; the other 2 processes run in main checkouts, downeast-zao and wavewarz-protocol, both also `in-progress`, so all 25 processes are in `in-progress` workspaces.)
 
 All 9 reopened "closed" lanes were `in-progress` with an empty comment. The seat closes lanes with `orca terminal close` (12 calls since 20:00 on 22 Oct), which ends the terminal and leaves the workspace status alone. Lanes marked `completed` with a comment (for example cpu-trim, "Done 19 Oct: 5 CPU PRs merged; terminal closed") stayed closed. The rule that would have prevented it is already written: `LANE-POLICY.md`, "closing moves the workspace to completed with a comment" (19 Oct, memory `feedback_orca_sidebar_format`). `bin/orca-board`'s sync sets `completed` only for "no session, idle 30h", so a lane closed one minute before a restart is still `in-progress`.
 

@@ -278,26 +278,49 @@ export class InMemorySchemaRegistry implements SchemaRegistry {
 /* ========== Signing & Verification ========== */
 
 /**
- * The exact object an envelope's hash covers: the 7 required fields, plus each
- * optional field only when it is defined. Create and verify both hash this, so
+ * Every field of UnsignedSporeEnvelope, in one list: the hash covers exactly
+ * these. `satisfies` refuses a name the interface does not have, and
+ * HASHED_FIELDS_COVER_INTERFACE fails to typecheck if the interface gains a
+ * field this list lacks, so the two cannot drift apart.
+ */
+export const HASHED_ENVELOPE_FIELDS = [
+  'kind',
+  'nonce',
+  'audience',
+  'schema',
+  'issuer',
+  'subject',
+  'issuedAt',
+  'expiresAt',
+  'policyRef',
+  'privacyClass',
+  'parents',
+  'dependencies',
+] as const satisfies readonly (keyof UnsignedSporeEnvelope)[];
+
+type UnhashedEnvelopeField = Exclude<
+  keyof UnsignedSporeEnvelope,
+  (typeof HASHED_ENVELOPE_FIELDS)[number]
+>;
+
+/** Compile-time check that HASHED_ENVELOPE_FIELDS covers the whole interface. */
+export const HASHED_FIELDS_COVER_INTERFACE: [UnhashedEnvelopeField] extends [never]
+  ? true
+  : never = true;
+
+/**
+ * The exact object an envelope's hash covers: each field in
+ * HASHED_ENVELOPE_FIELDS that is defined. Create and verify both hash this, so
  * an envelope carrying an extra key (or the id/hash/signature of a previous
  * signing) verifies against its own hash instead of failing as tampered.
+ * Bytes match the previous verify whitelist: it set the 7 required fields
+ * unconditionally, and canonicalizeRfc8785 already omitted any undefined one.
  */
 export function unsignedHashInput(envelope: UnsignedSporeEnvelope): Record<string, unknown> {
-  const input: Record<string, unknown> = {
-    kind: envelope.kind,
-    nonce: envelope.nonce,
-    audience: envelope.audience,
-    issuer: envelope.issuer,
-    subject: envelope.subject,
-    issuedAt: envelope.issuedAt,
-    expiresAt: envelope.expiresAt,
-  };
-  if (envelope.schema !== undefined) input.schema = envelope.schema;
-  if (envelope.policyRef !== undefined) input.policyRef = envelope.policyRef;
-  if (envelope.privacyClass !== undefined) input.privacyClass = envelope.privacyClass;
-  if (envelope.parents !== undefined) input.parents = envelope.parents;
-  if (envelope.dependencies !== undefined) input.dependencies = envelope.dependencies;
+  const input: Record<string, unknown> = {};
+  for (const field of HASHED_ENVELOPE_FIELDS) {
+    if (envelope[field] !== undefined) input[field] = envelope[field];
+  }
   return input;
 }
 

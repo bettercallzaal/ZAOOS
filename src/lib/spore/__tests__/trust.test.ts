@@ -19,6 +19,7 @@ import {
   SPORE_ENVELOPE_VERSION,
   createSignedEnvelope,
   unsignedHashInput,
+  HASHED_ENVELOPE_FIELDS,
   verifyEnvelopeWithTrust,
   assessLegacyEnvelope,
   isTrustEnabled,
@@ -650,7 +651,10 @@ describe('Create and verify hash the same input (unsignedHashInput)', () => {
     return { signed, hashCheck: assessment.checks.find((c) => c.type === 'HASH') };
   }
 
-  it('G-A: an undefined optional field round-trips and hashes like the absent key', async () => {
+  // Regression guard, not a red control: canonicalizeRfc8785 already omits undefined
+  // on main, so this passes there too. It turns red if the canonicalizer adopts the
+  // Spore SDK's throw-on-undefined rule without create stripping undefined first.
+  it('G-A (regression guard): an undefined optional field round-trips and hashes like the absent key', async () => {
     const withUndefined: UnsignedSporeEnvelope = { ...base, policyRef: undefined };
     const { signed, hashCheck } = await hashCheckFor(withUndefined);
     expect(hashCheck?.ok).toBe(true);
@@ -666,6 +670,19 @@ describe('Create and verify hash the same input (unsignedHashInput)', () => {
     const { hashCheck } = await hashCheckFor(withExtra);
     expect(hashCheck?.ok).toBe(true);
     expect(unsignedHashInput(withExtra)).not.toHaveProperty('extraField');
+  });
+
+  it('hashes every declared field of a fully populated envelope, and nothing else', () => {
+    const full: UnsignedSporeEnvelope = {
+      ...base,
+      schema: 's',
+      policyRef: 'p',
+      privacyClass: 'PUBLIC',
+      parents: ['a'],
+      dependencies: ['b'],
+    };
+    expect(Object.keys(unsignedHashInput(full)).sort()).toEqual([...HASHED_ENVELOPE_FIELDS].sort());
+    expect(Object.keys(full).sort()).toEqual([...HASHED_ENVELOPE_FIELDS].sort());
   });
 
   it('keeps hash bytes unchanged for a plain schema-conformant envelope', async () => {

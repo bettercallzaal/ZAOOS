@@ -1,5 +1,7 @@
 # Handoff Discipline - succession is an artifact, and it lives in the vault
 
+mechanism: none yet (since 2026-10-23, #4080)
+
 From doc 2319 (the handoff audit). The `lane_handoffs` Supabase table cited by older docs was never built; the vault is the system. History: `research/dev-workflows/2649-rules-history/archive/handoff-discipline.md`. Rule numbers are stable.
 
 1. **One living brief per lane at `~/zao-vault/handoffs/<lane>.md`.** Git history is the version layer; no dated copies. Frontmatter: `lane, machine (mac|windows|vps|pi), repo, status (unconsumed|consumed|ready|closed|superseded - the five in TEMPLATE.md, nothing else), written, context-pct-at-write`. Template `zao-vault/handoffs/TEMPLATE.md`. Soft cap ~200 lines; link out for anything bigger. Embed the session-summary tail (tasks, files, decisions).

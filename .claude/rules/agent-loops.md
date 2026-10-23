@@ -1,5 +1,7 @@
 # Agent Loop Operating Rules
 
+mechanism: bin/destructive-guard, bin/safe-git-push.sh, bin/zao-merge-only-guard, bin/zao-pr-open, .github/workflows/doc-collision-guard.yml (partial: rules 8 and 19 and 38 only)
+
 Binding for any autonomous /loop or agent building or deploying in this repo (Claude Code sessions and ZOE's own loops). Numbers are STABLE cross-references - never renumber. Incidents, sources and the fold-back history: `research/dev-workflows/2649-rules-history/archive/agent-loops.md`.
 
 1. **Ground truth over confidence.** Done only when `npm run typecheck` (0 errors), `esbuild`/build and the relevant tests are green and the bot boots clean. tsc alone is not enough.

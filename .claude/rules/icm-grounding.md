@@ -1,5 +1,7 @@
 # ICM Grounding - the ZAO agent kit's source of truth
 
+mechanism: none yet (since 2026-10-23, #4155)
+
 The ICM boxes are the canonical AI-readable definition of every ZAO brand and project. **Since Zaal's 2026-10-11 ruling the master copy is the `bettercallzaal/zao-icm` repo, folder `boxes/`, served at `https://context.thezao.com/<name>`** (recorded in `research/identity/icm-boxes/README.md`). useicm.com is a frozen legacy copy: never read it as current. History: `research/dev-workflows/2649-rules-history/archive/icm-grounding.md`; docs 1016, 1021.
 
 **Before working on, describing, or generating anything for a ZAO brand/project, GROUND on its ICM box first.**

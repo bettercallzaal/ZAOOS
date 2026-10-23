@@ -1,5 +1,7 @@
 # No rm -rf - Deletion Is Zaal's
 
+mechanism: bin/destructive-guard, claude/policy/destructive_policy.py
+
 Zaal 2026-08-01: "lets never rm rf tbh thats something zaal should always just delete." History: `research/dev-workflows/2649-rules-history/archive/no-rm-rf.md`.
 
 **No agent, loop, or session ever runs a recursive or forced delete of user content.** Deleting files or directories is a manual action Zaal takes. If something should be removed, SURFACE it - name the path and why. Binds on the Mac, the Windows desktop, the VPS and the Pi, and hardest on unattended surfaces.

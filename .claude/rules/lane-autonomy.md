@@ -1,5 +1,7 @@
 # Lane Autonomy - non-gated menus auto-proceed
 
+mechanism: bin/zao-no-picker-guard (partial: refuses a picker in an unwatched lane; the log line is unenforced)
+
 Adopted 2026-08-19 (pipeline-upgrade grill, upgrade 4). History: `research/dev-workflows/2649-rules-history/archive/lane-autonomy.md`.
 
 **A lane only BLOCKS on a question when the answer is genuinely Zaal's.** A question is ZAAL-GATED when ANY is true: money moves or spend is committed; anything goes public or outbound; the action is irreversible (delete, on-chain, permaweb, key rotation); the answer is a fact only Zaal knows; Zaal asked to be asked.

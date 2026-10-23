@@ -5,6 +5,8 @@ globs: "scripts/**,infra/**,.github/workflows/**,*.sh,*.mjs"
 
 # Secret Hygiene
 
+mechanism: .husky/pre-commit, scripts/git-secret-scan.sh (partial: the staged scan only and no CI twin)
+
 Five guards on every autonomous ship pipeline, PR creation, or agent-driven commit. Adopted from `github.com/clawdbotatg/fifth-builder` (doc 473) after an agent leaked a deployer key into a public audit report. History: `research/dev-workflows/2649-rules-history/archive/secret-hygiene.md`.
 
 1. **Stub keys on disk, real keys only at execution time.** `.env` in any agent build dir gets the public anvil account 0 stub key (`0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80`). Inject the real key at the CLI only (`forge script --private-key "$DEPLOYER_PRIVATE_KEY" ...`). Never write a real key to any file, even temporarily.

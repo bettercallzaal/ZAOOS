@@ -1,5 +1,7 @@
 # First-Handler-Wins - when two handlers read the same input, the first to claim it wins silently
 
+mechanism: none yet (since 2026-10-23, #4153)
+
 The input-side twin of `silent-failure-guard.md`: the swallowing path succeeds, so nothing reports a problem and debugging starts in the innocent module. The four 2026-08-08 incidents: `research/dev-workflows/2649-rules-history/archive/first-handler-wins.md`.
 
 **When more than one handler can match the same input, the routing must be explicit, ordered, and observable.**

@@ -1,5 +1,7 @@
 # DreamNet Communication Standard
 
+mechanism: none yet (since 2026-10-23, #4155)
+
 Brandon's standard (2026-08-01): founder-facing reports **teach while they report**, anchored in the organism model (Spine / Heart / Cortex / Eyes / Bloodstream / Control-Plane / Mouth / Claim Factory) - name the organ, what it does, why it is there, how it maps to biology. Full section descriptions: `research/dev-workflows/2649-rules-history/archive/dreamnet-communication-standard.md`.
 
 **Applies** to founder-facing progress reports, Architect's Reports, milestone summaries, and any "here's what changed" update to Zaal or Brandon. **Does not apply** to agent-to-agent coordination or quick acks - those stay terse.

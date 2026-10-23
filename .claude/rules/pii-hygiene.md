@@ -1,5 +1,7 @@
 # PII Hygiene
 
+mechanism: .husky/pre-commit, scripts/git-pii-scan.py (partial: a local pre-commit hook with no CI twin)
+
 Third-party personal data from connected services (Gmail, Calendar, Drive, GitHub) must not leak through commits, PR/commit text, chat, Bonfire episodes, or public artifacts. Sibling of `secret-hygiene.md`. Threat model and amendment history: `research/dev-workflows/2649-rules-history/archive/pii-hygiene.md`.
 
 **Rule 1 - raw query output writes to `~/.zao/private/`**, never inside a repo working tree: `gmail-<query-slug>-<YYYYMMDD>.json`, `gcal-<calendar>-<YYYYMMDD>.json`, `gdrive-<folder-slug>-<YYYYMMDD>.json`, `github-<repo>-<query-slug>-<YYYYMMDD>.json`.

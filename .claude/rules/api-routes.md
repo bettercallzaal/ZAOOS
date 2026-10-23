@@ -5,6 +5,8 @@ globs: src/app/api/**/*.ts
 
 # API Route Conventions
 
+mechanism: none yet (since 2026-10-23, #4150)
+
 - Validate ALL input with Zod `safeParse` before processing. Return 400 with error details on failure.
 - Check session with `getSession()` before any authenticated operation. Return 401 if missing.
 - Always return `NextResponse.json(...)` - never plain `Response` or raw strings.

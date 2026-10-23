@@ -5,6 +5,8 @@ globs: "**/*.test.ts,**/*.test.tsx"
 
 # Test Conventions
 
+mechanism: none yet (since 2026-10-23, #4150)
+
 - Use Vitest: `describe`, `it`, `expect`. Do not use Jest globals.
 - Cover both success and error paths for every function under test.
 - Mock modules with `vi.mock()` + `vi.hoisted()` - do NOT use MSW or mock `fetch` directly.

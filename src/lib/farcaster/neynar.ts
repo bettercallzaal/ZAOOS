@@ -83,7 +83,21 @@ export async function getChannelFeed(channelId: string, cursor?: string, limit =
     const body = await res.text();
     throw new Error(`Neynar feed error ${res.status}: ${body.slice(0, 200)}`);
   }
-  return res.json();
+  const data = await res.json();
+  if (Array.isArray(data?.casts)) data.casts = sortCastsNewestFirst(data.casts);
+  return data;
+}
+
+/**
+ * Sort a channel page newest-first, keeping every cast. Hypersnap pages each
+ * shard on its own and joins the pages unsorted, up to `limit` casts per shard,
+ * with one resume token per shard (doc 2418, UPDATE 2026-10-23). Trimming the
+ * page to `limit` would lose casts for good, because the cursor has already
+ * moved past them; sorting is safe because the tokens do not depend on order.
+ */
+export function sortCastsNewestFirst<T extends { timestamp?: string }>(casts: T[]): T[] {
+  const time = (c: T): number => Date.parse(c.timestamp ?? '') || 0;
+  return [...casts].sort((a, b) => time(b) - time(a));
 }
 
 /**

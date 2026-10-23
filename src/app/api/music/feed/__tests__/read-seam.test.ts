@@ -77,6 +77,18 @@ describe('/api/music/feed through the read seam', () => {
     }
   });
 
+  it('orders a shard-ordered read-base page newest-first before picking tracks', async () => {
+    // haatz joins shard pages unsorted (doc 2418, UPDATE 2026-10-23).
+    const older = { ...cast, hash: '0xold', timestamp: '2026-09-30T14:28:29Z' };
+    const newer = { ...cast, hash: '0xnew', timestamp: '2026-10-23T15:28:06Z' };
+    stub(() => ({ status: 200, body: { casts: [older, newer], next: {} } }));
+
+    const res = await GET(makeGetRequest('/api/music/feed', { channel: 'zao', limit: '1' }));
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { tracks: Array<{ castHash: string }> };
+    expect(body.tracks.map((t) => t.castHash)).toEqual(['0xnew']);
+  });
+
   it('keeps the "all" search on Neynar', async () => {
     const fetchMock = stub(() => ({ status: 200, body: { result: { casts: [cast] } } }));
 

@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { ENV } from '@/lib/env';
-import { neynarRead } from '@/lib/farcaster/neynar';
+import { neynarRead, sortCastsNewestFirst } from '@/lib/farcaster/neynar';
 import { logger } from '@/lib/logger';
 import { isMusicUrl } from '@/lib/music/isMusicUrl';
 import type { TrackType } from '@/types/music';
@@ -146,7 +146,8 @@ async function getChannelMusicCasts(
     throw new Error(`Neynar feed error ${res.status}: ${body.slice(0, 200)}`);
   }
   const data = await res.json();
-  const casts = (data.casts || []) as NeynarCast[];
+  // Newest first before the track filter stops at `limit` (doc 2418, UPDATE 2026-10-23).
+  const casts = sortCastsNewestFirst((data.casts || []) as NeynarCast[]);
   return {
     casts,
     nextCursor: data.next?.cursor as string | undefined,

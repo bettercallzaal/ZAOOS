@@ -12,8 +12,10 @@ vi.mock('@/lib/env', () => ({
 import {
   getBestFriends,
   getCastConversationSummary,
+  getChannelFeed,
   getFollowSuggestions,
   getTrendingTopics,
+  sortCastsNewestFirst,
 } from '../neynar';
 
 function res(status: number, body: unknown) {
@@ -86,5 +88,52 @@ describe('getCastConversationSummary', () => {
     await expect(getCastConversationSummary('0xabc')).rejects.toThrow(
       'Neynar cast conversation summary error 500',
     );
+  });
+});
+
+describe('getChannelFeed on a read-base page', () => {
+  // Verbatim timestamp order from haatz feed/channels?channel_ids=zao&limit=5, 2026-10-23:
+  // 9 casts, one shard's 5 then the other's 4 (doc 2418, UPDATE 2026-10-23).
+  const MEASURED = [
+    '2026-10-10T12:48:59.000Z',
+    '2026-10-05T17:43:58.000Z',
+    '2026-10-05T14:40:30.000Z',
+    '2026-10-02T16:18:58.000Z',
+    '2026-09-30T14:28:29.000Z',
+    '2026-10-23T15:28:06.000Z',
+    '2026-10-23T00:43:39.000Z',
+    '2026-10-22T01:52:18.000Z',
+    '2026-10-21T21:03:40.000Z',
+  ];
+  const casts = MEASURED.map((timestamp, i) => ({ hash: `0x${i}`, timestamp }));
+
+  it('sorts newest-first and keeps every cast and the cursor', async () => {
+    const body = { casts, next: { cursor: 'shard-tokens' } };
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(new Response(JSON.stringify(body), { status: 200 })),
+    );
+
+    const data = await getChannelFeed('zao', undefined, 5);
+    const got = data.casts.map((c: { timestamp: string }) => c.timestamp);
+    expect(got).toEqual([...MEASURED].sort().reverse());
+    expect(got).toHaveLength(9);
+    expect(data.next).toEqual({ cursor: 'shard-tokens' });
+  });
+});
+
+describe('sortCastsNewestFirst', () => {
+  it('leaves an already newest-first page in the same order', () => {
+    const page = [
+      { hash: 'a', timestamp: '2026-10-23T00:00:00Z' },
+      { hash: 'b', timestamp: '2026-10-22T00:00:00Z' },
+    ];
+    expect(sortCastsNewestFirst(page)).toEqual(page);
+  });
+
+  it('puts a cast with no readable timestamp last and does not mutate the input', () => {
+    const page = [{ hash: 'x' }, { hash: 'y', timestamp: '2026-10-23T00:00:00Z' }];
+    expect(sortCastsNewestFirst(page).map((c) => c.hash)).toEqual(['y', 'x']);
+    expect(page.map((c) => c.hash)).toEqual(['x', 'y']);
   });
 });

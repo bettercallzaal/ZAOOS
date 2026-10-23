@@ -13,4 +13,4 @@ Rule numbers are stable.
 3. **A path argument is checked to be the repo it claims before any write,** by its git common dir or its origin URL. Otherwise the tool refuses and writes nothing. A typo must not land a commit on another repo's main.
 4. **In a chain, a step that can fail stops the chain.** Put `cd /abs || exit 1` on its own; a failed clone or checkout aborts everything after it.
 5. **A shared clone is written through a throwaway worktree at origin/main.** Success is the push confirmed by `git merge-base --is-ancestor <sha> origin/main`; a local-only commit is not success.
-6. **Run the copy of a tool that origin/main has,** not one checked out in a diverged clone. `zao-inflight-row` does this for the BLACKBOARD row writer.
+6. **Run the copy of a tool that origin/main has,** not one checked out in a diverged clone. `zao-inflight-row` will do this for the BLACKBOARD row writer once zaal-dotfiles #588 lands.

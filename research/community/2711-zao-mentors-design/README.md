@@ -100,7 +100,7 @@ The sections follow 758e's outline, with compensation removed: there is no cash 
 | Arthur | none by filename |
 | deez | none by filename |
 
-The search covered the 604 filenames in `zao-media/content/`. It did not read each entry's `guest` field, so a lesson filed under another name would be missed. 2705's pilot (yerbearserker, kmac.eth and one more Zaal names) is unchanged. The year-end-opportunities lane put options for the third mentor to Zaal on 2026-10-23, with Shriyash Soni recommended.
+The search covered the 604 filenames in `zao-media/content/`. It did not read each entry's `guest` field, so a lesson filed under another name would be missed. The pilot runs with two mentors, yerbearserker and kmac.eth, until Zaal names a third. That is the away-mode default recorded in the vault (`decisions/grill-2026-10-23-grill.md`, item 16, MEN, 2026-10-23 16:54 EDT), and Zaal can override it at any time. The year-end-opportunities lane put options for the third mentor to Zaal on 2026-10-23, with Shriyash Soni recommended. With two mentors the steward rotation alternates between them; Zaal is steward for the pilot month either way.
 
 ## What other programs show
 
@@ -118,8 +118,8 @@ The search covered the 604 filenames in `zao-media/content/`. It did not read ea
 | Action | Owner | Type | By When |
 |---|---|---|---|
 | Decide the pilot month and the fixed Mentor Hour slot; done when both are written in the 2705 pilot table | Zaal | decision | 2026-10-30 |
-| Name the third pilot mentor from the 7; done when named in a grill ruling | Zaal | decision | 2026-10-30 |
-| Ask the pilot mentors; done when each has said yes or no | Zaal | outbound | 2026-11-06 |
+| Optional: name a third pilot mentor from the 7; until then the pilot runs with two (grill 2026-10-23 item 16, MEN); done when named in a grill ruling, or the pilot starts with two | Zaal | decision | 2026-10-30 |
+| Ask the two pilot mentors, yerbearserker and kmac.eth (and a third if named); done when each has said yes or no | Zaal | outbound | 2026-11-06 |
 | Create `notes/zao-mentors-ledger.md` with the table above; done when merged on vault main | bandzbuilds lane | vault note | 2026-10-31 |
 | Fill the one-page handbook from the sections above; done when a vault note exists for Zaal to read | bandzbuilds lane | vault note | 2026-10-31 |
 | Agree `show: "ZAO Mentors"` with the zao-media lane; done when its brief names the field | bandzbuilds lane | message | 2026-10-31 |

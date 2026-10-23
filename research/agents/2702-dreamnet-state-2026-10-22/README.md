@@ -13,7 +13,7 @@ tier: STANDARD
 
 > **Goal:** One grounded snapshot of the DreamNet relationship (Brandon Ducar, github.com/BrandonDucar) as of 2026-10-22, read from code and git rather than from earlier docs, with the next three steps for The ZAO.
 
-**Credit:** DreamNet, Spore, the dreamloop format, the protocol-hardening spec and the "playable operational environments" thesis are Brandon Ducar's. This is Brandon **Ducar**, not Brandon Beckwith.
+**Credit:** DreamNet, Spore, the dreamloop format, the protocol-hardening spec and the playable-environments thesis are Brandon Ducar's. This is Brandon **Ducar**, not Brandon Beckwith.
 
 **Measured against:** ZAOOS `origin/main` at `e86864932` (2026-10-22 22:27Z); zorca cloned at `d3eb5b2`; vault `origin/main` after a fetch on 2026-10-22; `gh api` reads of Brandon's public repos the same evening. Nothing was sent to Brandon and nothing was written to any live system.
 
@@ -52,7 +52,7 @@ The 2026-09-19 decision asked Brandon to build dreamloops into zorca. What arriv
 
 | Date | Change | Source |
 |---|---|---|
-| 2026-10-18 | Brandon's iMessage ask: "applications should become playable operational environments", plus one agent gateway. The ecosystem map was written the same day | vault `notes/dreamnet-ecosystem-map-2026-10-18.md`, merged as vault #193 on 2026-10-19 |
+| 2026-10-18 | Brandon's private ask to Zaal (paraphrased here): apps as playable operational environments, plus one multi-platform agent gateway. The ecosystem map was written the same day | vault `notes/dreamnet-ecosystem-map-2026-10-18.md`, merged as vault #193 on 2026-10-19 |
 | 2026-10-18 | Zaal said yes to building a WaveWarZ receipt adapter to Brandon's schema (card 1289). The board note marks its state "unverified" | vault `notes/board-burn-2026-10-22.md:168` |
 | 2026-10-18 to 10-20 | Brandon created **WikiREA** (MIT, created 2026-10-18T19:00Z, 10 commits since 10-18). The 18 Oct map listed WikiREA as "no web hit (FAILED)" (note line 17). It now exists and links a page on "how runtime findings can feed DreamNet" | `gh api repos/BrandonDucar/WikiREA`, LICENSE file read |
 | 2026-10-20 | Grill sweep closed the dreamnet lane's old grill questions with evidence | vault #220, `e5d50fcd` |

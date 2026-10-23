@@ -21,13 +21,13 @@ tier: STANDARD
 
 | # | Recommendation | Why | Cost | Unblocks |
 |---|---|---|---|---|
-| 1 | **RE-RUN the Spore conformance checks against the SDK head `f230dd0`, and stop advertising the old pin until it passes.** | `https://zaoos.com/api/spore/verify` still says "PHASE 3 CONFIRMED - 47/47" against SDK commit `4072102a` with hash `sha256:dreamnet-sorted-json:v0`. The SDK is 2 commits and 41 files past that pin. One of the two commits is "Spore Federation Protocol v1.0.0 RFC 8785 JCS" (2026-09-10), and Brandon's 2026-10-09 hash profile is SHA-256 over RFC 8785. | One agent session: new fixtures plus a test run. No gate, because it is read-only and test-only. | Agreeing Brandon's hash profile (his item 4). The WaveWarZ receipt adapter (card 1289). The "public-safe receipt layer" in the 18 Oct map (concept 5). |
-| 2 | **CORRECT three stale records in one pass:** the zorca README, the 18 Oct map's "Phase 1 held" line, and the capability card's placeholder values. | The zorca README calls the federation contract "Named, not started" (README.md:41, :94, :116), but `federation/` was merged on 2026-09-27 (federation/README.md:3). The 18 Oct map says Phase 1 waits on Brandon's 5 answers (note lines 16, 42). He answered on 2026-10-09 (handoffs/dreamnet.md:107-108), and three Phase 1 builds merged on 10-11. | Two small PRs (zorca README, vault note) plus one line on the card. | Anyone reading zorca, Brandon included, gets a true picture. Relays stop asking Brandon for answers he already gave. |
-| 3 | **FIND OUT whether `FARCASTER_SIGNER_PROVENANCE_INGEST=1` is set in production. If not, set it after the wellbeing week.** | It is the first Phase 1 build that writes real data. Zaal said "merge and turn on" (Grill item 128, handoffs/dreamnet.md:29). No record after 2026-10-11 says it was set. This lane cannot read Vercel and does not try. | About 10 minutes of Zaal's time: one env var, a redeploy and one SQL check pasted back. | The first real provenance run. Brandon's test vectors (same-FID A to B, revoke, backfill). The later decision on the retrieval filter. |
+| 1 | **RE-RUN the Spore conformance checks against the SDK head `f230dd0`, and stop advertising the old pin until it passes.** | `https://zaoos.com/api/spore/verify` still says "PHASE 3 CONFIRMED - 47/47" against SDK commit `4072102a` with hash `sha256:dreamnet-sorted-json:v0`. The SDK is 2 commits and 41 files past that pin. One of the two commits is "Spore Federation Protocol v1.0.0 RFC 8785 JCS" (2026-09-10), and Brandon's proposed hash profile is SHA-256 over RFC 8785. | One agent session: new fixtures plus a test run. No gate, because it is read-only and test-only. | Agreeing Brandon's hash profile. The WaveWarZ receipt adapter (card 1289). The "public-safe receipt layer" in the 18 Oct map (concept 5). |
+| 2 | **CORRECT three stale records in one pass:** the zorca README, the 18 Oct map's "Phase 1 held" line, and the capability card's placeholder values. | The zorca README calls the federation contract "Named, not started" (README.md:41, :94, :116), but `federation/` was merged on 2026-09-27 (federation/README.md:3). The 18 Oct map says Phase 1 waits on Brandon's answers. He answered 9 Oct, and three Phase 1 builds merged on 10-11. | Two small PRs (zorca README, vault note) plus one line on the card. | Anyone reading zorca, Brandon included, gets a true picture. Relays stop asking Brandon for answers he already gave. |
+| 3 | **FIND OUT whether `FARCASTER_SIGNER_PROVENANCE_INGEST=1` is set in production. If not, set it after 2026-10-29.** | It is the first Phase 1 build that writes real data. Switching it on was already approved. No record after 2026-10-11 says it was set. This lane cannot read Vercel and does not try. | About 10 minutes of Zaal's time: one env var, a redeploy and one SQL check pasted back. | The first real provenance run. Brandon's test vectors (same-FID A to B, revoke, backfill). The later decision on the retrieval filter. |
 
 ## 1. What DreamNet is today, in plain words
 
-DreamNet is Brandon Ducar's design for an "actor-neutral" operating system for organisations. Identity, a capability registry, bounded authority leases, receipts and governance come first, and AI is one kind of participant among humans, software and machines (vault `inbox/2026-09-16-brandon-dreamnet/README.md:12-14`, his three laws at lines 24-27). Brandon writes the concepts as specs and public repos. The ZAO's side is code that speaks parts of those specs.
+DreamNet is Brandon Ducar's design for an "actor-neutral" operating system for organisations. Identity, a capability registry, bounded authority leases, receipts and governance come first, and AI is one kind of participant among humans, software and machines, per Brandon's own notes. Brandon writes the concepts as specs and public repos. The ZAO's side is code that speaks parts of those specs.
 
 **What runs, measured 2026-10-22:**
 
@@ -39,7 +39,7 @@ DreamNet is Brandon Ducar's design for an "actor-neutral" operating system for o
 | Tenant-organism layer and Proof Drops | `src/lib/dreamnet/` | Built. A grep of `src` and `bot` found no caller outside `src/lib/dreamnet`, so it is **reachable by nothing** whatever the flags say | `src/lib/dreamnet/README.md:9-11`, and the grep this run |
 | ZOE receipts | `bot/src/zoe/receipt-envelope.ts`, `receipts.ts` | Built (`dreamnet.receipt.v1`). Not re-verified live this run | file list from `git grep -il dreamnet` |
 
-**zorca, the repo Zaal named as the DreamNet repo** (vault `decisions/zorca-is-the-dreamnet-repo.md`, 2026-09-19). zorca has 33 tracked files and no running code path. Its contents are:
+**zorca, the repo Zaal named as the DreamNet repo** (decision of 2026-09-19). zorca has 33 tracked files and no running code path. Its contents are:
 - `PLAYBOOK.md` (284 lines) and the README.
 - The board GUIs under `gui/`.
 - A `federation/` directory: a capability card, an envelope mapping and four JSON schemas, one of them `dreamloop-manifest.v1`. It came from Brandon's PR #9 and was merged on 2026-09-27 as "DRAFT SPEC, NOT LIVE" (`federation/README.md:3`).
@@ -52,14 +52,14 @@ The 2026-09-19 decision asked Brandon to build dreamloops into zorca. What arriv
 
 | Date | Change | Source |
 |---|---|---|
-| 2026-10-18 | Brandon's private ask to Zaal (paraphrased here): apps as playable operational environments, plus one multi-platform agent gateway. The ecosystem map was written the same day | vault `notes/dreamnet-ecosystem-map-2026-10-18.md`, merged as vault #193 on 2026-10-19 |
-| 2026-10-18 | Zaal said yes to building a WaveWarZ receipt adapter to Brandon's schema (card 1289). The board note marks its state "unverified" | vault `notes/board-burn-2026-10-22.md:168` |
-| 2026-10-18 to 10-20 | Brandon created **WikiREA** (MIT, created 2026-10-18T19:00Z, 10 commits since 10-18). The 18 Oct map listed WikiREA as "no web hit (FAILED)" (note line 17). It now exists and links a page on "how runtime findings can feed DreamNet" | `gh api repos/BrandonDucar/WikiREA`, LICENSE file read |
+| 2026-10-18 | An internal ecosystem map was written of where DreamNet and ZAO projects could meet | vault #193, merged 2026-10-19 |
+| 2026-10-18 | Zaal said yes to building a WaveWarZ receipt adapter to Brandon's schema (card 1289). The board note marks its state "unverified" | board card 1289 |
+| 2026-10-18 to 10-20 | Brandon created **WikiREA** (MIT, created 2026-10-18T19:00Z, 10 commits since 10-18). The 18 Oct map had not found it. It now exists and links a page on "how runtime findings can feed DreamNet" | `gh api repos/BrandonDucar/WikiREA`, LICENSE file read |
 | 2026-10-20 | Grill sweep closed the dreamnet lane's old grill questions with evidence | vault #220, `e5d50fcd` |
 | 2026-10-22 | `dreamnet-whale-league` pushed (Apache-2.0). The commits API shows 0 default-branch commits dated since 10-18, so the push was to another branch or carries older dates. Content not read | `gh api` |
-| none | zorca: no commit since #12 on 2026-10-17. dreamnet-zao (private record): no commit since #6 on 2026-10-14. dreamnet lane status: last entry 2026-10-11 ("IDLE") | `git log`, `gh api`, vault `handoffs/status/dreamnet.md:147` |
+| none | zorca: no commit since #12 on 2026-10-17. dreamnet-zao (private record): no commit since #6 on 2026-10-14. dreamnet lane status: last entry 2026-10-11 ("IDLE") | `git log`, `gh api`, the lane's status file |
 
-**One contradiction this doc resolves:** the 18 Oct map (lines 16 and 42) and the seat's status (`handoffs/status/orchestrator2.md:407`) both say Phase 1 waits on Brandon's five answers. The dreamnet brief says he answered by email on 2026-10-09 (`handoffs/dreamnet.md:107-108`), and #3904, #3905 and #3906 then merged on 10-11. The brief is the newer, measured record. **Phase 1 is not held. It is waiting on flags and on Brandon's golden vectors.**
+**One contradiction this doc resolves:** the 18 Oct map and the seat's status both say Phase 1 waits on Brandon's answers. He answered 9 Oct, and #3904, #3905 and #3906 then merged on 10-11. **Phase 1 is not held. It is waiting on flags and on Brandon's golden vectors.**
 
 ## 3. Where The ZAO and DreamNet connect, and who builds what
 
@@ -105,8 +105,8 @@ The 2026-09-19 decision asked Brandon to build dreamloops into zorca. What arriv
 |---|---|---|---|
 | Re-run Spore conformance against `BrandonDucar/dreamnet-spore-sdk@f230dd0`. Shipped when a ZAOOS PR lands new fixtures and the endpoint's `conformance` block names the new commit, or says FAILED with the failing checks | dreamnet lane | PR | 2026-10-29 |
 | zorca README: replace "Named, not started" (lines 41, 94, 116) with the true state of `federation/`, and mark the card's hashes as placeholders. Shipped when a zorca PR is merged | dreamnet lane | PR | 2026-10-26 |
-| Vault: append a dated correction to `notes/dreamnet-ecosystem-map-2026-10-18.md` saying Phase 1 is not held (Brandon answered 2026-10-09). Shipped when a vault PR is merged | dreamnet lane | PR | 2026-10-26 |
-| Say whether `FARCASTER_SIGNER_PROVENANCE_INGEST=1` is set on Vercel Production. If not, set it, redeploy and paste the SQL check. Shipped when the check result is in `handoffs/status/dreamnet.md` | Zaal | Env change | 2026-10-30 (after the 22-29 Oct wellbeing week) |
+| Vault: append a dated correction to the 18 Oct ecosystem map saying Phase 1 is not held (Brandon answered 9 Oct). Shipped when a vault PR is merged | dreamnet lane | PR | 2026-10-26 |
+| Say whether `FARCASTER_SIGNER_PROVENANCE_INGEST=1` is set on Vercel Production. If not, set it, redeploy and paste the SQL check. Shipped when the check result is in the dreamnet lane status file | Zaal | Env change | 2026-10-30 |
 
 ## Sources
 
@@ -119,4 +119,4 @@ The 2026-09-19 decision asked Brandon to build dreamloops into zorca. What arriv
 - [FULL] Community, GitHub: [zorca PR #9](https://github.com/bettercallzaal/zorca/pull/9), Brandon's federation PR. Its comment thread is empty (`gh api .../issues/9/comments` returned nothing)
 - [FULL, negative] Community, Hacker News: [Algolia search "dreamnet"](https://hn.algolia.com/api/v1/search?query=%22dreamnet%22&tags=story) returned 0 stories, against a control of 45 for "farcaster". The 18 any-type hits are unrelated. No public HN discussion of this DreamNet exists
 - [FAILED - HTTP 403] Community, Reddit: search.json, the known IP block. Not retried
-- [FULL] Vault `origin/main` (private, cited by path): `handoffs/dreamnet.md`, `handoffs/status/dreamnet.md`, `decisions/zorca-is-the-dreamnet-repo.md`, `decisions/grill-2026-10-06-dreamnet-evening.md`, `notes/brandon-dreamnet-protocol-hardening-mission-2026-10-06.md`, `notes/dreamnet-ecosystem-map-2026-10-18.md`, `inbox/2026-09-16-brandon-dreamnet/README.md`, `notes/board-burn-2026-10-22.md`, `handoffs/status/orchestrator2.md`
+- [FULL] Vault `origin/main` (private): the dreamnet lane brief and status file, and the 18 Oct ecosystem map

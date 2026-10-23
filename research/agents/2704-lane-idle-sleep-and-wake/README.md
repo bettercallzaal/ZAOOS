@@ -15,6 +15,8 @@ tier: DEEP
 
 ## Key Decisions
 
+> **Update 2026-10-23 (Part 8, prior art): Orca already has the sleep and the wake.** Orca 1.4.237 has a workspace Sleep (`worktree.sleep` in its runtime API: it stops the workspace's terminals, checks they stopped, and writes resume records with each agent's session id) and a wake (`worktree.activate`, which resumes the slept agents in a fresh tab). Its own CLI notes say: "Use workspace Sleep when the terminals and agent sessions should resume later." What Orca lacks is an idle trigger, a wake on an incoming message, and a CLI command for either (`orca worktree sleep` is "Unknown command"). So decisions 1 and 3 change from "build exit plus resume" to **"extend Orca: call its sleep on idle, and its activate from the doorbell"**. The measurements below still hold: they are what Orca's sleep frees and what its wake costs.
+
 | # | Decision | Why (measured here, or fetched) |
 |---|---|---|
 | 1 | **The idle cost is memory, not CPU. USE "sleep = exit the process, keep the pane and the transcript; wake = `claude --resume <session id>`".** | 26 `claude` processes at 07:02 EDT held **6.47 GiB** RSS themselves and **9.97 GiB with their child trees** (median 219 MB per process, 328 MB per tree, 17 children). Idle CPU is near zero: `top`'s second sample gave a **median 0.9 percent** per `claude` process, 19 of 26 at or under 1 percent, and the 65 `node` children 0.0 in total. Exit frees the whole tree; the transcript keeps the conversation (Claude Code docs: a resumed session restores "the messages, tool calls, and results"). Wake measured at **4 to 6 s of start-up**, 7.8 to 10.1 s send-to-answer, on a loaded Mac (Part 3). |
@@ -149,6 +151,34 @@ The plugin's `context7` and `playwright` duplicate user-scope entries with ident
 | Never-sleep lanes stay up | a helper with a Monitor sleeps and its Monitor dies | the never-sleep check refuses to sleep it |
 | A closed lane stays closed | (doc 2703) a lane closed with only `orca terminal close` returns after a restart | a slept lane returns on restart by design, a closed one does not |
 
+## Part 8. Prior art: has anyone built this? (added 2026-10-23)
+
+Zaal on this doc: "I love sleeping lanes, let's see if others have made something like this". GitHub first, real fetches only. A scout fetched items 2 to 15 into raw files; the Fly, systemd and fleet quotes were re-checked against those files. Item 1 was read from Orca's public repo and the app installed on this Mac.
+
+**Plainly: the closest thing to our design is in the tool we already run.** Orca has workspace Sleep and wake built. No agent manager read here wakes a sleeping agent when a message arrives; that pattern exists only in infrastructure (Fly, Knative, systemd).
+
+| # | Project | What it does about idle agents | Licence (from the LICENSE file) | Fit |
+|---|---|---|---|---|
+| 1 | **Orca** (stablyai/orca, the app every lane runs in; 1.4.237 here) | **Workspace Sleep**: the runtime method `worktree.sleep` (`sleepManagedWorktree`) stops a workspace's terminals, verifies they stopped (`postStopVerified`) and keeps `SleepingAgentSessionRecord`s with each agent's provider session id. `worktree.activate` wakes them: sleep records "are consumed by worktree activation, which opens a fresh tab" (`src/shared/agent-session-resume.ts`). After a crash or overload, "Orca keeps restored agent sessions asleep instead of starting them all at once. Each one resumes when you open it" (`orca serve restore resume`). Not found: an idle trigger (0 hits for autoSleep, idleSleep or sleepAfter in the app bundle), a wake on a message, a CLI command (`orca worktree sleep`: "Unknown command"). | MIT (Copyright 2026 Lovecast Inc.) | **ADOPT and extend**: call its sleep and activate; build only the idle trigger and the doorbell |
+| 2 | Claude Agent SDK sessions (docs) | "Pass a session ID to resume to return to that specific session. The agent picks up with full context from wherever the session left off." "Sessions persist the conversation, not the filesystem." "Session files are local to the machine that created them." | vendor docs | **ADOPT**: the resume semantics both Orca and our doorbell rely on; local only, so the doorbell runs on this Mac |
+| 3 | claude-squad (smtg-ai/claude-squad) | Pause and resume by keypress: "Pause stops the tmux session and removes the worktree, preserving the branch" (`session/instance.go`). No idle trigger, no message wake. | AGPL-3.0 | BORROW the idea only; AGPL code is not copied |
+| 4 | ilucin/fleet | After a reboot, "dormant sessions: list, bring back (same tmux layout, `claude --resume`)", by hand | MIT | BORROW the idea (resume by session id into the same layout) |
+| 5 | ccmanager (kbwo/ccmanager) | Idle is a status label only; "restoring means starting the same command again, not resuming where it left off". Its `isProcessAlive(pid)` check leaves alone sessions owned by another live instance | MIT | BORROW `isProcessAlive` (one instance per session) |
+| 6 | primeline-ai/claude-tmux-orchestration | A heartbeat loop polls live sessions for idle and sends them a message; nothing exits or resumes | MIT | BORROW idle detection by polling, as a fallback to the `idle_prompt` hook |
+| 7 | kungbi/claude-tmux-session | "Lists resumable sessions when reopening in the same directory within 5 minutes" | no LICENSE file found | SKIP (no licence) |
+| 8 | Crystal (now Nimbalyst), vibe-kanban, uzi | No idle, sleep, resume or wake in their READMEs (source not searched: GitHub code search was rate-limited) | MIT, Apache-2.0, MIT | SKIP |
+| 9 | Conductor (conductor.build) | "A cloud sandbox for every agent... isolated microVMs"; no public repo found | UNVERIFIED (closed source not confirmed) | SKIP: cloud, not this Mac |
+| 10 | **systemd socket activation** | "Socket units may be used to implement on-demand starting of services"; a holder keeps the socket and starts the service on the first connection | (documentation) | **BORROW**: the closest analog; the doorbell holds the address and starts the lane on the first message |
+| 11 | **Fly.io autostop/autostart** | "When a request arrives and no Machine is running, Fly Proxy starts a stopped Machine and routes the request to it." "A cold start takes about 2 seconds or more for common apps." "Resuming a suspended Machine takes a few hundred milliseconds." | (documentation) | **BORROW**: wake on request, and a suspend state that wakes faster than a cold start |
+| 12 | **Knative activator** | "It is responsible to queue incoming requests (if a Knative Service is scaled-to-zero)... bring scaled-to-zero Services back up and forward the queued requests." | (documentation) | **BORROW**: queue the message while the lane wakes, then forward it, so nothing is lost |
+| 13 | Cloud Run min-instances | Keeping instances warm "to avoid slow container start times" | (documentation) | SKIP: the opposite of freeing memory |
+
+**What the design takes from each.** The sleep and wake are Orca's (item 1). The doorbell is the messenger acting as the activator (items 10 to 12): it holds the lane's address in the sleep registry, queues the message, calls Orca's `worktree.activate` (or `claude --resume <id>` in the kept pane until Orca exposes activate), waits for the lane to answer, then forwards the queued message. The one-instance check is ccmanager's `isProcessAlive` idea (item 5). The idle signal is the `idle_prompt` hook, with polling as the fallback (item 6).
+
+**The extend path, in order.** (1) Ask Orca to expose `worktree.sleep` and `worktree.activate` as CLI commands. They are runtime methods already; Orca is MIT and on GitHub, so the ask is an issue, or a small PR if the maintainers want one. (2) Until then, Zaal's workspace Sleep in the app is the manual version today, and the doorbell's wake is `claude --resume <id>` in the kept pane. (3) Build only the idle trigger and the doorbell.
+
+Credit (credit-attribution.md): Orca, stablyai/orca, MIT, Lovecast Inc.; claude-squad, smtg-ai, AGPL-3.0 (idea only, no code); ilucin/fleet, MIT; ccmanager, kbwo, MIT; primeline-ai/claude-tmux-orchestration, MIT; the systemd project (socket activation); Fly.io; Knative. Nothing is copied yet; a build that takes code from any MIT project names it at the use site.
+
 ## Comparison
 
 | Option | Frees | Wake | Breaks | Verdict |
@@ -171,7 +201,8 @@ The plugin's `context7` and `playwright` duplicate user-scope entries with ident
 | Action | Owner | Type | By When |
 |---|---|---|---|
 | Add the three `deniedMcpServers` lines to the Orca profile's `settings.json` and dotfiles `claude/settings.json`, then verify with `/mcp` and a process count | Zaal (settings) | settings change | 10:30 sitting |
-| Build the sleep registry and the messenger's doorbell, with the never-sleep check, against the Part 7 tests | quidli or lane-quality, seat picks | dotfiles PR | after Zaal says yes |
+| Ask Orca (stablyai/orca) to expose `worktree.sleep` and `worktree.activate` as CLI commands (an issue on a public repo is outbound) | Zaal decides whether to file it | GitHub issue | after Zaal says yes |
+| Build only the idle trigger and the messenger's doorbell, calling Orca's sleep and activate (or `claude --resume` in the kept pane until activate is in the CLI), with the never-sleep check, against the Part 7 tests | quidli or lane-quality, seat picks | dotfiles PR | after Zaal says yes |
 | Measure an MCP proxy (one shared server, N clients) before adopting one | quidli | measurement | later |
 
 ## Sources
@@ -201,6 +232,22 @@ The plugin's `context7` and `playwright` duplicate user-scope entries with ident
 23. [CRIU](https://criu.org/Main_Page) [FULL: curl; Linux only, no latency figure]
 24. Firecracker snapshot docs [FAILED: HTTP 429]; Reddit r/ClaudeAI and r/ClaudeCode search [FAILED: HTTP 403 from this Mac]
 25. Local, this Mac, 23 Oct 07:02 to 07:30 EDT: `ps`, `top -l 2`, `vm_stat`, `sysctl vm.swapusage`, `lsof`, `orca --help`, `orca worktree list`, the plugin `.mcp.json`, the profile `settings.json` and `.claude.json`, and 105 transcripts of the last 7 days (tool-call counts with a Bash control) [FULL]
+
+Part 8 sources (2026-10-23):
+
+26. GitHub, [stablyai/orca](https://github.com/stablyai/orca) [FULL for what is cited: `gh api` repo metadata, LICENSE (MIT), `src/shared/agent-session-resume.ts`, `src/renderer/src/components/terminal-pane/pty-connection/pty-exit-hibernate.ts`; plus the installed app 1.4.237: `app.asar` bundle strings for `worktree.sleep`, `worktree.activate` and `sleepManagedWorktree`, and `orca agent-context --json` (287 commands) for the two notes quoted]
+27. Orca, [changelog.json](https://onorca.dev/whats-new/changelog.json) [FULL: curl; no suspend, hibernate, sleep or idle entries; resume entries are about chats and SSH workspaces]
+28. Claude Agent SDK, [Sessions](https://code.claude.com/docs/en/agent-sdk/sessions) [FULL: curl, raw]; [TypeScript reference](https://code.claude.com/docs/en/agent-sdk/typescript) [FULL]; [Python reference](https://docs.claude.com/en/docs/agent-sdk/python) [FULL]
+29. GitHub, smtg-ai/claude-squad `session/instance.go` [FULL: gh api; line 424 quoted]
+30. GitHub, [ilucin/fleet](https://github.com/ilucin/fleet) [FULL: README; MIT]
+31. GitHub, [primeline-ai/claude-tmux-orchestration](https://github.com/primeline-ai/claude-tmux-orchestration) [FULL: README; MIT]
+32. GitHub, [kungbi/claude-tmux-session](https://github.com/kungbi/claude-tmux-session) [PARTIAL: README; no LICENSE file found]
+33. GitHub, [stravu/crystal](https://github.com/stravu/crystal) (MIT), [BloopAI/vibe-kanban](https://github.com/BloopAI/vibe-kanban) (Apache-2.0), [devflowinc/uzi](https://github.com/devflowinc/uzi) (MIT) [PARTIAL: README and LICENSE only; code search FAILED, HTTP 403 rate limit]
+34. [Conductor](https://conductor.build) [PARTIAL: site text via curl; no repo found, licence UNVERIFIED]
+35. systemd, [systemd.socket](https://www.freedesktop.org/software/systemd/man/latest/systemd.socket.html) [FULL: curl]
+36. Fly.io, [Autostop/autostart Machines](https://fly.io/docs/launch/autostop-autostart/) [FULL: curl]; the proxy autostop reference [FAILED: HTTP 404]
+37. Knative, [Serving architecture](https://knative.dev/docs/serving/architecture/) and [Scale to zero](https://knative.dev/docs/serving/autoscaling/scale-to-zero/) [FULL: curl]
+38. Google Cloud, [Cloud Run min instances](https://cloud.google.com/run/docs/configuring/min-instances) [FULL: curl]
 
 A research scout fetched sources 7 to 24 (25 sources from 27 tool calls); the load-bearing quotes from #103693 and #63251 were checked against the saved raw text and #103693 against live `gh`.
 

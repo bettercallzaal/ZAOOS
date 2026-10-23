@@ -116,6 +116,22 @@ def test_allowlisted_zao_addresses_pass():
         assert not kinds(f"contact {addr} for access"), addr
 
 
+def test_the_noreply_trailer_line_in_zoe_research_doc_passes():
+    # bot/src/zoe/research-doc.ts:167, verbatim: any edit to this line used to be
+    # refused as third-party PII (2026-10-23).
+    line = ("    await git(['commit', '--quiet', '-m', `docs: ${topic} research doc ${num} "
+            "(ZOE auto-research, tier:STANDARD)\\n\\nCo-Authored-By: Claude Opus 4.8 "
+            "<noreply@anthropic.com>`]);")
+    assert not kinds(line), hits(line, "bot/src/zoe/research-doc.ts")
+
+
+def test_a_personal_address_at_the_same_domain_is_still_refused():
+    # the allowlist names one role address, not the domain. Assembled at runtime,
+    # like the fixtures below, so this file stays stageable by the scanner it tests.
+    personal = "someone" + "@" + "anthropic.com"
+    assert "email" in kinds(f"Co-Authored-By: Someone <{personal}>")
+
+
 def test_zao_role_addresses_pass():
     assert not kinds("email info@thezao.com or team@zabalgamez.com")
 

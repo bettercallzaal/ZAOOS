@@ -5,7 +5,7 @@ globs: src/app/api/**/*.ts
 
 # API Route Conventions
 
-mechanism: none yet (since 2026-10-23, #4150)
+mechanism: src/app/api/__tests__/auth-guards.test.ts, src/app/api/__tests__/admin-guards.test.ts (partial: hand-named routes only; a scan of every route is #4150)
 
 - Validate ALL input with Zod `safeParse` before processing. Return 400 with error details on failure.
 - Check session with `getSession()` before any authenticated operation. Return 401 if missing.

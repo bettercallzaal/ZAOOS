@@ -1,6 +1,6 @@
 # Pre-Merge Gate: security-review the route + run the FULL suite
 
-mechanism: bin/zao-merge-only-guard, bin/zao-merge, .github/workflows/ci.yml (partial: the route read for a 401 guard is human review)
+mechanism: bin/zao-merge-only-guard, bin/zao-merge, .github/workflows/ci.yml (partial: the route read for a 401 guard is human review; ZAO_RAW_GH_MERGE_OK=1 bypasses the merge-only guard)
 
 Typecheck-clean is not auth-clean, and touched-file-green is not suite-green. Incidents (#2829 anonymous board leak, #2830 red main): `research/dev-workflows/2649-rules-history/archive/pre-merge-security-and-suite.md`.
 

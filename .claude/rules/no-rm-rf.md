@@ -1,6 +1,6 @@
 # No rm -rf - Deletion Is Zaal's
 
-mechanism: bin/destructive-guard, claude/policy/destructive_policy.py
+mechanism: bin/destructive-guard, claude/policy/destructive_policy.py (partial: the guard fails open on an internal error; and recursive and find deletes anywhere under the temp roots are allowed where the rule allows one self-created file by exact path; #4121)
 
 Zaal 2026-08-01: "lets never rm rf tbh thats something zaal should always just delete." History: `research/dev-workflows/2649-rules-history/archive/no-rm-rf.md`.
 

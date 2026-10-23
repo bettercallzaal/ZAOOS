@@ -1,6 +1,6 @@
 # Agent Loop Operating Rules
 
-mechanism: bin/destructive-guard, bin/safe-git-push.sh, bin/zao-merge-only-guard, bin/zao-pr-open, .github/workflows/doc-collision-guard.yml (partial: rules 8 and 19 and 38 only)
+mechanism: bin/destructive-guard, bin/safe-git-push.sh, bin/zao-merge-only-guard, bin/zao-pr-open (partial: rules 8 and 38 only; ZAO_RAW_GH_MERGE_OK=1 bypasses the merge-only guard)
 
 Binding for any autonomous /loop or agent building or deploying in this repo (Claude Code sessions and ZOE's own loops). Numbers are STABLE cross-references - never renumber. Incidents, sources and the fold-back history: `research/dev-workflows/2649-rules-history/archive/agent-loops.md`.
 

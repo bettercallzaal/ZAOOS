@@ -1,6 +1,6 @@
 # PII Hygiene
 
-mechanism: .husky/pre-commit, scripts/git-pii-scan.py (partial: a local pre-commit hook with no CI twin)
+mechanism: .husky/pre-commit, scripts/git-pii-scan.py (partial: the staged diff only and a local hook with no CI twin; PR bodies and commit messages and issue text and chat and Bonfire posts are not scanned)
 
 Third-party personal data from connected services (Gmail, Calendar, Drive, GitHub) must not leak through commits, PR/commit text, chat, Bonfire episodes, or public artifacts. Sibling of `secret-hygiene.md`. Threat model and amendment history: `research/dev-workflows/2649-rules-history/archive/pii-hygiene.md`.
 

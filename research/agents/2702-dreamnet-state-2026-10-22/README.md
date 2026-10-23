@@ -22,7 +22,7 @@ tier: STANDARD
 | # | Recommendation | Why | Cost | Unblocks |
 |---|---|---|---|---|
 | 1 | **RE-RUN the Spore conformance checks against the SDK head `f230dd0`, and stop advertising the old pin until it passes.** | `https://zaoos.com/api/spore/verify` still says "PHASE 3 CONFIRMED - 47/47" against SDK commit `4072102a` with hash `sha256:dreamnet-sorted-json:v0`. The SDK is 2 commits and 41 files past that pin. One of the two commits is "Spore Federation Protocol v1.0.0 RFC 8785 JCS" (2026-09-10), and Brandon's proposed hash profile is SHA-256 over RFC 8785. | One agent session: new fixtures plus a test run. No gate, because it is read-only and test-only. | Agreeing Brandon's hash profile. The WaveWarZ receipt adapter (card 1289). The "public-safe receipt layer" in the 18 Oct map (concept 5). |
-| 2 | **CORRECT three stale records in one pass:** the zorca README, the 18 Oct map's "Phase 1 held" line, and the capability card's placeholder values. | The zorca README calls the federation contract "Named, not started" (README.md:41, :94, :116), but `federation/` was merged on 2026-09-27 (federation/README.md:3). The 18 Oct map says Phase 1 waits on Brandon's answers. He answered 9 Oct, and three Phase 1 builds merged on 10-11. | Two small PRs (zorca README, vault note) plus one line on the card. | Anyone reading zorca, Brandon included, gets a true picture. Relays stop asking Brandon for answers he already gave. |
+| 2 | **CORRECT three stale records in one pass:** the zorca README, the 18 Oct map's "Phase 1 held" line, and the capability card's placeholder values. | The zorca README calls the federation contract "Named, not started" (README.md:41, :94, :116), but `federation/` was merged on 2026-09-27 (federation/README.md:3). The 18 Oct map says Phase 1 waits on Brandon's answers, yet three Phase 1 builds merged on 10-11. | Two small PRs (zorca README, vault note) plus one line on the card. | Anyone reading zorca, Brandon included, gets a true picture. Relays stop asking Brandon for answers he already gave. |
 | 3 | **FIND OUT whether `FARCASTER_SIGNER_PROVENANCE_INGEST=1` is set in production. If not, set it after 2026-10-29.** | It is the first Phase 1 build that writes real data. Switching it on was already approved. No record after 2026-10-11 says it was set. This lane cannot read Vercel and does not try. | About 10 minutes of Zaal's time: one env var, a redeploy and one SQL check pasted back. | The first real provenance run. Brandon's test vectors (same-FID A to B, revoke, backfill). The later decision on the retrieval filter. |
 
 ## 1. What DreamNet is today, in plain words
@@ -59,7 +59,7 @@ The 2026-09-19 decision asked Brandon to build dreamloops into zorca. What arriv
 | 2026-10-22 | `dreamnet-whale-league` pushed (Apache-2.0). The commits API shows 0 default-branch commits dated since 10-18, so the push was to another branch or carries older dates. Content not read | `gh api` |
 | none | zorca: no commit since #12 on 2026-10-17. dreamnet-zao (private record): no commit since #6 on 2026-10-14. dreamnet lane status: last entry 2026-10-11 ("IDLE") | `git log`, `gh api`, the lane's status file |
 
-**One contradiction this doc resolves:** the 18 Oct map and the seat's status both say Phase 1 waits on Brandon's answers. He answered 9 Oct, and #3904, #3905 and #3906 then merged on 10-11. **Phase 1 is not held. It is waiting on flags and on Brandon's golden vectors.**
+**One contradiction this doc resolves:** the 18 Oct map and the seat's status both say Phase 1 waits on Brandon's answers, yet #3904, #3905 and #3906 (the Phase 1 builds) merged on 2026-10-11. **Phase 1 is not held. It is waiting on flags and on Brandon's golden vectors.**
 
 ## 3. Where The ZAO and DreamNet connect, and who builds what
 
@@ -105,7 +105,7 @@ The 2026-09-19 decision asked Brandon to build dreamloops into zorca. What arriv
 |---|---|---|---|
 | Re-run Spore conformance against `BrandonDucar/dreamnet-spore-sdk@f230dd0`. Shipped when a ZAOOS PR lands new fixtures and the endpoint's `conformance` block names the new commit, or says FAILED with the failing checks | dreamnet lane | PR | 2026-10-29 |
 | zorca README: replace "Named, not started" (lines 41, 94, 116) with the true state of `federation/`, and mark the card's hashes as placeholders. Shipped when a zorca PR is merged | dreamnet lane | PR | 2026-10-26 |
-| Vault: append a dated correction to the 18 Oct ecosystem map saying Phase 1 is not held (Brandon answered 9 Oct). Shipped when a vault PR is merged | dreamnet lane | PR | 2026-10-26 |
+| Vault: append a dated correction to the 18 Oct ecosystem map saying Phase 1 is not held (its builds merged 2026-10-11). Shipped when a vault PR is merged | dreamnet lane | PR | 2026-10-26 |
 | Say whether `FARCASTER_SIGNER_PROVENANCE_INGEST=1` is set on Vercel Production. If not, set it, redeploy and paste the SQL check. Shipped when the check result is in the dreamnet lane status file | Zaal | Env change | 2026-10-30 |
 
 ## Sources

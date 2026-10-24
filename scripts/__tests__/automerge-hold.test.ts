@@ -9,7 +9,7 @@
  * what the real `gh pr merge --disable-auto` returns. Those need a live PR.
  */
 import { spawnSync } from 'node:child_process';
-import { chmodSync, existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { chmodSync, existsSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
@@ -21,6 +21,7 @@ vi.setConfig({ testTimeout: 60_000 });
 const ROOT = join(__dirname, '..', '..');
 const AUTOMERGE = readFileSync(join(ROOT, '.github/workflows/docs-automerge.yml'), 'utf8');
 const CLEAR = readFileSync(join(ROOT, '.github/workflows/licence-clear.yml'), 'utf8');
+const SWEEP = readFileSync(join(ROOT, '.github/workflows/merge-pause-sweep.yml'), 'utf8');
 
 /** The lines of one step, from its `- name:` line to the next step. */
 function stepLines(workflow: string, name: string): string[] {
@@ -70,6 +71,9 @@ interface Stub {
   offBefore?: 'true' | 'false';
   /** `.auto_merge == null` after a --disable-auto call. */
   offAfter?: 'true' | 'false';
+  /** PR numbers the open-PR list reports as armed (the sweep). */
+  armed?: string[];
+  armedFail?: boolean;
 }
 
 interface Ran {
@@ -85,6 +89,10 @@ case "$*" in
   *"/labels?per_page=100"*)
     [ "$STUB_LABELS_FAIL" = "1" ] && exit 1
     [ -n "$STUB_LABELS" ] && printf '%s\\n' "$STUB_LABELS"
+    exit 0 ;;
+  *"pulls?state=open"*)
+    [ "$STUB_ARMED_FAIL" = "1" ] && exit 1
+    [ -n "$STUB_ARMED" ] && printf '%s\\n' "$STUB_ARMED"
     exit 0 ;;
   *"--disable-auto"*)
     touch "$STUB_CALLS.disabled"; exit 0 ;;
@@ -118,6 +126,8 @@ function run(script: string, stub: Stub, env: Record<string, string> = {}): Ran 
       STUB_LABELS_FAIL: stub.labelsFail ? '1' : '0',
       STUB_OFF_BEFORE: stub.offBefore ?? 'true',
       STUB_OFF_AFTER: stub.offAfter ?? 'true',
+      STUB_ARMED: (stub.armed ?? []).join('\n'),
+      STUB_ARMED_FAIL: stub.armedFail ? '1' : '0',
       ...env,
     },
   });
@@ -318,9 +328,77 @@ describe('the repo pause switch also stops licence-clear (ZAOOS #4059)', () => {
   });
 
   it('every workflow that calls gh pr merge reads the pause switch', () => {
-    for (const wf of [AUTOMERGE, CLEAR]) {
-      expect(wf.includes('gh pr merge')).toBe(true);
-      expect(wf).toContain('vars.ZAO_MERGES_PAUSED');
+    // Read from the directory, not a list, so a new merging workflow cannot skip it.
+    const dir = join(ROOT, '.github/workflows');
+    const merging = readdirSync(dir)
+      .filter((f) => /\.ya?ml$/.test(f))
+      .filter((f) => readFileSync(join(dir, f), 'utf8').includes('gh pr merge'));
+    expect(merging).toEqual(expect.arrayContaining(['docs-automerge.yml', 'licence-clear.yml', 'merge-pause-sweep.yml']));
+    for (const f of merging) {
+      expect(readFileSync(join(dir, f), 'utf8'), f).toContain('vars.ZAO_MERGES_PAUSED');
     }
+  });
+});
+
+describe('merge-pause-sweep disarms PRs armed before the pause (ZAOOS #4059)', () => {
+  const SWEEP_RUN = runBlock(SWEEP, 'Disarm every armed PR while merges are paused');
+  const disables = (r: Ran) => r.calls.filter((c) => c.includes('--disable-auto'));
+
+  it('runs on a schedule and by hand, and reads the switch through env', () => {
+    expect(SWEEP).toMatch(/^\s+schedule:/m);
+    expect(SWEEP).toMatch(/^\s+workflow_dispatch:/m);
+    expect(stepLines(SWEEP, 'Disarm every armed PR while merges are paused').map((l) => l.trim())).toContain(
+      'MERGES_PAUSED: ${{ vars.ZAO_MERGES_PAUSED }}',
+    );
+    expect(SWEEP_RUN).not.toContain('${{');
+  });
+
+  it('paused: every armed PR is disarmed and re-read, and the run is green', () => {
+    const r = run(SWEEP_RUN, { armed: ['12', '34'], offBefore: 'false', offAfter: 'true' }, { MERGES_PAUSED: 'true' });
+    expect(r.status).toBe(0);
+    expect(disables(r)).toEqual([
+      'pr merge 12 --repo owner/repo --disable-auto',
+      'pr merge 34 --repo owner/repo --disable-auto',
+    ]);
+    expect(r.log).toContain('2 armed PR(s) found, every one confirmed off');
+  });
+
+  it('not paused: lists nothing and disarms nothing', () => {
+    for (const v of ['', 'false', '0', 'no']) {
+      const r = run(SWEEP_RUN, { armed: ['12'] }, { MERGES_PAUSED: v });
+      expect(r.status, v).toBe(0);
+      expect(r.calls, v).toEqual([]);
+    }
+  });
+
+  it('paused, any case of true/1/yes', () => {
+    for (const v of ['TRUE', 'Yes', '1']) {
+      const r = run(SWEEP_RUN, { armed: ['12'] }, { MERGES_PAUSED: v });
+      expect(disables(r), v).toHaveLength(1);
+    }
+  });
+
+  it('fails closed when the open PRs cannot be listed', () => {
+    const r = run(SWEEP_RUN, { armedFail: true }, { MERGES_PAUSED: 'true' });
+    expect(r.status).not.toBe(0);
+    expect(r.log).toContain('could not list the open PRs');
+  });
+
+  it('fails closed, naming the PR, when auto-merge stays on after the disarm', () => {
+    const r = run(SWEEP_RUN, { armed: ['12'], offBefore: 'false', offAfter: 'false' }, { MERGES_PAUSED: 'true' });
+    expect(r.status).not.toBe(0);
+    expect(r.log).toContain('could not be confirmed off on: #12');
+  });
+
+  it('never merges, only disarms', () => {
+    const r = run(SWEEP_RUN, { armed: ['12'] }, { MERGES_PAUSED: 'true' });
+    expect(r.calls.filter((c) => c.startsWith('pr merge') && !c.includes('--disable-auto'))).toEqual([]);
+    expect(SWEEP_RUN.match(/gh pr merge/g)).toHaveLength(1);
+  });
+
+  it('paused with nothing armed is green and says 0', () => {
+    const r = run(SWEEP_RUN, { armed: [] }, { MERGES_PAUSED: 'true' });
+    expect(r.status).toBe(0);
+    expect(r.log).toContain('0 armed PR(s) found');
   });
 });

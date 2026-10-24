@@ -72,8 +72,9 @@ jobs:
           #   gh variable set ZAO_MERGES_PAUSED --body true -R <repo>   pause
           #   gh variable delete ZAO_MERGES_PAUSED -R <repo>            resume
           # A variable, not a file, so pausing needs no merge. Setting it fires no
-          # event: a PR armed BEFORE the pause stays armed until its next event, so
-          # pausing also needs the sweep in the PR that added this.
+          # event: a PR armed BEFORE the pause stays armed until its next event.
+          # merge-pause-sweep.yml disarms those (every 15 min, or run it by hand:
+          #   gh workflow run merge-pause-sweep.yml -R <repo>   right after pausing).
           MERGES_PAUSED: ${{ vars.ZAO_MERGES_PAUSED }}
         run: |
           held=false

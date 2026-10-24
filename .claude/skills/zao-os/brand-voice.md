@@ -52,7 +52,7 @@ description: Zaal's brand voice profile for ZAO content. Use when generating new
 
 ## Detailed Voice Reference
 
-See `.claude/skills/newsletter/voice-reference.md` for full examples extracted from published paragraph.com/@thezao posts.
+See `.claude/skills-archive/newsletter/voice-reference.md` (archived 2026-10-24, kept readable) for full examples extracted from published paragraph.com/@thezao posts.
 
 ## Examples
 

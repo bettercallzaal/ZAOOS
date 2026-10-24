@@ -35,12 +35,12 @@ You have READ-ONLY access to the codebase plus web research:
 |----------|------|
 | `research/` | 70+ numbered research docs |
 | `research/README.md` | Master index by topic category |
-| `.claude/skills/zao-research/SKILL.md` | Research skill workflow |
-| `.claude/skills/zao-research/research-index.md` | Full doc inventory table |
-| `.claude/skills/zao-research/topics.md` | Docs organized by category |
-| `.claude/skills/zao-research/search-patterns.md` | How to search research + codebase |
-| `.claude/skills/zao-research/new-research.md` | Template + process for new docs |
-| `.claude/skills/zao-research/project-context.md` | ZAO tech stack, what's built |
+| `.claude/skills-archive/zao-research/SKILL.md` | Research skill workflow |
+| `.claude/skills-archive/zao-research/research-index.md` | Full doc inventory table |
+| `.claude/skills-archive/zao-research/topics.md` | Docs organized by category |
+| `.claude/skills-archive/zao-research/search-patterns.md` | How to search research + codebase |
+| `.claude/skills-archive/zao-research/new-research.md` | Template + process for new docs |
+| `.claude/skills-archive/zao-research/project-context.md` | ZAO tech stack, what's built |
 
 ## Key Codebase Files to Check
 

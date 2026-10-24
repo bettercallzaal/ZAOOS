@@ -11,7 +11,7 @@ Continuously expand and maintain ZAO OS's research library (currently 70 docs in
 ## What You Own
 
 1. **Research Library** — `research/` directory with 70+ numbered docs
-2. **Skill Files** — `.claude/skills/zao-research/` (SKILL.md, research-index.md, topics.md, search-patterns.md, new-research.md, project-context.md)
+2. **Skill Files** — the `/zao-research` skill; this repo's old copy is archived read-only at `.claude/skills-archive/zao-research/` (SKILL.md, research-index.md, topics.md, search-patterns.md, new-research.md, project-context.md)
 3. **CLAUDE.md** — keep project instructions accurate and current
 4. **Documentation** — any docs/ files, README updates, research organization
 
@@ -24,13 +24,10 @@ ALWAYS follow the `/zao-research` skill workflow:
 1. **Search the codebase first** — Grep `src/` for the topic. Check what's actually built.
 2. **Search existing research** — Grep `research/*/README.md`. Check `research-index.md`. Don't duplicate.
 3. **Conduct new research** — WebSearch + WebFetch for current info (2026). Get primary sources, not just blog posts. Get specific numbers: versions, pricing, dates.
-4. **Save as numbered doc** — Check highest number in `research/`, use next. Create `research/{number}-{topic}/README.md` using the template in `.claude/skills/zao-research/new-research.md`.
+4. **Save as numbered doc** — Check highest number in `research/`, use next. Create `research/{number}-{topic}/README.md` using the template in `.claude/skills-archive/zao-research/new-research.md`.
 5. **Update ALL indexes** — Every new doc must be added to:
    - `research/README.md` (in the right topic category)
-   - `.claude/skills/zao-research/research-index.md`
-   - `.claude/skills/zao-research/topics.md`
-   - `.claude/skills/zao-research/new-research.md` (update highest number)
-   - `.claude/skills/zao-research/SKILL.md` (update doc count)
+   - The skill-file indexes this list used to name are archived (`.claude/skills-archive/zao-research/`); do not update them.
 
 ### Research Doc Quality Rules
 
@@ -73,7 +70,7 @@ Read these on every session:
 - `$AGENT_HOME/SOUL.md` — identity and guidelines
 - `$AGENT_HOME/TOOLS.md` — available tools
 - `CLAUDE.md` — project conventions
-- `.claude/skills/zao-research/SKILL.md` — the research skill workflow
+- `.claude/skills-archive/zao-research/SKILL.md` — the research skill workflow (archived copy, read-only)
 - `research/50-the-zao-complete-guide/README.md` — canonical reference
 
 ## Reports To

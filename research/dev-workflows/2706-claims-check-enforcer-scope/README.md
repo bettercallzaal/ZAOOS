@@ -17,7 +17,7 @@ tier: QUICK
 
 | # | Decision | Why |
 |---|---|---|
-| 1 | **SKIP the single text-scanning "claims check" the issue proposes.** Build per-rule mechanisms at the point each claim is made. | `confirm-before-claiming-absence.md` already records that a regex over prose was tried on 2026-08-10 and "fired only on false positives and missed the real case". Measured again here: a keyword regex for typed clock times matched 13 October entries, of which 6 were typed times (46 percent). Prose is the wrong surface. |
+| 1 | **SKIP the single text-scanning "claims check" the issue proposes.** Build per-rule mechanisms at the point each claim is made. | `confirm-before-claiming-absence.md` already records that a regex over prose was tried on 2026-08-10 and "fired only on false positives and missed the real case". Measured again here: the placeholder-time regex `\b\d{1,2}:\d[x]\b` matched 12 October entries, of which 4 are entries about a typed time (33 percent); the list is under "Typed-time shortlist" below. Prose is the wrong surface. |
 | 2 | **EXTEND `sendmessage-sha-check` with a placeholder-time refusal** (`\b\d{1,2}:\d[x]\b`, as in "11:5x") for measurement-traps and anti-fabrication. | The tool is already a PreToolUse hook on SendMessage and already refuses one kind of fabricated identifier. It would have caught 3 of the 6 typed-time entries. A placeholder digit is never a real reading, so expected false positives are near zero. It cannot catch a full time typed by feel ("13:30 EDT"). |
 | 3 | **Anti-fabrication rule 6 (claim before the result): use process gates, not text.** The narrowest are: a verdict is not posted while the head's CI is unfinished; and SendMessage refuses a PR number or branch named as merged or pushed that the remote does not show. | This is the biggest bucket (9 entries) and no text check sees it: "pushed" reads the same whether or not the push landed. The second gate is a PR-number existence check on `sendmessage-sha-check`, queued by quidli as a follow-up to dotfiles #601 (not yet built or claimed elsewhere). |
 | 4 | **Confirm-before-claiming-absence: do NOT build a hook.** Require the `zao-assert none` output line next to any absence claim in a verdict or doc, as skill text in zao-evaluate and zao-research. | 9 entries. The tool exists and exits 2 on an empty or unreadable path set. Every miss was a search that could not see the thing (a stale clone, a truncated `head`, a grep that could not match optional chaining, the wrong search words), which is the input `zao-assert` refuses. The rule bans the regex-hook route. |
@@ -26,9 +26,9 @@ tier: QUICK
 
 ## What was measured
 
-Source: vault `MISTAKES.md` on origin/main, read 2026-10-23. It holds 331 entries, of which **142 are dated October 2026**. The top shapes are trusted-my-own-unexamined-input (33), unmeasured-prediction-in-a-record (29) and surface-cannot-report-state (23).
+Source: vault `MISTAKES.md` on origin/main, read 2026-10-23; the counts reproduce at vault commit b95b1fc8 (`## 2026-10-` headings; one heading appears twice, so 142 counts headings, not unique entries). It holds 331 entries, of which **142 are dated October 2026**. The top shapes are trusted-my-own-unexamined-input (33), unmeasured-prediction-in-a-record (29) and surface-cannot-report-state (23).
 
-**Method.** Each October entry was read by title and its "What happened" line and placed in at most one bucket below, by one reader (quidli). A keyword regex was used only to shortlist; every placement was then read by hand. A second reader has not checked the placements, so the counts are one reading, not a measurement two people agree on.
+**Method.** Each October entry was read by title and its "What happened" line and placed in at most one bucket below, by one reader (quidli). A keyword regex was used only to shortlist; every placement was then read by hand. An evaluator spot-checked 18 placements against entry titles on 2026-10-23 and found them consistent. It also noted two CI-timing entries (6 and 9 Oct) that would fit the claim-before-the-result bucket, so that bucket's count is low. Beyond that, the counts are one reader's, not a measurement two readers agree on.
 
 | Bucket (rule) | October entries | Examples (entry titles, shortened) | Narrowest mechanism | Would have caught | False-positive risk |
 |---|---|---|---|---|---|
@@ -40,6 +40,29 @@ Source: vault `MISTAKES.md` on origin/main, read 2026-10-23. It holds 331 entrie
 | Fabricated citation (research-grounding) | 0 | none in October | URL liveness warning in CI (deferred) | 0 | Medium if it fails rather than warns |
 
 27 of the 142 October entries fall in these buckets. The rest belong to other rules and other issues (chain commits, routing, permissions, private content).
+
+### Typed-time shortlist
+
+**Correction.** An earlier version of this doc said "a keyword regex for typed clock times matched 13 October entries, of which 6 were typed times (46 percent)". It gave neither the regex nor the 13 entries, and the 13 could not be reproduced. On 2026-10-25, over October entries at b95b1fc8, the candidate patterns matched: `\b\d{1,2}:\d[x]\b` 12, `\b\d{1,2}:\d[0-9x]\b` 42, `\d{1,2}:\d[0-9xX]` 47, and a full time followed by a zone 30. None matched 13. The numbers below use the first pattern, the one Decision 2 proposes.
+
+The 12 entries matching `\b\d{1,2}:\d[x]\b`, by heading date and short title. **About a typed time** marks the 4 entries whose mistake is a time typed without the clock.
+
+| # | Date | Entry (short title) | About a typed time |
+|---|---|---|---|
+| 1 | 23 Oct | messenger pinned ZAOstock #486 as merge-lane | no |
+| 2 | 22 Oct | board-burn typed clock times ahead of date(1) into three card notes | yes |
+| 3 | 16 Oct | zcaster push line had no cd, ran in ZAOOS clone | no |
+| 4 | 4 Oct | Dotfiles attached a default to a public factual claim on ZAOstock #443 | no |
+| 5 | 4 Oct | Dotfiles merged zaal-dotfiles #417 before its CI had reported | no |
+| 6 | 1 Oct | context lane wrote 'measured at 11:5x' in three messages | yes |
+| 7 | 1 Oct | REPEAT within twenty minutes: hub emitted without block 3 | no |
+| 8 | 1 Oct | REPEAT (third today): feedback-clip build asserted, chain emitted nothing | no |
+| 9 | 2 Oct | x-account clip renames ran sed over the whole status file | no |
+| 10 | 12 Oct | A measurement time typed by feel into a PR body (dotfiles 515) | yes |
+| 11 | 22 Oct | messenger read a CI run's createdAt as its job start | no |
+| 12 | 22 Oct | Seat typed ruling times from memory, ahead of the clock | yes |
+
+The other 8 match because the entry itself writes a rough time ("about 03:3x EDT"). That is the false-positive problem with a regex over prose. It also bears on Decision 2: a refusal on SendMessage would block such approximate times in messages too. Under the clock rule they are not readings, so this doc counts that as intended, but the hook PR should say so.
 
 ## What already enforces part of this
 
@@ -66,7 +89,7 @@ So #4151's rules are not unenforced: four tools each refuse one narrow form. The
 
 ## Sources
 
-- Vault `MISTAKES.md`, origin/main, read 2026-10-23 [FULL, `git show`]; 142 October entries counted by date heading.
+- Vault `MISTAKES.md`, origin/main, read 2026-10-23 [FULL, `git show`]; 142 October entries counted by date heading. Re-read 2026-10-25 at vault commit b95b1fc8 [FULL, `git show b95b1fc8:MISTAKES.md`] for the typed-time shortlist.
 - ZAOOS issue #4151 [FULL, `gh issue view`].
 - `.claude/rules/confirm-before-claiming-absence.md` (the failed regex hook, 2026-08-10) [FULL].
 - `~/bin/sendmessage-sha-check` and `~/bin/zao-claims-check` docstrings [FULL, read from disk].

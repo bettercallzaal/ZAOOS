@@ -48,6 +48,10 @@ EMAIL_ALLOW = {
     "zoe-zao@agentmail.to",
     "hello@thezao.com",
     "support@thezao.com",
+    # A public no-reply ROLE address, not a person: the Co-Authored-By trailer
+    # that ZOE writes into its own commits (bot/src/zoe/research-doc.ts). Any
+    # edit to that line was refused as third-party PII (2026-10-23).
+    "noreply@anthropic.com",
 }
 # From pii-hygiene.md's "Venue address allowlist" section (added 2026-09-06).
 # A commercial venue's OWN PUBLISHED address is not third-party personal data.

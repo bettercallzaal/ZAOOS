@@ -1,0 +1,72 @@
+name: merge-pause-sweep
+
+# THE OTHER HALF OF THE REPO PAUSE SWITCH (ZAOOS #4059, 2026-10-24).
+#
+# docs-automerge.yml and licence-clear.yml read the repository variable
+# ZAO_MERGES_PAUSED on every PR event. But setting a variable fires no event, so a
+# PR whose auto-merge was armed BEFORE the pause stays armed, and GitHub merges it
+# the moment its checks pass - while merges are paused. This sweep is what turns
+# those off: every open PR with auto-merge armed is disarmed, then re-read.
+#
+#   gh variable set ZAO_MERGES_PAUSED --body true -R <repo>   pause
+#   gh workflow run merge-pause-sweep.yml -R <repo>           disarm now
+#   gh variable delete ZAO_MERGES_PAUSED -R <repo>            resume
+#
+# Run it by hand right after pausing: the schedule below is a backstop, and GitHub
+# delays scheduled runs. Without the variable set it reads nothing and exits 0.
+#
+# FAILS CLOSED. If the open PRs cannot be listed, or any armed PR cannot be
+# confirmed off by a re-read, the run fails red and names the PRs left.
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: merge-pause-sweep
+  cancel-in-progress: false
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Disarm every armed PR while merges are paused
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          MERGES_PAUSED: ${{ vars.ZAO_MERGES_PAUSED }}
+        run: |
+          case "$(printf '%s' "${MERGES_PAUSED:-}" | tr '[:upper:]' '[:lower:]')" in
+            true|1|yes) ;;
+            *) echo "sweep: merges are not paused (ZAO_MERGES_PAUSED unset or not true) - nothing to do"; exit 0 ;;
+          esac
+          if ! armed=$(gh api --paginate "repos/$REPO/pulls?state=open&per_page=100" --jq '.[] | select(.auto_merge != null) | .number'); then
+            echo "::error title=pause::could not list the open PRs - armed auto-merges may still merge; turn them off by hand"
+            exit 1
+          fi
+          n=0
+          left=""
+          for pr in $armed; do
+            case "$pr" in
+              ''|*[!0-9]*) echo "::error title=pause::not a PR number: '$pr'"; left="$left ?"; continue ;;
+            esac
+            n=$((n + 1))
+            # The exit status of --disable-auto is not the evidence; the re-read is.
+            gh pr merge "$pr" --repo "$REPO" --disable-auto || true
+            off=$(gh api "repos/$REPO/pulls/$pr" --jq '.auto_merge == null') || off=unknown
+            if [ "$off" = "true" ]; then
+              echo "sweep: auto-merge is off on #$pr"
+            else
+              left="$left #$pr"
+            fi
+          done
+          if [ -n "$left" ]; then
+            echo "::error title=pause::merges are paused but auto-merge could not be confirmed off on:$left - turn it off by hand"
+            exit 1
+          fi
+          echo "::notice title=pause::merges are paused - $n armed PR(s) found, every one confirmed off"

@@ -56,6 +56,8 @@ export async function POST(req: NextRequest) {
         if (!user.primary_wallet) continue;
         try {
           // Search Neynar for this wallet address
+          // Stays on Neynar (doc 2418 D6 PR 3): this route writes what it reads into
+          // users, and Hypersnap's bulk-by-address shape differs (not keyed by address)
           const response = await fetch(
             `https://api.neynar.com/v2/farcaster/user/bulk-by-address?addresses=${user.primary_wallet}`,
             { headers: { api_key: process.env.NEYNAR_API_KEY || '' } },
@@ -117,6 +119,7 @@ export async function POST(req: NextRequest) {
         if (fids.length === 0) continue;
 
         try {
+          // Stays on Neynar (doc 2418 D6 PR 3): this route writes what it reads into users
           const response = await fetch(
             `https://api.neynar.com/v2/farcaster/user/bulk?fids=${fids.join(',')}`,
             { headers: { api_key: process.env.NEYNAR_API_KEY || '' } },
@@ -226,6 +229,7 @@ export async function POST(req: NextRequest) {
         if (fids.length === 0) continue;
 
         try {
+          // Stays on Neynar (doc 2418 D6 PR 3): this route writes what it reads into users
           const response = await fetch(
             `https://api.neynar.com/v2/farcaster/user/bulk?fids=${fids.join(',')}`,
             { headers: { api_key: process.env.NEYNAR_API_KEY || '' } },

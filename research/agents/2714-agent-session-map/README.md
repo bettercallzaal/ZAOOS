@@ -14,6 +14,8 @@ Zaal wants one screen, open beside the seat inside Orca, that shows every sessio
 
 ## Key decisions
 
+> **Seat ruling, 2026-10-24 (vault 320bf0e5):** the agent-map lane builds this session map by EXTENDING its existing local estate page on port 7477 (zaal-dotfiles #747 and #754), local-only. That replaces "our own small page" in decision 1 below; the data sources and the 127.0.0.1-only rule stand.
+
 | # | Decision | Why |
 |---|---|---|
 | 1 | **BUILD our own small page. Fork nothing.** | None of the 20 tools surveyed below draws messages between sessions, and that is the part Zaal asked for ("how they interact with each other"). Every node, state and edge we need is already on disk here (section "What this Mac already records"). |

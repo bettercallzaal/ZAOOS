@@ -4,7 +4,7 @@
 topic: agents
 type: research
 status: archive-candidate
-last-validated: 2026-05-21
+last-validated: 2026-10-24
 original-query: Define deployment steps and integration plan for OpenClaw, Paperclip, and ElizaOS stack (reconstructed)
 tier: archive
 note: All three frameworks (OpenClaw, Paperclip, ElizaOS migration) decommissioned 2026-05-04. Doc archived as historical deployment reference.
@@ -308,6 +308,22 @@ Add Discord channel to OpenClaw:
 | Neynar API | $0 (free tier) | 1000 req/day covers ZAO's volume |
 | GitHub | $0 | Fine-grained PAT, no paid features needed |
 | **Total** | **~$15/mo** | Full 3-layer agent stack |
+
+## Updated 2026-10-24
+
+Both Paperclip and ElizaOS have had significant development since ZAO decommissioned this stack (2026-05-04). This doc remains historical reference; none of these changes are relevant to ZAO's current architecture (ZOE + Claude Code).
+
+**Paperclip** is actively maintained. Key releases since May 2026 (sources: GitHub releases page, fetched 2026-10-24, FULL):
+
+- v2026.916.0 (Sep 16): AI credentials moved into a Connections system with per-account grants; agents now get their own email via AgentMail; experimental chat connectors for Slack, Discord, Telegram, Teams, iMessage; GitHub per-person App identities. Breaking: agent APIs stop returning plaintext credentials.
+- v2026.1012.0 (Oct 12): Outside assistants (Claude Code, Codex, OpenCode, other MCP clients) can connect to Paperclip and delegate work; unified Connections catalog; Claude Sonnet 5.5 and GPT-6.1 Sol added to model list.
+- v2026.1023.0 (Oct 23): Private tasks and projects, bring-your-own model gateways (OpenRouter, Bedrock, Gemini, generic), Slack bots via Manifest API, two-screen GitHub review bot with a "Paperclip Review" status check. Breaking: Operator role permissions expanded, budgets block unpriced usage by default.
+
+The Claude Code / Paperclip integration (v2026.1012.0) would allow using Paperclip as a task layer driven by Claude Code sessions, the inverse of the original design in this doc.
+
+**ElizaOS** remains in beta as of late June 2026 (latest confirmed: v2.0.3-beta.7, Jun 28). Farcaster was removed from the steward OAuth modal in that beta release. The Farcaster plugin referenced in this doc (v1.0.5) is no longer part of the default onboarding flow. ElizaOS has no stable v2 release recorded on GitHub as of this validation (sources: GitHub releases page, fetched 2026-10-24, FULL for page 2; page 1 contained only PR evidence asset tags, not product releases).
+
+**OpenClaw** - no new public release data found in this validation run (source: WebSearch, standard, 2026-10-24, no dedicated result).
 
 ## Sources
 

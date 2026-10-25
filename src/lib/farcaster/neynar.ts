@@ -607,11 +607,18 @@ export async function getFollowSuggestions(fid: number, limit = 20) {
   return res.json();
 }
 
+/**
+ * Frame (mini app) reads go straight to Neynar. Hypersnap lists /frame/catalog,
+ * /frame/search and /frame/relevant as not implemented and answers HTTP 501
+ * (src/api/http.rs), so through fetchWithFailover every call paid a failed
+ * read-base round trip and a failover warning before reaching Neynar. Measured
+ * on haatz 2026-10-23: 501 on all three paths, 6 of 6 calls each.
+ */
 export async function getFrameCatalog(limit = 20, cursor?: string) {
   const params = new URLSearchParams({ limit: String(limit) });
   if (cursor) params.set('cursor', cursor);
-  const res = await fetchWithFailover(`/frame/catalog?${params}`, {
-    headers: readHeaders(),
+  const res = await fetch(`${NEYNAR_BASE}/frame/catalog?${params}`, {
+    headers: headers(),
     signal: AbortSignal.timeout(10000),
   });
   if (!res.ok) throw new Error(`Neynar frame catalog error: ${res.status}`);
@@ -620,8 +627,8 @@ export async function getFrameCatalog(limit = 20, cursor?: string) {
 
 export async function searchFrames(query: string, limit = 20) {
   const params = new URLSearchParams({ q: query, limit: String(limit) });
-  const res = await fetchWithFailover(`/frame/search?${params}`, {
-    headers: readHeaders(),
+  const res = await fetch(`${NEYNAR_BASE}/frame/search?${params}`, {
+    headers: headers(),
     signal: AbortSignal.timeout(10000),
   });
   if (!res.ok) throw new Error(`Neynar frame search error: ${res.status}`);
@@ -630,8 +637,8 @@ export async function searchFrames(query: string, limit = 20) {
 
 export async function getRelevantFrames(fid: number, limit = 20) {
   const params = new URLSearchParams({ fid: String(fid), limit: String(limit) });
-  const res = await fetchWithFailover(`/frame/relevant?${params}`, {
-    headers: readHeaders(),
+  const res = await fetch(`${NEYNAR_BASE}/frame/relevant?${params}`, {
+    headers: headers(),
     signal: AbortSignal.timeout(10000),
   });
   if (!res.ok) throw new Error(`Neynar relevant frames error: ${res.status}`);

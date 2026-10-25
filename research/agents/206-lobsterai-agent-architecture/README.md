@@ -4,7 +4,7 @@
 topic: agents
 type: research
 status: research-complete
-last-validated: 2026-05-21
+last-validated: 2026-10-25
 original-query: Evaluate LobsterAI agent architecture patterns transferable to ZAO OS skill system (reconstructed)
 tier: reference
 ---
@@ -111,9 +111,35 @@ The **scheduled tasks** skill (cron expressions for daily digests, periodic repo
 - **Redux state management** — ZAO OS uses React Query, different paradigm
 - **SQLite local storage** — ZAO OS uses Supabase PostgreSQL with RLS
 
+## Updated 2026-10-25
+
+**Repo growth since last validation (May 2026):** Stars 4,706 -> 6,200 (+32%), Forks 674 -> 977 (+45%), Open Issues 579 -> 150 (backlog cleared), Commits 4,599 on main. Active bi-weekly release cadence throughout the period. Sources: GitHub repo page (FULL fetch, 2026-10-25), GitHub releases page (FULL fetch, 2026-10-25).
+
+**New features of note for ZAO OS (Sep-Oct 2026 releases):**
+
+1. **MCP Connector Marketplace (2026.10.23)** -- Remote MCP connectors now installable from an in-app marketplace with browser-based OAuth or guided credential forms. This is the closest parallel to how ZAO OS wires MCP tools (doc 801/802), and the marketplace pattern could inform ZAO's own connector discovery UX. Source: https://github.com/netease-youdao/LobsterAI/releases
+2. **Computer Use on macOS (2026.10.13)** -- Native macOS computer-use added, Apple Silicon and Intel. Prior doc noted Electron/desktop as non-transferable; this is now also available via Claude's computer-use API, which ZAO could access directly without LobsterAI.
+3. **Office Document Editing (2026.10.13)** -- Word, Excel, PowerPoint created and edited in-app with AI-assisted updates. ZAO OS has xlsx/pptx/docx Anthropic skills; the pattern of agent-native doc editing is now validated at production scale.
+4. **OpenClaw upgraded to v2026.8.1 (2026.9.14)** -- Important because `scripts/openclaw-setup-github.sh` in this repo depends on OpenClaw. Check whether the local OpenClaw integration needs updating against this release.
+5. **Subagent Session Visibility (2026.9.20)** -- Per-subagent session tracking added. Aligns with ZAO's multi-agent architecture in `src/lib/agents/`; visibility pattern is worth adopting for ZOE's orchestrator loop.
+6. **Expert Plaza (2026.10.16)** -- Configurable marketplace of expert personas. For a community platform like ZAO (188+ members), a curated "expert" layer over ZOE's persona system (`bot/src/zoe/brand.md`) is a new pattern.
+7. **Desktop Companion (2026.10.16)** -- Always-on overlay with translation, read-aloud, quick input, and capture. Not directly transferable (Electron), but the "capture anywhere" pattern maps to ZOE's `capq:` capture flow.
+8. **Memory flush opt-in (2026.9.14)** -- Users can now explicitly flush memory. ZAO OS's planned Supabase memory store should expose an equivalent user-facing control.
+
+**Removed since last validation:**
+- Film and music search skills retired (2026.10.16). Both were already marked SKIP in this doc; no impact.
+- Background jobs removed from Cowork sessions (2026.9.20). The Cowork architecture section in this doc described background job execution as a pattern; that specific feature no longer exists in LobsterAI. The approval-gated step pattern still stands.
+
+**Recommendation updates:**
+- The MCP Connector Marketplace pattern (item 1) upgrades the IM bridge INVESTIGATE to ADOPT for connector discovery UX.
+- OpenClaw v2026.8.1 upgrade (item 4) is actionable: verify `scripts/openclaw-setup-github.sh` targets the right version.
+- No changes to the SKIP items (desktop, single-user, Chinese cloud drives, Redux, SQLite).
+
 ## Sources
 
-- [LobsterAI GitHub Repository](https://github.com/netease-youdao/LobsterAI) — MIT license, 4,706 stars
+- [LobsterAI GitHub Repository](https://github.com/netease-youdao/LobsterAI) — MIT license, 6,200 stars as of 2026-10-25 (FULL fetch)
+- [LobsterAI GitHub Releases](https://github.com/netease-youdao/LobsterAI/releases) — release history Sep-Oct 2026 (FULL fetch)
+- [LobsterAI 2026.10.16 Release Notes](https://github.com/netease-youdao/LobsterAI/releases/tag/2026.10.16) — Desktop Companion, Expert Plaza, model presets (FULL fetch)
 - [LobsterAI Homepage](https://lobsterai.youdao.com) — NetEase Youdao product page
 - [Claude Agent SDK](https://docs.anthropic.com/en/docs/agents) — underlying AI engine documentation
 - [ZAO OS Doc 200 — AI Agents Platform Vision](../../community/200-community-os-ai-agents-platform-vision/) — existing ZAO OS agent plans

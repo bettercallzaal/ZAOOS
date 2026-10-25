@@ -20,7 +20,7 @@ tier: QUICK
 | # | Recommendation | Why |
 |---|---|---|
 | 1 | **KEEP the live endpoint's claim as it is for now, but do not re-word it to name `f230dd0`.** | The 35 fixture checks pass. The 12 live checks against `f230dd0` were not run (see Result), so nothing here proves conformance to the new head. |
-| 2 | **RUN the 12 live checks in a lane allowed to execute the SDK, with `SPORE_SDK_PATH` pointing at a `f230dd0` checkout.** | That is the one measurement still missing. This session was blocked from installing the SDK's dependency. |
+| 2 | **The 12 live checks stay BLOCKED until Zaal decides whether they run.** | That is the one measurement still missing. This session's permission classifier refused installing the SDK's dependency. A refusal is a result, so the checks are not handed to another lane to run instead. |
 | 3 | **DECIDE whether ZAO should match the SDK's new refusal of `undefined`.** | From the source: ZAO omits `undefined` and the SDK at `f230dd0` throws on it. For inputs that hold `undefined`, ZAO hashes bytes the SDK refuses to produce. No fixture covers that case. |
 
 ## Result
@@ -57,7 +57,7 @@ So 35 + 12 = 47 is the doc 2138 total, and today 35 of those 47 are re-measured.
 
 | Action | Owner | Type | By When |
 |---|---|---|---|
-| Run `SPORE_SDK_PATH=<f230dd0 checkout> npx tsx scripts/spore-conformance.ts` in a lane permitted to install and execute the SDK, and append the live count to this doc. Shipped when the doc shows a 47-check result at `f230dd0` | dreamnet lane | PR | 2026-10-30 |
+| Decide whether the 12 live checks (`SPORE_SDK_PATH=<f230dd0 checkout> npx tsx scripts/spore-conformance.ts`) run at all, given the classifier refused the SDK install. If yes, the live count is appended to this doc. Shipped when the decision is recorded | Zaal | Decision | 2026-10-30 |
 | Add a TypeScript-side vector with an `undefined` value, and decide whether ZAO matches the SDK's refusal. Shipped when a ZAOOS PR adds the vector and the chosen behaviour | dreamnet lane | PR | 2026-11-06 |
 
 ## Sources

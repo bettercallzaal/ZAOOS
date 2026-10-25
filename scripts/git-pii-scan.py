@@ -39,6 +39,7 @@ from __future__ import annotations
 import re
 import subprocess
 import sys
+import unicodedata
 
 # From pii-hygiene.md's "Email allowlist" section. These are already public.
 EMAIL_ALLOW = {
@@ -72,6 +73,13 @@ VENUE_ADDR_ALLOW = {
 # Public role-addresses on ZAO-controlled domains, per the same section.
 ROLE_PREFIXES = ("contact@", "team@", "info@", "hello@", "support@", "press@", "zoe@")
 ZAO_DOMAINS = ("thezao.com", "bettercallzaal.com", "zabalgamez.com", "zaofestivals.com")
+# Reserved for documentation and tests (RFC 2606, RFC 6761): no real mailbox can
+# exist at these, so an address there is never a person's. Card 10451: the hook
+# blocked test@example.invalid in a test fixture on 2026-10-16. Matched on the
+# whole domain, or the last label for the reserved TLDs, so a real domain that
+# merely contains "example" (example.co.uk, myexample.com) still blocks.
+RESERVED_DOMAINS = ("example.com", "example.org", "example.net")
+RESERVED_TLDS = ("invalid", "test", "example", "localhost")
 
 # Lines that produced every observed false positive. A UUID is not a phone number.
 UUID_RE = re.compile(r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}", re.I)
@@ -90,7 +98,9 @@ HEX_RE = re.compile(r"0x[0-9a-fA-F]{16,}|\b[0-9a-fA-F]{32,}\b")
 
 PATTERNS: dict[str, tuple[str, bool]] = {
     # name: (regex, skip_on_uuid_or_url)
-    "email": (r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}", False),
+    # Kept for reference and for readers of this table; scan() finds emails
+    # with email_candidates() below, which uses EMAIL_RE on one token at a time.
+    "email": (r"[\w.%+\-]+@[\w.\-@]+\.[^\W\d_]{2,}", False),
     # NANP: neither the area code nor the exchange code may begin with 0 or 1.
     # The old pattern allowed any digits, so a bare 10-digit run matched - and
     # bare 10-digit runs in this repo are overwhelmingly Unix timestamps. It
@@ -122,9 +132,74 @@ def venue_addr_allowed(addr: str) -> bool:
     return " ".join(addr.split()).lower() in VENUE_ADDR_ALLOW
 
 
+# Email finding, card 10451 and evaluator-e2's two grades of #4078.
+#
+# A run of address characters is ONE token, so `user@example.com@gmail.com` is
+# one candidate (the old pattern read only its allowed first half). \w is
+# Unicode, so a Cyrillic or mixed-script address is a candidate at all. Each
+# token is matched once, anchored, so the cost is linear in the line: a
+# findall of the whole pattern restarted at every position and was quadratic
+# on repeated `a@a.` (3.7 s at 40k characters).
+#
+# Normalization DETECTS, it never allows. The allowlist and the reserved-domain
+# pass are decided on the raw text only. NFKC folding is run as a second pass,
+# and any candidate it produces that the raw pass did not see is flagged as is:
+# `user@gmail.com` + U+FF0E + `test` folds to `user@gmail.com.test`, which a
+# folded allowlist check would have passed as a reserved TLD.
+EMAIL_TOKEN_RE = re.compile(r"[\w.%+\-@]+")
+# A domain that may be allowed at all: non-empty labels of letters, digits and
+# inner hyphens. Without it `user@gmail.com..test` (an empty label) passed as
+# the reserved TLD .test (evaluator-e2, third grade of #4078).
+DOMAIN_OK_RE = re.compile(r"[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)+")
+EMAIL_RE = re.compile(r"[\w.%+\-]+@[\w.\-@]+\.[^\W\d_]{2,}")
+
+
+def email_candidates(line: str) -> list[str]:
+    out = []
+    for tok in EMAIL_TOKEN_RE.findall(line):
+        if "@" not in tok:
+            continue
+        m = EMAIL_RE.match(tok.lstrip("@"))
+        if m:
+            out.append(m.group(0))
+    return out
+
+
+def email_hits(line: str) -> list[str]:
+    """Candidates to report: raw ones not allowed, plus anything NFKC alone reveals."""
+    raw = email_candidates(line)
+    hits = [a for a in raw if not email_allowed(a)]
+    folded = unicodedata.normalize("NFKC", line)
+    if folded != line:
+        seen = set(raw)
+        hits += [a for a in email_candidates(folded) if a not in seen]
+    return hits
+
+
 def email_allowed(addr: str) -> bool:
+    """True only for one plain ASCII address on an allowlist, judged on the RAW text.
+
+    More than one @ is never allowed: the part a reader trusts can hide the
+    part that delivers. Non-ASCII is never allowed either: every allowlist entry
+    is ASCII, and a look-alike such as zaal@thez\u0430o.com (Cyrillic a) or an
+    address mixing scripts in its local or domain part must be shown, not
+    passed. Never call this on normalized text (see email_hits).
+    """
     a = addr.lower()
+    if a.count("@") != 1 or not a.isascii():
+        return False
+    if not DOMAIN_OK_RE.fullmatch(a.rsplit("@", 1)[-1]):
+        return False
     if a in EMAIL_ALLOW:
+        return True
+    domain = a.rsplit("@", 1)[-1]
+    labels = domain.split(".")
+    # At most ONE label in front of the reserved part: `mail.example.com` and
+    # `foo.test` pass, `gmail.com.example.com` and `gmail.com.test` do not,
+    # because those spell a real address inside a reserved one.
+    if domain in RESERVED_DOMAINS or (len(labels) == 3 and ".".join(labels[1:]) in RESERVED_DOMAINS):
+        return True
+    if len(labels) == 2 and labels[-1] in RESERVED_TLDS:
         return True
     return a.startswith(ROLE_PREFIXES) and a.endswith(ZAO_DOMAINS)
 
@@ -230,10 +305,12 @@ def scan(rows: list[tuple[str, str]]) -> list[tuple[str, str, str, str]]:
         for kind, (pat, guarded) in PATTERNS.items():
             if guarded and skip_numeric:
                 continue
+            if kind == "email":
+                for text in email_hits(line):
+                    found.append((kind, path, text, line.strip()[:100]))
+                continue
             for m in re.findall(pat, line):
                 text = m if isinstance(m, str) else m[0]
-                if kind == "email" and email_allowed(text):
-                    continue
                 if kind == "street_address" and venue_addr_allowed(text):
                     continue
                 found.append((kind, path, text, line.strip()[:100]))

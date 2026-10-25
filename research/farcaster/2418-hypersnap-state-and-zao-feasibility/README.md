@@ -2,7 +2,7 @@
 topic: farcaster
 type: decision
 status: research-complete
-last-validated: 2026-10-22
+last-validated: 2026-10-23
 superseded-by:
 related-docs: "304, 309, 489, 586, 587, 588, 589, 597, 643, 761, 762, 823, 2622"
 original-query: "STANDARD on hypersnap, Cassie's fork of Farcaster. Zaal plans the ZAO social on it (async Respect Game in-feed, ZID identity, member-run nodes) and it has zero documentation on this machine. The doc must answer: 1) what hypersnap is - repo, author, relation to Farcaster protocol and snapchain, divergence; 2) state - last commit, activity, production users; 3) LICENSE read from the file, never the API field; 4) node requirements - hardware, ops, cost; 5) ZAO feasibility and the fallback if unsuitable (vanilla hub, snapchain, custom)."
@@ -12,6 +12,25 @@ tier: STANDARD
 # 2418 - Hypersnap: what it actually is, what state it is in, and whether ZAO social can stand on it
 
 > **Goal:** Answer the five hypersnap questions blocking L4 of the decentralization scale, with every claim traced to a file, an API response, or a live node.
+
+## UPDATE 2026-10-23 (measure): every failover read against haatz, and why the channel feed must be sorted, never trimmed
+
+Read-only measurement, 2026-10-23. Every path that `src/lib/farcaster/neynar.ts` sends through `fetchWithFailover` was called on haatz (`https://haatz.quilibrium.com`) for fids 3 and 19640, 3 runs each, with `curl`-equivalent GETs and no key. All three runs gave the same result. PR states below were read with `gh pr view` at 2026-10-23 11:50 EDT.
+
+| Finding | Measured | What it means |
+|---|---|---|
+| `topic/trending` is the only list path that answers 200 with an empty list | 6 of 6 calls, `topics: []` | The empty-200 follow-up needs one list key, and #4143 (open) sets exactly that one |
+| `frame/catalog`, `frame/search`, `frame/relevant` answer 501 | 6 of 6 per path; Hypersnap's `http.rs` lists them as not implemented | Failover already reached Neynar, after one wasted request and one warn line per call. #4159 (open) sends them straight to Neynar |
+| `followers/relevant` answers 400 `Missing required parameter: fid` | 6 of 6 | Safe as it is. Hypersnap maps this path to the plain followers list, so sending `fid` would turn a clean failover into a 200 with the wrong data. Left alone on purpose |
+| `feed/channels` returns more casts than `limit`, and not newest-first | `limit=5` gave 9 casts, `limit=2` gave 3; with `limit=5` the newest cast (2026-10-23) came 6th, after one from 2026-09-30 | See below |
+
+**Why the channel feed over-delivers.** Read from `farcasterorg/hypersnap` at commit `2e8733d0` with `gh api` (raw file bytes). `src/api/feeds.rs:592` passes `limit` as `page_size` to the hub's `get_casts_by_parent`. In `src/network/server.rs`, line 2282 applies that `page_size` to each shard separately, line 2296 joins the shard pages with `flat_map` (no merge, no sort), and lines 2298 to 2300 build the next token as one resume token per shard. `feeds.rs:608` hex-encodes that token as `next.cursor`. So a page holds up to `limit` casts per shard, in shard order, and each shard's token resumes after that shard's last returned cast.
+
+**Consequence: sort, never trim.** Cutting the page down to `limit` would drop the casts past the cut for good, because the cursor has already moved past them. Sorting a page newest-first is safe, because the per-shard tokens do not depend on the order. Two callers are affected:
+- `src/app/api/chat/messages/route.ts`: the refresh path returns these casts to the client in shard order, and it takes the last cast as the oldest when it decides `hasMore`.
+- `src/app/api/music/feed/route.ts`: the channel path stops at `limit` tracks and still returns the cursor, so casts past the stop are skipped. That predates Hypersnap, because the route already over-fetches 3x from Neynar.
+
+Follow-up 4 (not built yet; it waits on load and on the PRs before it) sorts read-base channel pages newest-first in `getChannelFeed` and `getChannelMusicCasts`, keeps every cast, and tests the measured order.
 
 ## UPDATE 2026-10-22: a ZAO client on Hypersnap - what exists, what the node serves, and the build plan
 
@@ -146,7 +165,7 @@ The seat ruled that the D6 go/no-go question was not gated and auto-proceeded on
 | 4. Node probe | #4135 | merged 2026-10-22. `npx tsx scripts/hypersnap-probe.ts --base <url>`; exit 0, 1 or 2 |
 | 3. Bypass reads, social | #4138 | merged 2026-10-22. Adds `neynarRead()` to `src/lib/farcaster/neynar.ts` |
 | 3. Members | #4139 | merged 2026-10-22 |
-| 3. Music and chat search | #4140 | open, evaluator CLEAN pending CI |
+| 3. Music and chat search | #4140 | merged 2026-10-22T22:03:45Z (re-read 2026-10-23) |
 | 3. Admin and scrape | #4141 | open, comments only, in review |
 
 **Correction to D6 row 2.** D6 said to "keep Neynar's own paths on failover" for best friends, trending topics and follow suggestions. There are no separate Neynar paths. Neynar's own OpenAPI spec (`neynarxyz/OAS` `src/api/spec.yaml`, lines 3351, 6054 and 6276, read with `gh api`) names the same three paths Hypersnap serves: `/user/best_friends`, `/topic/trending` and `/following/suggested`. The old ZAOOS paths appear in neither spec. That they also failed on Neynar is inferred from the spec, not measured with a live Neynar call.
@@ -163,7 +182,7 @@ The seat ruled that the D6 go/no-go question was not gated and auto-proceeded on
 | Channels carry no `image_url` | haatz `user/channels` | channel icons go blank |
 | `topic/trending` returned 200 with `topics: []`; `cast/search` returned 0 casts for `soundcloud` | haatz, live | a list renders empty and nothing falls back |
 
-So PR 3 follows one rule: **a read moves only when every field and parameter its route uses is served.** Nine calls are routed: six in social (#4138, merged), two in members (#4139, merged), and one in music (#4140, open when this was written). So eight are on main and one is pending. The rest stay on Neynar, each with a comment at the call site that says why.
+So PR 3 follows one rule: **a read moves only when every field and parameter its route uses is served.** Nine calls are routed: six in social (#4138, merged), two in members (#4139, merged), and one in music (#4140, merged 2026-10-22T22:03:45Z, re-read 2026-10-23). All nine are on main. The rest stay on Neynar, each with a comment at the call site that says why.
 
 **Two existing bugs, found on the way. Both are read from the spec and not measured in production:**
 - compare's shared-following list read `u.fid` on Neynar's `{ user }` items, so it was probably always empty. Fixed in #4138.
@@ -543,8 +562,10 @@ probably to ask Cassie directly rather than self-host.
 | DONE 2026-10-22: the seat ruled this not gated and auto-proceeded on A (logged in the hypersnap lane status file). Read the 2026-10-22 section and say go or no-go on PRs 1 to 4 of the D6 build plan. | Zaal | Decision | 2026-10-29 |
 | Run the D2 checks on the desktop, read-only: `/v1/info` version and block delay, and whether `[api] enabled` plus the social graph, channels and search indexes are on. Shipped when the answers are in the vault | Zaal | Verification | 2026-10-29 |
 | DONE 2026-10-22 (#4133, #4134 merged). PR 1 and PR 2 of D6 (failover logging, the four silent paths). Shipped when both PRs merge with the tests named in D6 | hypersnap lane | PR | after the go |
-| Fall back when the read base answers 200 with an empty list on a path Neynar fills (trending topics first), or show "no data from this node". Shipped when a PR with a red-before test merges | hypersnap lane | PR | 2026-11-05 |
-| Stop a read-base cursor reaching Neynar (and the reverse) on failover mid-pagination: tag the cursor's origin or restart the page on the base that issued it. Shipped when a PR with a test merges | hypersnap lane | PR | 2026-11-05 |
+| IN REVIEW as #4143 (open 2026-10-23; the 2026-10-23 measurement found trending topics is the only empty-200 path). Fall back when the read base answers 200 with an empty list on a path Neynar fills (trending topics first), or show "no data from this node". Shipped when a PR with a red-before test merges | hypersnap lane | PR | 2026-11-05 |
+| BUILT, opens after #4143 merges (it changes the same function). Stop a read-base cursor reaching Neynar (and the reverse) on failover mid-pagination: tag the cursor's origin or restart the page on the base that issued it. Shipped when a PR with a test merges | hypersnap lane | PR | 2026-11-05 |
+| IN REVIEW as #4159 (open 2026-10-23). Send the three frame reads straight to Neynar, since Hypersnap answers 501 on them. Shipped when the PR merges | hypersnap lane | PR | after review |
+| Sort read-base channel feed pages newest-first and keep every cast (follow-up 4, see UPDATE 2026-10-23). Shipped when a PR with a test fed the measured order merges | hypersnap lane | PR | after #4159 |
 | Run `scripts/hypersnap-probe.ts` against Zaal's node and paste the table into the vault. Shipped when the table is in the vault | Zaal | Verification | 2026-10-29 |
 | PR 6 of D6, the write design doc (member signers, custody, Quorum model). Shipped when the doc PR merges | hypersnap lane | Research doc | after the go |
 | Re-check the comment at `bot/src/zoe/farcaster/write.ts:2` ("the self-hosted Hypersnap node is read-only") against Zaal's node. Shipped when the comment is confirmed or corrected in a PR | hypersnap lane | Verification | after D2 |

@@ -74,6 +74,11 @@ interface Stub {
   /** PR numbers the open-PR list reports as armed (the sweep). */
   armed?: string[];
   armedFail?: boolean;
+  /** Raw JSON the comments endpoint returns (one page). */
+  comments?: unknown[];
+  commentsFail?: boolean;
+  /** Raw JSON for `gh api repos/owner/repo/pulls/7` with no --jq. */
+  pr?: unknown;
 }
 
 interface Ran {
@@ -99,6 +104,13 @@ case "$*" in
   *".auto_merge == null"*)
     if [ -e "$STUB_CALLS.disabled" ]; then echo "$STUB_OFF_AFTER"; else echo "$STUB_OFF_BEFORE"; fi
     exit 0 ;;
+  *"-X POST"*"/comments"*)
+    exit 0 ;;
+  *"/comments?per_page=100"*)
+    [ "$STUB_COMMENTS_FAIL" = "1" ] && exit 1
+    printf '%s\n' "$STUB_COMMENTS"; exit 0 ;;
+  "api repos/owner/repo/pulls/7")
+    printf '%s\n' "$STUB_PR"; exit 0 ;;
   *) exit 0 ;;
 esac
 `;
@@ -128,6 +140,9 @@ function run(script: string, stub: Stub, env: Record<string, string> = {}): Ran 
       STUB_OFF_AFTER: stub.offAfter ?? 'true',
       STUB_ARMED: (stub.armed ?? []).join('\n'),
       STUB_ARMED_FAIL: stub.armedFail ? '1' : '0',
+      STUB_COMMENTS: JSON.stringify(stub.comments ?? []),
+      STUB_COMMENTS_FAIL: stub.commentsFail ? '1' : '0',
+      STUB_PR: JSON.stringify(stub.pr ?? {}),
       ...env,
     },
   });
@@ -148,7 +163,7 @@ const CLEAR_RUN = runBlock(CLEAR, 'Verify clearance and merge the verified head'
 
 describe('the extraction itself', () => {
   it('lifts real shell out of both workflows', () => {
-    expect(HOLD).toContain('grep -Fxq');
+    expect(HOLD).toContain("grep -Eq '^hold(:.*)?$'");
     expect(ARM).toContain('gh pr merge "$PR" --repo "$REPO" --squash --auto');
     expect(CLEAR_RUN).toContain('--match-head-commit');
     // No ${{ }} inside the two docs-automerge blocks, or bash would not be
@@ -248,21 +263,21 @@ describe('Enable auto-merge (squash)', () => {
     expect(armed(r)).toBe(false);
   });
 
-  it('is also gated in its if: on the hold step saying exactly false and the nightly gate exactly true', () => {
+  it('is also gated in its if: on the hold step saying exactly false, the nightly gate and the verdict step exactly true', () => {
     const cond = stepIf(AUTOMERGE, 'Enable auto-merge (squash)');
     expect(cond).toMatch(
-      /^if: \| steps\.hold\.outputs\.held == 'false' && steps\.nightly\.outputs\.ok == 'true' && \(/,
+      /^if: \| steps\.hold\.outputs\.held == 'false' && steps\.nightly\.outputs\.ok == 'true' && steps\.verdict\.outputs\.ok == 'true' && \(/,
     );
     expect(cond.endsWith(')')).toBe(true);
   });
 });
 
 describe('the workflow wiring', () => {
-  it('re-runs on the hold label being added or removed, and on no other label', () => {
+  it('re-runs on a hold label (hold or hold:*) being added or removed, and on no other label', () => {
     expect(AUTOMERGE).toContain('types: [opened, synchronize, reopened, labeled, unlabeled]');
     const job = AUTOMERGE.slice(AUTOMERGE.indexOf('  automerge:'), AUTOMERGE.indexOf('    steps:'));
     expect(job.replace(/\s+/g, ' ')).toContain(
-      "((github.event.action != 'labeled' && github.event.action != 'unlabeled') || github.event.label.name == 'hold')",
+      "((github.event.action != 'labeled' && github.event.action != 'unlabeled') || github.event.label.name == 'hold' || startsWith(github.event.label.name, 'hold:'))",
     );
   });
 
@@ -400,5 +415,159 @@ describe('merge-pause-sweep disarms PRs armed before the pause (ZAOOS #4059)', (
     const r = run(SWEEP_RUN, { armed: [] }, { MERGES_PAUSED: 'true' });
     expect(r.status).toBe(0);
     expect(r.log).toContain('0 armed PR(s) found');
+  });
+});
+
+// ---- ZAOOS #4086: no auto-merge without a CLEAN seat verdict at the head, and any
+// `hold:*` label holds. #4085 merged on 21 Oct with a hold label on and no verdict.
+const HEAD = 'a'.repeat(40);
+const OLD = 'b'.repeat(40);
+const verdict = (who: string, sha: string, word: string, re = false) => ({
+  user: { login: who },
+  body: `Seat evaluator ${re ? 're-verdict' : 'verdict'} (fresh-context zao-evaluator), head ${sha}: **${word}**\n\ndetail`,
+});
+const marker = (sha: string, who = 'github-actions[bot]') => ({ user: { login: who }, body: `AUTOMERGE_ELIGIBLE_HEAD=${sha}` });
+const openPr = { state: 'open', head: { sha: HEAD, repo: { full_name: 'owner/repo' } } };
+
+const VERDICT = runBlock(AUTOMERGE, 'Require a CLEAN verdict at this head');
+const MARK = runBlock(AUTOMERGE, 'Mark eligible for a verdict');
+const ON_VERDICT = runBlock(AUTOMERGE, 'Arm a judged head on its CLEAN verdict');
+
+describe('Respect the hold label: hold:* holds too (ZAOOS #4086)', () => {
+  it('holds on any hold:* label', () => {
+    for (const l of ['hold:review', 'hold:zaal', 'hold:']) {
+      expect(run(HOLD, { labels: [l] }).output).toBe('held=true\n');
+    }
+  });
+  it('leaves hold:licence to its own reset-and-rejudge path at this step', () => {
+    expect(run(HOLD, { labels: ['hold:licence'] }).output).toBe('held=false\n');
+    expect(run(HOLD, { labels: ['hold:licence', 'hold:zaal'] }).output).toBe('held=true\n');
+  });
+});
+
+describe('Require a CLEAN verdict at this head', () => {
+  const v = (comments: unknown[], stub: Stub = {}) => run(VERDICT, { comments, ...stub }, { HEAD_SHA: HEAD });
+  it('is ok on a CLEAN verdict by bettercallzaal naming this head, and disarms nothing', () => {
+    const r = v([verdict('bettercallzaal', HEAD, 'CLEAN')]);
+    expect(r.status).toBe(0);
+    expect(r.output).toBe('ok=true\n');
+    expect(disarmed(r)).toBe(false);
+  });
+  it('accepts a re-verdict too', () => {
+    expect(v([verdict('bettercallzaal', HEAD, 'CLEAN', true)]).output).toBe('ok=true\n');
+  });
+  it('ignores a verdict-shaped comment from any other author', () => {
+    const r = v([verdict('outsider', HEAD, 'CLEAN')], { offBefore: 'false', offAfter: 'true' });
+    expect(r.output).toBe('ok=false\n');
+    expect(disarmed(r)).toBe(true);
+  });
+  it('ignores a CLEAN for another head', () => {
+    expect(v([verdict('bettercallzaal', OLD, 'CLEAN')]).output).toBe('ok=false\n');
+  });
+  it('lets a newer NEEDS_WORK on the same head withdraw a CLEAN', () => {
+    expect(v([verdict('bettercallzaal', HEAD, 'CLEAN'), verdict('bettercallzaal', HEAD, 'NEEDS_WORK', true)]).output).toBe('ok=false\n');
+  });
+  it('counts unreadable comments as no verdict, and takes off an earlier arming', () => {
+    const r = v([], { commentsFail: true, offBefore: 'false', offAfter: 'true' });
+    expect(r.output).toBe('ok=false\n');
+    expect(disarmed(r)).toBe(true);
+    expect(r.log).toContain('could not read the comments');
+  });
+  it('fails when no verdict and auto-merge cannot be confirmed off', () => {
+    const r = v([], { offBefore: 'false', offAfter: 'false' });
+    expect(r.status).toBe(1);
+  });
+  it('gates the arm step and the marker step in their if:', () => {
+    expect(stepIf(AUTOMERGE, 'Enable auto-merge (squash)')).toContain("steps.verdict.outputs.ok == 'true'");
+    expect(stepIf(AUTOMERGE, 'Mark eligible for a verdict')).toContain("steps.verdict.outputs.ok != 'true'");
+  });
+});
+
+describe('Mark eligible for a verdict', () => {
+  const posted = (r: Ran) => r.calls.filter((c) => c.includes('-X POST') && c.includes(`AUTOMERGE_ELIGIBLE_HEAD=${HEAD}`));
+  it('posts the marker for this head once', () => {
+    expect(posted(run(MARK, { comments: [] }, { HEAD_SHA: HEAD }))).toHaveLength(1);
+  });
+  it('does not post it again when the bot already did', () => {
+    expect(posted(run(MARK, { comments: [marker(HEAD)] }, { HEAD_SHA: HEAD }))).toHaveLength(0);
+  });
+  it('does not count a marker typed by a lane', () => {
+    expect(posted(run(MARK, { comments: [marker(HEAD, 'bettercallzaal')] }, { HEAD_SHA: HEAD }))).toHaveLength(1);
+  });
+});
+
+describe('arm-on-verdict: arms a judged head on its CLEAN verdict, and nothing else', () => {
+  const good = [marker(HEAD), verdict('bettercallzaal', HEAD, 'CLEAN')];
+  const on = (stub: Stub) => run(ON_VERDICT, { pr: openPr, labels: ['documentation'], comments: good, ...stub });
+  it('arms, pinned to the head, when every condition holds', () => {
+    const r = on({});
+    expect(r.status).toBe(0);
+    expect(r.calls.some((c) => c.includes(`--squash --auto --match-head-commit ${HEAD}`))).toBe(true);
+  });
+  it('RED CONTROL: a held docs PR stays open (hold, hold:licence, hold:zaal)', () => {
+    for (const l of ['hold', 'hold:licence', 'hold:zaal']) {
+      expect(armed(on({ labels: [l] }))).toBe(false);
+    }
+    // Cut the label check out of the shipped block: the same held PR is now armed,
+    // so it is that check, and nothing else, that keeps it open.
+    const cut = ON_VERDICT.replace(/if printf '%s\\n' "\$names" \| grep -Eq '\^hold\(:\.\*\)\?\$'; then[\s\S]*?fi\n/, '');
+    expect(cut).not.toBe(ON_VERDICT);
+    expect(armed(run(cut, { pr: openPr, labels: ['hold'], comments: good }))).toBe(true);
+  });
+  it('does not arm when the labels cannot be read', () => {
+    expect(armed(on({ labelsFail: true }))).toBe(false);
+  });
+  it('does not arm without the bot marker for this head', () => {
+    expect(armed(on({ comments: [verdict('bettercallzaal', HEAD, 'CLEAN')] }))).toBe(false);
+    expect(armed(on({ comments: [marker(OLD), verdict('bettercallzaal', HEAD, 'CLEAN')] }))).toBe(false);
+    expect(armed(on({ comments: [marker(HEAD, 'bettercallzaal'), verdict('bettercallzaal', HEAD, 'CLEAN')] }))).toBe(false);
+  });
+  it('does not arm when the newest verdict at the head is not CLEAN, or is from someone else', () => {
+    expect(armed(on({ comments: [...good, verdict('bettercallzaal', HEAD, 'NEEDS_WORK', true)] }))).toBe(false);
+    expect(armed(on({ comments: [marker(HEAD), verdict('outsider', HEAD, 'CLEAN')] }))).toBe(false);
+    expect(armed(on({ comments: [marker(HEAD), verdict('bettercallzaal', OLD, 'CLEAN')] }))).toBe(false);
+  });
+  it('does not arm a closed PR or one from a fork', () => {
+    expect(armed(on({ pr: { ...openPr, state: 'closed' } }))).toBe(false);
+    expect(armed(on({ pr: { ...openPr, head: { sha: HEAD, repo: { full_name: 'someone/fork' } } } }))).toBe(false);
+  });
+  it('runs only on a bettercallzaal comment that starts "Seat evaluator", on a PR', () => {
+    const job = AUTOMERGE.slice(AUTOMERGE.indexOf('  arm-on-verdict:'));
+    const cond = job.slice(0, job.indexOf('    steps:')).replace(/\s+/g, ' ');
+    expect(cond).toContain("github.event_name == 'issue_comment'");
+    expect(cond).toContain('github.event.issue.pull_request');
+    expect(cond).toContain("github.event.comment.user.login == 'bettercallzaal'");
+    expect(cond).toContain("startsWith(github.event.comment.body, 'Seat evaluator')");
+  });
+});
+
+// The two features meet here (re-cut of #4127 over #4173): arm-on-verdict calls
+// gh pr merge --auto, so it must honour the repo pause switch like every other
+// merging step, or a CLEAN verdict landing during a pause arms a head the automerge
+// job marked eligible before it.
+describe('arm-on-verdict honours the repo pause switch (ZAOOS #4059 with #4086)', () => {
+  const good = [marker(HEAD), verdict('bettercallzaal', HEAD, 'CLEAN')];
+  it('reads ZAO_MERGES_PAUSED through env, and refuses before its one merge call', () => {
+    expect(stepLines(AUTOMERGE, 'Arm a judged head on its CLEAN verdict').join('\n')).toContain(
+      'MERGES_PAUSED: ${{ vars.ZAO_MERGES_PAUSED }}',
+    );
+    const pause = ON_VERDICT.indexOf('merges are paused for this repo');
+    const merge = ON_VERDICT.indexOf('gh pr merge');
+    expect(pause).toBeGreaterThan(-1);
+    expect(merge).toBeGreaterThan(pause);
+    expect(ON_VERDICT).not.toContain('${{');
+  });
+  it('paused: a CLEAN verdict at an eligible head arms nothing', () => {
+    for (const v of ['true', 'TRUE', '1', 'yes']) {
+      const r = run(ON_VERDICT, { pr: openPr, labels: ['documentation'], comments: good }, { MERGES_PAUSED: v });
+      expect(r.status).toBe(0);
+      expect(armed(r)).toBe(false);
+      expect(r.log).toContain('merges are paused for this repo');
+    }
+  });
+  it('control: not paused, the same PR is armed', () => {
+    for (const v of ['', 'false', '0']) {
+      expect(armed(run(ON_VERDICT, { pr: openPr, labels: ['documentation'], comments: good }, { MERGES_PAUSED: v }))).toBe(true);
+    }
   });
 });

@@ -67,6 +67,8 @@ jobs:
           PR: ${{ github.event.issue.number }}
           BODY: ${{ github.event.comment.body }}
           COMMENT_URL: ${{ github.event.comment.html_url }}
+          # The repo merge pause (docs-automerge.yml, ZAOOS #4059) stops this merge too.
+          MERGES_PAUSED: ${{ vars.ZAO_MERGES_PAUSED }}
         run: |
           set -euo pipefail
           say() { gh api -X POST "repos/$REPO/issues/$PR/comments" -f body="$1" >/dev/null; }
@@ -114,6 +116,11 @@ jobs:
           if [ -n "$other" ]; then
             say "licence-clear: not merging - files outside research/ and docs/: $(printf '%s' "$other" | head -5 | tr '\n' ' ')"; exit 0
           fi
+
+          # A paused repo merges nothing automatically, this included.
+          case "$(printf '%s' "${MERGES_PAUSED:-}" | tr '[:upper:]' '[:lower:]')" in
+            true|1|yes) say "licence-clear: not merging - merges are paused for this repo (ZAO_MERGES_PAUSED). Post the clearance line again once the pause is lifted."; exit 0 ;;
+          esac
 
           # The `hold` label stops every automatic merge of a PR, this one
           # included (docs-automerge.yml). Read last, right before the merge

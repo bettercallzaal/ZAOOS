@@ -59,7 +59,8 @@ export async function GET() {
       const batch = allFids.slice(i, i + 5);
       const results = await Promise.allSettled(
         batch.map(async (fid) => {
-          // Stays on Neynar: reads root_parent_url, which Hypersnap casts do not carry
+          // Stays on Neynar: reads root_parent_url, which Hypersnap sets to the cast's own
+          // parent_url (http.rs 2102), so replies in a channel would not count
           const res = await fetch(
             `${NEYNAR_BASE}/feed?feed_type=filter&filter_type=fids&fids=${fid}&limit=50`,
             { headers: { 'x-api-key': ENV.NEYNAR_API_KEY }, signal: AbortSignal.timeout(5000) },

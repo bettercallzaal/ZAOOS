@@ -1,5 +1,7 @@
 # Credit + Attribution - always name the source
 
+mechanism: none yet (since 2026-10-23, #4151)
+
 Whenever we adopt, vendor, adapt, or are inspired by someone else's work - code, a skill, a pattern, a library, a design, a track, a sample, an idea - we CREDIT where it was found + who it is from (+ the LICENSE, for code). Rationale: `research/dev-workflows/2649-rules-history/archive/credit-attribution.md`.
 
 | Surface | Credit form |

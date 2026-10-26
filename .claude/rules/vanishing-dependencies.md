@@ -1,5 +1,7 @@
 # Vanishing Dependencies - if something depends on it, git must hold it
 
+mechanism: none yet (since 2026-10-23, #3056)
+
 `~/bin`, `~/.claude/skills` and `~/.claude/settings.json` are symlinks into the `~/zaal-dotfiles` working tree, whose HEAD moves. The four 2026-08-12 losses (ZAOOS#3056): `research/dev-workflows/2649-rules-history/archive/vanishing-dependencies.md`.
 
 1. **If a hook, cron, skill, or another script depends on a file, that file is git-tracked** - written and committed in the same pass.

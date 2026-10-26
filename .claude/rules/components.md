@@ -5,6 +5,8 @@ globs: src/components/**/*.tsx
 
 # Component Conventions
 
+mechanism: none yet (since 2026-10-23, #4150)
+
 - Add `"use client"` directive at top of any component that uses hooks, event handlers, or browser APIs.
 - Design mobile-first - use Tailwind responsive prefixes (`sm:`, `md:`, `lg:`) to enhance for larger screens.
 - Follow the dark theme: navy `#0a1628` background, gold `#f5a623` primary accent.

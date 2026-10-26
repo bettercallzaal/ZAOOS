@@ -1,5 +1,7 @@
 # Session Boundaries - one thread, one named session
 
+mechanism: none yet (since 2026-10-23, #4152)
+
 Sessions fail from context conflict (superseded state held beside current state), not length. The 2026-08-09 evidence: `research/dev-workflows/2649-rules-history/archive/session-boundaries.md`.
 
 **A new thread gets a new session. The handoff is the artifact, never the conversation.**

@@ -1,5 +1,7 @@
 # Silent-Failure Guard
 
+mechanism: none yet (since 2026-10-23, #4153)
+
 A system reports SUCCESS while accomplishing NOTHING. Incidents (cocconcertz admin cookie, 7-week green cron, never-run tests, z.thezao.xyz open writes): `research/dev-workflows/2649-rules-history/archive/silent-failure-guard.md`; sweep `research/security/2093-silent-failure-sweep/`. Rule numbers are stable.
 
 1. **Verify the real EFFECT, not the wrapper's exit code.** `curl | tee` reports `tee`. Never gate on a pipe without `set -o pipefail`; prefer asserting the actual result.

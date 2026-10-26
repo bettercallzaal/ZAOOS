@@ -1,5 +1,7 @@
 # Liveness Probe Guard - busy is not dead
 
+mechanism: none yet (since 2026-10-23, #4153)
+
 A probe that cannot tell a busy service from a dead one eventually kills a healthy one. The three `gstack browse` instances and the root cause (ZAOOS#3065): `research/dev-workflows/2649-rules-history/archive/liveness-probe-guard.md`. Rule numbers are stable.
 
 **A single short-timeout probe measures load, not liveness.** Binds wherever a probe failure triggers a destructive action (kill, respawn, state-file delete, failover).

@@ -1,5 +1,7 @@
 # Measurement Traps - cheap signals that lie, and what to read instead
 
+mechanism: none yet (since 2026-10-23, #4151)
+
 The instance list for `state-claims.md`. Add an entry each time a new trap is found. Each trap's incident and full text: `research/dev-workflows/2649-rules-history/archive/measurement-traps.md`. Trap numbers are stable.
 
 1. **`ps -o pcpu` is a lifetime average, never current usage.** RIGHT: `top -b -n 2 -d 2` and read the SECOND sample; CHECK `uptime`. If a per-process figure and the load average disagree, the load average wins.

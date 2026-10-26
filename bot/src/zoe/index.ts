@@ -66,6 +66,7 @@ import {
 } from './x-desk';
 import { NO_SPINNER, startThinkingSpinner, thinkingSpinnerEnabled } from './thinking-spinner';
 import { sendTerminalsDigest, terminalsDigestEnabled, readTerminalsPage, parseTerminalsPage, vaultDir as terminalsVaultDir } from './terminals-digest';
+import { statusCommandHandler, statusRefreshHandler } from './recent-activity';
 import { captureTerminalTypedReply, maybeSendTailCard, recordTerminalAnswer, sendNextTerminalCard, setPendingType, tailCardScopeAllowed, terminalGrillEnabled } from './terminal-grill';
 import { formatPrList, inboxNudgeEnabled, mergeCommand, parsePrCallback, readTotals } from './inbox-nudge';
 import { RESUME_ROW, STOP_ROW, grillStopEnabled, setGrillPaused } from './grill-pause';
@@ -576,6 +577,7 @@ bot.command("help", async (ctx) => {
       "/grill - Answer pending decision cards",
       "/board - Show all open cards and active lanes",
       "/working - Tasks currently in progress",
+      "/status - The last ten things ZOE did",
       "/pulse - Health, models, and spend snapshot",
       "/companion - Live companion pulse and countdown",
       "/focus - Toggle hyperfocus mode",
@@ -919,6 +921,12 @@ bot.command('terminals', async (ctx, next) => {
   const r = await sendTerminalsDigest({ send: (text) => ctx.reply(text), scheduled: false });
   if (r === 'sent') featureRan('terminals-digest', 'command');
 });
+
+// /status - the last ten things ZOE did: features that ran, sends, things she could
+// not do (recent-activity.ts). Read-only, owner-only. ZOE_STATUS_COMMAND=0 turns it
+// off and the command falls through, so the word is not swallowed.
+bot.command('status', statusCommandHandler({ zaalId, ownerOnlyState }));
+bot.callbackQuery('zst:refresh', statusRefreshHandler({ zaalId, ownerOnlyState }));
 
 // /working - list tasks currently in_progress with how long they've been in that state
 bot.command('working', async (ctx) => {

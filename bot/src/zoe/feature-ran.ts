@@ -31,6 +31,19 @@
 const announced = new Set<string>();
 
 /**
+ * The LAST call of each feature, for /status (recent-activity.ts). One entry
+ * per feature, so a tick every minute cannot grow it. Memory only.
+ */
+export interface FeatureRun {
+  feature: string;
+  at: Date;
+  detail?: string;
+  /** Calls since boot. */
+  count: number;
+}
+const lastRuns = new Map<string, FeatureRun>();
+
+/**
  * Record that `feature` executed. Only the first call per process prints.
  *
  * Call this on the SUCCESS path, at the point where the feature has actually
@@ -38,6 +51,8 @@ const announced = new Set<string>();
  * loaded (the same mistake as a flag that proves reachability).
  */
 export function featureRan(feature: string, detail?: string): void {
+  const prev = lastRuns.get(feature);
+  lastRuns.set(feature, { feature, at: new Date(), detail, count: (prev?.count ?? 0) + 1 });
   if (announced.has(feature)) return;
   announced.add(feature);
   try {
@@ -55,7 +70,13 @@ export function announcedFeatures(): string[] {
   return [...announced].sort();
 }
 
+/** The last call of every feature since boot, for /status. */
+export function recentRuns(): FeatureRun[] {
+  return [...lastRuns.values()];
+}
+
 /** Test-only: forget what has been announced. */
 export function resetAnnouncedForTest(): void {
   announced.clear();
+  lastRuns.clear();
 }

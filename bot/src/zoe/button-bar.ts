@@ -45,6 +45,7 @@ export const PRIVATE_COMMANDS = [
   { command: "grill", description: "Answer pending decision cards" },
   { command: "board", description: "Show the board - all open items" },
   { command: "working", description: "Tasks currently in progress" },
+  { command: "status", description: "The last ten things ZOE did" },
   { command: "pulse", description: "Today's spend, health and models" },
   { command: "companion", description: "Live companion pulse and countdown" },
   { command: "focus", description: "Toggle hyperfocus (queue non-urgent pings)" },

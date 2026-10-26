@@ -3,7 +3,17 @@ import { mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { featureRan, recentRuns, resetAnnouncedForTest } from '../feature-ran';
-import { buildStatus, renderStatus, shortTime, statusCommandEnabled, statusKeyboard } from '../recent-activity';
+import type { Context } from 'grammy';
+import { newOwnerOnlyState, OWNER_ONLY_LINE } from '../owner-only';
+import {
+  buildStatus,
+  renderStatus,
+  shortTime,
+  statusCommandEnabled,
+  statusCommandHandler,
+  statusKeyboard,
+  statusRefreshHandler,
+} from '../recent-activity';
 import type { SendLogRow } from '../send-budget';
 
 // 2026-10-26 14:00 UTC = 10:00 EDT, a Monday.
@@ -142,5 +152,108 @@ describe('buildStatus reads the files ZOE writes', () => {
     process.env.ZOE_HOME = mkdtempSync(join(tmpdir(), 'zoe-status-empty-'));
     const text = await buildStatus(NOW);
     expect(text).toContain('Today: 0 sent, 0 held, 0 dropped');
+  });
+});
+
+describe('owner gate on /status and the Refresh button', () => {
+  const ZAAL = 111;
+  const STRANGER = 222;
+
+  function fakeCtx(fromId: number | undefined) {
+    const calls = { reply: [] as unknown[][], answer: [] as unknown[][], edit: [] as unknown[][] };
+    const ctx = {
+      from: fromId === undefined ? undefined : { id: fromId },
+      reply: async (...a: unknown[]) => {
+        calls.reply.push(a);
+      },
+      answerCallbackQuery: async (...a: unknown[]) => {
+        calls.answer.push(a);
+      },
+      editMessageText: async (...a: unknown[]) => {
+        calls.edit.push(a);
+      },
+    };
+    return { ctx: ctx as unknown as Context, calls };
+  }
+
+  function deps() {
+    return {
+      zaalId: ZAAL,
+      ownerOnlyState: newOwnerOnlyState(),
+      enabled: () => true,
+      build: async () => 'STATUS TEXT',
+      now: () => 0,
+    };
+  }
+
+  it('a non-owner never sees the status, only the owner-only line', async () => {
+    const { ctx, calls } = fakeCtx(STRANGER);
+    await statusCommandHandler(deps())(ctx, async () => undefined);
+    expect(calls.reply).toEqual([[OWNER_ONLY_LINE]]);
+    expect(JSON.stringify(calls.reply)).not.toContain('STATUS TEXT');
+  });
+
+  it('a non-owner asking again inside the hour gets silence', async () => {
+    const d = deps();
+    const first = fakeCtx(STRANGER);
+    await statusCommandHandler(d)(first.ctx, async () => undefined);
+    const second = fakeCtx(STRANGER);
+    await statusCommandHandler(d)(second.ctx, async () => undefined);
+    expect(second.calls.reply).toEqual([]);
+  });
+
+  it('an update with no sender gets nothing', async () => {
+    const { ctx, calls } = fakeCtx(undefined);
+    await statusCommandHandler(deps())(ctx, async () => undefined);
+    expect(calls.reply).toEqual([]);
+  });
+
+  it('the owner gets the status with the Refresh button', async () => {
+    const { ctx, calls } = fakeCtx(ZAAL);
+    await statusCommandHandler(deps())(ctx, async () => undefined);
+    expect(calls.reply).toEqual([['STATUS TEXT', { reply_markup: statusKeyboard() }]]);
+  });
+
+  it('switched off, the command falls through and replies nothing', async () => {
+    const { ctx, calls } = fakeCtx(ZAAL);
+    let passed = false;
+    await statusCommandHandler({ ...deps(), enabled: () => false })(ctx, async () => {
+      passed = true;
+    });
+    expect(passed).toBe(true);
+    expect(calls.reply).toEqual([]);
+  });
+
+  it('a non-owner tapping Refresh gets an empty answer and no edit', async () => {
+    const { ctx, calls } = fakeCtx(STRANGER);
+    await statusRefreshHandler(deps())(ctx);
+    expect(calls.answer).toEqual([[]]);
+    expect(calls.edit).toEqual([]);
+  });
+
+  it('the owner tapping Refresh gets the status edited in place', async () => {
+    const { ctx, calls } = fakeCtx(ZAAL);
+    await statusRefreshHandler(deps())(ctx);
+    expect(calls.answer).toEqual([[{ text: 'Refreshed' }]]);
+    expect(calls.edit).toEqual([['STATUS TEXT', { reply_markup: statusKeyboard() }]]);
+  });
+});
+
+describe('a JSONL row that parses to null', () => {
+  const prevHome = process.env.ZOE_HOME;
+  afterEach(() => {
+    if (prevHome === undefined) delete process.env.ZOE_HOME;
+    else process.env.ZOE_HOME = prevHome;
+  });
+
+  it('is skipped instead of crashing the render', async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'zoe-status-null-'));
+    process.env.ZOE_HOME = dir;
+    writeFileSync(
+      join(dir, 'send-budget-log.jsonl'),
+      `null\n42\n"text"\n${JSON.stringify(send('2026-10-26T13:40:00Z', 'sent', 'after nulls'))}\n`,
+    );
+    const text = await buildStatus(NOW);
+    expect(text).toContain('09:40 sent - after nulls');
   });
 });

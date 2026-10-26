@@ -26,7 +26,9 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 import type { SendLogRow } from './send-budget';
 import { gapsPath } from './capability-gaps';
-import { recentRuns, type FeatureRun } from './feature-ran';
+import type { Context } from 'grammy';
+import { featureRan, recentRuns, type FeatureRun } from './feature-ran';
+import { OWNER_ONLY_LINE, shouldSendOwnerOnlyLine, type OwnerOnlyState } from './owner-only';
 
 /** Kill switch. /status is read-only and owner-only, so it is on unless set to 0. */
 export function statusCommandEnabled(env: NodeJS.ProcessEnv = process.env): boolean {
@@ -127,7 +129,9 @@ async function tailJsonl<T>(path: string, n: number): Promise<T[]> {
     const out: T[] = [];
     for (const l of raw.split('\n').filter((x) => x.trim()).slice(-n)) {
       try {
-        out.push(JSON.parse(l) as T);
+        const row: unknown = JSON.parse(l);
+        // `null`, a number or a string parses fine and would crash the render.
+        if (row && typeof row === 'object') out.push(row as T);
       } catch {
         // one bad line does not hide the rest
       }
@@ -150,4 +154,52 @@ export async function buildStatus(now: Date = new Date()): Promise<string> {
     tailJsonl<GapLine>(gapsPath(), 50),
   ]);
   return renderStatus({ now, bootAt: BOOT_AT, ran: recentRuns(), sends, gaps });
+}
+
+// ---------------------------------------------------------------------------
+// Handlers. Here, not in index.ts, so the owner gate on both paths is tested
+// (index.ts boots the bot on import and cannot be loaded by a test).
+// ---------------------------------------------------------------------------
+
+export interface StatusHandlerDeps {
+  /** ZAAL_TELEGRAM_ID, the only user /status answers. */
+  zaalId: number;
+  /** index.ts's shared state, so the "That one is Zaal's." line stays once per user per hour across commands. */
+  ownerOnlyState: OwnerOnlyState;
+  enabled?: () => boolean;
+  build?: () => Promise<string>;
+  now?: () => number;
+}
+
+/** /status. A non-owner gets at most the owner-only line, never the status. */
+export function statusCommandHandler(deps: StatusHandlerDeps) {
+  const enabled = deps.enabled ?? (() => statusCommandEnabled());
+  const build = deps.build ?? (() => buildStatus());
+  const now = deps.now ?? Date.now;
+  return async (ctx: Context, next: () => Promise<void>): Promise<void> => {
+    if (!enabled()) return next();
+    const uid = ctx.from?.id;
+    if (uid !== deps.zaalId) {
+      if (uid !== undefined && shouldSendOwnerOnlyLine(deps.ownerOnlyState, uid, now())) {
+        await ctx.reply(OWNER_ONLY_LINE).catch(() => undefined);
+      }
+      return;
+    }
+    await ctx.reply(await build(), { reply_markup: statusKeyboard() });
+    featureRan('status-command');
+  };
+}
+
+/** The Refresh button. A non-owner tap is answered empty and edits nothing. */
+export function statusRefreshHandler(deps: StatusHandlerDeps) {
+  const build = deps.build ?? (() => buildStatus());
+  return async (ctx: Context): Promise<void> => {
+    if (ctx.from?.id !== deps.zaalId) {
+      await ctx.answerCallbackQuery().catch(() => undefined);
+      return;
+    }
+    await ctx.answerCallbackQuery({ text: 'Refreshed' }).catch(() => undefined);
+    // Telegram refuses an edit to identical text; that is not an error worth showing.
+    await ctx.editMessageText(await build(), { reply_markup: statusKeyboard() }).catch(() => undefined);
+  };
 }

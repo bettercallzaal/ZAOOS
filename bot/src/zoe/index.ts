@@ -66,7 +66,7 @@ import {
 } from './x-desk';
 import { NO_SPINNER, startThinkingSpinner, thinkingSpinnerEnabled } from './thinking-spinner';
 import { sendTerminalsDigest, terminalsDigestEnabled, readTerminalsPage, parseTerminalsPage, vaultDir as terminalsVaultDir } from './terminals-digest';
-import { buildStatus, statusCommandEnabled, statusKeyboard } from './recent-activity';
+import { statusCommandHandler, statusRefreshHandler } from './recent-activity';
 import { captureTerminalTypedReply, maybeSendTailCard, recordTerminalAnswer, sendNextTerminalCard, setPendingType, tailCardScopeAllowed, terminalGrillEnabled } from './terminal-grill';
 import { formatPrList, inboxNudgeEnabled, mergeCommand, parsePrCallback, readTotals } from './inbox-nudge';
 import { RESUME_ROW, STOP_ROW, grillStopEnabled, setGrillPaused } from './grill-pause';
@@ -925,22 +925,8 @@ bot.command('terminals', async (ctx, next) => {
 // /status - the last ten things ZOE did: features that ran, sends, things she could
 // not do (recent-activity.ts). Read-only, owner-only. ZOE_STATUS_COMMAND=0 turns it
 // off and the command falls through, so the word is not swallowed.
-bot.command('status', async (ctx, next) => {
-  if (!statusCommandEnabled()) return next();
-  if (!(await ownerOnly(ctx))) return;
-  await ctx.reply(await buildStatus(), { reply_markup: statusKeyboard() });
-  featureRan('status-command');
-});
-
-bot.callbackQuery('zst:refresh', async (ctx) => {
-  if (!isFromZaal(ctx)) {
-    await ctx.answerCallbackQuery().catch(() => undefined);
-    return;
-  }
-  await ctx.answerCallbackQuery({ text: 'Refreshed' }).catch(() => undefined);
-  // Telegram refuses an edit to identical text; that is not an error worth showing.
-  await ctx.editMessageText(await buildStatus(), { reply_markup: statusKeyboard() }).catch(() => undefined);
-});
+bot.command('status', statusCommandHandler({ zaalId, ownerOnlyState }));
+bot.callbackQuery('zst:refresh', statusRefreshHandler({ zaalId, ownerOnlyState }));
 
 // /working - list tasks currently in_progress with how long they've been in that state
 bot.command('working', async (ctx) => {

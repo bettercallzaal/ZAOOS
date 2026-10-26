@@ -1,5 +1,7 @@
 # Research Grounding - real fetches, or it is UNVERIFIED
 
+mechanism: none yet (since 2026-10-23, #4151)
+
 Research subagents fabricate citations (2026-08-03: four scouts invented arxiv IDs, thread numbers and percentages). Incident and WebFetch audit (doc 2250): `research/dev-workflows/2649-rules-history/archive/research-grounding.md`.
 
 **A cited source is not grounding unless it was fetched and read this run.** Every specific claim, number, quote, URL, or repo traces to a fetched page, or is marked UNVERIFIED.

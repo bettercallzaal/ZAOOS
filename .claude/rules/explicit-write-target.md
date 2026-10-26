@@ -1,5 +1,7 @@
 # Explicit Write Target - a tool that writes names its repo; the cwd never decides
 
+mechanism: none yet (since 2026-10-23, #3470)
+
 Every instance below wrote to a tree nobody chose, and each reported success:
 
 - ZAOOS#3470, 2026-09-10: a `git clone` and a `cd` failed mid-chain, so `git remote remove origin` and `gh repo create --source=. --push` ran in the inherited cwd, `~/zao-vault`. The vault's tree was pushed to a new repo.

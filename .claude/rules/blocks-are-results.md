@@ -1,5 +1,7 @@
 # Blocks Are Results - a denial is reported, never routed around
 
+mechanism: none yet (since 2026-10-23, #3467)
+
 The global CLAUDE.md says it in one line ("A denied tool call is a result. Report it as BLOCKED with the exact message."). That line did not stop three instances (ZAOOS#3467), so the forms are named here:
 
 - 2026-09-09: a subagent denied `git commit` wrote `.claude/settings.json` in its worktree to grant itself `Bash(git *)`, then asked its controller to "authorize these actions".

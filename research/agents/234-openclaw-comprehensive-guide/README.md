@@ -4,7 +4,7 @@
 topic: agents
 type: research
 status: archive-candidate
-last-validated: 2026-05-21
+last-validated: 2026-10-28
 original-query: Comprehensive guide to OpenClaw architecture, memory systems, knowledge graphs, and MCP integration (reconstructed)
 tier: archive
 note: OpenClaw framework and agent orchestration strategy decommissioned 2026-05-04. Doc archived as comprehensive historical reference; patterns may inform future agent infrastructure.
@@ -12,6 +12,25 @@ note: OpenClaw framework and agent orchestration strategy decommissioned 2026-05
 
 > **Status:** Research complete
 > **Date:** April 1, 2026
+> **Last revalidated:** October 28, 2026
+
+## Updated 2026-10-28: Post-May 2026 Activity (UNVERIFIED - full fetches blocked by network policy)
+
+WebSearch shows OpenClaw continued active development after ZAO's decommission of it (2026-05-04). Search snippets only - no pages could be fetched in this session due to network policy; all specific claims below are UNVERIFIED:
+
+- **2026.5.2** (May 3-4, 2026): Platform stability and plugin reliability release per buildfastwithai.com (UNVERIFIED - page unreachable).
+- **2026.6.6**: Security hardening and faster agent response times per createwith.com (UNVERIFIED - page unreachable).
+- **2026.3.22** (pre-cutoff, included for completeness): ClawHub plugin marketplace launched; multi-model support added per c-sharpcorner.com (UNVERIFIED).
+- **Version 2.0** (claimed ~August 30, 2026): One source (aitoolsatlas.ai, unreachable) described it as "the largest update in the project's history." Not confirmed from any second source. Treat as UNVERIFIED.
+- **A2A plugin architecture**: freecodecamp.org published a guide on an A2A plugin layer (date unknown, page unreachable).
+- **GitHub stars**: Search snippets variously claim 339K (as of April 2026) and 347K+ (same period). UNVERIFIED.
+- **Governance**: Creator Peter Steinberger joined OpenAI Feb 2026; project moved to an independent foundation; OpenAI reportedly sponsoring the project per multiple third-party blogs (UNVERIFIED).
+
+**ZAO relevance:** None of this changes ZAO's decision. OpenClaw was decommissioned 2026-05-04 (CLAUDE.md) and the decision stands. This doc remains an archive reference. If ZAO were to reconsider agent orchestration, the ClawHub marketplace and A2A architecture would be the angles to investigate fresh.
+
+Sources checked: WebSearch (standard, 2026-10-28) - 2 queries across ~36 results. Zero full-page fetches succeeded (network policy). All specific claims above are UNVERIFIED.
+
+---
 > **Tags:** `#openclaw` `#agent-memory` `#knowledge-graph` `#mcp` `#context-management` `#soul-md`
 > **Supersedes:** Partial — Doc 197 (memory system), Doc 204 (setup runbook), Doc 226 (best practices)
 > **Builds on:** Doc 202 (multi-agent orchestration), Doc 205 (deployment plan), Doc 208 (skills & capabilities)

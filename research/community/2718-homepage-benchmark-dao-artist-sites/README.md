@@ -161,7 +161,7 @@ All six PRs are open and the last three are marked on hold in their titles (`gh 
 - [Doc 2564 - UI improvement audit tools](../../dev-workflows/2564-ui-improvement-audit-tools/)
 - [Doc 1383 - front door consolidation](../../identity/1383-zao-front-door-consolidation-jul2026/)
 - Site repo: `app/page.tsx`, `lib/constants.ts`, `lib/wavewarz.ts`, `public/llms.txt`, `app/globals.css` (bettercallzaal/zao-website, origin/main)
-- Vault: `~/zao-vault-worktrees/thezao/notes/website-audit-2026-10-28.md`
+- An internal 2026-10-28 website audit note (private, not linked)
 
 ## Next Actions
 
@@ -225,4 +225,4 @@ The ZAO grounding
 31. Site repo origin/main [FULL]: `app/page.tsx`, `lib/constants.ts`, `lib/wavewarz.ts`, `public/llms.txt`, `app/globals.css` (lines 11, 14 for the palette).
 32. WaveWarZ public API stats endpoint https://wavewarz.info/api/public/stats [FULL - fetched 2026-10-29 02:12 UTC: 1,668 battles, 1,002.9548 SOL, artist payouts 15.7655 SOL, trader claims 520.9295 SOL in 3,559 withdrawals]. The API docs page (wavewarz.info/api-docs) was not fetched; the endpoint paths come from `lib/wavewarz.ts`.
 33. Luma calendar https://luma.com/zao [HTTP 200 only - page content not read]; Paragraph RSS https://api.paragraph.com/blogs/rss/@thezao [FULL for the channel header; feed items not read].
-34. Vault note `website-audit-2026-10-28.md` [FULL].
+34. An internal 2026-10-28 website audit note, private [FULL].

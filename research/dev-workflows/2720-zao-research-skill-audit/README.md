@@ -18,8 +18,8 @@ Measured Thu 2026-10-29 from the skill as served on this Mac (`~/.claude/skills`
 
 | # | Upgrade | Call | Grounded in |
 |---|---|---|---|
-| 1 | **Put the research-grounding subagent preamble into the skill, verbatim, at DISPATCH** | DO FIRST | `.claude/rules/research-grounding.md` says every research subagent prompt carries the "REAL FETCHES ONLY" block. A case-insensitive grep of the 7 instruction files (`SKILL.md`, `CHANGELOG.md`, the 5 references; the two index files left out) for `REAL FETCHES`, `fabricated arxiv`, `grounding preamble` and `tool_uses` found 0 hits in each; the control `WebFetch` hit 6 lines in `tools-and-scraping.md` (command in Reproduce). The DISPATCH template at `references/step-4-research-and-fetch-gate.md:44` spawns subagents with no grounding text at all |
-| 2 | **Turn the fetch-marker and `original-query` requirements into a refusing check** (a lint the commit hook runs), not prose | DO | Of 135 doc READMEs added to ZAOOS main since 2026-09-29, 109 (81%) carry `original-query:` and 112 (83%) carry a bracketed `[FULL]`/`[PARTIAL]`/`[FAILED]` marker. Both are "Hard Requirements" that every doc "must pass". Doc 2475 decision 4 measured the same split: hooked steps near 100%, honour-system steps 3-40% |
+| 1 | **Put the research-grounding subagent preamble into the skill, verbatim, at DISPATCH** | DO FIRST | `.claude/rules/research-grounding.md` says every research subagent prompt carries the "REAL FETCHES ONLY" block. A case-insensitive grep of the 7 instruction files (`SKILL.md`, `CHANGELOG.md`, the 5 references; the two index files left out) for `REAL FETCHES`, `fabricated arxiv`, `grounding preamble` and `tool_uses` found 0 hits in each; the same pattern run on `.claude/rules/research-grounding.md`, which carries the preamble, counts 3 lines (command in Reproduce). The DISPATCH template at `references/step-4-research-and-fetch-gate.md:44` spawns subagents with no grounding text at all |
+| 2 | **Turn the fetch-marker and `original-query` requirements into a refusing check** (a lint the commit hook runs), not prose | DO | Of the 135 doc READMEs added to ZAOOS main since 2026-09-29 that still exist at `17e55427d` (136 added; one is doc 2661's original folder, renamed in #3913 to `research/agents/2661-north-creek-helper-telegram-bot/`, so the denominator is 135), 109 (81%) carry `original-query:` and 112 (83%) carry a bracketed `[FULL]`/`[PARTIAL]`/`[FAILED]` marker. Both are "Hard Requirements" that every doc "must pass". Doc 2475 decision 4 measured the same split: hooked steps near 100%, honour-system steps 3-40% |
 | 3 | **Add a citation pass that checks quotes against saved raw text**, the way Anthropic's research system runs a separate CitationAgent | DO | Anthropic's post: findings go "to a CitationAgent, which processes the documents and research report to identify specific locations for citations". Ours asks the writer to grade its own sources. Raw fetches are already saved to disk in practice (this lane did it for 2719), so the check is a grep, not a model call |
 | 4 | **Delete the stale lines that still instruct** | DO | Four, listed in section 3. One is a citation doc 2475 found does not exist, still printed as a "HARD REQUIREMENT" header |
 | 5 | **Teach the skill about the two libraries and about private sources** | DO | ZAOOS holds 2,413 doc folders and the private `ZAODEVZ/ZAOresearch` 2,049, with 21 docs only in the private one (doc 2691, line 160). The skill names neither ZAOresearch nor what to do when the source is a private repo going into a public library; doc 2719 had to decide that alone |
@@ -127,17 +127,17 @@ Step 8's scan should also print email addresses and compare them to the `pii-hyg
 - [Hacker News thread 44272278](https://news.ycombinator.com/item?id=44272278) `[PARTIAL - Algolia API shows 35 points and 0 comments, so there is no discussion to read]`
 - [ZAODEVZ/ZAOresearch README](https://github.com/ZAODEVZ/ZAOresearch) (private) `[PARTIAL - README first 30 lines only]` - `gh api .../readme`
 - ZAOOS research library on origin/main `17e55427d` `[FULL]` for docs 2475, 693, 2470 (Key Decisions sections) and 2691 (lines grepped for ZAOresearch); docs resolved with `zao-research-health --resolve`
-- 30-day compliance count `[FULL]` - 135 readable docs at origin/main `17e55427d` (1 path added since then no longer exists there): 109 with `original-query`, 112 with a bracketed fetch marker, 120 with Next Actions. Commands under Reproduce
+- 30-day compliance count `[FULL]` - 136 READMEs added since 2026-09-29; 135 exist at `17e55427d` (the 136th, doc 2661's old folder, was renamed by #3913) and are the denominator: 109 with `original-query`, 112 with a bracketed fetch marker, 120 with Next Actions. Commands under Reproduce
 - ZAO's internal mistakes log `[FULL]` - read locally, 360 entries, shapes counted with `grep '^shape:'`; private, so cited here by date only
 
 ## Reproduce
 
-Run from a ZAOOS checkout that has fetched `17e55427d`. Printed on 2026-10-29: `docs=135 unreadable=1 original-query=109 markers=112 next-actions=120`.
+Run from a ZAOOS checkout that has fetched `17e55427d`. Printed on 2026-10-29: one `UNREADABLE research/agents/2661-<old slug>/README.md` line (the old slug carried a first name that #3913 removed, so it is not repeated here), then `docs=135 unreadable=1 original-query=109 markers=112 next-actions=120`. `docs=` is the denominator; the unreadable path is doc 2661's pre-rename folder (#3913), now `research/agents/2661-north-creek-helper-telegram-bot/`.
 
 ```bash
 git log origin/main --since=2026-09-29 --diff-filter=A --name-only --format= -- 'research/*/*/README.md' | sort -u \
 | while read f; do
-    git show "17e55427d:$f" >/dev/null 2>&1 || { echo UNREADABLE; continue; }
+    git show "17e55427d:$f" >/dev/null 2>&1 || { echo "UNREADABLE $f" >&2; echo UNREADABLE; continue; }
     c=$(git show "17e55427d:$f")
     printf '%s %s %s\n' "$(grep -c '^original-query:' <<<"$c")" \
       "$(grep -cE '\[(FULL|PARTIAL|FAILED)' <<<"$c")" "$(grep -ciE '^## Next Actions' <<<"$c")"
@@ -146,11 +146,14 @@ git log origin/main --since=2026-09-29 --diff-filter=A --name-only --format= -- 
        END{print "docs="n, "unreadable="u, "original-query="o, "markers="m, "next-actions="a}'
 ```
 
-The skill grep, against the files `~/.claude/skills/zao-research/` served on this Mac at zaal-dotfiles `36e7a9c` (printed 0 for each of the 7):
+The skill grep, against the 7 instruction files served on this Mac at zaal-dotfiles `36e7a9c` (printed 0 for each), then the same pattern on a file that carries the preamble, as the control (printed 3):
 
 ```bash
-grep -ciE "REAL FETCHES|fabricated arxiv|grounding preamble|tool_uses" \
-  ~/.claude/skills/zao-research/SKILL.md ~/.claude/skills/zao-research/CHANGELOG.md \
-  ~/.claude/skills/zao-research/references/*.md
-grep -ciE "WebFetch" ~/.claude/skills/zao-research/references/tools-and-scraping.md   # control: 6
+K=~/.claude/skills/zao-research
+P="REAL FETCHES|fabricated arxiv|grounding preamble|tool_uses"
+grep -ciE "$P" $K/SKILL.md $K/CHANGELOG.md \
+  $K/references/background.md $K/references/step-4-research-and-fetch-gate.md \
+  $K/references/steps-1-3-search-and-reserve.md $K/references/steps-5-9-write-check-commit-pr.md \
+  $K/references/tools-and-scraping.md
+grep -ciE "$P" .claude/rules/research-grounding.md   # control, run from a ZAOOS checkout: 3
 ```

@@ -4,7 +4,7 @@
 topic: agents
 type: research
 status: research-complete
-last-validated: 2026-05-21
+last-validated: 2026-10-29
 original-query: Evaluate free web search MCP alternatives for AI agents (reconstructed)
 tier: reference
 ---
@@ -325,3 +325,49 @@ Tavily (primary, 1,000/month) + DuckDuckGo (overflow) + Jina Reader (extraction)
   }
 }
 ```
+
+---
+
+## Updated 2026-10-29
+
+Three substantive changes since last validation (2026-05-21):
+
+### 1. DuckDuckGo MCP - breakage and recovery (FULL: GitHub releases page)
+
+The breakage risk called out in the original doc materialized. In July 2026 DuckDuckGo began actively blocking the default HTTP client used by the scraper. The nickclyde/duckduckgo-mcp-server package adapted with the following releases:
+
+- **v0.5.0 (2026-07-01):** Added Chrome TLS impersonation fallback when DuckDuckGo blocks the default client. Added SSRF protection to `fetch_content` (blocks private/internal addresses by default, opt-in to allow). Behavior change: some self-hosted targets require opting in.
+- **v0.6.0 (2026-07-27):** Better operation behind reverse proxies and Docker. Added host/origin allow-lists and custom CA bundle support.
+- **v0.6.1 (2026-07-28):** Fixed startup crash caused by `mcp` 2.0.0 removing a module the server depended on. Capped `mcp` dependency to `<2.0`.
+- **v0.7.0 (2026-09-04):** Added `mcp` 2.x support. Configurable per-host rate limits and 429-retry. In-memory cache. `ref://` URL tokens for long URLs, with `expand_link` tool.
+
+**Impact on recommendation:** DuckDuckGo remains free and key-free, but is now confirmed fragile (one block event already happened). The TLS impersonation workaround adds a maintenance dependency. For production agents the hybrid option D (Tavily primary, DDG overflow) is now more important to follow than "zero-config DDG alone."
+
+Sources: https://github.com/nickclyde/duckduckgo-mcp-server/releases (FULL)
+
+### 2. MCP protocol 2026-07-28 spec - stateless redesign (PARTIAL: search snippets, primary spec site blocked)
+
+The Model Context Protocol published a major revision on 2026-07-28:
+
+- **Stateless core:** The `initialize` handshake and `Mcp-Session-Id` header are removed. Every request is self-contained.
+- **HTTP+SSE transport deprecated:** Migrate to Streamable HTTP. A 12-month minimum deprecation window was added to the spec.
+- **Roots, Sampling, Logging deprecated** (not immediately removed).
+- **Auth tightened:** OAuth/OpenID updates and header-based routing added.
+
+The DuckDuckGo MCP server's v0.6.1/v0.7.0 releases directly reflect this: v0.6.1 had to cap the `mcp` dependency because 2.0.0 removed an API, and v0.7.0 added proper 2.x support.
+
+Any server still on `mcp` 1.x that uses HTTP+SSE should be migrated before the deprecation window closes (~July 2027).
+
+Sources: search snippets from appwrite.io, aaif.io, hyrax.dev, and others (PARTIAL - primary spec at modelcontextprotocol.net was blocked by session network policy)
+
+### 3. Jina AI Reader - OCR mode cost increase (UNVERIFIED: tracker snapshot only, jina.ai blocked)
+
+A pricing tracker (usagepricing.com) reports that on 2026-10-24 Jina's Reader premium conversion mode changed from ReaderLM-v2 (3x token multiplier) to jina-ocr-v1 (40x token multiplier). Reader bills on output-response tokens, so pages converted in premium mode would now cost approximately 13x more than before the swap.
+
+Jina's own announcement page for jina-ocr-v1 (released on jina.ai/news) describes it as a 3.4B-parameter vision-language model with 570M active parameters, designed for document parsing. One German-language report notes the model may not be usable commercially - verify jina.ai license terms before using OCR mode in a commercial product.
+
+This does not affect the free Reader tier for standard HTML pages (which does not use the premium OCR path). It matters for PDFs and images processed through r.jina.ai.
+
+**Status: UNVERIFIED** from primary source - jina.ai was blocked by session network policy. Verify at jina.ai/pricing and the Reader changelog before relying on this figure.
+
+Sources: https://www.usagepricing.com/blueprint/activity/jina-ai-2026-10-24-reader-ocr-mode-40x-tokens (tracker snapshot, PARTIAL - site blocked)

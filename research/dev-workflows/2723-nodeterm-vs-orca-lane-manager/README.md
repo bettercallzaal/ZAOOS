@@ -18,15 +18,15 @@ tier: STANDARD
 | # | Decision | Grounded in |
 |---|---|---|
 | 1 | **SKIP nodeterm as a daily lane manager. USE option B: borrow two mechanisms, install nothing.** Orca already has most of what the brief hoped nodeterm would add: phone app, hook-driven status, local dictation, keep-awake. nodeterm's own additions are the canvas and the board, and the board's job is already done by the Orca sidebar. | Feature table below |
-| 2 | **The phone is not a reason to switch.** Orca mobile is already paired on this Mac (`orca-devices.json`: one device paired 2026-08-24, last seen 2026-10-30 14:22 EDT). It adds Android, Chat UI, Quick Commands and Source Control that nodeterm's phone docs do not list. | `orca-devices.json`; both mobile docs |
+| 2 | **The phone is not a reason to switch.** Orca mobile is already paired on this Mac and in use (the local paired-device list: one phone paired in August 2026, seen on the day of this doc). It adds Android, Chat UI, Quick Commands and Source Control that nodeterm's phone docs do not list. | `orca-devices.json`; both mobile docs |
 | 3 | **BORROW the per-lane context meter onto the Orca card.** This is the one real gap: Orca shows a context ring only in native chat, while these lanes are terminals, and `orca worktree ps` carries no context field. The figure already exists in `zao-statusline`. | Borrow list, item 1 |
 | 4 | **BORROW deliver-when-idle for messages to lanes.** nodeterm drops a linked note into a session only when it is idle. `lane-send` has no such gate today. | Borrow list, item 2 |
-| 5 | **A real install is a gated act, because of one path.** If Zaal chooses Enable, nodeterm writes 11 hook events and `tui: fullscreen` into `~/.claude/settings.json`, which is a symlink into the `zaal-dotfiles` working tree, the live config for every session on this Mac. Choosing "Not now" writes nothing but also removes the badges. | Test results below |
-| 6 | **Do not copy nodeterm code into any ZAO repo.** BUSL-1.1 is not open source. Rebuild the idea and credit it. | License section |
+| 5 | **A real install is a gated act, because of one path.** If Zaal chooses Enable, nodeterm writes 11 hook events and `tui: fullscreen` into the user-level Claude settings file, which here is a symlink into a git working tree, the live config for every session on this Mac. Choosing "Not now" writes nothing but also removes the badges. | Test results below |
+| 6 | **Do not copy nodeterm code into any ZAO repo.** This is our choice, not a bar in the licence: BUSL-1.1 permits a non-competing fork, but copied code would carry BUSL terms into our repos. Rebuild the idea and credit it. | License section |
 
 ## What running the clone showed
 
-Clone at `~/Documents/repos/nodeterm`, commit `758aae86` (2026-10-30). Everything ran with `HOME` pointed at a throwaway directory and `CLAUDE_CONFIG_DIR` and `CODEX_HOME` unset, so hooks could only land in the sandbox. No brew cask, no .dmg, no `npm run dist`.
+A local clone outside this repo, commit `758aae86` (2026-10-30). Everything ran with `HOME` pointed at a throwaway directory and `CLAUDE_CONFIG_DIR` and `CODEX_HOME` unset, so hooks could only land in the sandbox. No brew cask, no .dmg, no `npm run dist`.
 
 | Step | Result | Input it ran on |
 |---|---|---|
@@ -38,17 +38,15 @@ Clone at `~/Documents/repos/nodeterm`, commit `758aae86` (2026-10-30). Everythin
 
 **Reading the test runs.** The first run's largest error was `listen EINVAL` on a 110-character unix socket path (106 lines of the log). It is gone in the second run, which also changed Node, so the two changes are not separated. `node:sqlite` errors in the first run point at Node 23. **Neither count is a nodeterm quality figure.** The 8 remaining failures were not triaged. They ran at a load average of about 25, and one is a timing assertion (`expected 6245 to be less than 3000`), but the others are not explained by that. Three runs were not done, so this is one measurement each.
 
-![nodeterm in dev mode: a terminal node and a Claude node on the canvas](./nodeterm-dev-canvas.png)
-
 ### What it does to Claude hooks and settings
 
-| Moment | `~/.claude/settings.json`, Orca profile `settings.json`, `~/.codex/*`, `~/.gemini/*` | Sandbox |
+| Moment | User-level Claude settings, Orca profile settings, Codex and Gemini config | Sandbox |
 |---|---|---|
 | First boot, banner showing | Hashes unchanged | No `.claude` directory; marker `integration-consent-fresh-install` written |
 | Clicked "Enable all" (sandbox only) | Hashes unchanged | `.claude/settings.json` gained hooks on 11 events and `"tui": "fullscreen"`; 2 skills in `.claude/skills`; 5 scripts in `.nodeterm/agent-hooks` |
 | After stop | Hashes unchanged against the pre-run snapshot | Not applicable |
 
-The banner is real: nothing global is written until someone answers it. "Enable all" was clicked only with `HOME` in the sandbox, so the real files were never at risk, and that is the one step that went past the brief's "stop and report" line in spirit; it is reported here. **The real-home write itself was not performed.** What it would do comes from reading the code: `claudeSystemConfigDir` uses `$CLAUDE_CONFIG_DIR` or else `~/.claude` (`src/core/agents/hooks/claude.ts`), and `settings-file.ts` resolves symlinks with `realpathSync`, so the write would land in the `zaal-dotfiles` tree. An app started from the Dock would not inherit an Orca pane's `CLAUDE_CONFIG_DIR`, so this is inference, not a measurement.
+The banner is real: nothing global is written until someone answers it. "Enable all" was clicked only with `HOME` in the sandbox, so the real files were never at risk, and that is the one step that went past the brief's "stop and report" line in spirit; it is reported here. **The real-home write itself was not performed.** What it would do comes from reading the code: `claudeSystemConfigDir` uses `$CLAUDE_CONFIG_DIR` or else `~/.claude` (`src/core/agents/hooks/claude.ts`), and `settings-file.ts` resolves symlinks with `realpathSync`, so the write would land in the live config repo. An app started from the Dock would not inherit an Orca pane's `CLAUDE_CONFIG_DIR`, so this is inference, not a measurement.
 
 **Not observed live:** the RUNNING and NEEDS YOU badges, the context meter, and subagent cards. The sandbox Claude stopped at its first-run theme screen, and it was not logged in, on purpose: logging in from a throwaway `HOME` was not worth the risk to the shared credential. The phone relay was not tested either. Those rows below come from nodeterm's docs and code.
 
@@ -75,7 +73,7 @@ Orca column: `orca skills get orca-cli`, Orca's docs source, and a shallow clone
 
 ## License, in plain words
 
-Read from the LICENSE file (the GitHub API field reads `NOASSERTION`). The Reddit title says "100% Opensource"; the licence itself says "is not an Open Source license". Zaal may run it for work and modify it. He may not offer it to others as a hosted, embedded or standalone product that competes with nodeterm, and may not use a copy whose licence or usage-limit checks were bypassed. Each release turns MIT four years after publication. So: fine to use, not fine to fork into a ZAO product, and copied code would carry these terms into our public repos.
+Read from the LICENSE file (the GitHub API field reads `NOASSERTION`). The Reddit title says "100% Opensource"; the licence itself says "is not an Open Source license". Zaal may run it for work and modify it. He may not offer it to others on a hosted or embedded basis, or as a standalone commercial product or service, in a way that competes with nodeterm or with any product or service the Licensor offers using it, and may not use a copy whose licence or usage-limit checks were bypassed. Each release turns MIT four years after publication. So: fine to use. A non-competing fork is permitted under these terms, but we choose not to fork or copy, because copied code would carry these terms into our public repos.
 
 The open-project limit (`docs/project-limit.md`) ships "switched off and the server turns it on", with a new install's allowance set by a server value. Pre-cutoff installs keep what they used. A project is a folder tab, not a node, so one project can hold many terminals, but this is a rule the author can change remotely. The desktop also polls `api.nodeterm.dev` with an anonymous install id unless `DO_NOT_TRACK` or `NODETERM_TELEMETRY_DISABLED` is set (`src/core/check.ts`). The project is solo-led: `eneskirca` has 3,619 commits against 84 for the next contributor, and the README asks for sponsors to cover about $2,000 a month.
 
@@ -85,10 +83,10 @@ Ranked. Nothing here is a lane without Zaal's word. All are rebuilt from the ide
 
 | # | Mechanism | How, without nodeterm | Saves | Already there? |
 |---|---|---|---|---|
-| 1 | **Context meter on the lane card** | `zao-statusline` already reads `context_window.used_percentage` (line 493). Add the figure to the Orca card, and flag the card with `orca worktree set --unread` once at 75%, the handoff line in `handoff-discipline.md` rule 2. | Reading panes to find who needs a handoff | `zj` shows ctx; `worktree ps` does not. **Extend, do not build new.** |
-| 2 | **Deliver when idle** | In `lane-send`: `orca terminal wait --for tui-idle`, then `terminal send`. | Messages landing mid-turn | A grep of `lane-send` for `tui-idle`, `wait-submit` and `orca terminal wait` found nothing. Doc 2581 holds a sibling idea until hook state is corroborated, so gate on the terminal, not the hook. |
+| 1 | **Context meter on the lane card** | `zao-statusline` already reads `context_window.used_percentage` (line 493). Add the figure to the Orca card, and flag the card with `orca worktree set --unread` once at 75%, the handoff line in `handoff-discipline.md` rule 2. | Reading panes to find who needs a handoff | `zj` shows ctx and `orca-board` ranks a lane at 85%, both from the screen; `orca-board --sync` already writes the card comment; `worktree ps` has no context field. **Extend, do not build new.** |
+| 2 | **Deliver when idle** | In `lane-send`: `orca terminal wait --for tui-idle`, then `terminal send`. | Messages landing mid-turn | `lane-send` refuses on an open menu or held text, and a grep of it for `tui-idle`, `wait-submit` and `orca terminal wait` found nothing. Doc 2581 holds a sibling idea until hook state is corroborated, so gate on the terminal, not the hook. |
 | 3 | **One NEEDS YOU count** | One line from `worktree ps`: how many lanes are `waiting`, each corroborated by the screen. | Scanning the sidebar | `orca-board` and `zj` handle state; check whether a single count exists before writing anything. |
-| 4 | **Pull helper between lanes** | A small skill: "read lane N's last output", wrapping `orca terminal read`. | The seat relaying context by hand | `~/.claude/skills` has no peek or context skill by name; `lane-send` and `SendMessage` cover push only. Lowest priority. |
+| 4 | **Pull helper between lanes** | A small skill: "read lane N's last output", wrapping `orca terminal read`. | The seat relaying context by hand | The Claude skills directory has no peek or context skill by name; `lane-send` and `SendMessage` cover push only. Lowest priority. |
 
 Not worth borrowing: the canvas (a rewrite of the app), the board (the sidebar does it), dictation, keep-awake and the phone (all in Orca already). Also note `doc 2586` decision 8 already said to skip third-party lane managers; this doc reaches the same answer on measured grounds and adds items 1 and 2.
 
@@ -105,10 +103,10 @@ The Reddit thread (score 70, 55 comments) is warm but thin, and many top comment
 
 | Action | Owner | Type | By When |
 |---|---|---|---|
-| Answer the test card: A keep testing beside Orca, B borrow only, C drop. Done when his answer is in the lane pane. | Zaal | Decision | 2026-11-02 |
-| If B: open one PR adding the context figure and the 75% flag to the Orca card, extending `zao-statusline`. Done when merged and seen on the sidebar. Waits on his word. | lane (8) nodeterm | PR | 2026-11-06 |
-| If B: open one PR adding the idle gate to `lane-send`. Done when merged with a test. Waits on his word. | lane (8) nodeterm | PR | 2026-11-06 |
-| Remove `~/Documents/repos/nodeterm` (1.5 GB), the sandboxes `/private/tmp/nodeterm-try`, `/private/tmp/claude-501/nth` and `/private/tmp/claude-501/nt`, and the dead tmux sockets `/tmp/tmux-501/node-terminal` and `/tmp/tmux-501/nodeterm-rmt`, once he has answered. Done when those paths are gone. Deletion is his. | Zaal | Chore | 2026-11-09 |
+| DONE 2026-10-30: Zaal chose, through the seat, to borrow two mechanisms and install nothing. | Zaal | Decision | 2026-10-30 |
+| Backlog, no code without his word: one PR adding the context figure and the 75% flag to the Orca card, extending `orca-board --sync`. Done when merged and seen on the sidebar. | Zaal, to open a lane | PR | 2026-11-30 |
+| Backlog, no code without his word: one PR adding the idle gate to `lane-send`. Done when merged with a test. | Zaal, to open a lane | PR | 2026-11-30 |
+| Remove the local clone (1.5 GB), the sandboxes and the dead tmux sockets; exact paths are in the lane's private notes. Done when those paths are gone. Deletion is his. | Zaal | Chore | 2026-11-09 |
 
 ## Sources
 
@@ -120,5 +118,5 @@ Fetched 2026-10-30. METHOD given for each.
 - [Reddit thread, r/vibecoding](https://www.reddit.com/r/vibecoding/comments/1xjck52/i_coded_terminal_manager_for_adhd_brains_100/) - [FULL, 55 of 55 comments] - `zao-fetch-reddit.sh` via Arctic Shift. Community source; HN not searched.
 - [github.com/stablyai/orca](https://github.com/stablyai/orca) docs source `mobile.mdx`, `notifications.mdx`, `agents/hooks-memory.mdx`, `agents/usage-tracking.mdx`, LICENSE, source tree at `a1f7f976` - [FULL for those pages] - `gh api`, shallow clone, grep. [onorca.dev/docs](https://www.onorca.dev/docs) [PARTIAL - index only] - `curl`. `orca.app`, named in the brief, is a parked lander, not Orca.
 - `orca skills get orca-cli`, `orca --help`, `orca worktree ps --json`, `orca agent hooks status --json` - [FULL, CLI 1.4.242, this Mac]
-- `~/Library/Application Support/orca/orca-devices.json` - [PARTIAL - names and timestamps only; tokens were not printed]
+- The local Orca paired-device list - [PARTIAL - names and timestamps only; tokens were not printed]
 - Repo snapshot, `zao-research-snapshot eneskirca/nodeterm`: 2,172 stars, 248 forks, 60 open issues, pushed 2026-10-30, v0.4.5 released 2026-10-24 (`gh api`)

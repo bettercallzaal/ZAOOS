@@ -109,6 +109,8 @@ If anything is unhealthy: `docker compose logs --tail 80 <service>`. Stop everyt
 
 ### 6. Hostname and the access gate (ZAAL - DNS and a cloudflared restart)
 
+**Add the gate first, before any command below.** Until an organisation exists, Postiz lets anyone register the first account, and that account becomes Super Admin (the `canRegister` row above). So the hostname must never be reachable without the gate. In the Cloudflare dashboard: Zero Trust -> Access -> Applications -> Add -> Self-hosted, domain `postiz.zaoos.com`, one Allow policy with the named emails only, login method one-time PIN. Whether the dashboard accepts this before the DNS record exists has not been tried; if it refuses, stop here and do not run the commands below.
+
 The tunnel is configured by file at `~/.cloudflared/config.yml` (tunnel `b5025a71-...`, one rule today: `bus.zaoos.com -> http://localhost:3099`, then the 404 catch-all).
 
 ```bash
@@ -123,11 +125,13 @@ systemctl --user restart cloudflared && sleep 5 && systemctl --user is-active cl
 curl -sS -o /dev/null -w '%{http_code}\n' https://bus.zaoos.com   # CHECK: same code as before the restart
 ```
 
-**Before opening the hostname in a browser**, add the gate in the Cloudflare dashboard: Zero Trust -> Access -> Applications -> Add -> Self-hosted, domain `postiz.zaoos.com`, one Allow policy with the named emails only, login method one-time PIN. Then:
+Then, right after the restart:
 
 ```bash
 curl -sS -o /dev/null -w '%{http_code} %{redirect_url}\n' https://postiz.zaoos.com   # CHECK: 302 to *.cloudflareaccess.com, never 200
 ```
+
+Any 200 means the gate is not working: run `cd ~/postiz && docker compose stop postiz` at once and fix the gate before going on.
 
 That refused request is the proof the gate is live (`.claude/rules/silent-failure-guard.md` rule 9); paste it into the PR or lane brief.
 

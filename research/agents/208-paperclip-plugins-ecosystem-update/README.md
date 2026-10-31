@@ -4,15 +4,34 @@
 topic: agents
 type: research
 status: archive-candidate
-last-validated: 2026-05-21
+last-validated: 2026-10-26
 original-query: Map Paperclip plugin ecosystem and design ZAO integration strategy (reconstructed)
 tier: archive
-note: Paperclip framework decommissioned 2026-05-04. Doc archived as historical plugin analysis; patterns may transfer to other agent frameworks.
+note: ZAO's Paperclip deployment decommissioned 2026-05-04 (agent-stack-cleanup-decision, doc 601). The Paperclip framework itself remains active and growing -- see Updated 2026-10-26 below.
 ---
 
 > **Status:** Research complete
 > **Date:** March 28, 2026
 > **Goal:** Map the current Paperclip plugin ecosystem (11 community plugins, 4 examples, 2 new releases), identify which plugins ZAO should install vs build, and update the integration plan from Doc 175
+
+## Updated 2026-10-26
+
+Plugin ecosystem has grown materially since this doc was written (March 2026, last validated May 2026). ZAO decommissioned its Paperclip deployment on 2026-05-04 (see doc 601), but the Paperclip framework itself continued active development. Sources below are all UNVERIFIED (WebSearch summaries only; full page fetches failed due to DNS restrictions in this environment).
+
+**Plugin count (UNVERIFIED):** A community directory by Aimantas (October 2026) lists 33 plugins total -- 30 community plugins and 3 official examples -- up from 11 community plugins documented in March 2026. Three of the 33 are labeled "Tested" by the directory author. Sources: [Aimantas plugin directory](https://aimantas.com/writing/paperclip-plugins-marketplace-evidence/), [awesome-paperclip by gsxdsm](https://github.com/gsxdsm/awesome-paperclip).
+
+**New notable plugins (UNVERIFIED, from awesome-paperclip forks and search snippets):**
+- `paperclip-plugin-linear` -- bidirectional Linear issue sync (no equivalent was in the March 2026 doc)
+- `paperclip-plugin-hindsight` -- persistent long-term memory for Paperclip agents
+- `paperclip-plugin-axiru-gate` (by AxiruAI) -- checks agent payment actions against company policy before they run
+
+**ClipMart status (UNVERIFIED):** A Contabo guide last updated 2026-09-17 states ClipMart is still in active development and has not launched publicly. A Polish-language guide from August 2026 likewise found no evidence of launch or abandonment. Assessment: the "defer and wait for ClipMart to launch" recommendation from this doc remains valid as of September 2026.
+
+**Framework growth (UNVERIFIED):** A review dated late June 2026 reports over 71,000 stars and 13,400 forks, up from 26,000 stars in March 2026. Source: fast.io review (fetch failed).
+
+**New release features (UNVERIFIED):** v2026.416.0 added an external adapter plugin system with dynamic UI parsers and declarative configuration schemas. v2026.403.0 (April 7, 2026) added workspace and routine features. Source: Zeabur template changelog (fetch failed).
+
+**Clarification:** The doc's former note ("Paperclip framework decommissioned 2026-05-04") was imprecise. ZAO shut down its Paperclip deployment as part of the agent stack cleanup (doc 601). The open-source Paperclip framework is not decommissioned.
 
 ## Key Decisions / Recommendations
 

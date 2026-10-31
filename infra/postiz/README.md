@@ -150,7 +150,19 @@ If the UI cannot create one, the fallback, behind the gate only:
 
 Write the result (which route worked) into doc 2667's "What is not known" list.
 
-### 9. Channels, one at a time, each proven with one real post before the next
+### 9. Backups, before any channel connects (ZAAL, on the VPS)
+
+```bash
+sudo mkdir -p /var/backups/postiz && sudo chown "$USER" /var/backups/postiz
+chmod +x ~/postiz/backup.sh && ~/postiz/backup.sh     # CHECK: three files, none 0 bytes; it exits non-zero if one is
+( crontab -l 2>/dev/null; echo '17 4 * * * $HOME/postiz/backup.sh >> $HOME/postiz/backup.log 2>&1' ) | crontab -
+```
+
+`backup.sh` writes `/var/backups/postiz/.last-ok` on success; a stamp older than two days means the job stopped. It deletes nothing: pruning old dumps is a manual step. Copy dumps off the box weekly. A restore has not been rehearsed until someone restores one.
+
+### 10. Channels, one at a time, each proven with one real post before the next
+
+**Do not connect any channel until the step 9 backup check passes.**
 
 After each set of keys: `cd ~/postiz && docker compose up -d postiz`, then connect the channel in the right organisation and publish one real post.
 
@@ -162,16 +174,6 @@ After each set of keys: `cd ~/postiz && docker compose up -d postiz`, then conne
 | **Farcaster** | `NEYNAR_CLIENT_ID`, `NEYNAR_SECRET_KEY` from a Neynar app (Free plan includes write APIs, doc 2667), plus `NEYNAR_APP_FID` and `NEYNAR_APP_MNEMONIC` for a **new, empty Farcaster account that represents the app**. Never a personal or brand account's recovery phrase on the server | Zaal: creates the empty app account, creates the Neynar app, keys into `.env`. Then each posting account (@zaal, @thezao) approves the signer in the Farcaster app. Skip until the app account exists |
 
 **Media.** Uploads are stored locally and served from `https://postiz.zaoos.com/uploads/...`, which is behind the gate. Platforms that fetch an image by URL cannot get through it. Start with text and link posts; check one image post per channel before relying on images. Which providers upload the file versus link it was not checked per provider. If one fails, the choices are an Access bypass for the `/uploads` path or `STORAGE_PROVIDER=cloudflare` (R2); both are a separate decision.
-
-### 10. Backups, before the first real post (ZAAL, on the VPS)
-
-```bash
-sudo mkdir -p /var/backups/postiz && sudo chown "$USER" /var/backups/postiz
-chmod +x ~/postiz/backup.sh && ~/postiz/backup.sh     # CHECK: three files, none 0 bytes; it exits non-zero if one is
-( crontab -l 2>/dev/null; echo '17 4 * * * $HOME/postiz/backup.sh >> $HOME/postiz/backup.log 2>&1' ) | crontab -
-```
-
-`backup.sh` writes `/var/backups/postiz/.last-ok` on success; a stamp older than two days means the job stopped. It deletes nothing: pruning old dumps is a manual step. Copy dumps off the box weekly. A restore has not been rehearsed until someone restores one.
 
 ## Updates
 

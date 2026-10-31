@@ -109,6 +109,8 @@ If anything is unhealthy: `docker compose logs --tail 80 <service>`. Stop everyt
 
 ### 6. Hostname and the access gate (ZAAL - DNS and a cloudflared restart)
 
+**Add the gate first, before any command below.** Until an organisation exists, Postiz lets anyone register the first account, and that account becomes Super Admin (the `canRegister` row above). So the hostname must never be reachable without the gate. In the Cloudflare dashboard: Zero Trust -> Access -> Applications -> Add -> Self-hosted, domain `postiz.zaoos.com`, one Allow policy with the named emails only, login method one-time PIN. Whether the dashboard accepts this before the DNS record exists has not been tried; if it refuses, stop here and do not run the commands below.
+
 The tunnel is configured by file at `~/.cloudflared/config.yml` (tunnel `b5025a71-...`, one rule today: `bus.zaoos.com -> http://localhost:3099`, then the 404 catch-all).
 
 ```bash
@@ -123,11 +125,13 @@ systemctl --user restart cloudflared && sleep 5 && systemctl --user is-active cl
 curl -sS -o /dev/null -w '%{http_code}\n' https://bus.zaoos.com   # CHECK: same code as before the restart
 ```
 
-**Before opening the hostname in a browser**, add the gate in the Cloudflare dashboard: Zero Trust -> Access -> Applications -> Add -> Self-hosted, domain `postiz.zaoos.com`, one Allow policy with the named emails only, login method one-time PIN. Then:
+Then, right after the restart:
 
 ```bash
 curl -sS -o /dev/null -w '%{http_code} %{redirect_url}\n' https://postiz.zaoos.com   # CHECK: 302 to *.cloudflareaccess.com, never 200
 ```
+
+Any 200 means the gate is not working: run `cd ~/postiz && docker compose stop postiz` at once and fix the gate before going on.
 
 That refused request is the proof the gate is live (`.claude/rules/silent-failure-guard.md` rule 9); paste it into the PR or lane brief.
 
@@ -146,7 +150,19 @@ If the UI cannot create one, the fallback, behind the gate only:
 
 Write the result (which route worked) into doc 2667's "What is not known" list.
 
-### 9. Channels, one at a time, each proven with one real post before the next
+### 9. Backups, before any channel connects (ZAAL, on the VPS)
+
+```bash
+sudo mkdir -p /var/backups/postiz && sudo chown "$USER" /var/backups/postiz
+chmod +x ~/postiz/backup.sh && ~/postiz/backup.sh     # CHECK: three files, none 0 bytes; it exits non-zero if one is
+( crontab -l 2>/dev/null; echo '17 4 * * * $HOME/postiz/backup.sh >> $HOME/postiz/backup.log 2>&1' ) | crontab -
+```
+
+`backup.sh` writes `/var/backups/postiz/.last-ok` on success; a stamp older than two days means the job stopped. It deletes nothing: pruning old dumps is a manual step. Copy dumps off the box weekly. A restore has not been rehearsed until someone restores one.
+
+### 10. Channels, one at a time, each proven with one real post before the next
+
+**Do not connect any channel until the step 9 backup check passes.**
 
 After each set of keys: `cd ~/postiz && docker compose up -d postiz`, then connect the channel in the right organisation and publish one real post.
 
@@ -158,16 +174,6 @@ After each set of keys: `cd ~/postiz && docker compose up -d postiz`, then conne
 | **Farcaster** | `NEYNAR_CLIENT_ID`, `NEYNAR_SECRET_KEY` from a Neynar app (Free plan includes write APIs, doc 2667), plus `NEYNAR_APP_FID` and `NEYNAR_APP_MNEMONIC` for a **new, empty Farcaster account that represents the app**. Never a personal or brand account's recovery phrase on the server | Zaal: creates the empty app account, creates the Neynar app, keys into `.env`. Then each posting account (@zaal, @thezao) approves the signer in the Farcaster app. Skip until the app account exists |
 
 **Media.** Uploads are stored locally and served from `https://postiz.zaoos.com/uploads/...`, which is behind the gate. Platforms that fetch an image by URL cannot get through it. Start with text and link posts; check one image post per channel before relying on images. Which providers upload the file versus link it was not checked per provider. If one fails, the choices are an Access bypass for the `/uploads` path or `STORAGE_PROVIDER=cloudflare` (R2); both are a separate decision.
-
-### 10. Backups, before the first real post (ZAAL, on the VPS)
-
-```bash
-sudo mkdir -p /var/backups/postiz && sudo chown "$USER" /var/backups/postiz
-chmod +x ~/postiz/backup.sh && ~/postiz/backup.sh     # CHECK: three files, none 0 bytes; it exits non-zero if one is
-( crontab -l 2>/dev/null; echo '17 4 * * * $HOME/postiz/backup.sh >> $HOME/postiz/backup.log 2>&1' ) | crontab -
-```
-
-`backup.sh` writes `/var/backups/postiz/.last-ok` on success; a stamp older than two days means the job stopped. It deletes nothing: pruning old dumps is a manual step. Copy dumps off the box weekly. A restore has not been rehearsed until someone restores one.
 
 ## Updates
 

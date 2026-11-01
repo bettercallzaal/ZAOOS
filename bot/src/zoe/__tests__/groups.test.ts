@@ -23,6 +23,11 @@ import {
   setGroupMode,
   shouldRespond,
   upsertGroup,
+  ENGAGED_MAX_TURNS,
+  ENGAGED_WINDOW_MS,
+  engagedUntilFor,
+  markEngaged,
+  resetEngagedForTests,
   writeGroups,
   type GateContext,
   type GroupConfig,
@@ -289,5 +294,98 @@ describe("autoRegisterGroup", () => {
     expect(cfg.mode).toBe("mention");
     expect(cfg.member_allowlist).toContain(-1);
     expect(cfg.member_allowlist).toContain(888);
+  });
+});
+
+
+// ── engaged window (1 Nov 2026) ───────────────────────────────────────────────
+// Shape measured on the VPS journal: a member mentions ZOE once, gets a reply,
+// then types two more lines without a mention; both were skipped as
+// "mode=mention + no mention/reply". Ids below are made up.
+
+describe('shouldRespond engaged window', () => {
+  const CHAT = -1000000000001;
+  const MEMBER = 424242;
+  const OTHER = 515151;
+  const mentionCfg = {
+    chat_id: CHAT,
+    chat_title: 'Test Group',
+    mode: 'mention' as const,
+    member_allowlist: [-1, 777],
+    created_at: '2026-10-01T00:00:00Z',
+    updated_at: '2026-10-01T00:00:00Z',
+  };
+  const base = {
+    fromId: MEMBER,
+    botUsername: 'zaoclaw_bot',
+    botId: 999,
+    messageText: 'a follow-up line with no mention of the bot',
+    entities: [],
+  };
+
+  afterEach(() => resetEngagedForTests());
+
+  it('allows a follow-up with no mention while the window is open', () => {
+    const now = 1_000_000;
+    const r = shouldRespond(mentionCfg, { ...base, engagedUntil: now + 60_000, nowMs: now });
+    expect(r.allow).toBe(true);
+    expect(r.reason).toBe('mode=mention + engaged window');
+  });
+
+  it('skips the same follow-up once the window has passed', () => {
+    const now = 1_000_000;
+    const r = shouldRespond(mentionCfg, { ...base, engagedUntil: now - 1, nowMs: now });
+    expect(r.allow).toBe(false);
+    expect(r.reason).toBe('mode=mention + no mention/reply');
+  });
+
+  it('skips when no window was ever opened (the pre-change behaviour)', () => {
+    expect(shouldRespond(mentionCfg, { ...base }).allow).toBe(false);
+  });
+
+  it('mode=silent still wins over an open window', () => {
+    const now = 1_000_000;
+    const r = shouldRespond({ ...mentionCfg, mode: 'silent' }, { ...base, engagedUntil: now + 60_000, nowMs: now });
+    expect(r.allow).toBe(false);
+    expect(r.reason).toBe('group mode=silent');
+  });
+
+  it('a restricted allowlist still wins over an open window', () => {
+    const now = 1_000_000;
+    const r = shouldRespond({ ...mentionCfg, member_allowlist: [777] }, { ...base, engagedUntil: now + 60_000, nowMs: now });
+    expect(r.allow).toBe(false);
+    expect(r.reason).toBe(`sender ${MEMBER} not in member_allowlist`);
+  });
+
+  it('markEngaged opens a window of ENGAGED_WINDOW_MS for that chat and sender only', () => {
+    markEngaged(CHAT, MEMBER, 5_000);
+    expect(engagedUntilFor(CHAT, MEMBER)).toBe(5_000 + ENGAGED_WINDOW_MS);
+    expect(engagedUntilFor(CHAT, OTHER)).toBeUndefined();
+    expect(engagedUntilFor(CHAT - 1, MEMBER)).toBeUndefined();
+  });
+
+  it('markEngaged prunes windows that have expired', () => {
+    markEngaged(1, 10, 0);
+    markEngaged(2, 20, ENGAGED_WINDOW_MS + 1);
+    expect(engagedUntilFor(1, 10)).toBeUndefined();
+    expect(engagedUntilFor(2, 20)).toBe(2 * ENGAGED_WINDOW_MS + 1);
+  });
+
+  it('the cap closes the window after ENGAGED_MAX_TURNS replies in a row', () => {
+    let t = 0;
+    for (let n = 1; n < ENGAGED_MAX_TURNS; n++) {
+      markEngaged(CHAT, MEMBER, (t += 1_000));
+      expect(engagedUntilFor(CHAT, MEMBER)).toBe(t + ENGAGED_WINDOW_MS);
+    }
+    markEngaged(CHAT, MEMBER, (t += 1_000));
+    expect(engagedUntilFor(CHAT, MEMBER)).toBeUndefined();
+  });
+
+  it('a reply after the window lapsed starts the count again', () => {
+    for (let n = 0; n < ENGAGED_MAX_TURNS; n++) markEngaged(CHAT, MEMBER, n * 1_000);
+    expect(engagedUntilFor(CHAT, MEMBER)).toBeUndefined();
+    const later = ENGAGED_MAX_TURNS * 1_000 + ENGAGED_WINDOW_MS + 1;
+    markEngaged(CHAT, MEMBER, later);
+    expect(engagedUntilFor(CHAT, MEMBER)).toBe(later + ENGAGED_WINDOW_MS);
   });
 });

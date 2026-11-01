@@ -140,7 +140,7 @@ import {
   NUDGE_CALLBACK,
 } from './nudges';
 import { attentionEnabled, recordTap, showAllAction, tapFamily, SHOW_ALL_CALLBACK } from './attention';
-import { mirrorTurn, recall, TURN_RECALL_TIMEOUT_MS } from './recall';
+import { mirrorTurn, recall, recallAllowedForTurn, TURN_RECALL_TIMEOUT_MS } from './recall';
 import { backgroundRecallMs, newRecallCarry, turnRecall } from './recall-carry';
 import { fanOutKnowledgeExtractors, EXTRACT_MIN_LEN } from './extractors';
 import { transcriptionConfigured, transcribeTelegramFile, downloadTelegramFile } from './transcribe';
@@ -3844,7 +3844,7 @@ async function dispatchConcierge(
     // running after that keeps going in the background and its result is used
     // on the next message in this chat (Bonfire delves measured ~14 s).
     let recallContext: string | undefined;
-    if (scope === 'private' && text.trim().length >= 12 && !wantsLinkResearch(text)) {
+    if (recallAllowedForTurn(scope, text, wantsLinkResearch(text))) {
       try {
         const r = await turnRecall(
           recallCarry,

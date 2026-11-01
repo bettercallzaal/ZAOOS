@@ -191,9 +191,11 @@ export function shouldRespond(config: GroupConfig | null, gctx: GateContext): Ga
  * The engaged window: after ZOE SENDS a reply to a member in a group, that
  * member's next messages in the same chat reach her for ENGAGED_WINDOW_MS
  * without an @-mention or a reply, for at most ENGAGED_MAX_TURNS replies in a
- * row. The cap is what stops one member holding ZOE in an endless exchange;
- * a fresh @-mention always works and starts the count again. mode=silent and
- * the allowlist win because shouldRespond checks them first. State is
+ * row. The cap is what stops one member holding ZOE in an endless exchange.
+ * Once it is spent, a fresh @-mention or a reply still passes the gate on its
+ * own merits, but the count resets only after the window lapses (ten quiet
+ * minutes from that member). mode=silent and the allowlist win because
+ * shouldRespond checks them first. State is
  * in-process only: a restart ends every window, the safe direction.
  */
 export const ENGAGED_WINDOW_MS = 10 * 60_000;

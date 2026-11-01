@@ -48,6 +48,19 @@ const WRITE_TIMEOUT_MS = 15_000;
 // env-configurable. recall() fetches 12 episodes, so keep this bounded.
 const RECALL_EPISODE_CHARS = Math.max(200, Number(process.env.ZOE_RECALL_EPISODE_CHARS ?? 1200));
 
+/**
+ * Whether a concierge turn may pull Bonfire recall into its prompt. Private
+ * (Zaal's DM) only: the ZABAL graph is written from his private turns
+ * (mirrorTurn), so a group, a member DM, a Discord channel or the board must
+ * not read it until a group-safe corpus exists. Short acks and link-research
+ * messages skip it too. index.ts is the entrypoint and cannot be imported by a
+ * test (agent-loops rule 21), which is why the gate lives here as a pure
+ * function with its own test.
+ */
+export function recallAllowedForTurn(scope: string, text: string, linkResearch: boolean): boolean {
+  return scope === 'private' && text.trim().length >= 12 && !linkResearch;
+}
+
 export function bonfireConfigured(): boolean {
   return !!API_KEY && !!BONFIRE_ID;
 }

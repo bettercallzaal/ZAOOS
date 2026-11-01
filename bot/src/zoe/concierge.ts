@@ -37,6 +37,11 @@ const ZOE_VERSION = '0.2.0';
  * "nothing on file yet" once and move on, never narrate tools, never grant
  * access, match the member's language. Group turns carry no Bonfire recall
  * on purpose: that graph is written from Zaal's private turns.
+ *
+ * Telegram groups ONLY (isTelegramGroupScope). A member DM (member-dm-<id>),
+ * a Discord channel (discord:<id>) and the untrusted board ask also build
+ * non-private blocks, and there "in a group" is false and so is the "tell
+ * Zaal ..." relay, which only handleGroupMessage runs (detectGroupEscalation).
  */
 export const COMMUNITY_BLOCK: readonly string[] = [
   `<community>`,
@@ -50,6 +55,11 @@ export const COMMUNITY_BLOCK: readonly string[] = [
   `</community>`,
   ``,
 ];
+
+/** A Telegram group or supergroup scope: handleGroupMessage passes String(chat.id), always negative. */
+export function isTelegramGroupScope(scope: string): boolean {
+  return /^-\d+$/.test(scope);
+}
 
 export function buildSystemBlocks(blocks: MemoryBlocks, currentDate: string, recallContext?: string, brandContext?: string, linkResearchIntent?: boolean, conversational?: boolean, gapLog?: boolean | 'community'): string {
   const isPrivate = blocks.chat_scope === 'private';
@@ -138,7 +148,7 @@ export function buildSystemBlocks(blocks: MemoryBlocks, currentDate: string, rec
           ``,
         ]
       : []),
-    ...(isPrivate ? [] : COMMUNITY_BLOCK),
+    ...(!isPrivate && isTelegramGroupScope(blocks.chat_scope) ? COMMUNITY_BLOCK : []),
     `<working_memory>`,
     chatLine,
     blocks.working,

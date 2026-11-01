@@ -66,7 +66,7 @@ Searched 2026-10-31: `zao-research-index` for "xerj", "code search", "agent memo
 
 | XERJ job | What we already run | Verdict |
 |---|---|---|
-| Search the research library | `~/bin/zao-research-index` (FTS5 over every doc on origin/main). Doc `agents/2474` chose exactly this: FTS5 first, small local embedder only for paraphrase. | Already built. XERJ adds a server process and a second index of the same corpus. |
+| Search the research library | `zao-research-index` (FTS5 over every doc on origin/main). Doc `agents/2474` chose exactly this: FTS5 first, small local embedder only for paraphrase. | Already built. XERJ adds a server process and a second index of the same corpus. |
 | Code search, go-to-definition | Serena symbol tools (mandated in CLAUDE.md, `.serena/` in this repo), `rg` installed | Already built. Serena is closer to the editor. |
 | Agent long-term memory | `mcp/hindsight-mcp-server/index.ts`, `src/lib/hindsight.ts`, `src/lib/memory-recall.ts` (all on origin/main, doc `agents/2599`); Bonfire for knowledge graph recall | Already built, two layers. |
 | Library and API docs for an agent | context7 MCP (auto-use rule in CLAUDE.md) | Already built, for public libraries. |

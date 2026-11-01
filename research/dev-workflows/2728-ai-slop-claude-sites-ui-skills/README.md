@@ -17,7 +17,7 @@ tier: STANDARD
 
 | # | Decision | Why |
 |---|---|---|
-| 1 | **fractal.thezao.com is a textbook generated page and should be treated as an unapproved AI design, not a finished site.** It hits 9 of the 18 patterns in the only measured study found (a "High" score is 4 or more), and 6 of the tells Anthropic's own `frontend-design` skill names (Findings 2). | Rulings 53 and 54 (vault `decisions/grill-2026-10-07-seat-morning.md`) and the 2026-10-28 homepage ruling say a public ZAO look is set by Zaal or a human designer; AI concepts are sketches. This look was AI-made and is live. |
+| 1 | **fractal.thezao.com is a textbook generated page and should be treated as an unapproved AI design, not a finished site.** It hits 9 of the 18 patterns in the only measured study found (a "High" score is 4 or more), and 6 of the tells Anthropic's own `frontend-design` skill names (Findings 2). | Rulings 53 and 54 (Zaal's 7 Oct 2026 rulings) and the 2026-10-28 homepage ruling say a public ZAO look is set by Zaal or a human designer; AI concepts are sketches. This look was AI-made and is live. |
 | 2 | **Do NOT copy Claude's look.** Anthropic's own skill lists "warm cream background, high-contrast serif, terracotta accent near #D97757" as trait 1 of AI-generated design, because it is Anthropic's accent. A ZAO site in cream and clay would trade one tell for another. | Copying a famous site is the same distributional convergence that produced the current page. |
 | 3 | **What to take from Claude's sites is method, not style:** one custom type family in three cuts (sans, serif, mono), a small named palette, and restraint. | Read from the live CSS of anthropic.com and claude.com on 1 Nov 2026 (Findings 3). |
 | 4 | **The look decision goes to Zaal as three options with a default** (Findings 5). The agent then builds the chosen one. | Item 53: "The spec is silent" is a question, not a choice (doc 2639, decision 2). |
@@ -100,7 +100,7 @@ Type.today's April 2024 piece records the earlier system: Styrene (Berton Hasebe
 
 ### 4. What Anthropic says about getting past it
 
-The official `frontend-design` skill (local copy: `~/.claude/plugins/marketplaces/claude-plugins-official/plugins/frontend-design/skills/frontend-design/SKILL.md`, 71 lines) works in two passes:
+The official `frontend-design` skill (the official plugin's SKILL.md, 71 lines) works in two passes:
 1. A plan: 4-6 named hex colors, type roles, a layout concept with ASCII wireframes, and principles. Then review the plan against the brief and replace anything "you would produce for any similar page".
 2. Build, then critique: "Spend your boldness in one place", cut decoration, meet a floor of responsive, visible focus, reduced motion and contrast.
 
@@ -124,7 +124,7 @@ Whichever he picks, the same content fixes apply: computed numbers, one stat def
 - P3, plain hero: `Hero.astro`, opened as #37
 - P4, join-first home: `index.astro`
 
-All four apply The ZAO's existing tokens in code and add no new visual, per the messenger's reading of item 53, which it is confirming with Zaal. A repo scout (vault #401) found MIT join-flow code to reuse in ZAO101 and theZAOZone, and GPL-3.0 ORDAO frontends (`sim31/ordao`, `zao.frapps.xyz`) to link to but not copy into MIT ZAOfractal.
+All four apply The ZAO's existing tokens in code and add no new visual, per the messenger's reading of item 53, which it is confirming with Zaal. A repo scout by another lane found MIT join-flow code to reuse in ZAO101 and theZAOZone, and GPL-3.0 ORDAO frontends (`sim31/ordao`, `zao.frapps.xyz`) to link to but not copy into MIT ZAOfractal.
 
 ### 6. ZAO UI skills: what to change
 
@@ -132,10 +132,10 @@ Measured on this Mac, 1 Nov 2026.
 
 | Skill | Where | Problem against item 53 | Change |
 |---|---|---|---|
-| `design` | `~/zaal-dotfiles/claude/skills/design/SKILL.md`, 79 lines | Produces three directions and "a recommendation"; names no rule that a person chooses on a public site; suggests 21st.dev and shadcn, which Krebs's list counts as a tell (#17) | Add: on a public ZAO surface output is options for Zaal or the named designer, never a pick; drop the library pointers; add the Anthropic and Krebs tell lists as a self-check before output |
+| `design` | the ZAO `design` skill, 79 lines | Produces three directions and "a recommendation"; names no rule that a person chooses on a public site; suggests 21st.dev and shadcn, which Krebs's list counts as a tell (#17) | Add: on a public ZAO surface output is options for Zaal or the named designer, never a pick; drop the library pointers; add the Anthropic and Krebs tell lists as a self-check before output |
 | ECC `frontend-design` | everything-claude-code 1.10.0 plugin, 145 lines, enabled | Tells the agent to choose an aesthetic whenever "visual direction matters"; doc 2639 found it is the one that loads unasked | Zaal's call, open since 2026-10-08 (doc 2639 Next Actions): turn it off for ZAO public sites. Default: off |
 | official `frontend-design` | Anthropic, Apache-2.0, in the marketplace folder, not enabled | Best tell list found, but its job is also choosing a look | Keep off (doc 2639); quote its tell list inside the site pass as QA |
-| `critique` | `~/zaal-dotfiles/claude/skills/critique/SKILL.md`, 206 lines | Self-critique by the builder; doc 2639 decision 4 says the grader is never the builder | Use only before handing to a grader, not as the grade |
+| `critique` | the ZAO `critique` skill, 206 lines | Self-critique by the builder; doc 2639 decision 4 says the grader is never the builder | Use only before handing to a grader, not as the grade |
 | `gstack/design-review` | 956 lines | Not read in full this pass | INVESTIGATE: does it check contrast numerically, or by eye? |
 | missing: a deterministic slop check | none | Nothing on this Mac scores a page against the tell list | Add `design-slop-cop` (MIT, 18 stars, last push 2026-07-07) to the site pass from doc 2639; run on fractal.thezao.com before and after |
 
@@ -153,14 +153,14 @@ Doc 2564 already decided axe-core and Lighthouse CI as the deterministic accessi
 
 | Action | Owner | Type | By When |
 |---|---|---|---|
-| Pick option A, B or C (or name a designer) for fractal.thezao.com; done when the choice is recorded in a vault decision | @Zaal | Decision | 2026-11-08 |
-| Pick the gold: thezao.com `#f5c518` against ZAOOS and ZAO101 `#f5a623` (vault #401 scout); done when recorded | @Zaal | Decision | 2026-11-08 |
+| Pick option A, B or C (or name a designer) for fractal.thezao.com; done when the choice is recorded as a ruling | @Zaal | Decision | 2026-11-08 |
+| Pick the gold: thezao.com `#f5c518` against ZAOOS and ZAO101 `#f5a623` (a repo scout by another lane); done when recorded | @Zaal | Decision | 2026-11-08 |
 | Merge the hero PR, ZAOfractal #37 (P3: decoration and hand-typed stats removed); done when merged and read live | fractal lane (6), merge by @Zaal | PR | 2026-11-04 |
 | P1 tokens, fonts and card-meta contrast to at least 4.5:1 in `global.css`; done when merged and re-measured | lane (2) | PR | 2026-11-04 |
 | P2 font names to tokens in the 14 other components and pages; done when merged | cards lane (1) | PR | 2026-11-04 |
 | P4 join-first home page plus stale chapter and transaction lines in `index.astro`; done when merged | first free helper, via messenger | PR | 2026-11-06 |
 | Run `design-slop-cop` on fractal.thezao.com and record the score in card 10661; done when the score is on the card | fractal lane (6) | Check | 2026-11-04, once Mac load allows a headless browser |
-| Edit the `design` skill to give options not picks on public ZAO surfaces and add the tell lists; done when the zaal-dotfiles PR is merged | skills lane (0p) | PR | 2026-11-08 |
+| Edit the `design` skill to give options not picks on public ZAO surfaces and add the tell lists; done when the skill change is merged | skills lane (0p) | PR | 2026-11-08 |
 | Rule on turning off ECC `frontend-design` for ZAO public sites; done when recorded | @Zaal | Decision | 2026-11-08 |
 
 ## Sources

@@ -82,7 +82,7 @@ interface MemberProfile {
   farcasterRegisteredAt: string | null;
   coverImageUrl: string | null;
   lastActiveAt: string | null;
-  createdAt: string;
+  createdAt: string | null;
 }
 
 function shortAddr(addr: string) {
@@ -712,7 +712,7 @@ export default function MemberProfilePage() {
           <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] p-4 mb-4">
             <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">Platforms</p>
             <div className="flex flex-wrap gap-2">
-              {p.fid && (
+              {p.fid && p.username && (
                 <a
                   href={`https://warpcast.com/${p.username}`}
                   target="_blank"

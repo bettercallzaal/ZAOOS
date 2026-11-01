@@ -247,3 +247,21 @@ describe('buildSystemBlocks — capability gap block', () => {
     expect(withGap(blocks, true)).not.toContain('<capability_gap>');
   });
 });
+
+
+// ── community block (1 Nov 2026) ──────────────────────────────────────────────
+
+describe('buildSystemBlocks — community block for group chats', () => {
+  it('a group scope carries <community> with the no-tools and no-access rules', () => {
+    const out = buildSystemBlocks({ ...BASE_BLOCKS, chat_scope: '-1003937923819', chat_title: "Zabal's DevTopIA" }, DATE);
+    expect(out).toContain('<community>');
+    expect(out).toContain('never narrate a memory lookup');
+    expect(out).toContain('cannot grant or promise');
+    expect(out).toContain('</community>');
+  });
+
+  it('the private DM with Zaal carries no <community> block', () => {
+    const out = buildSystemBlocks(BASE_BLOCKS, DATE);
+    expect(out).not.toContain('<community>');
+  });
+});

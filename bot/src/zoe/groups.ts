@@ -36,6 +36,11 @@ export interface GateContext {
   messageText: string;
   replyToFromId?: number;
   entities: ReadonlyArray<MessageEntity>;
+  /** Epoch ms until which this sender keeps the floor without re-mentioning
+   *  ZOE (see markEngaged). Absent or past = no engaged window. */
+  engagedUntil?: number;
+  /** Clock for the engaged check; tests pass it, callers leave it to Date.now(). */
+  nowMs?: number;
 }
 
 export interface GateResult {
@@ -169,7 +174,43 @@ export function shouldRespond(config: GroupConfig | null, gctx: GateContext): Ga
   const isReplyToBot = gctx.botId !== null && gctx.replyToFromId === gctx.botId;
   if (mentioned) return { allow: true, reason: 'mode=mention + @-mention' };
   if (isReplyToBot) return { allow: true, reason: 'mode=mention + reply-to-bot' };
+  // A member who just got an answer from ZOE is still talking to her. Zaal,
+  // 1 Nov 2026: give ZOE "more ability to talk to community members,
+  // especially groups they're talking back with it in". Measured on the VPS
+  // journal, 29 Oct to 1 Nov 2026: 148 group messages skipped as
+  // "mode=mention + no mention/reply", most of them a member's next line
+  // right after ZOE replied to them (Jose in DevTopIA, retrospect14 in COC).
+  const now = gctx.nowMs ?? Date.now();
+  if (typeof gctx.engagedUntil === 'number' && now < gctx.engagedUntil) {
+    return { allow: true, reason: 'mode=mention + engaged window' };
+  }
   return { allow: false, reason: 'mode=mention + no mention/reply' };
+}
+
+/**
+ * The engaged window: after ZOE answers a member in a group, that member's
+ * next messages in the same chat reach her for ENGAGED_WINDOW_MS without an
+ * @-mention or a reply. Zaal is never gated by it (his messages already pass
+ * elsewhere), and mode=silent still wins because shouldRespond checks mode
+ * first. State is in-process only: a restart ends every window, which is the
+ * safe direction.
+ */
+export const ENGAGED_WINDOW_MS = 10 * 60_000;
+const engaged = new Map<string, number>();
+
+export function markEngaged(chatId: number | string, fromId: number, nowMs: number = Date.now()): void {
+  // Prune expired entries so the map stays the size of the live conversations.
+  for (const [k, until] of engaged) if (until <= nowMs) engaged.delete(k);
+  engaged.set(`${chatId}:${fromId}`, nowMs + ENGAGED_WINDOW_MS);
+}
+
+export function engagedUntilFor(chatId: number | string, fromId: number): number | undefined {
+  return engaged.get(`${chatId}:${fromId}`);
+}
+
+/** Tests only: forget every engaged window. */
+export function resetEngagedForTests(): void {
+  engaged.clear();
 }
 
 export function isBotMentioned(gctx: GateContext): boolean {

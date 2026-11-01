@@ -23,6 +23,10 @@ import {
   setGroupMode,
   shouldRespond,
   upsertGroup,
+  ENGAGED_WINDOW_MS,
+  engagedUntilFor,
+  markEngaged,
+  resetEngagedForTests,
   writeGroups,
   type GateContext,
   type GroupConfig,
@@ -289,5 +293,71 @@ describe("autoRegisterGroup", () => {
     expect(cfg.mode).toBe("mention");
     expect(cfg.member_allowlist).toContain(-1);
     expect(cfg.member_allowlist).toContain(888);
+  });
+});
+
+
+// ── engaged window (1 Nov 2026) ───────────────────────────────────────────────
+// Captured shape: Jose in Zabal's DevTopIA, 1 Nov 2026 11:51 to 11:53 EST,
+// mentioned ZOE once, then typed two more lines without a mention; both were
+// skipped "mode=mention + no mention/reply" (VPS journal).
+
+describe('shouldRespond engaged window', () => {
+  const mentionCfg = {
+    chat_id: -1003937923819,
+    chat_title: "Zabal's DevTopIA",
+    mode: 'mention' as const,
+    member_allowlist: [-1, 1447437687],
+    created_at: '2026-10-01T00:00:00Z',
+    updated_at: '2026-10-01T00:00:00Z',
+  };
+  const base = {
+    fromId: 805582451,
+    botUsername: 'zaoclaw_bot',
+    botId: 999,
+    messageText: 'Lo que Zaal te dijo que me dieras damelo pues',
+    entities: [],
+  };
+
+  afterEach(() => resetEngagedForTests());
+
+  it('allows a follow-up with no mention while the window is open', () => {
+    const now = 1_000_000;
+    const r = shouldRespond(mentionCfg, { ...base, engagedUntil: now + 60_000, nowMs: now });
+    expect(r.allow).toBe(true);
+    expect(r.reason).toBe('mode=mention + engaged window');
+  });
+
+  it('skips the same follow-up once the window has passed', () => {
+    const now = 1_000_000;
+    const r = shouldRespond(mentionCfg, { ...base, engagedUntil: now - 1, nowMs: now });
+    expect(r.allow).toBe(false);
+    expect(r.reason).toBe('mode=mention + no mention/reply');
+  });
+
+  it('skips when no window was ever opened (the pre-change behaviour)', () => {
+    const r = shouldRespond(mentionCfg, { ...base });
+    expect(r.allow).toBe(false);
+  });
+
+  it('mode=silent still wins over an open window', () => {
+    const now = 1_000_000;
+    const r = shouldRespond({ ...mentionCfg, mode: 'silent' }, { ...base, engagedUntil: now + 60_000, nowMs: now });
+    expect(r.allow).toBe(false);
+    expect(r.reason).toBe('group mode=silent');
+  });
+
+  it('markEngaged opens a window of ENGAGED_WINDOW_MS for that chat and sender only', () => {
+    markEngaged(-1003937923819, 805582451, 5_000);
+    expect(engagedUntilFor(-1003937923819, 805582451)).toBe(5_000 + ENGAGED_WINDOW_MS);
+    expect(engagedUntilFor(-1003937923819, 574976300)).toBeUndefined();
+    expect(engagedUntilFor(-1001609766705, 805582451)).toBeUndefined();
+  });
+
+  it('markEngaged prunes windows that have expired', () => {
+    markEngaged(1, 10, 0);
+    markEngaged(2, 20, ENGAGED_WINDOW_MS + 1);
+    expect(engagedUntilFor(1, 10)).toBeUndefined();
+    expect(engagedUntilFor(2, 20)).toBe(2 * ENGAGED_WINDOW_MS + 1);
   });
 });

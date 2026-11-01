@@ -149,6 +149,8 @@ import {
   addAllowlistMember,
   autoRegisterGroup,
   detectGroupEscalation,
+  engagedUntilFor,
+  markEngaged,
   getGroupConfig,
   isBotMentioned,
   removeAllowlistMember,
@@ -2715,6 +2717,7 @@ bot.on('message:text', async (ctx) => {
 
   const gate = shouldRespond(cfg, {
     fromId,
+    engagedUntil: engagedUntilFor(chatId, fromId),
     botUsername: usernameHolder.value,
     botId: botIdHolder.value,
     messageText: text,
@@ -3409,6 +3412,9 @@ async function handleGroupMessage(
   }
 
   await dispatchConcierge(ctx, text, scope, label);
+  // She answered this member: their next lines in this chat reach her for a
+  // while without a re-mention (groups.ts, the engaged window).
+  if (!isFromZaal(ctx) && ctx.from) markEngaged(scope, ctx.from.id);
 }
 
 // A concierge turn can take 60s+ on Opus. Telegram clears the typing
@@ -3832,8 +3838,12 @@ async function dispatchConcierge(
     }
 
     // Pull relevant prior context from the ZABAL knowledge graph (Bonfire) via
-    // recall()/delve and inject it into the turn. DMs only + substantive
-    // messages (skip "y"/"ok"/short acks). Best-effort: no-op if Bonfire
+    // recall()/delve and inject it into the turn. Substantive messages only
+    // (skip "y"/"ok"/short acks). Groups included since 1 Nov 2026: before
+    // that a member asking ZOE about a person or a project in a group got a
+    // turn with no recall at all, and she answered "no record" (Jose in
+    // DevTopIA, 1 Nov 2026 11:53 EST). The group query carries the sender's
+    // label so the graph can match the person as well as the topic. Best-effort: no-op if Bonfire
     // unconfigured or delve returns nothing; never blocks the turn.
     // EXCEPTION: skip recall if the message has a URL + research intent. Links
     // should be fetched + analyzed by research-worker, not answered from recall.
@@ -3841,12 +3851,12 @@ async function dispatchConcierge(
     // running after that keeps going in the background and its result is used
     // on the next message in this chat (Bonfire delves measured ~14 s).
     let recallContext: string | undefined;
-    if (scope === 'private' && text.trim().length >= 12 && !wantsLinkResearch(text)) {
+    if (text.trim().length >= 12 && !wantsLinkResearch(text)) {
       try {
         const r = await turnRecall(
           recallCarry,
           String(chatId),
-          text,
+          scope === 'private' ? text : `${label}: ${text}`,
           async (query, timeoutMs) => {
             const res = await recall({ query, reason: 'concierge turn context', expected_kind: 'mixed', timeoutMs });
             return res.kind === 'sdk_response' ? res.text : undefined;

@@ -13,7 +13,7 @@ tier: DEEP
 
 > **Goal:** Teach Zaal, who directs agents and never handwrites code, the seven parts of Orca he works with every day, in the commands and clicks of this Mac, with examples from our own estate. Extends [doc 2581](../2581-orca-how-others-use-it/) rather than rebuilding it.
 
-Everything is pinned to **Orca 1.4.242** (`orca --version`, 31 Oct 2026) and measured read-only that evening. Orca is by Stably AI, MIT licence (LICENSE file read: "Copyright (c) 2026 Lovecast Inc."), [github.com/stablyai/orca](https://github.com/stablyai/orca). Companion: the health diagnosis at vault `notes/orca-health-2026-10-31.md` (vault PR 390).
+Everything is pinned to **Orca 1.4.242** (`orca --version`, 31 Oct 2026) and measured read-only that evening. Orca is by Stably AI, MIT licence (LICENSE file read: "Copyright (c) 2026 Lovecast Inc."), [github.com/stablyai/orca](https://github.com/stablyai/orca). Companion: a private health diagnosis in our vault, which also holds the exact local paths behind this doc's sources and the one-line commands. This public doc names no private location.
 
 You will not type most of these. Read a command as "this is what to tell a lane, or what it will show you". Commands marked **yours** are the ones only you should run.
 
@@ -61,9 +61,9 @@ Clicks: double-click a row title to rename. Right-click for archive, sleep or de
 
 **Our naming.** `(N) name - STATE: detail`. Slots 1 to 9 are top priorities, letters are children, `(0x)` are seat helpers, `(w)` is parked or waiting. In Progress holds your top 3, plus the seat, misc and their children; everything else is Todo, awake or asleep.
 
-**Worked example.** BCZ, 31 Oct: the seat built `(5) BCZ - parent` with `(5a)` yapz, `(5b)` resume and `(5c)` merch under it. Tonight's read shows the rule drifting: 6 top-level rows, (2), (3), (4), (6), (7), (8), sit in In Progress outside `~/.zao/top3`.
+**Worked example.** BCZ, 31 Oct: the seat built `(5) BCZ - parent` with `(5a)` yapz, `(5b)` resume and `(5c)` merch under it. Tonight's read shows the rule drifting: 6 top-level rows, (2), (3), (4), (6), (7), (8), sit in In Progress outside your local top-3 list.
 
-**Mistake to avoid.** `orca repo add` puts the root checkout on the board as if it were a lane, and `orca worktree rm` deletes the folder and the branch: on 9 Sept the safe-looking `ws-fractal-lane` held 56 commits that were not on origin (vault `handoffs/ORCA-SESSIONS.md`). Prove a branch is pushed before any removal. That tap is yours.
+**Mistake to avoid.** `orca repo add` puts the root checkout on the board as if it were a lane, and `orca worktree rm` deletes the folder and the branch: on 9 Sept the safe-looking `ws-fractal-lane` held 56 commits that were not on origin (private vault record). Prove a branch is pushed before any removal. That tap is yours.
 
 ## Tutorial 2: terminals and agents
 
@@ -102,7 +102,7 @@ zao-session-dupes --all                           # two Claudes in one worktree?
 
 **Worked example.** (9) cards tonight: `zao-session-dupes --all` shows two live Claudes, started 17:59 and 18:16 EDT. Which launcher started the second one is not established. One gets closed after reading both tails, on your word because it is numbered.
 
-**Mistake to avoid.** Using `orca terminal create` to open a lane. On 12 Oct that made iman-desk a tab inside the seat, not a sidebar row (vault `handoffs/orca-upgrades.md`). Also: `accepted: true` means the text arrived, not that a turn started, and long sends have lost their beginning (zorca `PLAYBOOK.md`), so lanes put the key point last and read the pane back.
+**Mistake to avoid.** Using `orca terminal create` to open a lane. On 12 Oct that made iman-desk a tab inside the seat, not a sidebar row (private vault record). Also: `accepted: true` means the text arrived, not that a turn started, and long sends have lost their beginning (our private Orca playbook), so lanes put the key point last and read the pane back.
 
 ## Tutorial 3: orchestration runs, tasks and gates
 
@@ -123,7 +123,7 @@ orca orchestration gate-create --task <id> --question "..." --options '["yes","n
 
 **Worked example.** Ours has 4 runs: the August "ZAO operating run" (22 tasks), your 19 Oct todo board (33 tasks), the 26 Oct finance cascade (2 tasks) and a legacy tombstone. Across them: 35 completed, 16 ready, 6 blocked, 8 gates. Nothing since 26 Oct. Our real coordination runs through SendMessage and the vault, as [doc 2677](../2677-orca-best-practices-and-upgrades/) decided.
 
-**Mistake to avoid.** `dispatch` without `--inject` records a task as dispatched and tells the worker nothing. All three lanes stalled that way on 26 Aug (`PLAYBOOK.md`). A send proves the message was stored, not read. Also, `gate-list` from a pane with no bound Run returns `run_required` (measured tonight): that is a scope refusal, not "no gates exist".
+**Mistake to avoid.** `dispatch` without `--inject` records a task as dispatched and tells the worker nothing. All three lanes stalled that way on 26 Aug (our private Orca playbook). A send proves the message was stored, not read. Also, `gate-list` from a pane with no bound Run returns `run_required` (measured tonight): that is a scope refusal, not "no gates exist".
 
 ## Tutorial 4: automations and timers
 
@@ -152,7 +152,7 @@ launchctl list | grep com.zao
 
 **Worked example, good.** `fleet-health`: hourly, precheck on, `reuseSession` true. **99 of its last 101 runs were skipped by the precheck.** That is the model.
 
-**Worked example, bad, live tonight.** `AFK review and prep through 5am`: Codex, hourly, no precheck, `UNTIL=20261027T090000Z`. It reached run 119 at 19:00 on 31 Oct. **Yours:** `orca automations edit 7dacb066-b0a5-442a-b294-cd1d36b7e80a --disabled --json`
+**Worked example, bad, live tonight.** `AFK review and prep through 5am`: Codex, hourly, no precheck, `UNTIL=20261027T090000Z`. It reached run 119 at 19:00 on 31 Oct. **Yours:** `orca automations edit <id> --disabled --json`, with the id from `orca automations list --json` or the private health note.
 
 **Mistake to avoid.** Trusting an end date: Orca accepts UNTIL, COUNT and INTERVAL and ignores them ([#35894](https://github.com/stablyai/orca/issues/35894), ours, open). Set a reminder to disable instead, and check it in `automations list`. The older form of the same mistake: `organizer-tick` ran every 5 minutes with no session reuse and leaked 136 tabs by 16:00 on 29 Aug.
 
@@ -195,9 +195,9 @@ orca skills installed --json         # tonight: 487 installed
 orca skills share --skill <name> --bundle-name "<name>" --json
 ```
 
-**Worked example.** The chain that gives every pane the same skills: the Orca profile's `home/skills` links to `~/.claude/skills`, which links to `~/zaal-dotfiles/claude/skills`. One folder, every workspace, both accounts.
+**Worked example.** The chain that gives every pane the same skills: each Orca profile's skills folder links to the main Claude skills folder, which links into our dotfiles checkout. One folder, every workspace, both accounts.
 
-**Mistake to avoid.** That same chain means a branch switch in `~/zaal-dotfiles` changes every session's skills mid-conversation, so nobody checks out a branch in that tree. For share links: the docs say "treat the link like a credential", revoking does not remove copies already installed, and a skill folder can hold scripts or keys. Name each skill; `--all` is deliberately refused.
+**Mistake to avoid.** That same chain means a branch switch in that dotfiles checkout changes every session's skills mid-conversation, so nobody checks out a branch in that tree. For share links: the docs say "treat the link like a credential", revoking does not remove copies already installed, and a skill folder can hold scripts or keys. Name each skill; `--all` is deliberately refused.
 
 ## Tutorial 7: the Orca browser and tabs
 
@@ -215,7 +215,7 @@ orca goto --url <url> --json          # then: orca snapshot, orca click --elemen
 
 Clicks: `Cmd-T` new tab, `Cmd-Shift-T` reopen a closed one, `Cmd-F` find, right-click reload for a hard reload. **Settings, Browser, Link Routing** decides whether links from terminals open here or in your system browser. Open a local HTML file and the toolbar offers **Share as artifact**, which is the public-link gate from tutorial 5.
 
-**Worked example.** `/clipboard` writes a page to `~/.zao/clipboard/` (188 entries tonight), and inside Orca opens it as a tab through `orca tab`, with the choice set by `CLIPBOARD_OPENER`. Duplicate the tab and you keep that clip, because the tab's URL is the clip's own file. Doc [2714](../../agents/2714-agent-session-map/)'s session map also opens in Orca's browser.
+**Worked example.** `/clipboard` writes a page to a local folder (188 entries tonight), and inside Orca opens it as a tab through `orca tab`, with the choice set by `CLIPBOARD_OPENER`. Duplicate the tab and you keep that clip, because the tab's URL is the clip's own file. Doc [2714](../../agents/2714-agent-session-map/)'s session map also opens in Orca's browser.
 
 **Mistake to avoid.** Reading `orca tab list` from one worktree as "no tabs": it printed 0 here while 5 existed, because the default is scoped to the current row. And on 25 Sept a lane closed a tab in a loop over a listing and took the ZAOstock Round 5 cast page with it. Clips survive on disk; unsaved page state does not. Close a named tab, never a list.
 
@@ -237,14 +237,14 @@ Clicks: `Cmd-T` new tab, `Cmd-Shift-T` reopen a closed one, `Cmd-F` find, right-
 | Rank | Adopt | Cost | Gain |
 |---|---|---|---|
 | 1 | Disable the AFK automation | One line, yours | Ends about 24 Codex runs a day that your 31 Oct ruling already excludes |
-| 2 | Fence (3), (4), (6) in `~/.zao/sleep-never` | One line, yours | The agent stops ending numbered lanes tonight; keeps the swap relief from (w) lanes |
+| 2 | Fence (3), (4), (6) in the local never-sleep list | One line, yours | The agent stops ending numbered lanes tonight; keeps the swap relief from (w) lanes |
 | 3 | Remove Playwright, with the corrected line in the health note | One line, yours. `/zao-research` loses one fetch rung | No Chrome tab per new pane, one less process tree per pane |
 | 4 | (0a) orca owner and policy file | One letter from you (item 19), one lane | One caller for sleep and wake; board sweeps stop reaching you as questions |
 | 5 | Agent sleep gated on swap, not load, with a caller log | One dotfiles PR | Sleeps fire on memory pressure, the thing they relieve. Load 117 tonight came largely from Chrome and vitest |
 | 6 | Use the Agents feed and `orca search` | Nothing; the index reads enabled and current | "Who said X" in one line; catch-up in one place |
 | 7 | Log swap around each wake | A few lines in the wake path | Replaces the unmeasured "3 GB" with a number the wake gate can use |
 | 8 | Update to 1.4.245, at a calm moment | App relaunch; old panes stay on the previous terminal host. I read only the 1.4.243 to .245 headlines and a keyword grep | Listed work on hidden-terminal memory and idle CPU, sleep and resume |
-| 9 | `orca.yaml` with `worktree.sharedDirectories: [node_modules]` in ZAOOS | One PR, ask-first | About 2.4 to 2.9 GiB saved per new workspace (vault `notes/node-modules-sharing-2026-10-09.md`); replaces the hand symlink in `.claude/rules/agent-loops.md` rule 25 |
+| 9 | `orca.yaml` with `worktree.sharedDirectories: [node_modules]` in ZAOOS | One PR, ask-first | About 2.4 to 2.9 GiB saved per new workspace (private vault note, 9 Oct); replaces the hand symlink in `.claude/rules/agent-loops.md` rule 25 |
 | 10 | Agent hibernation trial on (w) lanes | One settings toggle, yours; global, so it needs (2) and (4) first, and #33875 stays a risk | Resume with no prompt, which is the root fix for your first complaint |
 | Skip | Orchestration Runs, Orca artifacts, skill-share links | | Revisit when a job truly needs tracked workers, or a person outside this Mac needs a skill |
 
@@ -253,7 +253,7 @@ Clicks: `Cmd-T` new tab, `Cmd-Shift-T` reopen a closed one, `Cmd-F` find, right-
 1. **Hibernation docs against themselves.** The v1.4.242 page says a worktree's panes "hibernate together as a unit"; [#33940](https://github.com/stablyai/orca/issues/33940) says the shipped behaviour is per pane, and the page on `main` now says so. The docs on `main` win; I have not tested either.
 2. **Doc 2677 decision 7 against rank 10 here.** 2677 skips hibernation because it does not cut tokens. True. The case now is memory and resume prompts, a question 2677 did not ask.
 3. **"3 GB per pane" in the brief against the source.** The figure traces to about 2.9 GiB of disk for `npm install` on 7 lanes, marked prediction. Swap per wake is unmeasured. Footprint per awake workspace: 1.47 GiB median tonight (15 workspaces) against 330 MB idle in [doc 2704](../../agents/2704-lane-idle-sleep-and-wake/). Different dates, load and metric; not comparable as a trend.
-4. **Docs on Claude config.** `agents/claude-code` says Orca "picks up `~/.claude` automatically". Panes here run with `CLAUDE_CONFIG_DIR` set to a profile home, and that is what broke grill item 32's line. Control run in the health note.
+4. **Docs on Claude config.** `agents/claude-code` says Orca picks up the default Claude folder automatically. Panes here run with `CLAUDE_CONFIG_DIR` set to a profile home, and that is what broke grill item 32's line. Control run in the health note.
 5. **Community verdicts.** r/ClaudeCode's OP calls it "very mature and stable"; the same thread has "slow and laggy doing remote work" and "11 GB on my ssd". Lynxflow measures about 500 MB across 8 processes on an idle headless server; `orca diagnostics memory` reads 2.23 GiB for the app here tonight, at 173 rows. Lynxflow also warns that Orca rewrites agent config on start: not tested here.
 6. **"Sleep restores all the agents"** (HN, BlueOrigin50) against our resume prompts. Both are true. See the table in tutorial 2.
 
@@ -269,8 +269,8 @@ Orca ships near daily: three releases landed after the installed one between 28 
 - [Doc 2704](../../agents/2704-lane-idle-sleep-and-wake/) - why `zao-lane-sleep` exists
 - [Doc 2714](../../agents/2714-agent-session-map/) - session map in Orca's browser
 - [Doc 2423](../../agents/2423-vault-as-transport-inter-terminal-context/) - the vault as memory, not a bus
-- Vault `notes/orca-health-2026-10-31.md`, `notes/orca-unused-features-2026-10-29.md`, `handoffs/ORCA-SESSIONS.md`
-- Code: `~/zaal-dotfiles/bin/zao-lane-sleep`, `bin/zao-lane-sleep-auto`, `~/Documents/zorca/PLAYBOOK.md`
+- Private vault: the 31 Oct health note, the 29 Oct unused-features note, and the Orca sessions map
+- Local tools: `zao-lane-sleep`, `zao-lane-sleep-auto`, our Orca playbook
 - Tracker rows from `zao-tracker search orca`: 5 related, all done; none in flight on this topic
 
 ## Next Actions
@@ -278,10 +278,10 @@ Orca ships near daily: three releases landed after the installed one between 28 
 | Action | Owner | Type | By When |
 |---|---|---|---|
 | Disable the AFK automation (shipped = `orca automations show` reads `enabled` false) | Zaal | One line | 2026-11-01 |
-| Add the 3 fence lines to `~/.zao/sleep-never`, keeping `wavewarz-protocol` (shipped = `zao-lane-sleep scan` reads never-sleep for (3), (4), (6)) | Zaal | One line | 2026-11-01 |
+| Add the 3 fence lines to the local never-sleep list, keeping the line for (2) (shipped = `zao-lane-sleep scan` reads never-sleep for (3), (4), (6)) | Zaal | One line | 2026-11-01 |
 | Remove Playwright with the corrected line (shipped = `claude mcp get playwright` finds nothing in all 3 configs; a new pane opens no tab) | Zaal | One line | 2026-11-02 |
 | Rule grill item 19 (shipped = line in the misc grill's decisions file) | Zaal | Decision | 2026-11-02 |
-| Open the owner lane and commit `notes/orca-policy.md` (shipped = file on vault main; messenger skill no longer sleeps) | Seat, on Zaal's A | Lane | 2026-11-03 |
+| Open the owner lane and commit its policy file (shipped = file on vault main; messenger skill no longer sleeps) | Seat, on Zaal's A | Lane | 2026-11-03 |
 | Dotfiles PR: agent gates on swap and logs its caller; wake logs swap before and after (shipped = PR merged, tests with a red control) | (0a) orca | PR | 2026-11-07 |
 | ZAOOS `orca.yaml` PR, ask-first (shipped = new child worktree has `node_modules` with no manual step) | Zaal, through (0a) orca | PR | 2026-11-14 |
 | Re-validate after any Orca update; read 1.4.243 to 1.4.245 notes in full before updating (shipped = this doc's `last-validated` moved and rank 8 re-graded) | (0a) orca | Re-research | 2026-11-30 |
@@ -294,16 +294,16 @@ Primary, this Mac, 31 Oct 2026, 1.4.242, read-only:
 - `orca skills get orca-cli`, with references `automations`, `browser`, `publishing` **[FULL]**
 - `orca skills get orchestration` **[PARTIAL - first 80 of 213 lines; the `--full` references were read for doc 2581 at 1.4.218, not re-read]**
 - `orca worktree list/ps`, `terminal list`, `automations list/show/runs`, `orchestration run-list/run-show/inbox/gate-list`, `tab list`, `artifacts list`, `skills installed`, `skills update --all --dry-run`, `search --index-status`, `status`, `diagnostics memory`, all `--json` where offered **[FULL - read-only]**
-- `~/Library/Application Support/orca/logs/daemon.log`, `orchestration.db` by `sqlite3 mode=ro` **[FULL for the counts cited]**
-- `~/.zao/sleep/*.json`, `~/.zao/sleep/auto.log`, `~/.zao/sleep-never`, `~/.zao/top3`, `~/.claude/state/status-*.json`, launchd plist, `crontab -l`, `launchctl list` **[FULL]**
-- `~/bin/zao-lane-sleep`, `zao-lane-sleep-auto`, `zao-session-dupes`, `zao-lane-close`, `~/.claude/skills/clipboard/SKILL.md`, `messenger/SKILL.md` **[PARTIAL - headers and the sleep sections]**
+- Orca's terminal host log and its orchestration database, read-only **[FULL for the counts cited]**
+- Local sleep records and agent log, never-sleep and top-3 lists, Claude status records, the agent's launchd plist, `crontab -l`, `launchctl list` **[FULL]**
+- Local tools `zao-lane-sleep`, `zao-lane-sleep-auto`, `zao-session-dupes`, `zao-lane-close`; the clipboard and messenger skills **[PARTIAL - headers and the sleep sections]**
 
-Vault and repo records, origin/main:
+Private vault and local records (exact paths are in the private PR that holds the health note):
 
-- `handoffs/orca-research.md`, `orca-research.done.json`, `orca-upgrades.md`, `status/orca-upgrades.md`, `decisions/seat-2026-10-31-finance-claude-only.md`, `seat-2026-10-31-mac-claude-only-codex-desktop.md`, `notes/orca-unused-features-2026-10-29.md`, `~/.zao/briefs/misc-grill-queue-2026-10-31.md` **[FULL]**
-- `handoffs/ORCA-SESSIONS.md` **[PARTIAL - first 190 lines]**; `handoffs/status/messenger.md`, `orchestrator2.md`, `MISTAKES.md` **[PARTIAL - grep for sleep, swap, resume]**
-- `notes/storage-offload-2026-10-30.md` on the open vault #376 branch **[PARTIAL - swap and wake lines]**
-- `~/Documents/zorca/PLAYBOOK.md` **[FULL]**; memory files `feedback_seat_job_is_lanes_and_orca_workflow`, `feedback_zaal_time_is_test_and_feedback`, `feedback_orca_sidebar_format`, `feedback_orca_in_progress_max_three`, `project_orca_account_switch_restarts_panes` **[FULL]**
+- Orca research and upgrades lane briefs and status, two 31 Oct seat decisions, the 29 Oct unused-features note, the 31 Oct grill queue **[FULL]**
+- Orca sessions map **[PARTIAL - first 190 lines]**; messenger and seat status logs, the mistakes log **[PARTIAL - grep for sleep, swap, resume]**
+- The 30 Oct storage note on an open vault branch **[PARTIAL - swap and wake lines]**
+- Our Orca playbook **[FULL]**; five memory files on lanes, sidebar format, the max-three rule and account switches **[FULL]**
 - Doc 2581 **[FULL]**, doc 2677 **[FULL]**; docs 2513, 2704, 2714, 2423 **[PARTIAL - resolved by `zao-research-health --resolve`, summaries only]**
 
 Orca docs. Each read as raw MDX at tag `v1.4.242` by `gh api`; the live page answered HTTP 200 on 31 Oct:

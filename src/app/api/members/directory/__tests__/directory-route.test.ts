@@ -2,6 +2,10 @@ import { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { mockFrom } = vi.hoisted(() => ({ mockFrom: vi.fn() }));
+// Existing cases run as a signed-in member; the public view is in public-view.test.ts.
+vi.mock('@/lib/auth/session', () => ({
+  getSessionData: vi.fn().mockResolvedValue({ fid: 1, isAdmin: false }),
+}));
 vi.mock('@/lib/db/supabase', () => ({ supabaseAdmin: { from: mockFrom } }));
 
 import { GET } from '@/app/api/members/directory/route';

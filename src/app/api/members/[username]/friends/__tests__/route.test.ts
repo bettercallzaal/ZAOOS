@@ -10,6 +10,10 @@ const { mockGetBestFriends } = vi.hoisted(() => ({
   mockGetBestFriends: vi.fn(),
 }));
 
+// Existing cases run as a signed-in member; the public view is in public-view.test.ts.
+vi.mock('@/lib/auth/session', () => ({
+  getSessionData: vi.fn().mockResolvedValue({ fid: 1, isAdmin: false }),
+}));
 vi.mock('@/lib/db/supabase', () => ({
   supabaseAdmin: { from: mockFrom },
 }));

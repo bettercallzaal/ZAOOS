@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { PageHeader } from '@/components/navigation/PageHeader';
+import { useAuth } from '@/hooks/useAuth';
 
 interface Member {
   id: string;
@@ -111,6 +112,12 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
   // Track whether filters differ from default (skip fetch on first render)
   const [isDefaultFilters, setIsDefaultFilters] = useState(true);
 
+  // The server-rendered list is the public view. Signed-in members load theirs.
+  const { user } = useAuth();
+  useEffect(() => {
+    if (user) setIsDefaultFilters(false);
+  }, [user]);
+
   const fetchMembers = useCallback(() => {
     setLoading(true);
     const params = new URLSearchParams({
@@ -162,7 +169,7 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
     setSearchInput('');
     setMembers(initialMembers);
     setFilterOptions(initialFilterOptions);
-    setIsDefaultFilters(true);
+    setIsDefaultFilters(!user);
   };
 
   const applyPreset = (preset: Preset) => {

@@ -140,7 +140,7 @@ import {
   NUDGE_CALLBACK,
 } from './nudges';
 import { attentionEnabled, recordTap, showAllAction, tapFamily, SHOW_ALL_CALLBACK } from './attention';
-import { mirrorTurn, recall, TURN_RECALL_TIMEOUT_MS } from './recall';
+import { mirrorTurn, recall, recallAllowedForTurn, TURN_RECALL_TIMEOUT_MS } from './recall';
 import { backgroundRecallMs, newRecallCarry, turnRecall } from './recall-carry';
 import { fanOutKnowledgeExtractors, EXTRACT_MIN_LEN } from './extractors';
 import { transcriptionConfigured, transcribeTelegramFile, downloadTelegramFile } from './transcribe';
@@ -149,6 +149,8 @@ import {
   addAllowlistMember,
   autoRegisterGroup,
   detectGroupEscalation,
+  engagedUntilFor,
+  markEngaged,
   getGroupConfig,
   isBotMentioned,
   removeAllowlistMember,
@@ -2715,6 +2717,7 @@ bot.on('message:text', async (ctx) => {
 
   const gate = shouldRespond(cfg, {
     fromId,
+    engagedUntil: engagedUntilFor(chatId, fromId),
     botUsername: usernameHolder.value,
     botId: botIdHolder.value,
     messageText: text,
@@ -3841,7 +3844,7 @@ async function dispatchConcierge(
     // running after that keeps going in the background and its result is used
     // on the next message in this chat (Bonfire delves measured ~14 s).
     let recallContext: string | undefined;
-    if (scope === 'private' && text.trim().length >= 12 && !wantsLinkResearch(text)) {
+    if (recallAllowedForTurn(scope, text, wantsLinkResearch(text))) {
       try {
         const r = await turnRecall(
           recallCarry,
@@ -4089,6 +4092,11 @@ async function dispatchConcierge(
         replyToMessageId: scope === 'private' ? undefined : ctx.message?.message_id,
       });
     }
+    // A reply was SENT to a member in a group: their next lines in this chat
+    // reach ZOE for a while without a re-mention (groups.ts, the engaged
+    // window). Only here, after the send, so an empty or guarded reply opens
+    // no window; the per-sender cap lives in groups.ts.
+    if (scope !== 'private' && !isFromZaal(ctx) && ctx.from) markEngaged(scope, ctx.from.id);
 
     // The tail question (terminal-grill.ts, ZOE_TAIL_QUESTION, doc 2679 PR 3):
     // after answering Zaal in his DM, the first waiting seat item follows as its

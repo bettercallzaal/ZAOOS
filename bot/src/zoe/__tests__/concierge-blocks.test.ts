@@ -2,7 +2,7 @@
 // Tests for buildSystemBlocks — the pure prompt-assembly function in concierge.ts.
 // No mocks needed: function is purely functional (string in → string out).
 import { describe, expect, it } from 'vitest';
-import { buildSystemBlocks } from '../concierge';
+import { buildSystemBlocks, isTelegramGroupScope } from '../concierge';
 import type { MemoryBlocks } from '../memory';
 
 const BASE_BLOCKS: MemoryBlocks = {
@@ -245,5 +245,40 @@ describe('buildSystemBlocks — capability gap block', () => {
   it('is never added to a group chat, asked for or not', () => {
     const blocks: MemoryBlocks = { ...BASE_BLOCKS, chat_scope: '100', chat_title: 'ZAO HQ' };
     expect(withGap(blocks, true)).not.toContain('<capability_gap>');
+  });
+});
+
+
+// ── community block (1 Nov 2026) ──────────────────────────────────────────────
+
+describe('buildSystemBlocks — community block for group chats', () => {
+  it('a group scope carries <community> with the no-tools and no-access rules', () => {
+    const out = buildSystemBlocks({ ...BASE_BLOCKS, chat_scope: '-1000000000001', chat_title: 'Test Group' }, DATE);
+    expect(out).toContain('<community>');
+    expect(out).toContain('never narrate a memory lookup');
+    expect(out).toContain('cannot grant or promise');
+    expect(out).toContain('</community>');
+  });
+
+  it('the private DM with Zaal carries no <community> block', () => {
+    expect(buildSystemBlocks(BASE_BLOCKS, DATE)).not.toContain('<community>');
+  });
+
+  it('a group turn still carries no <human> or <tasks> block', () => {
+    const out = buildSystemBlocks({ ...BASE_BLOCKS, chat_scope: '-1000000000001', chat_title: 'Test Group' }, DATE);
+    expect(out).not.toContain('<human>');
+    expect(out).not.toContain('<tasks>');
+  });
+
+  it('a member DM, a Discord channel and the board ask carry no <community> block', () => {
+    for (const chat_scope of ['member-dm-424242', 'discord:123456', 'discord-dm:424242', 'cowork-board-untrusted']) {
+      expect(buildSystemBlocks({ ...BASE_BLOCKS, chat_scope }, DATE)).not.toContain('<community>');
+    }
+  });
+
+  it('isTelegramGroupScope matches only a negative chat id', () => {
+    expect(isTelegramGroupScope('-1000000000001')).toBe(true);
+    expect(isTelegramGroupScope('-5000000001')).toBe(true);
+    for (const s of ['private', '424242', 'member-dm-424242', 'discord:-1', '-', '']) expect(isTelegramGroupScope(s)).toBe(false);
   });
 });

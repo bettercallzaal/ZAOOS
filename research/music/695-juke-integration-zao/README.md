@@ -2,7 +2,7 @@
 topic: music
 type: decision
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-11-02
 superseded-by:
 related-docs: 662, 661h, 591, 547, 508
 original-query: "juke integration for the zao"
@@ -166,6 +166,24 @@ Re-fetched `juke.audio/llms.txt` + `juke.audio/SKILL.md` today — **identical**
 | Update memory: add `project_juke_integration.md` (ecosystem map) linking `project_fishbowlz_revival` / doc 662 | @Zaal | Memory update | After doc merge |
 | Re-validate this doc in 45 days — Juke is a fast-moving beta | @Zaal | Recurring check | 2026-07-04 |
 
+## Updated 2026-11-02
+
+Five material changes since the 2026-05-20 validation:
+
+**1. ZAO OS has shipped the Juke integration (was: 0 hits; now: 70 files).** Path A (iframe embed via `JukeEmbed.tsx`), Path B (developer API via `src/app/api/juke/space/route.ts`), and webhooks are all live. A partner-SSO bridge at `/api/juke/partner-token` lets ZAO-signed-in users skip the SIWF QR step in the embed. The "greenfield" note in this doc is no longer accurate.
+
+**2. Juke went open source.** `99darwin/farcaster-audio` was published on GitHub and merged as a single sync commit on 2026-10-17. The open source drop includes: iOS + Android + web (Expo bare workflow), Hypersnap replacing Neynar for writes (signed Farcaster messages, KeyGateway on Optimism), Direct Casts (Farcaster DMs inside Juke), and a self-hosting README. The doc's "maybe open-source" risk item is resolved -- it shipped. Source: `https://github.com/99darwin/farcaster-audio/pull/1` [FULL].
+
+**3. Farcaster shipped native audio spaces.** The Medium-High risk in this doc has materialized. Nickysap wrote that "within a month of shipping my app, Farcaster deployed its own version of audio Spaces." This removes Juke's core differentiator of being the only Farcaster-native live audio. Juke's remaining differentiation: recording, scroll-while-listening in the Farcaster feed, native reply-based chat, and the noted Farcaster Spaces interop gap (the two are not interoperable per the Oct 2026 PR). Source: web search synthesis citing nickysap Substack and `farcaster-audio` PR #1 [PARTIAL -- nickysap.substack.com blocked in this session].
+
+**4. Juke has webhooks (was: absent).** The `recording.ready`, `room.started`, `room.finished`, `participant.joined`, and `participant.left` events are live. ZAO's `src/lib/spaces/jukeWebhookHandlers.ts` already handles them, including auto-casting to Farcaster on space end and an agent-join flow. The doc's "still absent from docs: webhooks" note is stale.
+
+**5. Juke is now on Android and web (was: iOS TestFlight only).** A Google Play listing exists for `com.juke.audio.juke_audio`. The Oct 2026 open-source PR adds Android alongside iOS (Expo bare) and a web app. Play Store listing status (approved vs pending) could not be confirmed -- play.google.com was blocked in this session.
+
+**Unchanged:** pricing tiers and SLA still not publicly documented. FIP-2 chat refactor (Path D) has not been done in ZAO OS -- `src/app/api/spaces/chat` still exists alongside the Juke integration.
+
+Sources added below.
+
 ## Sources
 
 - [Juke llms.txt](https://juke.audio/llms.txt) — primary API reference, re-fetched verbatim 2026-05-20 `[FULL]`
@@ -176,4 +194,7 @@ Re-fetched `juke.audio/llms.txt` + `juke.audio/SKILL.md` today — **identical**
 - [Recorded zaal x nickysap x rish space](https://x.com/nicky_sap/status/2047770959403516069) — referenced by the @farcaster cast above; recorded audio, not transcribed `[PARTIAL — audio artifact, existence confirmed via the @farcaster cast, contents not transcribed]`
 - ZAO OS codebase: `src/components/spaces/AudioRoomAdapter.tsx`, `src/lib/spaces/roomsDb.ts`, `src/app/api/stream/rooms/route.ts`, `src/lib/portal/destinations.ts`, `package.json` `[FULL]`
 - GitHub org search `bettercallzaal/` for `juke` — zero hits, 2026-05-20 (negative signal: greenfield) `[FULL]`
+- [99darwin/farcaster-audio PR #1](https://github.com/99darwin/farcaster-audio/pull/1) — Juke open-source sync PR, merged 2026-10-17; Android, Hypersnap, Direct Casts, security hardening, 2163 backend tests `[FULL]`
+- Web search: "Juke audio Farcaster nickysap 2026 updates" — confirmed Android Play Store listing, Farcaster native audio shipped, open-source repo, 2026-11-02 `[PARTIAL -- juke.audio and nickysap.substack.com blocked in this session]`
+- ZAO OS codebase grep for `juke` across `src/` — 70 files, including `JukeEmbed.tsx`, `juke-api.ts`, `jukeWebhookHandlers.ts`, `juke-partner-token.ts`, `jukeAgentJoin.ts`, 2026-11-02 `[FULL]`
 - [Doc 662](../662-fishbowlz-revival-juke-mute-lockout/README.md) — internal, the FISHBOWLZ-on-Juke decision doc this doc extends `[FULL]`

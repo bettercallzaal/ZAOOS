@@ -25,7 +25,7 @@ Doc 1032 (last-validated 2026-07-11) explicitly flags this as unconfirmed: "Whet
 
 Strong indirect evidence it is solvable: the City of Ellsworth runs its own weekly **Downtown Summer Concert Series** (Thursdays, July 23-October 1, 2026) at this exact parklet with amplified live bands - meaning the power problem has been solved by the city for its own use; the answer just was not documented publicly.
 
-If a generator is confirmed necessary: **Wallace Events** (207-667-6000, already the ZAOstock tent/staging vendor via contact Roddy) rents generators in the 15-45kW range. Doc 1032 cites a realistic one-day cost of $220-480 all-in (unit + delivery + fuel). Asking Wallace about generator rental in the same call as the tent is the obvious path. Backup if Wallace cannot cover it: Prime Power Rentals (statewide, specializes in quiet/sound-attenuated generators - relevant for a downtown venue).
+If a generator is confirmed necessary: **Wallace Events** (already the ZAOstock tent/staging vendor; number on their site) rents generators in the 15-45kW range. Doc 1032 cites a realistic one-day cost of $220-480 all-in (unit + delivery + fuel). Asking Wallace about generator rental in the same call as the tent is the obvious path. Backup if Wallace cannot cover it: Prime Power Rentals (statewide, specializes in quiet/sound-attenuated generators - relevant for a downtown venue).
 
 **This must be resolved by a direct call to the City of Ellsworth or the Downtown Summer Concert Series organizer before any PA configuration decision is locked.**
 
@@ -78,7 +78,7 @@ The prior research pass (doc 2488, last-validated 2026-09-25) established and re
 
 ## Recommended Action
 
-1. **Resolve the Parklet power question first** by calling the City of Ellsworth events coordinator or the Downtown Summer Concert Series organizer - ask directly what power is available at Franklin Street Parklet and whether a generator permit is needed. This unblocks every PA configuration decision. If a generator is required, Wallace Events (207-667-6000) is the one-stop path alongside the existing tent contract.
+1. **Resolve the Parklet power question first** by calling the City of Ellsworth events coordinator or the Downtown Summer Concert Series organizer - ask directly what power is available at Franklin Street Parklet and whether a generator permit is needed. This unblocks every PA configuration decision. If a generator is required, Wallace Events ([number on their site] is the one-stop path alongside the existing tent contract.
 
 2. **If the event has not yet occurred**, call Greg Young (djgregyoung.com/contact) immediately - he is the only vendor where one call covers both the day DJ gap and a backup PA quote, and he has confirmed Ellsworth service area with real local gigs on record. Call Grand Rental Station (grandrentalmaine.com, Trenton - 10 min away) in parallel for an equipment-only backup speaker set if OPEN X's rig has a problem day-of.
 

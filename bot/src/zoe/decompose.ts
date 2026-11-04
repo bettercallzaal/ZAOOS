@@ -329,41 +329,49 @@ function coerceToSubtask(raw: unknown, idx: number): Subtask {
   };
 }
 
+const QUOTE_REPLY_HEAD = '[Zaal is replying to your earlier message:\n"';
+const QUOTE_REPLY_SEP = '"]\n\nHis reply: ';
+
 /**
- * Heuristic: should ZOE bother decomposing this goal at all? Short
- * conversational messages, factual questions, and simple captures should
- * stay inline in concierge.ts and NOT trigger decomposition.
+ * Fold a quote-replied message into the turn text, so a short reply ("zol yes")
+ * anchors to the draft it answers. ownWords() is its inverse; both live here so
+ * the wrapper the DM handler builds is the wrapper the router strips.
+ */
+export function wrapQuotedReply(quoted: string, reply: string): string {
+  return `${QUOTE_REPLY_HEAD}${quoted.slice(0, 1200)}${QUOTE_REPLY_SEP}${reply}`;
+}
+
+/** Zaal's own words in a turn, without any quoted earlier message. */
+export function ownWords(turnText: string): string {
+  if (!turnText.startsWith(QUOTE_REPLY_HEAD)) return turnText;
+  const at = turnText.lastIndexOf(QUOTE_REPLY_SEP);
+  return at === -1 ? turnText : turnText.slice(at + QUOTE_REPLY_SEP.length);
+}
+
+/**
+ * Heuristic: should ZOE turn this DM into an agent plan? Default NO: plain
+ * talk is answered inline in concierge.ts (Zaal, vault decisions item 193,
+ * 2026-11-04: "answer plain talk inline instead of planning").
  *
- * Returns true if the goal LOOKS multi-step. False positives are cheap
- * (we just run decompose and get 1 subtask back); false negatives mean
- * ZOE under-decomposes which is worse, so lean toward true.
+ * Plans only on an explicit "decompose", or a clear multi-step work ask: a
+ * sequence word AND a work verb. The old rule fired on any one of 15 loose
+ * markers (" also ", ", and ", " next ", " research ", ...) and read the
+ * QUOTED message as well as Zaal's reply, so "Please loop on this task",
+ * quote-replied to a long plan, became a plan. Measured in his 1-4 Nov
+ * Telegram export: 7 of his 13 messages got "Decomposing into a routed
+ * plan", none was a multi-step ask. Typed `plan:` still always plans (PLAN_PREFIX, index.ts).
  */
 export function shouldDecompose(goal: string): boolean {
-  const text = goal.trim();
+  const text = ownWords(goal).trim();
   if (text.length < 30) return false;
   const lower = text.toLowerCase();
   // Single-question signals - stay inline.
   if (/^(what|when|where|who|how much|what time|is it|are we)\b/.test(lower)) return false;
   if (/^(yes|no|y|n)\b/.test(lower)) return false;
-  // Multi-step signals - decompose.
-  const multiStepMarkers = [
-    ' and then ',
-    ' then ',
-    ' after that',
-    ' next ',
-    ' also ',
-    ' plus ',
-    ', and ',
-    ' followed by ',
-    ' before ',
-    ' once ',
-    ' build ',
-    ' ship ',
-    ' research ',
-    ' decompose ',
-    ' decide ',
-  ];
-  return multiStepMarkers.some((m) => lower.includes(m));
+  if (/\bdecompose\b/.test(lower)) return true;
+  const sequence = /\b(and then|then|after that|followed by|once that)\b/.test(lower);
+  const work = /\b(build|ship|research|draft|write|fix|deploy|audit|implement|migrate|refactor|set up)\b/.test(lower);
+  return sequence && work;
 }
 
 /**

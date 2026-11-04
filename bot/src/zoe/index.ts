@@ -4092,11 +4092,12 @@ async function dispatchConcierge(
         replyToMessageId: scope === 'private' ? undefined : ctx.message?.message_id,
       });
     }
-    // A reply was SENT to a member in a group: their next lines in this chat
-    // reach ZOE for a while without a re-mention (groups.ts, the engaged
-    // window). Only here, after the send, so an empty or guarded reply opens
-    // no window; the per-sender cap lives in groups.ts.
-    if (scope !== 'private' && !isFromZaal(ctx) && ctx.from) markEngaged(scope, ctx.from.id);
+    // A reply was SENT in a group: for a while everyone's next lines in this
+    // chat reach ZOE without a re-mention (groups.ts, the chat-wide engaged
+    // window, item 135). Zaal's own mention opens it too ("after any
+    // @mention"). Only here, after the send, so an empty or guarded reply
+    // opens no window; the per-sender turn cap lives in groups.ts.
+    if (scope !== 'private' && ctx.from) markEngaged(scope, ctx.from.id);
 
     // The tail question (terminal-grill.ts, ZOE_TAIL_QUESTION, doc 2679 PR 3):
     // after answering Zaal in his DM, the first waiting seat item follows as its

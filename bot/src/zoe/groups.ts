@@ -36,8 +36,9 @@ export interface GateContext {
   messageText: string;
   replyToFromId?: number;
   entities: ReadonlyArray<MessageEntity>;
-  /** Epoch ms until which this sender keeps the floor without re-mentioning
-   *  ZOE (see markEngaged / engagedUntilFor). Absent or past = no window. */
+  /** Epoch ms until which this chat's engaged window lets this sender reach
+   *  ZOE without re-mentioning her (see markEngaged / engagedUntilFor).
+   *  Absent or past = no window. */
   engagedUntil?: number;
   /** Clock for the engaged check; tests pass it, callers leave it to Date.now(). */
   nowMs?: number;
@@ -188,35 +189,44 @@ export function shouldRespond(config: GroupConfig | null, gctx: GateContext): Ga
 }
 
 /**
- * The engaged window: after ZOE SENDS a reply to a member in a group, that
- * member's next messages in the same chat reach her for ENGAGED_WINDOW_MS
- * without an @-mention or a reply, for at most ENGAGED_MAX_TURNS replies in a
- * row. The cap is what stops one member holding ZOE in an endless exchange.
- * Once it is spent, a fresh @-mention or a reply still passes the gate on its
- * own merits, but the count resets only after the window lapses (ten quiet
- * minutes from that member). mode=silent and the allowlist win because
- * shouldRespond checks them first. State is
- * in-process only: a restart ends every window, the safe direction.
+ * The engaged window, CHAT-WIDE (item 135, Zaal 2026-11-02: "after any
+ * @mention, she answers everyone in that Telegram chat for 10 minutes. Not per
+ * member."). After ZOE SENDS a reply in a group, every sender's next messages
+ * in that chat reach her for ENGAGED_WINDOW_MS without an @-mention or a reply.
+ * Each new reply in the chat pushes the window out again.
+ *
+ * The turn cap stays PER SENDER inside the chat window: one member gets at most
+ * ENGAGED_MAX_TURNS replies in a row without a fresh mention, so no single
+ * member can hold ZOE in an endless exchange, while the rest of the room still
+ * reaches her. A spent member's fresh @-mention or reply still passes the gate
+ * on its own merits; their count resets only when the whole chat window lapses
+ * (ten quiet minutes in that chat). mode=silent and the allowlist win because
+ * shouldRespond checks them first. State is in-process only: a restart ends
+ * every window, the safe direction.
  */
 export const ENGAGED_WINDOW_MS = 10 * 60_000;
 export const ENGAGED_MAX_TURNS = 6;
-interface Engaged { until: number; turns: number }
-const engaged = new Map<string, Engaged>();
+interface ChatWindow { until: number; turns: Map<number, number> }
+const engaged = new Map<string, ChatWindow>();
 
-/** Call ONLY after a reply to this member was actually sent. */
+/** Call ONLY after a reply in this chat was actually sent; fromId is who it answered. */
 export function markEngaged(chatId: number | string, fromId: number, nowMs: number = Date.now()): void {
-  for (const [k, e] of engaged) if (e.until <= nowMs) engaged.delete(k);
-  const key = `${chatId}:${fromId}`;
-  const prev = engaged.get(key);
-  const turns = prev && prev.until > nowMs ? prev.turns + 1 : 1;
-  engaged.set(key, { until: nowMs + ENGAGED_WINDOW_MS, turns });
+  for (const [k, w] of engaged) if (w.until <= nowMs) engaged.delete(k);
+  const key = String(chatId);
+  const w = engaged.get(key);
+  if (!w) {
+    engaged.set(key, { until: nowMs + ENGAGED_WINDOW_MS, turns: new Map([[fromId, 1]]) });
+    return;
+  }
+  w.until = nowMs + ENGAGED_WINDOW_MS;
+  w.turns.set(fromId, (w.turns.get(fromId) ?? 0) + 1);
 }
 
-/** The window's end for this sender, or undefined when none is open or the cap is spent. */
+/** The chat window's end for this sender, or undefined when none is open in the chat or this sender's cap is spent. */
 export function engagedUntilFor(chatId: number | string, fromId: number): number | undefined {
-  const e = engaged.get(`${chatId}:${fromId}`);
-  if (!e || e.turns >= ENGAGED_MAX_TURNS) return undefined;
-  return e.until;
+  const w = engaged.get(String(chatId));
+  if (!w || (w.turns.get(fromId) ?? 0) >= ENGAGED_MAX_TURNS) return undefined;
+  return w.until;
 }
 
 /** Tests only: forget every engaged window. */

@@ -357,11 +357,27 @@ describe('shouldRespond engaged window', () => {
     expect(r.reason).toBe(`sender ${MEMBER} not in member_allowlist`);
   });
 
-  it('markEngaged opens a window of ENGAGED_WINDOW_MS for that chat and sender only', () => {
+  // Item 135 (2026-11-02): the window is chat-wide. Red on the per-sender
+  // key this replaced: OTHER got undefined there.
+  it('markEngaged opens a window of ENGAGED_WINDOW_MS for EVERY sender in that chat, and no other chat', () => {
     markEngaged(CHAT, MEMBER, 5_000);
     expect(engagedUntilFor(CHAT, MEMBER)).toBe(5_000 + ENGAGED_WINDOW_MS);
-    expect(engagedUntilFor(CHAT, OTHER)).toBeUndefined();
+    expect(engagedUntilFor(CHAT, OTHER)).toBe(5_000 + ENGAGED_WINDOW_MS);
     expect(engagedUntilFor(CHAT - 1, MEMBER)).toBeUndefined();
+  });
+
+  it('a member with no mention passes the gate once anyone in the chat was answered', () => {
+    const now = 10_000;
+    markEngaged(CHAT, MEMBER, now);
+    const r = shouldRespond(mentionCfg, { ...base, fromId: OTHER, engagedUntil: engagedUntilFor(CHAT, OTHER), nowMs: now + 1_000 });
+    expect(r.allow).toBe(true);
+    expect(r.reason).toBe('mode=mention + engaged window');
+  });
+
+  it('each reply in the chat pushes the window out for everyone', () => {
+    markEngaged(CHAT, MEMBER, 0);
+    markEngaged(CHAT, OTHER, 60_000);
+    expect(engagedUntilFor(CHAT, MEMBER)).toBe(60_000 + ENGAGED_WINDOW_MS);
   });
 
   it('markEngaged prunes windows that have expired', () => {
@@ -371,7 +387,7 @@ describe('shouldRespond engaged window', () => {
     expect(engagedUntilFor(2, 20)).toBe(2 * ENGAGED_WINDOW_MS + 1);
   });
 
-  it('the cap closes the window after ENGAGED_MAX_TURNS replies in a row', () => {
+  it('the cap closes the window for one sender after ENGAGED_MAX_TURNS replies in a row, not for the room', () => {
     let t = 0;
     for (let n = 1; n < ENGAGED_MAX_TURNS; n++) {
       markEngaged(CHAT, MEMBER, (t += 1_000));
@@ -379,6 +395,7 @@ describe('shouldRespond engaged window', () => {
     }
     markEngaged(CHAT, MEMBER, (t += 1_000));
     expect(engagedUntilFor(CHAT, MEMBER)).toBeUndefined();
+    expect(engagedUntilFor(CHAT, OTHER)).toBe(t + ENGAGED_WINDOW_MS);
   });
 
   it('a reply after the window lapsed starts the count again', () => {

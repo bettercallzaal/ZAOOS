@@ -8,9 +8,9 @@
  * PR and replies the pinned zao-merge line. It never merges and never posts a
  * GitHub comment: the "ZOE final review" text is only logged for now.
  *
- * Grade: the live adapter over bot/src/hermes/critic.ts is NOT built (it needs
- * a checkout of the head). Until it is, the default grade throws, so a card is
- * never raised on an unreviewed diff. See the PR body.
+ * Grade: makeHermesGrade (critic-adapter.ts) fetches the diff of the exact head
+ * SHA read-only and scores it with the Hermes critic. Any failure there throws,
+ * so a card is never raised on an unreviewed diff.
  */
 
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
@@ -20,6 +20,7 @@ import { featureRan } from '../feature-ran';
 import { ZOE_PATHS } from '../memory';
 import { CardStore, cardTtlMs, type Card, type CardPersistence } from './card';
 import { handleTap, reviewPr, type FlowDeps } from './flow';
+import { makeHermesGrade } from './critic-adapter';
 import type { GradeFn } from './grade';
 import { isRepoSlug } from './merge-line';
 import { defaultGhRunner, readSnapshot } from './snapshot';
@@ -35,10 +36,6 @@ export function verdictLogins(env: NodeJS.ProcessEnv = process.env): string[] {
     .map((s) => s.trim())
     .filter(Boolean);
 }
-
-const unbuiltGrade: GradeFn = async () => {
-  throw new Error('final-review grade adapter not built');
-};
 
 function filePersistence(path: string): CardPersistence {
   return {
@@ -74,7 +71,7 @@ export function registerFinalReview(bot: Bot<Context>, hooks: FinalReviewHooks):
   const deps: FlowDeps = {
     store: new CardStore(filePersistence(join(ZOE_PATHS.home, 'final-review-cards.json'))),
     read: (repo, n) => readSnapshot(repo, n, defaultGhRunner),
-    grade: hooks.grade ?? unbuiltGrade,
+    grade: hooks.grade ?? makeHermesGrade({ gh: defaultGhRunner }),
     allowedLogins: verdictLogins(),
     now: () => Date.now(),
     ttlMs: cardTtlMs(),

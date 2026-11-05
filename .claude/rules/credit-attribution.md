@@ -13,5 +13,6 @@ Whenever we adopt, vendor, adapt, or are inspired by someone else's work - code,
 | ICM boxes / bios / partner lists | sources + partners named |
 
 - **Respect license terms.** MIT/BSD/Apache require attribution; AGPL/GPL add share-alike. If a license is unclear, check BEFORE using; do not adopt code we cannot legally and attributably use.
+- **Standing licence rule (Zaal, 2026-11-05, decisions item 218), future PRs only.** A credit under MIT, Apache-2.0, BSD or MPL-2.0 passes with no per-PR licence call to Zaal. GPL, AGPL, an unclear licence or no licence still ask him before the code is adopted. A doc that only cites articles and adopts no code needs no licence call. Credit is still given every time, under the table above. Read the LICENSE file, never the API classifier field (`/zao-research` requirement 13).
 - **Music:** every track, sample, beat, loop, cover or artist's work gets the artist credited (name + handle + link where possible), visibly on published surfaces. **Uncleared or unlicensed = do not publish:** if we cannot both credit it AND have the right to use it publicly, we do not use it publicly.
 - Credit only the public identity/handle; never leak secrets or private PII. If the origin is unknown, say "origin unknown"; never invent a source.

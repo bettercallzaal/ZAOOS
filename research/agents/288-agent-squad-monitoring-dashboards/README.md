@@ -2,7 +2,7 @@
 topic: agents
 type: research-report
 status: research-complete
-last-validated: 2026-05-21
+last-validated: 2026-11-04
 original-query: "Survey monitoring dashboards for AI agent squads, focused on open-source tools for visualization and observability (reconstructed)"
 tier: production
 ---
@@ -472,6 +472,54 @@ For your 8-agent VPS squad, the best combination would be:
 4. **Pixel Agents concept** as inspiration for a fun "virtual office" view — could build a simplified version showing ZOE, ZOEY, WALLET etc. as characters with live status indicators.
 
 5. **tugcantopaloglu/openclaw-dashboard** for OpenClaw-specific features if you're using OpenClaw as the gateway — rate limits, cost analysis, memory viewer, system health.
+
+---
+
+---
+
+## Updated 2026-11-04
+
+Three material developments since last validated (2026-05-21). Note: the ClickHouse acquisition predates last validation but was not in the doc.
+
+### 1. Langfuse acquired by ClickHouse (January 2026) - MISSED IN MAY VALIDATION
+
+ClickHouse announced the acquisition of Langfuse on approximately January 16, 2026, alongside its $400M Series D at a $15B valuation. The Langfuse team joined ClickHouse; the core platform remains MIT-licensed and open-source. ClickHouse's rationale: Langfuse already runs on ClickHouse under the hood. Langfuse continues to be developed from Berlin and San Francisco.
+
+Implication for the ZAO recommendation: Langfuse (Tier 1, item 2) is now a ClickHouse-owned product. The open-source commitment is explicitly stated, but the independent startup risk profile has changed. This was confirmed across multiple outlets including the law firm Orrick (which handled the transaction), ClickHouse's own blog, and InfoWorld. PARTIAL - could not fetch full articles (network policy blocks those domains).
+
+Sources (from search results, not full fetches): https://clickhouse.com/blog/clickhouse-acquires-langfuse-open-source-llm-observability, https://www.orrick.com/en/News/2026/01/Open-source-LLM-Observability-Langfuse-Acquired-by-ClickHouse-Inc, https://www.infoworld.com/article/4118621/clickhouse-buys-langfuse-as-data-platforms-race-to-own-the-ai-feedback-loop
+
+### 2. Langfuse v4 launched (August 13-17, 2026) - NEW
+
+Langfuse v4 is live. Key changes per official changelog URLs found in search (langfuse.com/changelog/2026-08-13-langfuse-v4):
+- Up to 165x faster at scale via a new observations-first data model on a wide ClickHouse table
+- 10x faster dashboard loads for large projects
+- Full-text search across inputs, outputs, and metadata
+- Monitors and alerts (new capability)
+- Multimodal evaluators: can now assess images, audio, video, PDFs, and text files in traces
+- Faster Observations API v2 and Metrics API v2
+
+Migration note: Langfuse Cloud becomes v4-only on November 16, 2026 (12 days from now). Self-hosted v3 receives security patches through January 2027. PARTIAL - search found official changelog URL but langfuse.com is blocked in this session's network policy.
+
+Source: https://langfuse.com/changelog/2026-08-13-langfuse-v4 (PARTIAL - URL from search, page not fetched)
+
+### 3. Opik Claude Code plugin (June 3, 2026) - NEW, directly relevant to ZAO
+
+Comet announced an Opik plugin for Claude Code that automatically configures observability for complex agentic systems. A separate announcement describes native observability alerts for OpenClaw. Opik also shipped: Test Suites for unit and regression testing of AI agents (April 21, 2026), and an Agent Playground for iterating on agent code during development (April 23, 2026). Comet's site now explicitly promotes tracking and optimizing Claude Code spend across engineering teams.
+
+Implication: Opik (Tier 1, item 3) now has direct Claude Code and OpenClaw integrations, which the original doc did not note. Upgrade its integration assessment from "REST API only" to "native Claude Code plugin + native OpenClaw plugin." PARTIAL - dates and feature names from Comet blog index in search results; pages at comet.com and plushcap.com are blocked in this session.
+
+Source: https://www.comet.com/site/products/opik/features/ (PARTIAL - URL from search, page not fetched)
+
+### Not verified
+
+- VoltAgent star count of ~47K (search snippet from directory, single source, unverified)
+- Galileo acquired by Cisco (April 2026) for Splunk - headline only from SiliconAngle; siliconangle.com blocked
+- Langfuse "20K+ GitHub stars" claim from search snippets may predate the doc's 24,418 count; treat current count as UNVERIFIED
+
+### Recommendation matrix impact
+
+The acquisition of Langfuse by ClickHouse and Galileo by Cisco signals that enterprise data/security platforms are absorbing the AI observability layer. For ZAO's self-hosted stack, the open-source tools (Langfuse, Opik) remain valid choices, but their roadmaps are now steered by larger acquirers. Opik's new Claude Code and OpenClaw integrations make it more immediately useful than its original assessment suggested.
 
 ---
 

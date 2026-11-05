@@ -65,11 +65,13 @@ export const CAPABILITIES: Capability[] = [
  * the same at one rung as at four, and one rung is not a fallback - it is a
  * second single point of failure. On 2026-08-21 the ladder was OpenRouter then
  * Grok, OpenRouter ran out of credits, and 17 loops went silent. On 2026-09-11
+ * (ruling item 194, 2026-11-04) OpenRouter left the live order: it is a rung only
+ * with ZOE_OPENROUTER_RUNG=1, matching models/router.ts hasOpenRouterRung().
  * the live VPS had exactly one rung again. Zaal: "i odnt wanna have openrouter
  * be the only backup".
  */
 export const FALLBACK_RUNGS: Array<{ name: string; when: (env: Record<string, string | undefined>) => boolean }> = [
-  { name: 'openrouter', when: (e) => Boolean(e.OPENROUTER_API_KEY?.trim()) },
+  { name: 'openrouter', when: (e) => e.ZOE_OPENROUTER_RUNG?.trim() === '1' && Boolean(e.OPENROUTER_API_KEY?.trim()) },
   { name: 'surplus', when: (e) => Boolean(e.SURPLUS_API_KEY?.trim()) },
   { name: 'grok', when: (e) => Boolean(e.XAI_API_KEY?.trim()) },
   { name: 'gpt', when: (e) => Boolean(e.OPENAI_API_KEY?.trim()) },

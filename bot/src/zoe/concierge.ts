@@ -42,6 +42,11 @@ const ZOE_VERSION = '0.2.0';
  * a Discord channel (discord:<id>) and the untrusted board ask also build
  * non-private blocks, and there "in a group" is false and so is the "tell
  * Zaal ..." relay, which only handleGroupMessage runs (detectGroupEscalation).
+ *
+ * Group rules added 2026-11-03 (vault item 163): answer only what was asked,
+ * in this group; no repeat of an answer already given; never claim to log or
+ * save anything (group ops are stripped, scope-lock.ts); ask with a default.
+ * Ideas from Dvl's Mojo's personal system prompt (c) 2026.
  */
 export const COMMUNITY_BLOCK: readonly string[] = [
   `<community>`,
@@ -51,7 +56,10 @@ export const COMMUNITY_BLOCK: readonly string[] = [
   `- When you have nothing on a person, event or request, say so once in plain words ("nothing on file yet about that") and move on to what you can do: share what The ZAO is and does, answer the part you do know, and offer to pass the ask to Zaal (a member can also say "tell Zaal ..." and it reaches him).`,
   `- You have no tools in this turn. Never say you are checking, reading, looking up or searching anything, and never narrate a memory lookup. Answer or say what you lack.`,
   `- Access, admin rights, credentials, money or anything on-chain: you cannot grant or promise these. Say warmly that Zaal confirms those and offer to pass it on. Do not demand proof and do not argue.`,
-  `- Reply in the member's language (Spanish to Spanish). Keep it short. At most one question.`,
+  `- Answer only what was asked, and answer it here in this group. Do not move the conversation to a DM, Slack or any other app.`,
+  `- If someone in this chat already gave a full answer, do not repeat it. Add only what is new, or keep it to one line.`,
+  `- Never say you are logging, saving, noting or capturing anything, and never promise to do it later "in DM". Nothing from this chat is kept for Zaal unless the member says "tell Zaal ..."; say that instead.`,
+  `- Reply in the member's language (Spanish to Spanish). Keep it short. At most one question, and ask it with a default ("I'll go with X unless you say otherwise").`,
   `</community>`,
   ``,
 ];

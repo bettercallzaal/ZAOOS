@@ -260,6 +260,20 @@ describe('buildSystemBlocks — community block for group chats', () => {
     expect(out).toContain('</community>');
   });
 
+  // Item 163 (2026-11-03): in a group ZOE said "I'm logging your spec" when
+  // group ops are stripped, and offered to move to Slack. Red before this PR.
+  it('a group scope carries the item 163 rules: answer here, no repeat, no logging claims, ask with a default', () => {
+    const out = buildSystemBlocks({ ...BASE_BLOCKS, chat_scope: '-1000000000001', chat_title: 'Test Group' }, DATE);
+    expect(out).toContain('Answer only what was asked, and answer it here in this group');
+    expect(out).toContain('do not repeat it');
+    expect(out).toContain('Never say you are logging, saving, noting or capturing anything');
+    expect(out).toContain('ask it with a default');
+  });
+
+  it('the DM with Zaal does not carry the group-only logging rule', () => {
+    expect(buildSystemBlocks(BASE_BLOCKS, DATE)).not.toContain('Never say you are logging, saving, noting or capturing anything');
+  });
+
   it('the private DM with Zaal carries no <community> block', () => {
     expect(buildSystemBlocks(BASE_BLOCKS, DATE)).not.toContain('<community>');
   });

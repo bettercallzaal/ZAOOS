@@ -271,6 +271,7 @@ import {
 import type { PendingBonfireSubmission } from './approvals';
 import { attachCaster } from './caster';
 import { handleCastTrigger } from './caster/trigger';
+import { registerFinalReview } from './final-review/wire';
 import { subscribeToCasts } from './farcaster/event-stream';
 import {
   getPendingReply,
@@ -900,6 +901,10 @@ bot.callbackQuery(/^inb:cmd:/, async (ctx) => {
   await ctx.reply(`${pr.repo} #${pr.number}, your call, run it yourself:\n${mergeCommand({ repo: pr.repo, number: pr.number, title: '', url: '', draft: false, createdAt: null })}`).catch(() => {});
   featureRan('inbox-nudge', 'merge command');
 });
+
+// ZOE final reviewer (ZOE_FINAL_REVIEW=1, default OFF): one merge-request card,
+// a tap re-checks head + CI and replies the pinned zao-merge line. Never merges.
+registerFinalReview(bot, { zaalId, ownerOnly, isFromZaal, scopeOf: chatScopeFor });
 
 bot.command(['grill', 'needsme'], async (ctx) => {
   if (!(await ownerOnly(ctx))) return;
@@ -4092,11 +4097,12 @@ async function dispatchConcierge(
         replyToMessageId: scope === 'private' ? undefined : ctx.message?.message_id,
       });
     }
-    // A reply was SENT to a member in a group: their next lines in this chat
-    // reach ZOE for a while without a re-mention (groups.ts, the engaged
-    // window). Only here, after the send, so an empty or guarded reply opens
-    // no window; the per-sender cap lives in groups.ts.
-    if (scope !== 'private' && !isFromZaal(ctx) && ctx.from) markEngaged(scope, ctx.from.id);
+    // A reply was SENT in a group: for a while everyone's next lines in this
+    // chat reach ZOE without a re-mention (groups.ts, the chat-wide engaged
+    // window, item 135). Zaal's own mention opens it too ("after any
+    // @mention"). Only here, after the send, so an empty or guarded reply
+    // opens no window; the per-sender turn cap lives in groups.ts.
+    if (scope !== 'private' && ctx.from) markEngaged(scope, ctx.from.id);
 
     // The tail question (terminal-grill.ts, ZOE_TAIL_QUESTION, doc 2679 PR 3):
     // after answering Zaal in his DM, the first waiting seat item follows as its

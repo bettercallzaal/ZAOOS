@@ -10,7 +10,7 @@ Monday closed with 13 commits — the biggest single-day ZOE push in recent memo
 
 Two new research docs landed with it — doc 2469 on loops vs graphs (the 100-line agent case that makes the point better than any argument), and doc 2470 on avoiding fabrication in agentic systems. The NYC weekend record is committed with three plan corrections and a venue-address allowlist for the PII scanner, which is a small thing that closes a real gap. The PR queue hit zero for the first time in a while. T-27 starts tomorrow.
 
-The deal memos are the only thing that matters this week. Five verbal confirms — Crown Vics, Acadia Rising, Dcoop, Fellenz, Michael Anderson — documented in doc 2464, drafted and sitting. The artist cutoff was September 3. It's now 5 days past that. The gap between "everything is ready" and "sent" is getting uncomfortable. The Steve Peer call and the sponsor email are in the same category: the work is done, the execution is the thing that's outstanding. Tuesday is for closing those gaps.
+The deal memos are the only thing that matters this week. Five verbal confirms — <names in the vault> — documented in doc 2464, drafted and sitting. The artist cutoff was September 3. It's now 5 days past that. The gap between "everything is ready" and "sent" is getting uncomfortable. The Steve Peer call and the sponsor email are in the same category: the work is done, the execution is the thing that's outstanding. Tuesday is for closing those gaps.
 
 ---
 

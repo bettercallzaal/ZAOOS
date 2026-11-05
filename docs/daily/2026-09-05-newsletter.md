@@ -10,7 +10,7 @@ Week 36 closed on a run. Five PRs merged Friday — including the one that had b
 
 The rest of Friday was cleanup and correction. Thirty-nine dangling worktrees consolidated — six of them had unmerged work that would have been quietly lost. ZOE's `<think>` markup strip was covering the wrong bot. WaveWarZ sync was fail-open on a missing env var. ZAO NYC's public whitepaper had stale Magnetiq claims that needed correcting. Five distinct "this should have been fixed weeks ago" items, cleared in a single afternoon.
 
-The thing that's sitting with me heading into the weekend: doc 2464 ended Thursday with five verbal confirmations — Crown Vics, Acadia Rising, Dcoop, Fellenz, Michael Anderson. Verbal is not a contract. The deal memos are drafted. The lineups are real. The gap between a verbal lineup and a real one is sending the document, and that send is the first thing on Monday's list. ZAOstock is 30 days out. The clock is running on the right things.
+The thing that's sitting with me heading into the weekend: doc 2464 ended Thursday with five verbal confirmations — <names in the vault>. Verbal is not a contract. The deal memos are drafted. The lineups are real. The gap between a verbal lineup and a real one is sending the document, and that send is the first thing on Monday's list. ZAOstock is 30 days out. The clock is running on the right things.
 
 ---
 

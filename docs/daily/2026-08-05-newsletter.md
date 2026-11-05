@@ -28,4 +28,4 @@ The intention for Wednesday: name one more thing that already exists but hasn't 
 
 ---
 
-*Tomorrow's priorities: Merge PR #2786 (CI — 54+ red runs). Jose (amount in the vault) (Day 33+). Proof Drops review — PR #2817. Record Fractal DreamNet Phase 0 decisions.*
+*Tomorrow's priorities: Merge PR #2786 (CI — 54+ red runs). Payee (amount in the vault) (Day 33+). Proof Drops review — PR #2817. Record Fractal DreamNet Phase 0 decisions.*

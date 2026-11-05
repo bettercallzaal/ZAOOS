@@ -28,6 +28,16 @@
  *      Found 2026-10-15 when the pre-commit scanner blocked the sweep of
  *      docs/daily on main: a third-party address in 16 files since July.
  *
+ * Item 203 (Zaal, 2026-11-04) added three classes after 228 public daily files were
+ * found to carry the payee's name beside "(amount in the vault)", the names of
+ * third parties in deal-memo lines, and overdue Stripe task text:
+ *   6. payee-name     a name still sitting before "(amount in the vault)"      -> Payee (amount in the vault)
+ *                     (class 3 now writes "Payee" itself, so a new night never leaves a name)
+ *   7. deal-names     a list of three or more names on a "deal memo" or
+ *                     "verbal confirm" line                                    -> <names in the vault>
+ *   8. stripe-overdue a task line that is both about Stripe and overdue; the
+ *                     text after its list marker                               -> Overdue payment-links task (details in the vault)
+ *
  * Usage:
  *   node scripts/zoe/nightly-redact.mjs docs/daily/2026-10-16-tasks.md ...   rewrite in place, print per-file counts
  *   node scripts/zoe/nightly-redact.mjs --check <files...>                    exit 1 if any file still carries a class
@@ -65,19 +75,41 @@ const NAME_STOP = new Set([
   'Send', 'Sent', 'Entry', 'Jul', 'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Cost', 'Costs', 'Budget', 'Spend', 'Revenue', 'Prize', 'Prizes', 'Bounty', 'Tier', 'Plan', 'Target', 'Cap',
   'Stripe', 'Neynar', 'Vercel', 'Claude', 'Anthropic', 'OpenRouter', 'Ollama', 'Base', 'Solana', 'Ethereum', 'Farcaster',
   'Supabase', 'Hostinger', 'Luma', 'Paragraph', 'Bonfire', 'Artizen', 'Grant', 'Grants', 'Match', 'Deal', 'Deals',
+  'Payee',
 ]);
+
+// Class 6: a name still sitting before the "(amount in the vault)" marker an
+// older night wrote. Same name shape and same stop list as class 3.
+const PAYEE_MARKED = /\b([A-Z][a-z]{2,}(?:\s+[A-Z][a-z]{2,})?)(\s+(?:-\s+)?(?:owes|owed|paid|pay|payment|payout|invoice|to|next|gets|get|receives|due)?\s*)\(amount in the vault\)/g;
+// Class 7: three or more capitalised names in a row, comma separated, on a
+// line about deal memos or verbal confirms.
+const DEAL_LINE = /deal memos?|verbal confirm/i;
+const NAME_TOKEN = String.raw`[A-Z][A-Za-z0-9'’&-]*(?:\s[A-Z][A-Za-z0-9'’&-]*)?`;
+const NAME_LIST = new RegExp(NAME_TOKEN + String.raw`(?:,\s*(?:and\s+)?` + NAME_TOKEN + '){2,}', 'g');
+// The same names written as sentences: "Alpha Band. Beta. Gamma. Delta Echo." (four or more).
+const NAME_SENTENCES = new RegExp(NAME_TOKEN + String.raw`(?:\.\s+` + NAME_TOKEN + String.raw`){3,}\.`, 'g');
+// And slash separated: "Alpha Band / Beta / Gamma".
+const NAME_SLASHES = new RegExp(NAME_TOKEN + String.raw`(?:\s+\/\s+` + NAME_TOKEN + '){2,}', 'g');
+// Class 8: Stripe and overdue on one task line. Keeps the list marker.
+const STRIPE_LINE = /stripe/i;
+const OVERDUE_WORDS = /overdue|past due|deadline was|if not shipped/i;
+const LIST_MARKER = /^(\s*(?:[-*]\s+(?:\[[ xX]\]\s+)?|\d+\.\s+))/;
+const STRIPE_REPLACEMENT = 'Overdue payment-links task (details in the vault)';
+
+const lineIsStripeOverdue = (line) => STRIPE_LINE.test(line) && OVERDUE_WORDS.test(line);
+const isNameStop = (name) => NAME_STOP.has(name.split(/\s+/)[0]);
 
 // Keep in step with scripts/git-pii-scan.py EMAIL_ALLOW and .claude/rules/pii-hygiene.md.
 const EMAIL_ALLOW = new Set(['zaal@thezao.com', 'zaalp99@gmail.com', 'zaal@bettercallzaal.com', 'zoe-zao@agentmail.to', 'hello@thezao.com', 'support@thezao.com']);
 const EMAIL = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g;
 const thirdPartyEmail = (e) => !EMAIL_ALLOW.has(e.toLowerCase());
 
-export const CLASSES = ['private-path', '1password-item', 'name-amount', 'dash', 'email'];
+export const CLASSES = ['private-path', '1password-item', 'name-amount', 'dash', 'email', 'payee-name', 'deal-names', 'stripe-overdue'];
 
 /** Pure. Returns the redacted text and how many hits of each class were replaced. */
 export function redact(text, only = CLASSES) {
   const on = new Set(only);
-  const counts = { 'private-path': 0, '1password-item': 0, 'name-amount': 0, dash: 0, email: 0 };
+  const counts = Object.fromEntries(CLASSES.map((c) => [c, 0]));
   let out = text;
   if (on.has('private-path')) out = out.replace(BACKTICK_WITH_PATH, () => {
     counts['private-path'] += 1;
@@ -94,8 +126,40 @@ export function redact(text, only = CLASSES) {
   if (on.has('name-amount')) out = out.replace(NAME_AMOUNT, (m, name, sep) => {
     if (NAME_STOP.has(name.split(/\s+/)[0])) return m;
     counts['name-amount'] += 1;
-    return `${name}${sep}(amount in the vault)`;
+    return 'Payee' + sep + '(amount in the vault)';
   });
+  if (on.has('payee-name')) out = out.replace(PAYEE_MARKED, (m, name, sep) => {
+    if (isNameStop(name)) return m;
+    counts['payee-name'] += 1;
+    return 'Payee' + sep + '(amount in the vault)';
+  });
+  if (on.has('deal-names') || on.has('stripe-overdue')) {
+    out = out
+      .split('\n')
+      .map((line) => {
+        if (on.has('stripe-overdue') && lineIsStripeOverdue(line)) {
+          counts['stripe-overdue'] += 1;
+          return (LIST_MARKER.exec(line)?.[1] ?? '') + STRIPE_REPLACEMENT;
+        }
+        if (on.has('deal-names') && DEAL_LINE.test(line)) {
+          return line
+            .replace(NAME_LIST, () => {
+              counts['deal-names'] += 1;
+              return '<names in the vault>';
+            })
+            .replace(NAME_SLASHES, () => {
+              counts['deal-names'] += 1;
+              return '<names in the vault>';
+            })
+            .replace(NAME_SENTENCES, () => {
+              counts['deal-names'] += 1;
+              return '<names in the vault>.';
+            });
+        }
+        return line;
+      })
+      .join('\n');
+  }
   if (on.has('dash')) out = out.replace(/\s*—\s*/g, () => {
     counts.dash += 1;
     return ' - ';
@@ -122,8 +186,12 @@ export function remaining(text, only = CLASSES) {
   if (on.has('name-amount') && nm.length) found.push('name-amount');
   if (on.has('dash') && /[—–]/.test(text)) found.push('dash');
   if (on.has('email') && [...text.matchAll(EMAIL)].some((m) => thirdPartyEmail(m[0]))) found.push('email');
+  if (on.has('payee-name') && [...text.matchAll(PAYEE_MARKED)].some((m) => !isNameStop(m[1]))) found.push('payee-name');
+  const lines = text.split('\n');
+  if (on.has('deal-names') && lines.some((l) => DEAL_LINE.test(l) && (new RegExp(NAME_LIST.source).test(l) || new RegExp(NAME_SENTENCES.source).test(l) || new RegExp(NAME_SLASHES.source).test(l)))) found.push('deal-names');
+  if (on.has('stripe-overdue') && lines.some(lineIsStripeOverdue)) found.push('stripe-overdue');
   // The regexes above carry the g flag; reset so a second call starts clean.
-  for (const re of [BACKTICK_WITH_PATH, PRIVATE_PATH, OP_ITEM, NAME_AMOUNT, EMAIL]) re.lastIndex = 0;
+  for (const re of [BACKTICK_WITH_PATH, PRIVATE_PATH, OP_ITEM, NAME_AMOUNT, EMAIL, PAYEE_MARKED, NAME_LIST, NAME_SENTENCES, NAME_SLASHES]) re.lastIndex = 0;
   return found;
 }
 

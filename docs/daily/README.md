@@ -55,3 +55,13 @@ docs/daily nightly file whose date is not the one `nightly-dates.mjs` gives for
 the PR's open time, whose correct file is already on main, or whose content
 still carries a `nightly-redact.mjs` class. Until the prompt line is pasted,
 expect the nightly PR to go red rather than land wrong.
+
+## Item 203 scrub (2026-11-05)
+
+Zaal ruled (vault decisions item 203) to fix the template and scrub the public daily files in one PR. `scripts/zoe/nightly-redact.mjs` gained three classes, and `nightly-check.mjs` already runs every class, so a nightly PR that brings one back goes red:
+
+- `payee-name`: a name beside "(amount in the vault)" becomes "Payee (amount in the vault)". The `name-amount` class now writes "Payee" itself.
+- `deal-names`: a list of three or more names on a deal-memo or verbal-confirm line becomes "<names in the vault>".
+- `stripe-overdue`: a task line that is both about Stripe and overdue becomes "Overdue payment-links task (details in the vault)".
+
+To scrub an older file without touching its dashes: `node scripts/zoe/nightly-redact.mjs --only payee-name,deal-names,stripe-overdue <files>`. A nightly branch opened before this merged integrates main after the merge and runs that command on its own daily files.

@@ -28,10 +28,10 @@ describe('the four classes, verbatim', () => {
     expect(text).toBe('- AgentMail inbox inaccessible - Day 149. One-command fix: `<command in the vault>`');
     expect(remaining(text)).toEqual([]);
   });
-  it('a payment line about a named person keeps the name, hides the amount', () => {
+  it('a payment line about a named person hides the name and the amount (item 203)', () => {
     expect(remaining(PAY_LINE)).toEqual(['name-amount']);
     const { text } = redact(PAY_LINE);
-    expect(text).toBe('- [ ] **Sam (amount in the vault) - Day 90+** - One action.');
+    expect(text).toBe('- [ ] **Payee (amount in the vault) - Day 90+** - One action.');
     expect(remaining(text)).toEqual([]);
   });
   it('the captures header carries three classes at once', () => {
@@ -72,12 +72,12 @@ describe('the shapes that slipped the first sweep (evaluator on #3957); names an
   it('<name> next $<amt> USDC', () => {
     const line = '- **Jul 1** - Sam next $100 USDC';
     expect(remaining(line)).toEqual(['name-amount']);
-    expect(redact(line).text).toBe('- **Jul 1** - Sam next (amount in the vault)');
+    expect(redact(line).text).toBe('- **Jul 1** - Payee next (amount in the vault)');
   });
   it('<full name> - next $<amt> USDC', () => {
     const line = '- **July 1 (14 days)** - Sam Example - next $100 USDC';
     expect(remaining(line)).toEqual(['name-amount']);
-    expect(redact(line).text).toBe('- **July 1 (14 days)** - Sam Example - next (amount in the vault)');
+    expect(redact(line).text).toBe('- **July 1 (14 days)** - Payee - next (amount in the vault)');
   });
   it('a dotenv under a home folder, a ~/.claude path, and an absolute home path with the username', () => {
     for (const p of ['~/n8n/.env', '~/.claude/projects/*/memory/*.md', '/Users/someone/Documents/repo/x.md', '$HOME/.claude/skills/x/SKILL.md']) {
@@ -125,6 +125,80 @@ describe('other spellings of the same classes', () => {
     expect(redact('key in 1Password item ZOE AgentMail').text).toBe('key in 1Password (item in the vault)');
   });
   it('a name with a verb between, and an en dash', () => {
-    expect(redact('paid Candy 50 USDC – done').text).toBe('paid Candy (amount in the vault) - done');
+    expect(redact('paid Candy 50 USDC – done').text).toBe('paid Payee (amount in the vault) - done');
+  });
+});
+
+// Item 203 (Zaal, 2026-11-04): the sweep of the public daily files. Names are stand-ins.
+const SC = ['payee-name', 'deal-names', 'stripe-overdue'];
+describe('item 203: payee name left beside the marker', () => {
+  it('a name before "(amount in the vault)" is removed; red before, clean after', () => {
+    for (const line of [
+      '- [ ] **Sam (amount in the vault) - Day 99+** - One action.',
+      '- **July 9** - Sam next (amount in the vault)',
+      '- **Sam Example (amount in the vault) -- OVERDUE**',
+    ]) {
+      expect(remaining(line)).toEqual(['payee-name']);
+      const { text, counts } = redact(line, SC);
+      expect(text).toContain('Payee');
+      expect(text).not.toContain('Sam');
+      expect(counts['payee-name']).toBe(1);
+      expect(remaining(text)).toEqual([]);
+    }
+  });
+  it('is idempotent and leaves a stop word alone', () => {
+    const once = redact('- **Sam (amount in the vault)**', SC).text;
+    expect(redact(once, SC).text).toBe(once);
+    expect(redact('Total (amount in the vault)', SC).text).toBe('Total (amount in the vault)');
+  });
+});
+
+describe('item 203: names on a deal-memo line', () => {
+  it('a comma list after "verbal confirms"', () => {
+    const line = '- [ ] **Deal memos to 4 verbal confirms - Alpha Band, Beta, Gamma, Delta Echo. Doc 1234. Written.**';
+    expect(remaining(line)).toEqual(['deal-names']);
+    const { text } = redact(line, SC);
+    expect(text).toBe('- [ ] **Deal memos to 4 verbal confirms - <names in the vault>. Doc 1234. Written.**');
+    expect(remaining(text)).toEqual([]);
+  });
+  it('sentence style and slash style lists', () => {
+    expect(redact('The deal memos went out. Alpha Band. Beta. Gamma. Delta Echo. Plus a call.', SC).text).toBe(
+      'The deal memos went out. <names in the vault>. Plus a call.',
+    );
+    expect(redact('deal memos to Alpha Band / Beta / Gamma (day 9+).', SC).text).toBe('deal memos to <names in the vault> (day 9+).');
+  });
+  it('what stays: a deal line with no name list, and a name list on a line that is not about deals', () => {
+    for (const line of ['- [ ] **Send deal memos** - DAY 9 OVERDUE (see URGENT)', 'Real stage. Real people. Real music. Real.', 'Pick one of Alpha, Beta, Gamma.']) {
+      expect(redact(line, SC).text).toBe(line);
+      expect(remaining(line)).toEqual([]);
+    }
+  });
+});
+
+describe('item 203: overdue Stripe task text', () => {
+  it('replaces the text after the list marker, keeps the marker', () => {
+    const cases: Array<[string, string]> = [
+      ['- [ ] **Stripe Payment Links - DAY 9+ OVERDUE** - Two links -> some-issue 9.', '- [ ] Overdue payment-links task (details in the vault)'],
+      ['3. **Clear the overdue queue** - Stripe links (day 9), deal memos (day 9).', '3. Overdue payment-links task (details in the vault)'],
+      ['- Stripe Payment Links: if not shipped today, this is Day 9 overdue.', '- Overdue payment-links task (details in the vault)'],
+    ];
+    for (const [line, want] of cases) {
+      expect(remaining(line)).toEqual(['stripe-overdue']);
+      expect(redact(line, SC).text).toBe(want);
+      expect(remaining(want)).toEqual([]);
+    }
+  });
+  it('what stays: Stripe without overdue, overdue without Stripe', () => {
+    for (const line of ['- Stripe Payment Links deadline: Sep 26 (4 days)', '- [ ] **Send the invoice** - DAY 9 OVERDUE', '- Stripe fee is 2.9 percent']) {
+      expect(redact(line, SC).text).toBe(line);
+    }
+  });
+});
+
+describe('item 203: the sweep only touches its own classes', () => {
+  it('--only keeps dashes and unrelated lines byte for byte', () => {
+    const doc = ['# Tasks', '', '- [ ] **Sam (amount in the vault) — Day 9**', '- unrelated line — with a dash', ''].join('\n');
+    const out = redact(doc, SC).text;
+    expect(out).toBe(['# Tasks', '', '- [ ] **Payee (amount in the vault) — Day 9**', '- unrelated line — with a dash', ''].join('\n'));
   });
 });

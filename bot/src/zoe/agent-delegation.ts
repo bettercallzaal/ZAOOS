@@ -9,6 +9,7 @@
  */
 
 import { enqueueWork, runWorkTick, type WorkItem, type WorkTickDeps } from "./work-loop";
+import { innerText } from "./decompose";
 
 /**
  * Who may delegate. Kept pure so index.ts cannot forget it and a test can
@@ -60,7 +61,7 @@ const DELEGATION_PATTERNS: ReadonlyArray<{
  * and short questions.
  */
 export function detectDelegationIntent(text: string): DelegationIntent {
-  const trimmed = text.trim();
+  const trimmed = innerText(text).trim();
   if (trimmed.length < 10) {
     return { isDelegated: false, cleanTask: "", kind: "general", confidence: 0 };
   }

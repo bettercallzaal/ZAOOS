@@ -2,7 +2,7 @@
 topic: farcaster
 type: research-report
 status: research-complete
-last-validated: 2026-05-21
+last-validated: 2026-10-31
 original-query: "Map Farcaster agents landscape, compare registration methods, find cheapest path for CASTER (reconstructed)"
 tier: production
 ---
@@ -153,6 +153,73 @@ CASTER posting 5 casts/day = 1,825/year. 5,000 limit is plenty.
 4. Configure CASTER agent on VPS with FID + signer UUID
 5. Test: draft a post, get Zaal's approval, post it
 
+## Updated 2026-10-31
+
+**Source method:** GitHub fetch (FULL) + WebSearch snippets (UNVERIFIED where noted). Direct fetches of neynar.com, farcaster.xyz, blockeden.xyz, theblock.co, infoq.com, arxiv.org, fidforge.11211.me, and x402.org were blocked by the session's network policy; facts from those sources are marked UNVERIFIED.
+
+### 1. ERC-8004: Ecosystem No Longer "Early" - Reconsider the Skip Recommendation
+
+**Original doc (May 2026):** "only 20K agents registered, ecosystem is early. Get the FID first, add ERC-8004 later."
+
+**Current state (Oct 2026):** UNVERIFIED (search snippets only; could not full-fetch registries)
+- Multiple independent search results report 1.33-1.53 million ERC-8004 registered agents across 24 chains as of Oct 23-24, 2026. Sources cited: agenteconomy.to, 8004scan (via search snippet from github.com/sudeepb02/awesome-erc8004 and agentcast-ai repo).
+- An AIXBT agent tweet (x.com/aixbt_agent/status/1997737391055118796, UNVERIFIED) cited "1M+ registered agents processing $250M weekly flows."
+- A June 2026 arXiv paper (2606.12128v1, UNVERIFIED - host blocked) studying the first 10,000 Ethereum mainnet agents found only 67 expose service records and only 628 receive reputation feedback -- registration numbers significantly overstate operational agents.
+- **AgentCast** (800works / Termo.ai skill): a new tool that crosslinks ERC-8004 Identity Registry registrations to Farcaster accounts by wallet address, allowing automatic indexing when the same wallet holds both identities (UNVERIFIED, search snippet).
+
+**Updated recommendation:** The "skip ERC-8004" call is likely stale given reported scale, but verify operational-agent numbers before committing effort. If CASTER uses the same wallet for both FID registration and ERC-8004, AgentCast can index it automatically at zero cost.
+
+### 2. x402: From "Demand Not There Yet" to Foundation Stage
+
+**Original doc (May 2026):** Cited CoinDesk March 2026 "just not there yet." Recommended for Neynar per-call only.
+
+**Current state (Oct 2026):** UNVERIFIED (could not full-fetch primary sources)
+- x402 was donated to the Linux Foundation as the x402 Foundation on approximately April 2, 2026, with reported members including AWS, Cloudflare, Anthropic, Circle, Stripe, Visa, Mastercard, and Microsoft (sources: theblock.co, blockeden.xyz -- hosts blocked, snippets only).
+- Coinbase reported in April 2026: 165 million cumulative transactions, approximately $50M volume, 69,000 active AI agents using x402 (source: blockeden.xyz snippet, UNVERIFIED).
+- Cloudflare added x402 to its Agents SDK and MCP integrations, and opened a waitlist for a Monetization Gateway (source: search snippet, UNVERIFIED).
+- The Neynar hub x402 pricing (0.001 USDC per call on Base for submitMessage) is confirmed current per Neynar's published docs (search snippet, partial).
+
+**Updated take:** x402 moved from "interesting but minimal" to "Linux Foundation standard with major cloud players." For ZAO the Neynar path ($0.001/call) remains unchanged. The broader signal is that x402 is now infrastructure, not a bet.
+
+### 3. ACP/A2A: Still Not on Farcaster
+
+**Original doc:** "ACP and Google's A2A merged under Linux Foundation but are NOT used on Farcaster yet. Expected Q4 2026 at earliest."
+
+**Current state (Oct 2026):**
+- IBM's ACP project merged into Google's A2A under the Linux Foundation (confirmed via IBM Research project page, FULL search snippet from research.ibm.com -- host blocked; UNVERIFIED).
+- No search results connect ACP or A2A to Farcaster. A direct search for "ACP agent communication protocol Farcaster 2026 Q3 Q4" returned zero Farcaster-related hits.
+- We are now in Q4 2026 and no Farcaster ACP adoption has materialized. The "Q4 2026 at earliest" prediction appears to have been optimistic; the timeline has slipped.
+
+### 4. farcaster-agent Toolkit: Still Valid, One Known Fix
+
+**Original doc:** Recommended as primary path (~$1, `npm run auto`).
+
+**Current state (Oct 2026):** CONFIRMED via GitHub FULL fetch.
+- Repository github.com/rishavmukherji/farcaster-agent is live: 42 stars, 4 open PRs, 1 open issue.
+- Active fix: upgrade `@farcaster/hub-nodejs` to 0.15.9 or later to resolve an "invalid hash" error on message submission. Without this version the registration will fail at the cast step.
+- Neynar hub now explicitly requires x402 payment header on submitMessage because public hubs lag on syncing new FIDs. This matches the original doc's Neynar-x402 recommendation.
+- **No commit dates available from the GitHub fetch**; last activity level is UNVERIFIED.
+
+### 5. Base App: Farcaster Sign-In Removed After April 9, 2026
+
+**Confirmed via Base documentation (FULL fetch from docs.base.org):** After April 9, 2026, the Base App treats every app as a standard web app. Farcaster sign-in and FID-based identity are no longer available inside the Base App. Developers are pointed to wagmi, viem, and SIWE instead.
+
+This does not affect Option A (farcaster-agent) or Option B (fid-forge Stripe) since both register on-chain directly. It removes one discovery path for agents that had been discoverable through Base App's mini-app frame, including any that used Farcaster manifest-based sign-in inside the Base App context.
+
+### 6. fid-forge: Status UNVERIFIED
+
+Could not fetch fidforge.11211.me (host blocked by network policy). Status of the Stripe checkout backup path (reg_mnmcfhzitsgnrfwn) is unverified as of this update.
+
+### Summary of Recommendations Changes
+
+| Recommendation | Previous (May 2026) | Updated (Oct 2026) |
+|---|---|---|
+| Skip ERC-8004 | Yes - only 20K agents | Reconsider - 1M+ reported, but operational count is much lower |
+| x402 for Neynar | Yes ($0.001/call) | Still valid; x402 is now a Linux Foundation standard |
+| farcaster-agent toolkit | Primary path | Still valid; pin hub-nodejs to 0.15.9+ |
+| ACP/A2A on Farcaster | Expected Q4 2026 | Not arrived; timeline slipped past Q4 2026 |
+| fid-forge backup | YES (Stripe) | UNVERIFIED - could not reach service |
+
 ## Sources
 
 - [Neynar: Building AI Agents on Farcaster](https://neynar.com/blog/building-ai-agents-on-farcaster)
@@ -168,3 +235,17 @@ CASTER posting 5 casts/day = 1,825/year. 5,000 limit is plenty.
 - [Farcaster Free Registration](https://phemex.com/news/article/farcaster-opens-free-account-registration-eliminates-5-fee-30024)
 - [a16z Awesome Farcaster](https://github.com/a16z/awesome-farcaster)
 - [Farcaster Mini Apps: Agent Checklist](https://miniapps.farcaster.xyz/docs/guides/agents-checklist)
+
+**Added 2026-10-31 (search snippets / UNVERIFIED unless noted):**
+- [farcaster-agent toolkit on GitHub](https://github.com/rishavmukherji/farcaster-agent) (FULL fetch 2026-10-31)
+- [Base App: Migrate to Standard Web App](https://docs.base.org/apps/guides/migrate-to-standard-web-app) (FULL fetch 2026-10-31)
+- [Cloudflare + Coinbase launch x402 Foundation - The Block](https://www.theblock.co/post/372064/cloudflare-coinbase-launch-x402-foundation) (UNVERIFIED - host blocked)
+- [Cloudflare + AWS x402 micropayment - InfoQ July 2026](https://infoq.com/news/2026/07/cloudflare-aws-x402-micropayment/) (UNVERIFIED - host blocked)
+- [x402 Protocol: 154 Million AI Agent Transactions - BlockEden](https://blockeden.xyz/blog/2026/04/01/x402-protocol-http-402-ai-agent-commerce-stablecoin-payments/) (UNVERIFIED - host blocked)
+- [x402 Linux Foundation enterprise standard - BlockEden](https://blockeden.xyz/blog/2026/04/03/x402-linux-foundation-enterprise-ai-agent-payment-standard-stablecoin/) (UNVERIFIED - host blocked)
+- [Awesome ERC-8004 list](https://github.com/sudeepb02/awesome-erc8004) (search snippet only)
+- [AgentCast skill - Termo.ai](https://termo.ai/skills/agentcast) (search snippet only)
+- [ERC-8004 arXiv study (2606.12128v1)](https://arxiv.org/html/2606.12128v1) (UNVERIFIED - host blocked)
+- [AIXBT tweet on ERC-8004 1M+ agents](https://x.com/aixbt_agent/status/1997737391055118796) (UNVERIFIED - not fetched)
+- [IBM ACP merged into A2A - IBM Research](https://research.ibm.com/projects/agent-communication-protocol) (UNVERIFIED - host blocked)
+- [Neynar: Autonomous Farcaster Agent docs](https://docs.neynar.com/docs/autonomous-farcaster-agent) (search snippet only)

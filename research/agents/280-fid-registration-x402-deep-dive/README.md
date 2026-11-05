@@ -2,7 +2,7 @@
 topic: farcaster
 type: technical-guide
 status: research-complete
-last-validated: 2026-05-21
+last-validated: 2026-10-30
 original-query: "How to register a Farcaster FID for agents, comparing direct on-chain vs fid-forge vs Neynar (reconstructed)"
 tier: production
 ---
@@ -214,6 +214,41 @@ const response = await payingFetch('https://hub-api.neynar.com/v1/submitMessage'
 | [rishavmukherji/farcaster-agent](https://github.com/rishavmukherji/farcaster-agent) | MIT | Direct IdGateway.register() + KeyGateway.add() | Full registration flow, self-signed key metadata encoding |
 | [coinbase/x402](https://github.com/coinbase/x402) | Apache-2.0 | x402-fetch client, EIP-3009 payment signing | Post-registration hub API payments |
 | [farcasterxyz/hub-monorepo](https://github.com/farcasterxyz/hub-monorepo) | MIT | @farcaster/hub-nodejs, NobleEd25519Signer | Profile setup + cast submission via hub |
+
+## Updated 2026-10-30
+
+Three material changes since last validation:
+
+**1. `x402-fetch` v1.x deprecated -- migrate to `@x402/fetch` v2**
+
+The `x402-fetch` package (v1.1.0 cited in this doc) is now deprecated. v1.2.0 was published 2026-04-16 as a security-patch-only release; its README explicitly says migrate to v2. The new package family is `@x402/fetch`, `@x402/evm`, etc., maintained under the `@x402` npm scope. Latest version at revalidation: `@x402/fetch@2.29.0` (published 2026-10-28). The repository moved from `github.com/coinbase/x402` to `github.com/x402-foundation/x402`, and stewardship transferred from "Coinbase Inc." to "x402 Foundation." The Sources section listing `coinbase/x402` (Apache-2.0) still applies to the code but the canonical home has moved.
+
+Action required: update the CASTER registration script and any future Neynar hub API calls to use `@x402/fetch@^2` instead of `x402-fetch`.
+
+Sources (FULL fetch from registry.npmjs.org):
+- https://registry.npmjs.org/x402-fetch -- FULL: deprecation notice, v1.2.0 changelog
+- https://registry.npmjs.org/@x402/fetch -- FULL: latest 2.29.0, published 2026-10-28
+
+**2. Farcaster acquired by Network School (October 15, 2026) -- new AI-content rules**
+
+Neynar sold Farcaster to Network School (Balaji Srinivasan) on October 15, 2026. A new "social smart contract" was introduced, requiring users to accept conduct rules or be moved to read-only access on the main client (Warpcast). The rules include a ban on "passing off AI-generated content as your own" as a bannable offense. Network School also announced plans to gradually require human verification for accounts.
+
+Impact on CASTER and ZAO agent FID strategy:
+- Registering a FID and having an agent post autonomously as-if-human may violate the new social smart contract's AI disclosure requirement.
+- The human verification roadmap could eventually gate new agent FIDs on the main Warpcast client.
+- Non-compliant accounts get read-only access to Warpcast but retain keys, funds, followers, and history and can operate on other Farcaster clients (the protocol is still open).
+- This doc's core recommendation -- direct on-chain FID registration via IdGateway -- is unaffected (registration is at the protocol layer, not the app layer). The compliance question is at the app/moderation layer.
+- Recommend disclosing agent identity in the FID profile bio before any public launch.
+
+Sources (search snippets; theblock.co, neynar.com, kucoin.com unreachable from this session):
+- https://www.kucoin.com/news/flash/farcaster-acquired-by-balaji-s-network-school-introduces-social-smart-contract -- PARTIAL (DNS blocked)
+- https://newsoftechs.com/story/90294-farcaster-acquired-by-balaji-s-network-school-with-new-social-smart-contract-for -- PARTIAL (search snippet)
+
+**3. x402 MCP ecosystem now available**
+
+An `@x402/mcp` package and related community tools (Civic's x402-mcp, xmcp.dev plugin) now allow MCP tools to be monetized per-call via x402. This is new infrastructure on top of the protocol since the original doc. Relevant if ZAO ever wants to sell access to its MCP tools or buy paid MCP tools from agents.
+
+Source (search snippet): https://eco.com/support/en/articles/14846276-build-an-mcp-server-with-x402-monetization -- PARTIAL (search snippet)
 
 ## Sources
 

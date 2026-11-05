@@ -1,5 +1,7 @@
 # Loop Evals - a rubric every autonomous loop passes BEFORE it opens a PR
 
+mechanism: .github/workflows/ci.yml, bin/zao-merge (partial: gate A only)
+
 From Karpathy's agent model (march of nines: gate each step; agents bloat) and Anthropic's Default-FAIL harness. Sources, incidents (#3502/#3505): `research/dev-workflows/2649-rules-history/archive/loop-evals.md`.
 
 ## The gate - all applicable checks pass before a PR opens

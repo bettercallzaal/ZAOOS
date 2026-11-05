@@ -1,5 +1,7 @@
 # Thread Discipline (anti-sprawl)
 
+mechanism: none yet (since 2026-10-23, #4152)
+
 Externalize open loops so a fast pivot cannot drop one. History and the tool-status saga: `research/dev-workflows/2649-rules-history/archive/thread-discipline.md`.
 
 1. **Live ledger.** The moment a thread opens, `TaskCreate` it (in_progress); on finish, `TaskUpdate` -> completed. The ledger, not the scrollback, is what is still open.

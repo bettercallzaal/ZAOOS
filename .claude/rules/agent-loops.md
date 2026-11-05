@@ -1,5 +1,7 @@
 # Agent Loop Operating Rules
 
+mechanism: bin/destructive-guard, bin/safe-git-push.sh, bin/zao-merge-only-guard, bin/zao-pr-open (partial: rules 8 and 38 only; ZAO_RAW_GH_MERGE_OK=1 bypasses the merge-only guard)
+
 Binding for any autonomous /loop or agent building or deploying in this repo (Claude Code sessions and ZOE's own loops). Numbers are STABLE cross-references - never renumber. Incidents, sources and the fold-back history: `research/dev-workflows/2649-rules-history/archive/agent-loops.md`.
 
 1. **Ground truth over confidence.** Done only when `npm run typecheck` (0 errors), `esbuild`/build and the relevant tests are green and the bot boots clean. tsc alone is not enough.
@@ -20,7 +22,7 @@ Binding for any autonomous /loop or agent building or deploying in this repo (Cl
 
    Which store wins on conflict: `handoff-discipline.md` rule 7.
 7. **Subagents for bounded research/isolation; inline for the hot path.** Code, verify, commit stays inline. Don't grow one giant prompt.
-8. **PR-only + human gate is the circuit breaker.** Never push to main or force-push. Autonomous work opens PRs; a human merges. Outbound (posts/DMs), on-chain and spend stay human-gated. Research docs and internal pings can be autonomous.
+8. **PR-only + a gated merge is the circuit breaker.** Never push to main or force-push. Autonomous work opens PRs. From the merge of zaal-dotfiles #587 (Zaal, seat grill 2026-10-20, option A), an agent may merge any PR with `zao-merge`, in any repo, when zao-merge's agent gate passes. That means: an evaluator verdict, posted by the evaluator account, with its heading on line 1; CLEAN at the exact head; a line reading exactly `Reserved: none`; an `Evaluator-Session` that pushed no commit on the PR. Also CI green, mergeable state clean, no reserved path, and no outside fork. The gate has no skip path. Reserved for Zaal: DB migrations and schema, settings and permissions, hooks, CI workflows, vercel.json, the merge gate itself, money, on-chain, DNS, and outbound/publishing actions (posts, DMs, sends). He merges those himself on github.com, and anyone then runs `zao-merge --verify-only`. Merge commands that call the GitHub API written out literally are refused; one built at run time is not caught, and is banned by this rule. Until #587 merges, a human merges. Spend stays human-gated. Research docs and internal pings can be autonomous.
 9. **One instance per resource.** Only one process polls a given bot token or holds a given lock. Check liveness by PROCESS, not tmux session name.
 10. **Learn online periodically.** Every several cycles, pull fresh best practice and fold behavior-changing items back into these rules.
 11. **Git hygiene on a shared clone.** Never leave uncommitted changes across sequential commands; commit before switching branches; after merging, `git reset --hard origin/main`; verify a fix is on origin/main before claiming it landed.

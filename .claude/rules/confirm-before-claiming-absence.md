@@ -1,5 +1,7 @@
 # Confirm Before Claiming Absence
 
+mechanism: none yet (since 2026-10-23, #4151)
+
 **"X is missing" / "the gap is X" / "we should add X" is a claim about absence, and absence is proven only by an EXHAUSTIVE search, never a partial read.** Zaal chose slower and costlier over any production mistake. Incidents, and why mechanising this failed: `research/dev-workflows/2649-rules-history/archive/confirm-before-claiming-absence.md`.
 
 Spend the most verification on the cheapest, most certain thing to check: our own code.

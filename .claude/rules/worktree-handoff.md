@@ -1,5 +1,7 @@
 # Worktree Handoff - never hand another agent a writable path inside your own git tree
 
+mechanism: none yet (since 2026-10-23, #3338)
+
 Two writers in one working tree, nothing failing, nothing warning. Instances (doc 554, issue #3338): `research/dev-workflows/2649-rules-history/archive/worktree-handoff.md`.
 
 **A path you hand to another agent is a path you no longer control.**

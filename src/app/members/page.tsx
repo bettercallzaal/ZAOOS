@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { projectPublicMember } from '@/lib/members/public-profile';
 import MembersDirectoryClient from './MembersDirectoryClient';
 
 export const metadata: Metadata = {
@@ -13,16 +14,18 @@ export const revalidate = 300;
 
 async function fetchInitialMembers() {
   try {
+    // This page is cached and shared, so it only ever holds the public view.
     const { data: users, error } = await supabaseAdmin
       .from('users')
       .select(`
         id, fid, username, display_name, pfp_url, ens_name, bio,
         member_tier, zid, tags, bluesky_handle, x_handle, instagram_handle,
         soundcloud_url, spotify_url, audius_handle, discord_id,
-        primary_wallet, location, last_active_at
+        primary_wallet, location, last_active_at, hidden_wallets, public_name, public_fields
       `)
       .eq('is_active', true)
-      .order('zid', { ascending: true, nullsFirst: false })
+      .not('public_name', 'is', null)
+      .order('public_name', { ascending: true })
       .limit(10);
 
     if (error || !users) return { members: [], filterOptions: { categories: [], locations: [] } };
@@ -78,7 +81,7 @@ async function fetchInitialMembers() {
 
       const artistProfile = u.fid ? profileMap[u.fid] || null : null;
 
-      return {
+      return projectPublicMember(u, {
         id: u.id,
         fid: u.fid,
         username: u.username,
@@ -102,11 +105,8 @@ async function fetchInitialMembers() {
         respect,
         artistProfile,
         lastActiveAt: u.last_active_at || null,
-      };
+      });
     });
-
-    // Sort by respect total (default view)
-    members.sort((a, b) => (b.respect?.total ?? 0) - (a.respect?.total ?? 0));
 
     const categories = [
       ...new Set(members.map((m) => m.artistProfile?.category).filter(Boolean)),

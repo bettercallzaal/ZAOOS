@@ -32,6 +32,10 @@ const SocialsSection = dynamic(
   () => import('./SocialsSection').then((m) => ({ default: m.SocialsSection })),
   { ssr: false },
 );
+const PublicProfileSection = dynamic(
+  () => import('./PublicProfileSection').then((m) => ({ default: m.PublicProfileSection })),
+  { ssr: false },
+);
 const CrossPostingSection = dynamic(
   () => import('./CrossPostingSection').then((m) => ({ default: m.CrossPostingSection })),
   { ssr: false },
@@ -790,6 +794,14 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
             <ListenBrainzConnect />
           </div>
         </section>
+
+        {/* ── Public Profile ───────────────────────────────────────── */}
+        <PublicProfileSection
+          wallet={profile.primary_wallet || null}
+          walletHidden={hiddenWallets.includes('primary_wallet')}
+          walletSaving={walletVisLoading || walletVisSaving}
+          onToggleWallet={() => toggleWalletVisibility('primary_wallet')}
+        />
 
         {/* ── Socials ──────────────────────────────────────────────── */}
         <SocialsSection profile={profile} />

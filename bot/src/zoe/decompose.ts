@@ -338,8 +338,19 @@ function coerceToSubtask(raw: unknown, idx: number): Subtask {
  * (we just run decompose and get 1 subtask back); false negatives mean
  * ZOE under-decomposes which is worse, so lean toward true.
  */
+/**
+ * The user's own words from a quote-reply turn. index.ts (DM and group quote-reply
+ * handlers) wraps a reply as `[Zaal is replying to your earlier message:\n"<quoted>"]\n\nHis reply: <reply>`;
+ * detectors must read the reply, never the wrapper. Unwrapped text is returned as-is.
+ */
+const QUOTE_REPLY_WRAPPER = /^\[Zaal is replying to your earlier message:\n"[\s\S]*?"\]\n\nHis reply: ([\s\S]*)$/;
+export function innerText(message: string): string {
+  const m = QUOTE_REPLY_WRAPPER.exec(message);
+  return m ? m[1] : message;
+}
+
 export function shouldDecompose(goal: string): boolean {
-  const text = goal.trim();
+  const text = innerText(goal).trim();
   if (text.length < 30) return false;
   const lower = text.toLowerCase();
   // Single-question signals - stay inline.

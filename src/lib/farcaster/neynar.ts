@@ -607,11 +607,18 @@ export async function getFollowSuggestions(fid: number, limit = 20) {
   return res.json();
 }
 
+/**
+ * Frame (mini app) reads go straight to Neynar. Hypersnap lists /frame/catalog,
+ * /frame/search and /frame/relevant as not implemented and answers HTTP 501
+ * (src/api/http.rs), so through fetchWithFailover every call paid a failed
+ * read-base round trip and a failover warning before reaching Neynar. Measured
+ * on haatz 2026-10-23: 501 on all three paths, 6 of 6 calls each.
+ */
 export async function getFrameCatalog(limit = 20, cursor?: string) {
   const params = new URLSearchParams({ limit: String(limit) });
   if (cursor) params.set('cursor', cursor);
-  const res = await fetchWithFailover(`/frame/catalog?${params}`, {
-    headers: readHeaders(),
+  const res = await fetch(`${NEYNAR_BASE}/frame/catalog?${params}`, {
+    headers: headers(),
     signal: AbortSignal.timeout(10000),
   });
   if (!res.ok) throw new Error(`Neynar frame catalog error: ${res.status}`);
@@ -620,8 +627,8 @@ export async function getFrameCatalog(limit = 20, cursor?: string) {
 
 export async function searchFrames(query: string, limit = 20) {
   const params = new URLSearchParams({ q: query, limit: String(limit) });
-  const res = await fetchWithFailover(`/frame/search?${params}`, {
-    headers: readHeaders(),
+  const res = await fetch(`${NEYNAR_BASE}/frame/search?${params}`, {
+    headers: headers(),
     signal: AbortSignal.timeout(10000),
   });
   if (!res.ok) throw new Error(`Neynar frame search error: ${res.status}`);
@@ -630,8 +637,8 @@ export async function searchFrames(query: string, limit = 20) {
 
 export async function getRelevantFrames(fid: number, limit = 20) {
   const params = new URLSearchParams({ fid: String(fid), limit: String(limit) });
-  const res = await fetchWithFailover(`/frame/relevant?${params}`, {
-    headers: readHeaders(),
+  const res = await fetch(`${NEYNAR_BASE}/frame/relevant?${params}`, {
+    headers: headers(),
     signal: AbortSignal.timeout(10000),
   });
   if (!res.ok) throw new Error(`Neynar relevant frames error: ${res.status}`);
@@ -641,9 +648,10 @@ export async function getRelevantFrames(fid: number, limit = 20) {
 /**
  * Read through the seam from a route: READ_BASE first, Neynar on failover.
  * Only for calls whose fields the read base serves. Hypersnap omits
- * `viewer_context`, `power_badge` and a cast's `root_parent_url`, and returns
- * followers/following as flat users, so check the fields a caller reads first
- * (doc 2418 D6 PR 3).
+ * `viewer_context` and `power_badge`, leaves a cast's `channel` null, sets its
+ * `root_parent_url` to its own `parent_url` (so a reply in a channel has none),
+ * and returns followers/following as flat users, so check the fields a caller
+ * reads first (doc 2418 D6 PR 3).
  */
 export function neynarRead(path: string, init: RequestInit = {}): Promise<Response> {
   return fetchWithFailover(path, { ...init, headers: readHeaders() });

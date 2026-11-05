@@ -1,5 +1,7 @@
 # Anti-Fabrication
 
+mechanism: none yet (since 2026-10-23, #4151)
+
 **A claim is not a fact until it is checked against ground truth.** The orchestrator verifies every load-bearing subagent claim before trusting, reporting, or PR-ing it. Rule numbers are stable. History: `research/dev-workflows/2649-rules-history/archive/anti-fabrication.md`.
 
 1. **Subagents do not write repo files by default.** They RETURN content; the orchestrator writes it at the right path/number and reads back the diff. If a subagent must write (worktree isolation), it reports the exact path and the orchestrator `ls`-confirms it.

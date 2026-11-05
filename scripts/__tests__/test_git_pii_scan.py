@@ -104,7 +104,7 @@ def test_catches_a_card_number():
 
 
 def test_reports_the_file_it_found_it_in():
-    h = hits("mail bob@example.org", path="research/x/README.md")
+    h = hits("mail bob" + "@" + "somecompany.co.uk", path="research/x/README.md")  # example.org is reserved since card 10451
     assert h and h[0][1] == "research/x/README.md"
 
 
@@ -114,6 +114,22 @@ def test_allowlisted_zao_addresses_pass():
     for addr in ["zaal@thezao.com", "zaalp99@gmail.com", "zoe-zao@agentmail.to",
                  "hello@thezao.com", "support@thezao.com"]:
         assert not kinds(f"contact {addr} for access"), addr
+
+
+def test_the_noreply_trailer_line_in_zoe_research_doc_passes():
+    # bot/src/zoe/research-doc.ts:167, verbatim: any edit to this line used to be
+    # refused as third-party PII (2026-10-23).
+    line = ("    await git(['commit', '--quiet', '-m', `docs: ${topic} research doc ${num} "
+            "(ZOE auto-research, tier:STANDARD)\\n\\nCo-Authored-By: Claude Opus 4.8 "
+            "<noreply@anthropic.com>`]);")
+    assert not kinds(line), hits(line, "bot/src/zoe/research-doc.ts")
+
+
+def test_a_personal_address_at_the_same_domain_is_still_refused():
+    # the allowlist names one role address, not the domain. Assembled at runtime,
+    # like the fixtures below, so this file stays stageable by the scanner it tests.
+    personal = "someone" + "@" + "anthropic.com"
+    assert "email" in kinds(f"Co-Authored-By: Someone <{personal}>")
 
 
 def test_zao_role_addresses_pass():

@@ -174,8 +174,8 @@
           {
             "type": "command",
             "if": "Edit(src/**/*.ts)|Edit(src/**/*.tsx)|Write(src/**/*.ts)|Write(src/**/*.tsx)",
-            "command": "cd \"$CLAUDE_PROJECT_DIR\" && npx eslint --fix \"$TOOL_ARG_FILE_PATH\" 2>/dev/null; exit 0",
-            "statusMessage": "Auto-formatting..."
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && python3 scripts/hooks/eslint-fix-changed-lines.py 2>/dev/null; exit 0",
+            "statusMessage": "Auto-formatting the changed lines..."
           }
         ]
       }

@@ -61,6 +61,9 @@ export async function POST() {
     const addresses = batch.map((e) => e.wallet_address!.toLowerCase());
 
     try {
+      // Stays on Neynar (doc 2418 D6 PR 3): Hypersnap answers bulk-by-address as
+      // { users: [...] }, not keyed by address, so data[addr] below would miss every
+      // member on a 200 that never fails over; and this route writes what it reads
       const res = await fetch(
         `${NEYNAR_BASE}/user/bulk-by-address?addresses=${addresses.join(',')}`,
         { headers: headers(), signal: AbortSignal.timeout(10000) },

@@ -27,7 +27,22 @@ machine's transcripts were read.
 
 Auto-proceeded by the Grill on 2026-10-06, override anytime. Not a ruling of Zaal's.
 
+## Stale copies of maintained skills (2026-10-24)
+
+Zaal's ruling (grill S2, "archive"): the out-of-date copies of skills that are maintained in his own skill set are archived here, not replaced. The current versions carry private paths and names, and this repo is public. Each one below differs from the maintained copy and was last changed here on the date shown, while the maintained copy is the same age or newer. Loads were not measured for this batch.
+
+| Skill | Use instead | Retired | Last change here | Why |
+|---|---|---|---|---|
+| `bonfire` | the maintained skill of the same name | 2026-10-24 | 2026-07-17 | stale copy |
+| `clipboard` | the maintained skill of the same name | 2026-10-24 | 2026-07-15 | stale copy |
+| `handoff` | the maintained skill of the same name | 2026-10-24 | 2026-07-15 | stale copy |
+| `newsletter` | the maintained skill of the same name | 2026-10-24 | 2026-09-11 | stale copy |
+| `socials` | the maintained skill of the same name | 2026-10-24 | 2026-09-11 | stale copy |
+| `zao-research` | the maintained skill of the same name | 2026-10-24 | 2026-07-17 | stale copy |
+
 ## Named for retirement and left in place
 
 - `z`: `CLAUDE.md` lists `/z` among the key commands. It stays until that line changes.
 - `fishbowlz`: `bot/REGISTRY.md` records it as the pointer to the graduated FISHBOWLZ repo.
+- `meeting` (2026-10-24): `scripts/sync-meeting-skill.sh` names this repo's copy the source of truth, and `scripts/fleet/loop-episode.sh` falls back to its path. Archiving it would break both.
+- `autoresearch` (2026-10-24): this repo's copy took its own fix on 2026-10-11 (#3899), after the 2026-10-06 count of stale copies.

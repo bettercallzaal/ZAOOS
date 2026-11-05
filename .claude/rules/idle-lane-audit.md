@@ -1,5 +1,7 @@
 # Idle Lane Audit - a lane with no queue audits its own ground
 
+mechanism: none yet (since 2026-10-23, #4152)
+
 Zaal 2026-08-20: idle should audit the project and confirm nothing is missing. The four silent breakages that motivated it: `research/dev-workflows/2649-rules-history/archive/idle-lane-audit.md`.
 
 **A lane that finishes its queue runs this audit, reports, and only then idles.** Scope: the lane's OWN repo, brief and tools - not the whole estate.

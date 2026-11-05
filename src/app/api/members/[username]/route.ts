@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import {
   getENSAvatar,
@@ -8,12 +9,23 @@ import {
   resolveENSNames,
 } from '@/lib/ens/resolve';
 import { logger } from '@/lib/logger';
+import {
+  applyWalletVisibility,
+  hasPublicField,
+  hasPublicProfile,
+  isWalletPublic,
+  memberScope,
+  projectPublicMember,
+} from '@/lib/members/public-profile';
 
 const usernameParamSchema = z.string().min(1).max(100);
+const memberIdSchema = z.string().uuid();
 
 /**
  * GET /api/members/[username] — Unified member profile
- * PUBLIC — no auth required. Shareable profile pages.
+ * PUBLIC: no auth required. Shareable profile pages. Without a member session the
+ * response holds only what this member opted in to, and a member who has not
+ * picked a public name is a 404.
  * Merges: users + respect_members + community_profiles + Neynar live data
  */
 export async function GET(req: NextRequest, { params }: { params: Promise<{ username: string }> }) {
@@ -27,15 +39,28 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ user
   try {
     // Find user by username, FID, or wallet
     let user = null;
+    let matchedBy: 'id' | 'username' | 'fid' | 'wallet' = 'username';
 
-    // Try username first
+    // Try the member id first: the only link a name-only public profile has
+    if (memberIdSchema.safeParse(lookup).success) {
+      const { data: byId } = await supabaseAdmin
+        .from('users')
+        .select('*')
+        .eq('id', lookup)
+        .eq('is_active', true)
+        .maybeSingle();
+      user = byId;
+      if (user) matchedBy = 'id';
+    }
+
+    // Try username
     const { data: byUsername } = await supabaseAdmin
       .from('users')
       .select('*')
       .ilike('username', lookup)
       .eq('is_active', true)
       .maybeSingle();
-    user = byUsername;
+    user = user ?? byUsername;
 
     // Try FID if numeric
     if (!user && /^\d+$/.test(lookup)) {
@@ -46,6 +71,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ user
         .eq('is_active', true)
         .maybeSingle();
       user = byFid;
+      if (user) matchedBy = 'fid';
     }
 
     // Try wallet address
@@ -57,10 +83,32 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ user
         .eq('is_active', true)
         .maybeSingle();
       user = byWallet;
+      if (user) matchedBy = 'wallet';
     }
 
     if (!user) {
       return NextResponse.json({ error: 'Member not found' }, { status: 404 });
+    }
+
+    const session = await getSessionData();
+    const scope = memberScope(session, user.fid);
+
+    // A hidden identifier must not resolve to a member, and ilike wildcards must
+    // not work as a guess. Same 404 as an unknown member.
+    if (scope === 'public') {
+      const canResolve =
+        hasPublicProfile(user) &&
+        (matchedBy === 'id' ||
+          (matchedBy === 'username' &&
+            hasPublicField(user, 'username') &&
+            user.username?.toLowerCase() === lookup) ||
+          (matchedBy === 'fid' && hasPublicField(user, 'farcaster')) ||
+          (matchedBy === 'wallet' &&
+            isWalletPublic(user) &&
+            user.primary_wallet?.toLowerCase() === lookup));
+      if (!canResolve) {
+        return NextResponse.json({ error: 'Member not found' }, { status: 404 });
+      }
     }
 
     // Fetch respect data
@@ -432,8 +480,17 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ user
       createdAt: user.created_at,
     };
 
-    return NextResponse.json(profile, {
-      headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30' },
+    if (scope === 'public') {
+      return NextResponse.json(projectPublicMember(user, profile), {
+        headers: {
+          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30',
+          Vary: 'Cookie',
+        },
+      });
+    }
+
+    return NextResponse.json(scope === 'full' ? profile : applyWalletVisibility(user, profile), {
+      headers: { 'Cache-Control': 'private, no-store', Vary: 'Cookie' },
     });
   } catch (err) {
     logger.error('[members/profile] error:', err);

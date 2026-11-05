@@ -1,5 +1,7 @@
 # Resource Release - whatever a run creates, the same file says how it is released
 
+mechanism: none yet (since 2026-10-23, #4128)
+
 Three measured leaks (136 tabs, 50 sessions on 40 panes, 26 leftover worktrees on a disk that hit ENOSPC on 2026-10-10). Instances, what this does not ask for, and sources: `research/dev-workflows/2649-rules-history/archive/resource-release.md`.
 
 1. **The file that creates a per-run resource names its release, next to the create.** Not in a README, not in a cleanup script somebody runs later.

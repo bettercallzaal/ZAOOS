@@ -1,5 +1,7 @@
 # Recap Follow-Through - a recap is written at the moment of promising
 
+mechanism: none yet (since 2026-10-23, #4152)
+
 A recap freezes when nothing has been done yet, so it is the worst record of whether a commitment was honoured. The 2026-08-20 sweep evidence: `research/dev-workflows/2649-rules-history/archive/recap-followthrough.md`.
 
 1. **Every recap carries a follow-through block: who owes what, to whom, by when** - a named person on each side of each item.

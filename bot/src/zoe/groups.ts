@@ -36,6 +36,12 @@ export interface GateContext {
   messageText: string;
   replyToFromId?: number;
   entities: ReadonlyArray<MessageEntity>;
+  /** Epoch ms until which this chat's engaged window lets this sender reach
+   *  ZOE without re-mentioning her (see markEngaged / engagedUntilFor).
+   *  Absent or past = no window. */
+  engagedUntil?: number;
+  /** Clock for the engaged check; tests pass it, callers leave it to Date.now(). */
+  nowMs?: number;
 }
 
 export interface GateResult {
@@ -169,7 +175,63 @@ export function shouldRespond(config: GroupConfig | null, gctx: GateContext): Ga
   const isReplyToBot = gctx.botId !== null && gctx.replyToFromId === gctx.botId;
   if (mentioned) return { allow: true, reason: 'mode=mention + @-mention' };
   if (isReplyToBot) return { allow: true, reason: 'mode=mention + reply-to-bot' };
+  // A member who just got an answer from ZOE is still talking to her. Zaal,
+  // 1 Nov 2026: give ZOE "more ability to talk to community members,
+  // especially groups they're talking back with it in". Measured on the VPS
+  // journal, 29 Oct to 1 Nov 2026: 148 group messages skipped as
+  // "mode=mention + no mention/reply", most of them a member's next line
+  // right after ZOE had replied to that member.
+  const now = gctx.nowMs ?? Date.now();
+  if (typeof gctx.engagedUntil === 'number' && now < gctx.engagedUntil) {
+    return { allow: true, reason: 'mode=mention + engaged window' };
+  }
   return { allow: false, reason: 'mode=mention + no mention/reply' };
+}
+
+/**
+ * The engaged window, CHAT-WIDE (item 135, Zaal 2026-11-02: "after any
+ * @mention, she answers everyone in that Telegram chat for 10 minutes. Not per
+ * member."). After ZOE SENDS a reply in a group, every sender's next messages
+ * in that chat reach her for ENGAGED_WINDOW_MS without an @-mention or a reply.
+ * Each new reply in the chat pushes the window out again.
+ *
+ * The turn cap stays PER SENDER inside the chat window: one member gets at most
+ * ENGAGED_MAX_TURNS replies in a row without a fresh mention, so no single
+ * member can hold ZOE in an endless exchange, while the rest of the room still
+ * reaches her. A spent member's fresh @-mention or reply still passes the gate
+ * on its own merits; their count resets only when the whole chat window lapses
+ * (ten quiet minutes in that chat). mode=silent and the allowlist win because
+ * shouldRespond checks them first. State is in-process only: a restart ends
+ * every window, the safe direction.
+ */
+export const ENGAGED_WINDOW_MS = 10 * 60_000;
+export const ENGAGED_MAX_TURNS = 6;
+interface ChatWindow { until: number; turns: Map<number, number> }
+const engaged = new Map<string, ChatWindow>();
+
+/** Call ONLY after a reply in this chat was actually sent; fromId is who it answered. */
+export function markEngaged(chatId: number | string, fromId: number, nowMs: number = Date.now()): void {
+  for (const [k, w] of engaged) if (w.until <= nowMs) engaged.delete(k);
+  const key = String(chatId);
+  const w = engaged.get(key);
+  if (!w) {
+    engaged.set(key, { until: nowMs + ENGAGED_WINDOW_MS, turns: new Map([[fromId, 1]]) });
+    return;
+  }
+  w.until = nowMs + ENGAGED_WINDOW_MS;
+  w.turns.set(fromId, (w.turns.get(fromId) ?? 0) + 1);
+}
+
+/** The chat window's end for this sender, or undefined when none is open in the chat or this sender's cap is spent. */
+export function engagedUntilFor(chatId: number | string, fromId: number): number | undefined {
+  const w = engaged.get(String(chatId));
+  if (!w || (w.turns.get(fromId) ?? 0) >= ENGAGED_MAX_TURNS) return undefined;
+  return w.until;
+}
+
+/** Tests only: forget every engaged window. */
+export function resetEngagedForTests(): void {
+  engaged.clear();
 }
 
 export function isBotMentioned(gctx: GateContext): boolean {

@@ -13,7 +13,10 @@ import {
   getBestFriends,
   getCastConversationSummary,
   getFollowSuggestions,
+  getFrameCatalog,
+  getRelevantFrames,
   getTrendingTopics,
+  searchFrames,
 } from '../neynar';
 
 function res(status: number, body: unknown) {
@@ -86,5 +89,33 @@ describe('getCastConversationSummary', () => {
     await expect(getCastConversationSummary('0xabc')).rejects.toThrow(
       'Neynar cast conversation summary error 500',
     );
+  });
+});
+
+// Hypersnap answers 501 on all three frame paths (src/api/http.rs; haatz 6 of 6, 2026-10-23).
+describe.each([
+  ['getFrameCatalog', () => getFrameCatalog(5, 'c1'), '/frame/catalog?limit=5&cursor=c1'],
+  ['searchFrames', () => searchFrames('zao', 5), '/frame/search?q=zao&limit=5'],
+  ['getRelevantFrames', () => getRelevantFrames(3, 5), '/frame/relevant?fid=3&limit=5'],
+])('%s', (_name, call, path) => {
+  it('goes straight to Neynar with the API key, never to the read base', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockImplementation(async (url: string) =>
+        url.startsWith('https://read.example')
+          ? res(501, { message: 'not implemented' })
+          : res(200, { frames: [] }),
+      );
+    vi.stubGlobal('fetch', fetchMock);
+
+    expect(await call()).toEqual({ frames: [] });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock.mock.calls[0][0]).toBe(`https://api.neynar.com/v2/farcaster${path}`);
+    expect(fetchMock.mock.calls[0][1].headers['x-api-key']).toBe('test-neynar-key');
+  });
+
+  it('throws on a non-OK Neynar response', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(res(500, 'boom')));
+    await expect(call()).rejects.toThrow('500');
   });
 });

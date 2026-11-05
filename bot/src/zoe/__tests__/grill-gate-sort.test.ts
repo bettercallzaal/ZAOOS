@@ -294,9 +294,12 @@ describe('auto-deferred: fail closed, the log, and the digest', () => {
   it('the log round-trips and keeps only the last 24 hours', async () => {
     const dir = await fs.mkdtemp(join(tmpdir(), 'autodef-'));
     const path = join(dir, 'auto-deferred.jsonl');
+    // Pin the clock: append trims to the last 7 days of `now`, so a wall clock
+    // aged these fixed entries out of the log (main went red on 2026-10-24).
+    const now = Date.parse('2026-10-17T12:00:00Z');
     try {
-      expect(await appendAutoDeferred([{ taskId: 'old', title: 'Old', choice: 'later', at: '2026-10-15T12:00:00Z' }], path)).toBe(true);
-      expect(await appendAutoDeferred([{ taskId: 'new', title: 'New', choice: 'park it', at: '2026-10-17T11:00:00Z' }], path)).toBe(true);
+      expect(await appendAutoDeferred([{ taskId: 'old', title: 'Old', choice: 'later', at: '2026-10-15T12:00:00Z' }], path, now)).toBe(true);
+      expect(await appendAutoDeferred([{ taskId: 'new', title: 'New', choice: 'park it', at: '2026-10-17T11:00:00Z' }], path, now)).toBe(true);
       await fs.appendFile(path, 'not json\n');
       const got = await readAutoDeferred(Date.parse('2026-10-16T12:00:00Z'), path);
       expect(got.map((e) => e.taskId)).toEqual(['new']);

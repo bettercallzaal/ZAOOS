@@ -136,3 +136,27 @@ describe('agent-delegation: delegationAllowed - the gate index.ts must call', ()
     expect(delegationAllowed({ zaalId: 19640, chatType: 'private' })).toBe(false);
   });
 });
+
+describe('agent-delegation: quote-reply wrapper', () => {
+  // Verbatim shape from bot/src/zoe/index.ts (DM quote-reply turnText, ~line 2446).
+  const wrap = (quoted: string, reply: string) =>
+    `[Zaal is replying to your earlier message:\n"${quoted}"]\n\nHis reply: ${reply}`;
+
+  it('detects a delegation phrase in the inner reply, not the quoted wrapper', () => {
+    const r = detectDelegationIntent(wrap('Want me to check the venue options?', 'look into sound gear in Ellsworth'));
+    expect(r.isDelegated).toBe(true);
+    expect(r.cleanTask).toBe('sound gear in Ellsworth');
+    expect(r.kind).toBe('investigation');
+  });
+
+  it('does not detect when the inner reply has no delegation phrase', () => {
+    const r = detectDelegationIntent(wrap('Look into sound gear in Ellsworth?', 'yes that works for me'));
+    expect(r.isDelegated).toBe(false);
+  });
+
+  it('leaves unwrapped text unchanged', () => {
+    const r = detectDelegationIntent('dig into the latest PRs on ZAO OS');
+    expect(r.isDelegated).toBe(true);
+    expect(r.cleanTask).toBe('the latest PRs on ZAO OS');
+  });
+});

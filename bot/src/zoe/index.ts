@@ -18,6 +18,7 @@ import { groupIds } from './env';
 import { OWNER_ONLY_LINE, newOwnerOnlyState, privateScopeAllowed, shouldSendOwnerOnlyLine } from './owner-only';
 import { config as loadEnv } from 'dotenv';
 import { sendChunkedToTelegram } from './tg-chunk';
+import { installTelegramFormat } from './tg-format';
 loadEnv();
 
 import { Bot, Context, InlineKeyboard } from 'grammy';
@@ -464,6 +465,9 @@ installSendBudget(bot);
 // Surplus Intelligence, and those are exactly the reasoning models that wrap
 // their output in <think>. Same egress placement as the send budget above.
 installAgentMarkupGuard(bot);
+// Readable Telegram (tg-format.ts, item 193): markdown the model writes is
+// turned into plain text at egress, so tables and ** never arrive raw.
+installTelegramFormat(bot);
 
 const usernameHolder: { value: string | null } = { value: null };
 const botIdHolder: { value: number | null } = { value: null };

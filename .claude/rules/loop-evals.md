@@ -1,5 +1,7 @@
 # Loop Evals - a rubric every autonomous loop passes BEFORE it opens a PR
 
+mechanism: .github/workflows/ci.yml, bin/zao-merge (partial: gate A only)
+
 From Karpathy's agent model (march of nines: gate each step; agents bloat) and Anthropic's Default-FAIL harness. Sources, incidents (#3502/#3505): `research/dev-workflows/2649-rules-history/archive/loop-evals.md`.
 
 ## The gate - all applicable checks pass before a PR opens
@@ -28,6 +30,7 @@ For high-stakes output (code change to a live route, deploy-path edit, security-
 3. **Treat an impossibility claim in a comment ("indistinguishable", "cannot be empty", "safe because") as the thing to check.** A coherent, false justification is the most effective thing at stopping a reviewer checking.
 4. **When correcting such a comment, name the false claim** rather than quietly replacing it; prefer a signature that cannot express the confusion (`None` for could-not-read vs `[]` for read-empty).
 5. **A negative result is reported as a negative result** - "I could not construct a case" is not "the problem is not there".
+6. **Every PR body names its author lane on its first line** ("Author lane: <name>"), written by hand until `zao-pr-open` adds it itself. The 2026-10-21 mistakes review could not count NEEDS_WORK verdicts per lane because no body said whose PR it was.
 
 Twin: `~/zao-vault/AGENTS.md` rule 10 ("state what the count would read if the thing you fear had happened"). **Editing either means checking the other.** This is two extra questions, not a re-review of everything.
 

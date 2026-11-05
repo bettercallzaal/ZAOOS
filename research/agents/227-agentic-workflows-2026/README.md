@@ -4,7 +4,7 @@
 topic: agents
 type: research
 status: research-complete
-last-validated: 2026-05-21
+last-validated: 2026-10-27
 original-query: Map agentic workflow landscape for 2026 including frameworks, patterns, and music/web3 applications for ZAO OS (reconstructed)
 tier: reference
 ---
@@ -12,6 +12,35 @@ tier: reference
 > **Status:** Research complete
 > **Date:** March 29, 2026
 > **Goal:** Map the agentic workflow landscape for 2026 — frameworks, SDKs, real-world DAO/community patterns, music-specific agent use cases, and cost/pricing models. Evaluate what fits ZAO OS (Next.js + TypeScript + Supabase + web3).
+
+---
+
+## Updated 2026-10-27
+
+Four material changes since the May 21 validation:
+
+**1. Claude model lineup replaced by the Claude 5 family.** The 4.x generation (Opus 4.6, Sonnet 4.6, Haiku 4.5) are now legacy. Current models as of October 2026 (source: FULL fetch of platform.claude.com/docs/en/models/overview):
+
+| Model | Input (per 1M) | Output (per 1M) | Context | Notes |
+|-------|---------------|----------------|---------|-------|
+| Claude Fable 5.1 | $10 | $50 | 1M tokens | Demanding reasoning, long-horizon agentic |
+| Claude Opus 5.5 | $4 | $20 | 1M tokens | Recommended default for most workloads |
+| Claude Sonnet 5.5 | $2 | $10 | 1M tokens | Best speed/intelligence balance |
+| Claude Haiku 5.5 | $0.10 | $0.50 | 1M tokens | High-volume classification/routing |
+
+Haiku 5.5 is 10x cheaper than the Haiku 4.5 listed in Section 4 ($0.10 vs $1.00 input). All models carry a Jun 2026 knowledge cutoff. ZAO budget estimates in Section 4 undercount savings -- recalculate using Haiku 5.5 for routing/curation and Sonnet 5.5 for reasoning.
+
+**2. Vercel AI SDK v7 shipped June 25, 2026.** The `ai` npm package's `latest` tag now resolves to the 7.x line (7.0.143 as of October 16, 2026 per Developers Digest). Key addition: `HarnessAgent`, which wraps Claude Code, Codex, Deep Agents, and OpenCode as first-class agents. Durable/resumable agents are available via the Workflow DevKit (canary). Breaking changes are mostly renames. Pin `ai@6` to stay on the API described in Section 1 until you validate the v7 migration. Source: WebSearch secondary blogs, UNVERIFIED against official changelog -- check github.com/vercel/ai releases.
+
+**3. Mastra reached 1.0 stable January 2026; now at 1.78.x.** In April 2026 the company raised a $22M Series A (Spark Capital, $35M total) and launched a hosted platform: Studio (workflow visualization), Server (managed hosting), and Memory Gateway (persistent state service). The security incident listed by one aggregator (dated 2026-06-16, supply-chain) requires verification before adding new Mastra dependencies -- check the official mastra.ai blog and GitHub advisories. Source: WebSearch secondary, UNVERIFIED on the security item.
+
+**4. Two new major frameworks now competitive.** Not in the original doc:
+- **OpenAI Agents SDK** (`openai-agents` Python 0.24.0, `@openai/agents` TS 0.20.0 as of October 2026): April 2026 update added sandbox code execution, subagents, and first-class MCP. MIT license. Relevant if ZAO ever runs multi-provider agent workflows.
+- **Google Agent Development Kit (ADK)** (`google-adk` 2.12.0 as of October 2026): ADK 2.0 added graph workflows and collaborative agent teams. One `adk deploy` command targets Vertex AI Agent Engine. Apache-2.0 license. Not a ZAO priority given the TypeScript-first stack but worth watching. Source: WebSearch secondary, UNVERIFIED version numbers -- check PyPI/npm directly.
+
+**ZAO recommendation update:** The Section 5 architecture is still sound. Swap the model routing table in Section 4 to use Haiku 5.5 ($0.10/$0.50) for classification/routing and Sonnet 5.5 ($2/$10) for reasoning. Monthly cost estimate drops to roughly $5-12/month at current ZAO scale (10-25x cheaper than the May 2026 estimate).
+
+---
 
 ## Key Decisions / Recommendations
 

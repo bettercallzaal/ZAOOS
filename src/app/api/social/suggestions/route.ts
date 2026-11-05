@@ -20,8 +20,10 @@ export async function GET() {
   try {
     // Fetch suggestions from Neynar and community members in parallel
     const [suggestionsRes, membersResult] = await Promise.all([
+      // Stays on Neynar: reads power_badge and viewer_context, which Hypersnap does not return.
+      // Path per Neynar's spec (doc 2418 D6 PR 2); /user/suggestions is not in it.
       fetch(
-        `${NEYNAR_BASE}/user/suggestions?fid=${session.fid}&limit=20&viewer_fid=${session.fid}`,
+        `${NEYNAR_BASE}/following/suggested?fid=${session.fid}&limit=20&viewer_fid=${session.fid}`,
         {
           headers: { 'x-api-key': ENV.NEYNAR_API_KEY },
         },

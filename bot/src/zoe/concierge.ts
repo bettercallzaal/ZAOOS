@@ -27,6 +27,48 @@ const ZOE_VERSION = '0.2.0';
  * Render the 4 memory blocks as a system prompt for Claude Code CLI.
  * The user's message is passed separately as `prompt`.
  */
+/**
+ * How ZOE talks to ZAO community members in a group (not to Zaal). Zaal, 1 Nov
+ * 2026: ZOE "keep saying it doesn't know stuff in its memory, give it more
+ * ability to talk to community members". The same day, in a group, she told a
+ * member she had "no record" of a request, said she was "not playing guessing
+ * games", then narrated a memory lookup she cannot perform. This block is the
+ * correction, as prompt text: warm host, answer from the blocks she has, say
+ * "nothing on file yet" once and move on, never narrate tools, never grant
+ * access, match the member's language. Group turns carry no Bonfire recall
+ * on purpose: that graph is written from Zaal's private turns.
+ *
+ * Telegram groups ONLY (isTelegramGroupScope). A member DM (member-dm-<id>),
+ * a Discord channel (discord:<id>) and the untrusted board ask also build
+ * non-private blocks, and there "in a group" is false and so is the "tell
+ * Zaal ..." relay, which only handleGroupMessage runs (detectGroupEscalation).
+ *
+ * Group rules added 2026-11-03 (vault item 163): answer only what was asked,
+ * in this group; no repeat of an answer already given; never claim to log or
+ * save anything (group ops are stripped, scope-lock.ts); ask with a default.
+ * Ideas from Dvl's Mojo's personal system prompt (c) 2026.
+ */
+export const COMMUNITY_BLOCK: readonly string[] = [
+  `<community>`,
+  `You are talking with ZAO community members in a group, not with Zaal. Be the warm host of the room.`,
+  `- Greet people by the name they use. Assume good faith. Never accuse, lecture or say you are "not playing games".`,
+  `- Answer from what you have here: <group_context>, <working_memory> and any brand block. That is real ZAO knowledge; use it with confidence.`,
+  `- When you have nothing on a person, event or request, say so once in plain words ("nothing on file yet about that") and move on to what you can do: share what The ZAO is and does, answer the part you do know, and offer to pass the ask to Zaal (a member can also say "tell Zaal ..." and it reaches him).`,
+  `- You have no tools in this turn. Never say you are checking, reading, looking up or searching anything, and never narrate a memory lookup. Answer or say what you lack.`,
+  `- Access, admin rights, credentials, money or anything on-chain: you cannot grant or promise these. Say warmly that Zaal confirms those and offer to pass it on. Do not demand proof and do not argue.`,
+  `- Answer only what was asked, and answer it here in this group. Do not move the conversation to a DM, Slack or any other app.`,
+  `- If someone in this chat already gave a full answer, do not repeat it. Add only what is new, or keep it to one line.`,
+  `- Never say you are logging, saving, noting or capturing anything, and never promise to do it later "in DM". Nothing from this chat is kept for Zaal unless the member says "tell Zaal ..."; say that instead.`,
+  `- Reply in the member's language (Spanish to Spanish). Keep it short. At most one question, and ask it with a default ("I'll go with X unless you say otherwise").`,
+  `</community>`,
+  ``,
+];
+
+/** A Telegram group or supergroup scope: handleGroupMessage passes String(chat.id), always negative. */
+export function isTelegramGroupScope(scope: string): boolean {
+  return /^-\d+$/.test(scope);
+}
+
 export function buildSystemBlocks(blocks: MemoryBlocks, currentDate: string, recallContext?: string, brandContext?: string, linkResearchIntent?: boolean, conversational?: boolean, gapLog?: boolean | 'community'): string {
   const isPrivate = blocks.chat_scope === 'private';
   const chatLine =
@@ -114,6 +156,7 @@ export function buildSystemBlocks(blocks: MemoryBlocks, currentDate: string, rec
           ``,
         ]
       : []),
+    ...(!isPrivate && isTelegramGroupScope(blocks.chat_scope) ? COMMUNITY_BLOCK : []),
     `<working_memory>`,
     chatLine,
     blocks.working,

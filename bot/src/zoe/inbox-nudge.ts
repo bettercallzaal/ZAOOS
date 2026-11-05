@@ -15,12 +15,18 @@
  *   board  decisions and due-soon cards (needs-zaal-digest.ts
  *          filterNeedsZaalTasks over the cockpit tasks)
  *   prs    open, non-draft PRs by the review owners that do not carry the
- *          `hold` label (cockpit/adapters.ts fetchReviewPRs). Whether a PR is
- *          auto-merge-armed or already passed review is NOT read here: the
- *          search API row has neither, and one call per PR is not worth a
- *          daily count. Stated, not hidden: a PR that will merge itself is
- *          still listed until it does.
- * total = lanes + page + board + prs. Mail is not counted: inbox-ingest.ts
+ *          `hold` label (cockpit/adapters.ts fetchReviewPRs) AND change a
+ *          path reserved for Zaal (pr-reserved.ts, his 2026-10-20 merge
+ *          rule). Every other PR is merged by an agent once an evaluator
+ *          passes it, so it is not on his hand. One files call per PR; a PR
+ *          whose files cannot be read is still counted, marked "files
+ *          unread", never silently dropped. On 2026-10-21 the old count
+ *          said 24 when most of those were agent merges.
+ *   held   open non-draft PRs with a hold label (hold, hold:licence): parked
+ *          for his tap, so on his hand too, on their own line "On hold for
+ *          you". Both PR lines name the PRs, not only a count (seat,
+ *          2026-10-21), so he can act from the phone.
+ * total = lanes + page + board + prs + held. Mail is not counted: inbox-ingest.ts
  * folds mail into context and keeps no pending number (IngestResult has
  * ingested, skipped, scanned only), so a mail count would be invented.
  *
@@ -52,10 +58,11 @@
 import { promises as fs } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
-import { fetchCockpitTasks, fetchReviewPRs } from '../cockpit/adapters';
+import { fetchCockpitTasks, fetchPrFiles, fetchReviewPRs } from '../cockpit/adapters';
 import type { ReviewPR } from '../cockpit/types';
 import type { Button } from './grill-pause';
 import { filterNeedsZaalTasks, parseLaneGrillSections, type NeedsZaalTask } from './needs-zaal-digest';
+import { reservedClasses } from './pr-reserved';
 import { inQuietWindow, parseClock, easternMinute } from './quiet-window';
 import { parseTerminalsPage, readTerminalsPage, vaultDir as pageVaultDir } from './terminals-digest';
 
@@ -84,11 +91,18 @@ export interface Totals {
   page: number;
   board: number;
   prs: number;
+  /** Open PRs left to agents: not hold, not draft, no reserved path. */
+  agentPrs?: number;
   total: number;
   /** Which sources could not be read; their count is 0 and the message says so. */
   failed: string[];
-  prList: ReviewPR[];
+  prList: HandPR[];
+  /** Open non-draft PRs carrying a hold label (hold, hold:licence, ...): parked for his tap. In the total. */
+  holdList?: ReviewPR[];
 }
+
+/** A PR on his hand, with why: the reserved classes it touches, or "files unread". */
+export type HandPR = ReviewPR & { reserved?: string[] };
 
 export interface NudgeState {
   /** Eastern calendar day the state is for. */
@@ -146,11 +160,24 @@ export function decide(
   return { action: 'send', nth: state.sends.length + 1 };
 }
 
-const holdLabel = (pr: ReviewPR): boolean => (pr.labels ?? []).some((l) => l.toLowerCase() === 'hold');
+// Any label starting "hold" (hold, hold:licence) parks a PR for his tap.
+const holdLabel = (pr: ReviewPR): boolean => (pr.labels ?? []).some((l) => l.toLowerCase().startsWith('hold'));
 
-/** The PRs that wait on his hand: open, not draft, not labelled hold. */
+/** The PRs that may wait on his hand: open, not draft, not on hold. */
 export function waitingPrs(prs: ReviewPR[]): ReviewPR[] {
   return prs.filter((p) => !p.draft && !holdLabel(p));
+}
+
+/** The PRs on hold for him: open, not draft, with a hold label. */
+export function heldPrs(prs: ReviewPR[]): ReviewPR[] {
+  return prs.filter((p) => !p.draft && holdLabel(p));
+}
+
+/** "ZAOOS #4066, zaal-dotfiles #592", at most `max`, then "+N more". Numbers he can act on from the phone. */
+export function prRefs(prs: ReviewPR[], max = 8): string {
+  const refs = prs.slice(0, max).map((p) => `${p.repo.split('/')[1] ?? p.repo} #${p.number}`);
+  if (prs.length > max) refs.push(`+${prs.length - max} more`);
+  return refs.join(', ');
 }
 
 export function ageDays(createdAt: string | null, now: Date): string {
@@ -184,8 +211,10 @@ export function formatTotals(t: Totals, nth: number, now: Date): { text: string;
     `Lanes asking: ${t.lanes}`,
     `Seat page: ${t.page}`,
     `Board: ${t.board}`,
-    `PRs on your hand: ${t.prs}`,
+    `PRs on your hand: ${t.prs}${t.prs ? `: ${prRefs(t.prList)}` : ''}${t.agentPrs ? ` (${t.agentPrs} more are agent merges)` : ''}`,
   ];
+  const held = t.holdList ?? [];
+  if (held.length) lines.push(`On hold for you: ${held.length}: ${prRefs(held)}`);
   if (t.failed.length) lines.push(`Could not read: ${t.failed.join(', ')} (counted as 0)`);
   lines.push('', 'It repeats while this is above zero and stops the day it hits zero.');
   const buttons: Button[][] = [];
@@ -195,9 +224,10 @@ export function formatTotals(t: Totals, nth: number, now: Date): { text: string;
 }
 
 /** Pure. The PR list message: one line and one button per PR. */
-export function formatPrList(prs: ReviewPR[], now: Date): { text: string; buttons: Button[][] } {
+export function formatPrList(prs: HandPR[], now: Date): { text: string; buttons: Button[][] } {
   if (!prs.length) return { text: 'No PR waits on your hand right now.', buttons: [] };
-  const lines = prs.map((p) => `${p.repo} #${p.number} (${ageDays(p.createdAt, now)}): ${p.title.slice(0, 80)}`);
+  const why = (p: HandPR): string => (p.reserved?.length ? ` [${p.reserved.join(', ')}]` : '');
+  const lines = prs.map((p) => `${p.repo} #${p.number} (${ageDays(p.createdAt, now)})${why(p)}: ${p.title.slice(0, 80)}`);
   const buttons = prs
     .map((p) => ({ p, data: prCallback(p) }))
     .filter((x): x is { p: ReviewPR; data: string } => x.data !== null)
@@ -232,6 +262,8 @@ export interface Sources {
   page: () => Promise<number>;
   board: () => Promise<number>;
   prs: () => Promise<ReviewPR[]>;
+  /** Changed paths of one PR; throws when unreadable. Absent = unreadable. */
+  prFiles?: (pr: ReviewPR) => Promise<string[]>;
 }
 
 export const defaultSources: Sources = {
@@ -252,7 +284,32 @@ export const defaultSources: Sources = {
     return decisions.length + dueSoon.filter((t) => !decisions.some((d) => d.id === t.id)).length;
   },
   prs: fetchReviewPRs,
+  prFiles: (pr) => fetchPrFiles(pr.repo, pr.number),
 };
+
+/** Keep only the PRs that are his: a reserved path, or files that could not be read. */
+export async function handPrs(
+  prs: ReviewPR[],
+  prFiles?: (pr: ReviewPR) => Promise<string[]>,
+): Promise<{ hand: HandPR[]; agent: number }> {
+  const read = await Promise.allSettled(
+    prs.map((p) => (prFiles ? prFiles(p) : Promise.reject(new Error('no files source')))),
+  );
+  const hand: HandPR[] = [];
+  let agent = 0;
+  read.forEach((r, i) => {
+    const p = prs[i];
+    if (r.status === 'rejected') {
+      console.error(`[zoe/inbox-nudge] files unread for ${p.repo}#${p.number}:`, (r.reason as Error)?.message);
+      hand.push({ ...p, reserved: ['files unread'] });
+      return;
+    }
+    const cls = reservedClasses(r.value, p.repo, p.labels ?? []);
+    if (cls.length) hand.push({ ...p, reserved: cls });
+    else agent++;
+  });
+  return { hand, agent };
+}
 
 /** Read every source; one that throws counts 0 and is named in `failed`. */
 export async function readTotals(src: Sources = defaultSources): Promise<Totals> {
@@ -267,15 +324,22 @@ export async function readTotals(src: Sources = defaultSources): Promise<Totals>
     }
   };
   const [lanes, page, board] = await Promise.all([num('lanes', src.lanes), num('page', src.page), num('board', src.board)]);
-  let prList: ReviewPR[] = [];
+  let prList: HandPR[] = [];
+  let holdList: ReviewPR[] = [];
+  let agentPrs = 0;
   try {
-    prList = waitingPrs(await src.prs());
+    const all = await src.prs();
+    holdList = heldPrs(all);
+    const split = await handPrs(waitingPrs(all), src.prFiles);
+    prList = split.hand;
+    agentPrs = split.agent;
   } catch (e) {
     console.error('[zoe/inbox-nudge] prs source failed:', (e as Error)?.message);
     failed.push('prs');
   }
   const prs = prList.length;
-  return { lanes, page, board, prs, total: lanes + page + board + prs, failed, prList };
+  const held = holdList.length;
+  return { lanes, page, board, prs, agentPrs, total: lanes + page + board + prs + held, failed, prList, holdList };
 }
 
 export type TickResult = Decision['action'] | 'off';

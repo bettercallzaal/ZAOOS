@@ -30,7 +30,11 @@
  *
  * WHAT IS KEPT. The model's own short paraphrase of the want, cut to
  * MAX_WANT_CHARS and passed through redactPii, with a timestamp. Never the
- * message text. The file lives beside ZOE's other state in ZOE_HOME.
+ * message text. A want that carries anything containsSecret matches (an API
+ * key, a bot token, a private key) is dropped whole rather than redacted
+ * (card 10396, the Codex finding: redactPii has no secret patterns, so a key
+ * pasted into the want reached the log as written). The file lives beside
+ * ZOE's other state in ZOE_HOME.
  *
  * DISCORD (doc 2685 D7, 2026-10-18). The same log hears the community: a
  * Discord turn outside Zaal's own DM asks for the GAP line with
@@ -46,6 +50,7 @@ import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 import { ZOE_PATHS } from './memory';
 import { redactPii } from './pii';
+import { containsSecret } from './recall';
 
 export const MAX_WANT_CHARS = 160;
 export const MIN_ASKS_FOR_UPGRADE = 2;
@@ -163,6 +168,9 @@ export function gapWeekKey(now: Date): string {
 /** One line, redacted, bounded. Empty when nothing usable is left. */
 export function cleanWant(raw: string): string {
   const oneLine = raw.replace(/[<>`]/g, '').replace(/\s+/g, ' ').trim();
+  // Checked on the whole line before the cut, so a key that straddles
+  // MAX_WANT_CHARS cannot leave its first half behind.
+  if (containsSecret(oneLine)) return '';
   return redactPii(oneLine).slice(0, MAX_WANT_CHARS).trim();
 }
 

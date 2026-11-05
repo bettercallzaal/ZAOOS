@@ -30,3 +30,56 @@ Not searched: XMTP's blog after January 2026, its X or Farcaster accounts, and t
 - https://improve.xmtp.org/t/decentralization-milestones/2039 - FULL (Discourse JSON)
 - https://improve.xmtp.org/c/announcements - PARTIAL (topic titles and dates only, Discourse JSON)
 - https://docs.xmtp.org/fund-agents-apps/fund-your-app - FAILED (client-rendered)
+
+
+## Update 2026-10-21: XMTP now documents a backend you run, and Cassie's claim against XMTP
+
+Re-checked on 2026-10-21 (overnight lane run, QUICK) after the B and Z Build stream. There Zaal relayed Cassie (Quilibrium) on why her team's work beats XMTP for DMs: "XMTP is currently subsidized, but it's not free actually. So users would have to pay per message and that's just like not a long-term viable option" [0:17:16-0:17:37, mlx-whisper transcript of https://www.youtube.com/watch?v=uEIT4rvgsNo; Whisper wrote her name as "gas"].
+
+**What changed since 2026-10-18:**
+
+| Read | Result |
+|---|---|
+| `docs.xmtp.org/...` | 301 to `xmtp.org`, whose `llms.txt` now reads "Build secure messaging with XMTP and a backend you run" and points to `self-hosted-docs.xmtp.to` |
+| The developer guide (`xmtp.org/llms-full.txt`, 657,506 bytes) | "Use **8.0.0-rc1** for Browser, Node, Android, iOS, and Agent clients. Use `ghcr.io/xmtp/backend:8.0.0-rc1` for the backend." "The published Browser 7 and Node 6 packages use an earlier backend API." "An older network SDK cannot use this backend." The backend "is one binary" and "All durable state lives in PostgreSQL". As words, "mainnet", "decentral" and "cost" appear 0 times in the guide. "MAINNET" appears once, inside an Ethereum RPC variable name (`XMTP_RPC_MAINNET`) |
+| npm `@xmtp/browser-sdk` | `latest` 7.1.0. `prerelease` 8.0.0-rc4 (2026-10-20); rc2 2026-10-14, rc3 2026-10-19; nightlies daily |
+| `xmtp/libxmtp` branch `self-hosted` | last commit 2026-10-21 23:36 UTC |
+| improve.xmtp.org announcements | newest topic still 2026-01-28 ("Privacy policy"). No announcement of the self-hosted move or of a mainnet cutover |
+| `xmtp/docs-xmtp-org` | last commit still 2026-04-08 |
+| `xmtp/xmtpd` | last release v1.3.0 (2026-03-30), last push 2026-10-02 |
+| Production endpoints | `grpc.production.xmtp.network` answers HTTP 415 to a plain request (a gRPC server that is up). `api.production.xmtp.network` answers 200 |
+
+**What XMTP's own sources say on price, against Cassie's claim:**
+
+- XMTP's blog, 2026-01-06, Shane Mac: "On XMTP Mainnet, every message is a transaction." "It costs about $5 per 100k messages." That is **$0.00005 a message**.
+- The fee is paid by the **app** through a funded payer wallet, not by each user. That is the 2026-10-18 reading above, from the decentralization milestones post. So "users would have to pay per message" is wrong in detail: the app pays, and may pass the cost on.
+- **Doc 074 is out by a factor of 20.** It says "~$0.001/message". XMTP's own figure is about $0.00005. Correcting 074 is a Next Action, not done here.
+- "Currently subsidized": no XMTP source read here says the subsidy has ended, or when it will. Still **UNKNOWN**.
+
+**Cassie's alternative.** The stream does not name the repo she sent. Quilibrium's messenger is Quorum: `QuilibriumNetwork/quorum-desktop` ("The world's first fully private and decentralized group messenger", AGPL-3.0, 35 stars), `quorum-mobile` (GPL-3.0, 48 stars, last push 2026-10-21) and `quorum-shared` (E2E encryption in `src/crypto/`, **no LICENSE file**, so all rights reserved). Licences were read from the LICENSE files. Nothing read here states what Quorum costs per message. "Free" is **UNVERIFIED**.
+
+**What it means for the ZAO XMTP app** (`bettercallzaal/zao-xmtp`, MIT, pins `@xmtp/browser-sdk` 7.0.0):
+
+1. **Stay on 7.x for now.** It is still `latest` and still talks to the production network. The 8.x line targets a self-run backend and is a release candidate.
+2. **A self-run backend changes the cost question.** With a backend you run, the cost is your own PostgreSQL and hosting, not a per-message network fee. Whether 8.x can also talk to the production network was not found in the guide. **UNVERIFIED.**
+3. **Do not cite Cassie's comparison as fact** until a Quorum cost source is read.
+
+**Added sources (2026-10-21):**
+
+- https://xmtp.org/llms.txt and https://xmtp.org/llms-full.txt - FULL (curl, raw text)
+- https://blog.xmtp.org/xmtp-network-metrics-jan-6th-2026/ - FULL (WebFetch, quotes above)
+- https://improve.xmtp.org/c/announcements/7/l/latest.json - FULL (Discourse JSON, topic list)
+- npm registry `@xmtp/browser-sdk` - FULL (`npm view` dist-tags and times)
+- GitHub API: `xmtp/libxmtp` branch `self-hosted`, `xmtp/docs-xmtp-org` commits, `xmtp/xmtpd` releases; `QuilibriumNetwork/quorum-desktop`, `quorum-mobile`, `quorum-shared` READMEs and LICENSE files; `bettercallzaal/zao-xmtp` LICENSE and package.json - FULL
+- https://xmtp.org/fund-agents-apps/calculate-fees - FAILED (a "Moved" notice pointing to the backend page)
+- B and Z Build transcript, window 0:16:40 to 0:19:30 - FULL
+
+**Next Actions (2026-10-21):**
+
+| Action | Owner | Type | By When |
+|---|---|---|---|
+| Correct doc 074's "~$0.001/message" to XMTP's "$5 per 100k messages" (2026-01-06), with the source. Shipped when the PR merges | bandzbuilds lane | PR | 2026-10-28 |
+| Decide whether the ZAO XMTP app stays on 7.x with the production network or plans for an 8.x self-run backend. Shipped when the answer is in this file | Zaal | Decision | 2026-11-04 |
+| If Quorum is a candidate for ZAO DMs, read its cost model and licence fit (AGPL desktop, unlicensed shared package) first. Shipped when a QUICK doc exists | bandzbuilds lane | Research | 2026-11-11 |
+
+**What this means for The ZAO:** XMTP messages are cheap ($5 per 100,000 per XMTP), and the app pays, not each member. XMTP is moving toward a backend we could run ourselves, so the "pay per message" worry may not apply to us at all. Quorum's "free" is a claim nobody has sourced yet.

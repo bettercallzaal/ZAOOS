@@ -43,6 +43,15 @@ if [[ "${1:-}" == "--all" ]]; then MODE="all"; shift; fi
 
 REPO="${1:-$(git rev-parse --show-toplevel 2>/dev/null)}"
 if [[ -z "$REPO" || ! -d "$REPO/research" ]]; then
+  # A full audit that found no tree did not audit anything (card 10405). Exit 0
+  # read as "every doc is indexed" and an evaluator verdict rested on it
+  # (ZAOOS #3923, 2026-10-12). In --all mode it is a check that could not run,
+  # so it says so and exits 2. The staged (pre-commit) mode keeps exit 0: a
+  # commit in a tree with no research/ has nothing for this guard to judge.
+  if [[ "$MODE" == "all" ]]; then
+    echo "[research-index] CANNOT RUN: no research/ dir under '${REPO:-<no git toplevel>}'; nothing was audited, so this is not a pass" >&2
+    exit 2
+  fi
   echo "[research-index-guard] no research/ dir found, skipping" >&2
   exit 0
 fi
@@ -110,15 +119,24 @@ if [[ "$MODE" == "staged" ]]; then
     indexed "$folder" "$slug" || MISSING="${MISSING}\n  $folder/$slug -> add a row to research/$folder/README.md"
   done <<< "$PAIRS"
 else
+  EXAMINED=0
   for folder in agents music dev-workflows infrastructure governance community \
                 cross-platform farcaster identity business events wavewarz security; do
     [[ -f "$REPO/research/$folder/README.md" ]] || continue
     for d in "$REPO/research/$folder"/*/; do
       slug=$(basename "$d")
       [[ "$slug" =~ ^[0-9]+- ]] || continue
+      EXAMINED=$((EXAMINED + 1))
       indexed "$folder" "$slug" || MISSING="${MISSING}\n  $folder/$slug"
     done
   done
+  # A full audit that examined no doc audited nothing, whatever the reason: an
+  # empty research/, or topic folders with no README.md, which the loop skips
+  # (evaluator-b2 on #4115). That is CANNOT RUN, not a clean index.
+  if [[ "$EXAMINED" -eq 0 ]]; then
+    echo "[research-index] CANNOT RUN: --all examined 0 numbered docs under $REPO/research (no topic folder with a README.md held one); nothing was audited, so this is not a pass" >&2
+    exit 2
+  fi
 fi
 
 if [[ -n "$MISSING" ]]; then

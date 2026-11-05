@@ -42,15 +42,55 @@
 #   new: the OK notice goes out with ZAO_STATUS_NO_TAG=1. zao-status tagged Zaal on any
 #     message containing "approve", so a doc titled "how ZAO holders can approve a ZIP"
 #     tagged him on a routine deploy.
+#
+# --- v5 (2026-10-21, ZAOOS #4063): it keeps ITSELF current, and the skip is on. -------
+# v4 was merged on 2026-10-08 and never reached the VPS: cron kept running the
+# 2026-09-17 copy in ~/bin, which has no non-bot skip, so ZOE restarted 22 times
+# across 23 merges from 2026-10-19 (research doc 2692). The deploy path was updated
+# by hand, and nothing compared it with main.
+#   SELF-REFRESH (ZOE_AUTODEPLOY_SELF_REFRESH, default 1): after the fetch, when this
+#     file differs from origin/main:scripts/zoe-autodeploy.sh in the live clone, the
+#     origin copy replaces it and is re-run once. The origin copy must pass `bash -n`
+#     and carry the ZOE_AUTODEPLOY_SELF_REFRESH marker (so a refresh can never install
+#     a script that would not keep itself current), or it is refused, a BLOCKED notice
+#     is sent and this copy carries on. ZOE_AUTODEPLOY_REFRESHED=1 marks the re-run, so
+#     a copy that still differs after one refresh is reported, never looped.
+#   ZOE_AUTODEPLOY_SKIP_NONBOT now defaults to 1. 0 restores a restart on every merge.
+#   ZOE_AUTODEPLOY_LIVE overrides the live clone path (tests).
+# The first install of v5 is still by hand (`cp scripts/zoe-autodeploy.sh ~/bin/`); after
+# that, merges to main reach the VPS without one. scripts/vps-staleness-check.sh reports
+# a drifted script or a lagging clone.
 set -uo pipefail
 exec 9>/tmp/zoe-autodeploy.lock; flock -n 9 || exit 0
 [ -f /tmp/zoe-autodeploy.HOLD ] && exit 0
 export XDG_RUNTIME_DIR="/run/user/$(id -u)"
 export DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$(id -u)/bus"   # touch this file to pause deploys
 
-LIVE=/home/zaal/zao-bot-live
+LIVE="${ZOE_AUTODEPLOY_LIVE:-/home/zaal/zao-bot-live}"
 cd "$LIVE" || exit 1
 git fetch origin main --quiet 2>/dev/null || exit 0
+
+# --- v5 self-refresh: run main's copy of this script, not a hand-installed one ---
+SELF="$(readlink -f "$0" 2>/dev/null || echo "$0")"
+if [ "${ZOE_AUTODEPLOY_SELF_REFRESH:-1}" = 1 ] && [ -f "$SELF" ]; then
+  NEW="$SELF.new.$$"
+  if git show origin/main:scripts/zoe-autodeploy.sh > "$NEW" 2>/dev/null && [ -s "$NEW" ] && ! cmp -s "$NEW" "$SELF"; then
+    if [ "${ZOE_AUTODEPLOY_REFRESHED:-0}" = 1 ]; then
+      rm -f "$NEW"
+      ~/bin/zao-status "autodeploy BLOCKED: still differs from origin/main after one self-refresh; running this copy, not looping" 2>/dev/null
+    elif bash -n "$NEW" 2>/dev/null && grep -q 'ZOE_AUTODEPLOY_SELF_REFRESH' "$NEW"; then
+      chmod +x "$NEW" && mv -f "$NEW" "$SELF"
+      ZAO_STATUS_NO_TAG=1 ~/bin/zao-status "autodeploy updated itself to origin/main $(git rev-parse --short origin/main)" 2>/dev/null
+      exec 9>&-
+      ZOE_AUTODEPLOY_REFRESHED=1 exec "$SELF" "$@"
+    else
+      rm -f "$NEW"
+      ~/bin/zao-status "autodeploy BLOCKED: origin/main's zoe-autodeploy.sh fails bash -n or lacks the self-refresh marker; not installed, running this copy" 2>/dev/null
+    fi
+  else
+    rm -f "$NEW"
+  fi
+fi
 LOCAL=$(git rev-parse HEAD 2>/dev/null); REMOTE=$(git rev-parse origin/main 2>/dev/null)
 [ "$LOCAL" = "$REMOTE" ] && exit 0
 
@@ -129,7 +169,7 @@ ESB_RC=$?
 # in packages/heart-fleet). META_OK stays 0 if this build or its metafile fails in any
 # way, and then nothing is skipped.
 META_OK=0; EXTRA=()
-if [ "${ZOE_AUTODEPLOY_SKIP_NONBOT:-0}" = 1 ] && \
+if [ "${ZOE_AUTODEPLOY_SKIP_NONBOT:-1}" = 1 ] && \
    "$ESB" bot/src/zoe/index.ts --bundle --platform=node --format=esm --outfile=/dev/null --packages=external --metafile="$V/.zoe-meta.json" >/dev/null 2>&1; then
   META_LIST=$(python3 - "$V/.zoe-meta.json" <<'PY'
 import json, sys
@@ -155,7 +195,7 @@ fi
 # clone still moves to origin/main so it stays current. `git diff --quiet` exits 0
 # only when it read both commits and found no change; 1 (changed) and 128 (could not
 # read) both fall through to the normal deploy, as does META_OK=0.
-if [ "${ZOE_AUTODEPLOY_SKIP_NONBOT:-0}" = 1 ] && [ "$META_OK" = 1 ] && git -C "$LIVE" diff --quiet "$LOCAL" "$REMOTE" -- bot/ "${EXTRA[@]+"${EXTRA[@]}"}" 2>/dev/null; then
+if [ "${ZOE_AUTODEPLOY_SKIP_NONBOT:-1}" = 1 ] && [ "$META_OK" = 1 ] && git -C "$LIVE" diff --quiet "$LOCAL" "$REMOTE" -- bot/ "${EXTRA[@]+"${EXTRA[@]}"}" 2>/dev/null; then
   cd "$LIVE"
   if [ -z "$(git status --porcelain --untracked-files=no)" ]; then
     git merge --ff-only --quiet origin/main 2>/dev/null || true

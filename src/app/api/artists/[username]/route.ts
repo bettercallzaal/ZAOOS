@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { ENV } from '@/lib/env';
+import { neynarRead } from '@/lib/farcaster/neynar';
 import { logger } from '@/lib/logger';
 
 const paramsSchema = z.object({
@@ -88,8 +88,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ user
 
       // Neynar follower count
       user.fid
-        ? fetch(`https://api.neynar.com/v2/farcaster/user/bulk?fids=${user.fid}`, {
-            headers: { 'x-api-key': ENV.NEYNAR_API_KEY },
+        ? neynarRead(`/user/bulk?fids=${user.fid}`, {
             signal: AbortSignal.timeout(5000),
           }).then((r) => (r.ok ? r.json() : null))
         : Promise.resolve(null),

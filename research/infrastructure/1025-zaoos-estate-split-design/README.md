@@ -1,15 +1,18 @@
 ---
 topic: infrastructure
 type: design
-status: design-approved
+status: superseded
 last-validated: 2026-07-10
-superseded-by:
+superseded-by: 2691
 related-docs: 998, 836, 601, 1021
 original-query: "the ZAO OS should be just a library of docs and research on ai and agentic coding - take everything else out and move to a new repo"
 tier: DEEP
 ---
 
 # 1025 - ZAOOS Estate Split: Docs-Library + Code-Out
+
+
+> **Superseded 2026-10-20 by [doc 2691](../2691-zaoos-graduation-map-2026-10/)** (docs-only ZAOOS split, never executed; ZAOOS stays the lab per Zaal 2026-10-20). Kept as the record of what was planned.
 
 > **Goal:** Turn ZAOOS from a monorepo-lab into a pure docs/research library, and give the code proper homes - reusing existing repos where they fit instead of minting new ones. Approved by Zaal in the 2026-07-10 brainstorm. This is the target architecture; the actual migration is a separate staged plan (high-risk: a live Vercel app + the VPS bot clone + years of history all relocate).
 

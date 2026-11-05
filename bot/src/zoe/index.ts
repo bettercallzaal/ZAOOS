@@ -66,6 +66,7 @@ import {
 } from './x-desk';
 import { NO_SPINNER, startThinkingSpinner, thinkingSpinnerEnabled } from './thinking-spinner';
 import { sendTerminalsDigest, terminalsDigestEnabled, readTerminalsPage, parseTerminalsPage, vaultDir as terminalsVaultDir } from './terminals-digest';
+import { statusCommandHandler, statusRefreshHandler } from './recent-activity';
 import { captureTerminalTypedReply, maybeSendTailCard, recordTerminalAnswer, sendNextTerminalCard, setPendingType, tailCardScopeAllowed, terminalGrillEnabled } from './terminal-grill';
 import { formatPrList, inboxNudgeEnabled, mergeCommand, parsePrCallback, readTotals } from './inbox-nudge';
 import { RESUME_ROW, STOP_ROW, grillStopEnabled, setGrillPaused } from './grill-pause';
@@ -139,7 +140,7 @@ import {
   NUDGE_CALLBACK,
 } from './nudges';
 import { attentionEnabled, recordTap, showAllAction, tapFamily, SHOW_ALL_CALLBACK } from './attention';
-import { mirrorTurn, recall, TURN_RECALL_TIMEOUT_MS } from './recall';
+import { mirrorTurn, recall, recallAllowedForTurn, TURN_RECALL_TIMEOUT_MS } from './recall';
 import { backgroundRecallMs, newRecallCarry, turnRecall } from './recall-carry';
 import { fanOutKnowledgeExtractors, EXTRACT_MIN_LEN } from './extractors';
 import { transcriptionConfigured, transcribeTelegramFile, downloadTelegramFile } from './transcribe';
@@ -148,6 +149,8 @@ import {
   addAllowlistMember,
   autoRegisterGroup,
   detectGroupEscalation,
+  engagedUntilFor,
+  markEngaged,
   getGroupConfig,
   isBotMentioned,
   removeAllowlistMember,
@@ -268,6 +271,7 @@ import {
 import type { PendingBonfireSubmission } from './approvals';
 import { attachCaster } from './caster';
 import { handleCastTrigger } from './caster/trigger';
+import { registerFinalReview } from './final-review/wire';
 import { subscribeToCasts } from './farcaster/event-stream';
 import {
   getPendingReply,
@@ -576,6 +580,7 @@ bot.command("help", async (ctx) => {
       "/grill - Answer pending decision cards",
       "/board - Show all open cards and active lanes",
       "/working - Tasks currently in progress",
+      "/status - The last ten things ZOE did",
       "/pulse - Health, models, and spend snapshot",
       "/companion - Live companion pulse and countdown",
       "/focus - Toggle hyperfocus mode",
@@ -897,6 +902,10 @@ bot.callbackQuery(/^inb:cmd:/, async (ctx) => {
   featureRan('inbox-nudge', 'merge command');
 });
 
+// ZOE final reviewer (ZOE_FINAL_REVIEW=1, default OFF): one merge-request card,
+// a tap re-checks head + CI and replies the pinned zao-merge line. Never merges.
+registerFinalReview(bot, { zaalId, ownerOnly, isFromZaal, scopeOf: chatScopeFor });
+
 bot.command(['grill', 'needsme'], async (ctx) => {
   if (!(await ownerOnly(ctx))) return;
   if (await sendNextTerminalItem()) return;
@@ -919,6 +928,12 @@ bot.command('terminals', async (ctx, next) => {
   const r = await sendTerminalsDigest({ send: (text) => ctx.reply(text), scheduled: false });
   if (r === 'sent') featureRan('terminals-digest', 'command');
 });
+
+// /status - the last ten things ZOE did: features that ran, sends, things she could
+// not do (recent-activity.ts). Read-only, owner-only. ZOE_STATUS_COMMAND=0 turns it
+// off and the command falls through, so the word is not swallowed.
+bot.command('status', statusCommandHandler({ zaalId, ownerOnlyState }));
+bot.callbackQuery('zst:refresh', statusRefreshHandler({ zaalId, ownerOnlyState }));
 
 // /working - list tasks currently in_progress with how long they've been in that state
 bot.command('working', async (ctx) => {
@@ -2707,6 +2722,7 @@ bot.on('message:text', async (ctx) => {
 
   const gate = shouldRespond(cfg, {
     fromId,
+    engagedUntil: engagedUntilFor(chatId, fromId),
     botUsername: usernameHolder.value,
     botId: botIdHolder.value,
     messageText: text,
@@ -3833,7 +3849,7 @@ async function dispatchConcierge(
     // running after that keeps going in the background and its result is used
     // on the next message in this chat (Bonfire delves measured ~14 s).
     let recallContext: string | undefined;
-    if (scope === 'private' && text.trim().length >= 12 && !wantsLinkResearch(text)) {
+    if (recallAllowedForTurn(scope, text, wantsLinkResearch(text))) {
       try {
         const r = await turnRecall(
           recallCarry,
@@ -4081,6 +4097,12 @@ async function dispatchConcierge(
         replyToMessageId: scope === 'private' ? undefined : ctx.message?.message_id,
       });
     }
+    // A reply was SENT in a group: for a while everyone's next lines in this
+    // chat reach ZOE without a re-mention (groups.ts, the chat-wide engaged
+    // window, item 135). Zaal's own mention opens it too ("after any
+    // @mention"). Only here, after the send, so an empty or guarded reply
+    // opens no window; the per-sender turn cap lives in groups.ts.
+    if (scope !== 'private' && ctx.from) markEngaged(scope, ctx.from.id);
 
     // The tail question (terminal-grill.ts, ZOE_TAIL_QUESTION, doc 2679 PR 3):
     // after answering Zaal in his DM, the first waiting seat item follows as its

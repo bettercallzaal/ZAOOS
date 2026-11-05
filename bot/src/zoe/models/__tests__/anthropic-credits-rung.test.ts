@@ -89,12 +89,12 @@ describe('hasAnthropicCreditsRung', () => {
 
 describe('ladder order', () => {
   it('puts anthropic-credits first when enabled', () => {
-    setEnv({ ZOE_ANTHROPIC_API_RUNG: '1', ZOE_ANTHROPIC_CREDITS_KEY: 'k', OPENROUTER_API_KEY: 'or' });
+    setEnv({ ZOE_ANTHROPIC_API_RUNG: '1', ZOE_ANTHROPIC_CREDITS_KEY: 'k', OPENROUTER_API_KEY: 'or', ZOE_OPENROUTER_RUNG: '1' });
     expect(capFallbackProviders()).toEqual(['anthropic-credits', 'openrouter']);
   });
 
   it('leaves the ladder unchanged when disabled', () => {
-    setEnv({ ZOE_ANTHROPIC_CREDITS_KEY: 'k', OPENROUTER_API_KEY: 'or' });
+    setEnv({ ZOE_ANTHROPIC_CREDITS_KEY: 'k', OPENROUTER_API_KEY: 'or', ZOE_OPENROUTER_RUNG: '1' });
     expect(capFallbackProviders()).toEqual(['openrouter']);
   });
 });
@@ -139,7 +139,7 @@ describe('callCapFallback through the credits rung', () => {
   });
 
   it('treats a 200 with no text as a failure and falls through to OpenRouter', async () => {
-    setEnv({ ZOE_ANTHROPIC_API_RUNG: '1', ZOE_ANTHROPIC_CREDITS_KEY: 'k', OPENROUTER_API_KEY: 'or' });
+    setEnv({ ZOE_ANTHROPIC_API_RUNG: '1', ZOE_ANTHROPIC_CREDITS_KEY: 'k', OPENROUTER_API_KEY: 'or', ZOE_OPENROUTER_RUNG: '1' });
     let call = 0;
     globalThis.fetch = vi.fn(async () => {
       call++;
@@ -151,7 +151,7 @@ describe('callCapFallback through the credits rung', () => {
   });
 
   it('falls through on an API error, e.g. credits exhausted', async () => {
-    setEnv({ ZOE_ANTHROPIC_API_RUNG: '1', ZOE_ANTHROPIC_CREDITS_KEY: 'k', OPENROUTER_API_KEY: 'or' });
+    setEnv({ ZOE_ANTHROPIC_API_RUNG: '1', ZOE_ANTHROPIC_CREDITS_KEY: 'k', OPENROUTER_API_KEY: 'or', ZOE_OPENROUTER_RUNG: '1' });
     let call = 0;
     globalThis.fetch = vi.fn(async () => {
       call++;

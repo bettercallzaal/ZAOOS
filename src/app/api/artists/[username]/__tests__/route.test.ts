@@ -972,7 +972,7 @@ describe('GET /api/artists/[username]', () => {
       expect(mockFetch).toHaveBeenCalledWith(
         'https://api.neynar.com/v2/farcaster/user/bulk?fids=666',
         expect.objectContaining({
-          headers: { 'x-api-key': 'test-neynar-key' },
+          headers: { 'Content-Type': 'application/json', 'x-api-key': 'test-neynar-key' },
         }),
       );
     });

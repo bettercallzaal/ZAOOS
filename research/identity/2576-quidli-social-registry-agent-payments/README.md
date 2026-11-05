@@ -2,9 +2,9 @@
 topic: identity
 type: decision
 status: research-complete
-last-validated: 2026-10-12
+last-validated: 2026-10-22
 superseded-by:
-related-docs: "891, 316, 291, 2181, 2230"
+related-docs: "891, 316, 291, 2181, 2230, 2577, 2673, 2699"
 original-query: "/zao-research https://farcaster.xyz/ahn.eth/0xafbc3695"
 tier: DEEP
 ---
@@ -32,10 +32,133 @@ from the documentation. What changed is marked throughout.
 | 5 | **The cast's premise does not survive its reply thread, and ZAO should not repeat it.** | `@unify34`: *"Unfortunately by law in certain places a KYC is required"*, unanswered. Removing a platform's KYC demand on a recipient does not remove ZAO's obligation as a payer. |
 | 6 | **Treat this as a funded 2018 company on its seventh positioning, not a new protocol.** It is not vapour and it is not new. | **QUIDLI SARL, France, SIREN 844760272, incorporated 2018-11-29**, plus **QUIDLI INC.** in Delaware (file 7066264). Same CEO, same GitHub org since 2018-03-21, and **seven distinct taglines** on `quid.li` between 2018 and 2025. Backed by **Tachyon (ConsenSys Ventures) from Q3 2018**. |
 
+## Delta, 2026-10-22: re-validated, then measured against The ZAO's own flows
+
+**Why this delta.** Zaal, 2026-10-22: review this tech and see how effective it
+can be for The ZAO. Part 1 re-checks what changed since 2026-10-12. Part 2 takes
+each ZAO flow that moves money and asks what Quidli would replace, what it costs,
+what it needs, and what could go wrong. **The Key Decisions above stand.** Nothing
+was spent or signed, no key or wallet was set, and no MCP config was changed.
+
+### Part 1: what changed since 2026-10-12
+
+| Check | 2026-10-12 | 2026-10-22 | Method |
+|---|---|---|---|
+| Hosted MCP version | 0.6.5 | **0.6.7** | curl JSON-RPC `initialize` to `https://mcp.connect.quid.li/` |
+| Tools, and which spend | 14, 3 destructive | **14, the same 3 destructive** (`connect_drop`, `connect_trust_create`, `connect_trust_revoke`) | `tools/list` |
+| npm `@quidli/connect-mcp` | (not recorded) | latest **0.6.12**, six releases 2026-10-15 to 10-17; **1,668 downloads** 2026-09-19 to 10-18 | `registry.npmjs.org`, `api.npmjs.org` |
+| GitHub mirror | pushed 2026-10-07 | pushed **2026-10-17**; **32 commits since 2026-10-12, every one** `chore: sync from sns-backend` or `chore: restore mirror content after sync`; `package.json` says 0.6.7 while npm says 0.6.12; 7 stars, 1 fork | `gh api repos/Quidli/connect-mcp` and `/commits?since=2026-10-12` |
+| Issues | #1 (host bug), #2 (outreach) open, no team reply | same two still open, plus **#3** (2026-10-17, another outside pitch). No team reply on any | `gh api .../issues?state=all` |
+| Spend cap in the client | none | **still none**: `src/x402-fetch.ts` line 39 is `return wrapFetchWithPayment(fetch, client);` | codeload tarball of `main`, grep |
+| Chains (`GET /chains`) | 9, 8 mainnet | **11, 10 mainnet**: adds **Monad (143)** and **Robinhood Chain (4663)**. `drop` is true on all 11 | curl, JSON |
+| Read prices (`/price` and `connect_get_price`) | 0 and 0 | **0 and 0**, still free | curl and MCP |
+| A provenance field on `/lookup` | absent | **still absent**. `RecipientWithWalletDto` has the same six fields: `did`, `type`, `value`, `ethWalletAddress`, `solWalletAddress`, `amountInWei` | `https://api.connect.quid.li/openapi.json`, 49,226 bytes, schemas parsed |
+| `connect_lookup` farcaster/zaal | `0x4238...3E76`, nonce 0 | **the same ETH and SOL addresses, still nonce 0** on Base and Ethereum. Control on the same endpoints: a known-active address reads nonce 70 on Base and 5,969 on Ethereum | MCP, then `eth_getTransactionCount` on `mainnet.base.org` and `ethereum-rpc.publicnode.com` |
+| `connect_lookup_exposed` farcaster/zaal | `accountCount: 0` | **`accountCount: 0`, `hasWallets: false`** | MCP |
+| `connect_scores_by_account` farcaster/zaal | 98 | **98** (Neynar 0.98, Lens 0.8) | MCP |
+| Homepage `quidli.xyz` | "claim them" playground copy | **New tagline: "The open payment layer for the agent economy"**. Claims "50+ Weekly MCP Downloads", "6M+ Indexed Social Accounts", "10 Chains". **Says lookup returns "a verified EVM or Solana wallet"** | curl + HTML strip, 81,612 bytes |
+| `docs.quid.li` | HTTP 403 | **HTTP 403** | curl |
+| Pricing for an API key or Smart Send | not published | **still not published.** The spec says only "x-api-key (subscription)"; no price on the homepage or the README | the three sources above |
+| Is the Quidli MCP installed on this Mac? | no | **no.** No `quidli` entry in `mcpServers`, top-level or per-project, in the two `.claude.json` files read; no `.mcp.json` in this worktree | `python3` read of those files |
+
+**Two of these matter.**
+
+1. **The homepage now says lookup returns "a verified" wallet.** Measured on
+   Zaal's own handle, it returns an address that is not one of his six
+   Farcaster-verified addresses and has never sent a transaction. That claim is
+   wrong for the one handle tested, and the API still has no field that would let
+   a caller check it. **The invalidation condition this doc set on 2026-10-12, "a
+   provenance or confidence field on `/lookup`", has not been met.**
+2. **The release pace is real and the repo is a one-way mirror.** Six npm
+   releases in three days, no human-written commit in the public repo, and no
+   reply to any outside issue. Anyone installing it trusts a private backend they
+   cannot read, and pinning matters: `npx -y @quidli/connect-mcp` takes whatever
+   is latest.
+
+### Part 2: every ZAO money flow, one at a time
+
+Read from `origin/main` code, not from memory. File paths are ZAOOS unless said.
+
+| ZAO flow | What we do today | What Quidli would change | Needs | Verdict |
+|---|---|---|---|---|
+| **Artist tips by Farcaster handle** (Spaces) | The tipper signs in their own wallet; `src/app/api/spaces/tips/route.ts` records `txHash`, `amount`, `chain` and `recipientFid` after the fact, behind `getSessionData()` and Zod. Recipient addresses come from Neynar `verified_addresses` (`src/app/api/users/wallet/route.ts`) | Replace the address step with `connect_lookup`. **Worse:** for `zaal` it returns an address that is not one of his verified wallets | Nothing for reads; an API key and a funded Quidli wallet to send | **Do not use.** Neynar already gives the recipient's own verified wallet, and we hold the key |
+| **Respect and ZOLs** | Respect is read and synced from chain per member wallet (`src/app/api/respect/*`, `src/app/api/fractals/member/[wallet]`). ZAO members join with a wallet, so every recipient already has an address we know | Nothing. Quidli sends tokens; it cannot mint or award Respect, and it would resolve a member to a different address than the one they joined with | n/a | **Do not use.** No problem for it to solve |
+| **WaveWarZ prizes and team payout** | Solana. The team split lives in `bettercallzaal/wwtracker` `lib/distributions.ts` (doc 2673: 33/22/22/22, which sums to 99, and empty wallet fields) | Quidli is the **only** tool reviewed so far that can send SOL or SPL to a handle (Splits cannot touch Solana, doc 2673). But a send comes **from the API-key owner's Quidli embedded wallet**, so treasury funds would first move into a wallet Quidli provisions, and X handles resolve to fresh wallets (doc 2576 headline: `twitter/jack` nonce 0) | API key (price unknown), SOL moved into a Privy wallet, gas | **Do not use.** Fix the 99% split and fill the wallet fields first; the team and the artists can give their own addresses |
+| **ZAOstock artist pay** (the 7 acts who played on 2026-10-03) | Not built in code; the KYC and reporting decision for payouts was due 2026-10-17 and **no written decision was found** (searched: ZAO decision records by "KYC" and "quidli", 2026-10-22) | Pay by handle. Several acts have no on-chain identity at all, which no handle resolver can fix (doc 2577) | KYC and tax reporting apply to ZAO as payer whatever the rail (Key Decision 5) | **Do not use.** Fiat, or each act's own confirmed wallet |
+| **The new ZAO Agent paying for tools** (doc 2699) | ZOE already pays Neynar over x402 with a **fixed** 0.01 USDC per call (`bot/src/zoe/farcaster/x402.ts`); a fixed amount is a cap by construction. Agent wallets in `src/lib/agents/wallet.ts` are Privy server wallets **with signing-time spending policies**. Doc 2699 Key Decision 4 sends every money call to a Zaal approval card | Quidli's client pays whatever a `402` asks, with no maximum, and `CONNECT_API_BASE_URL` can point it at any host | An `EVM_PRIVATE_KEY` or API key in the agent | **Do not use for payments.** The read tools could sit in the agent as open (free) tools, except `connect_lookup`, which **provisions a wallet for a third party** and so belongs on the gated list |
+| **Paying someone with no wallet at all** (a bounty winner who only has GitHub or email) | Ask them to make a wallet, or pay fiat | This is Quidli's real strength: a claimable Privy wallet, made for them, that they get by signing in | API key, a funded Quidli wallet, and telling the person how to claim | **The one fit**, small amounts only, Zaal's tap, and the recipient told first |
+
+**Cost, as far as it can be measured.** Reads are free today (`/price` returns 0
+for lookup and scores). Sending needs an API key on a "subscription" whose price is
+not published anywhere we could read (`docs.quid.li` returns 403), or x402 USDC per
+request where priced, plus gas and the tokens themselves. **The cost of using it for
+ZAO payouts is therefore UNKNOWN**, not zero. What it would replace costs nothing:
+Neynar verified addresses (key already held), the keyless Farcaster hub, and asking
+the payee.
+
+**What it needs, in full.** For reads: nothing, no key, no wallet, no KYC. For
+sends: a Quidli Connect account (a Privy sign-in), an API key, and funds in that
+account's embedded wallet on the chain you send from. No KYC is asked of the
+recipient; the homepage says stricter checks, "KYC included", are available "only
+where a payment needs them", which is a sales contact, not a documented feature.
+
+**Risks, ranked.**
+
+1. **Wrong destination, silently.** Measured on Zaal's own handle twice, ten days
+   apart: a payout address that is not his wallet, with no flag. Money sent there
+   waits for a claim the recipient does not know about.
+2. **No spend cap** in the client, and a configurable payment host.
+3. **Custody shift.** Sends come from a Quidli-provisioned embedded wallet, so ZAO
+   funds would sit in a wallet whose additional signers are not publicly stated
+   (Privy allows `additional_signers`; doc section above, UNKNOWN).
+4. **Side effects on third parties.** A lookup provisions a wallet for the person
+   looked up. That is an action on someone who did not ask.
+5. **Supply chain.** A one-way mirror of a private backend, six releases in three
+   days, outside issues unanswered.
+6. **Reputation score** still tracks Ethos (Key Decision 3); it would rank Maine
+   musicians as strangers.
+
+### Use it for / do not use it for (ranked)
+
+| Rank | Use it for | Why |
+|---|---|---|
+| 1 | **Reading what a person chose to expose**, with `connect_lookup_exposed`, when an artist says "find me on Quidli" | Free, keyless, consent-based: it lists only what the owner exposed |
+| 2 | **Onboarding one person who has no wallet at all**, a small payment sent by Zaal from his own account with claim instructions sent first | The claimable generated wallet is the product's genuine strength; it is the only case where "a wallet made for you" is what we want |
+| 3 | **Watching it.** Re-check when a provenance field appears on `/lookup` | That one field would change Key Decision 1 |
+
+| Rank | Do not use it for | Why |
+|---|---|---|
+| 1 | **Paying anyone who already has a wallet**: Farcaster artists, the 188 members, Respect holders | Measured: may pay a fresh wallet instead of theirs, with no flag |
+| 2 | **WaveWarZ prizes or the team payout** | Treasury funds would move into a Quidli wallet first; X handles resolve to fresh wallets; fix the 99% split first anyway |
+| 3 | **ZAOstock artist pay** | KYC and reporting are ZAO's as payer; several acts have no on-chain identity |
+| 4 | **The ZAO Agent's x402 payments** | No spend cap; ZOE's own x402 path is fixed-price already |
+| 5 | **Reputation gating** (who gets a reward, who is "real") | The score mostly measures Ethos |
+| 6 | **On-chain trust attestations** (`connect_trust_create`) | Public, irreversible, costs gas, and provisions a wallet for the target |
+
+### Next Actions (2026-10-22; supersedes the table further down)
+
+| Action | Owner | Type | By When |
+|--------|-------|------|---------|
+| **Still open from 2026-10-12:** add `EVM_PRIVATE_KEY` and `CONNECT_API_KEY` to the variables no lane may hold. Not done: `AGENTS.md` on `origin/main` (173 lines) has no line naming either, read 2026-10-22. SHIPPED = the line exists | @Zaal (a lane can draft the PR) | PR | 2026-10-29 |
+| **Still open:** the KYC and reporting decision for ZAOstock artist pay, independent of any rail. SHIPPED = a written decision on record | @Zaal | Decision | 2026-10-29 |
+| Optional, Zaal's own account: sign in at `connect.quid.li` with Farcaster `zaal` and see whether `0x4238...3E76` is shown as his claimable wallet. Settles the Privy-pregeneration hypothesis. SHIPPED = a one-line result appended here | @Zaal | Test | none set |
+| Re-run Part 1. **Invalidation condition, not a date:** a provenance field on `/lookup`, a published spend cap, or a public price for Smart Send. SHIPPED = a delta section here | quidli lane | Re-research | 2026-11-19 |
+| Classify `connect_lookup` as a gated tool if the ZAO Agent ever lists Quidli tools (it provisions a wallet for a third party). SHIPPED = a line in that agent's gate table | ZAO Agent lane | Spec | when doc 2699 PR 2 (`core/gates.ts`) is built |
+
+### Sources for this delta (all fetched 2026-10-22, keyless, nothing spent)
+
+- `https://mcp.connect.quid.li/` - **[FULL, method: curl JSON-RPC]** `initialize`, `tools/list`, `tools/call` for `connect_get_price`, `connect_lookup`, `connect_lookup_exposed`, `connect_scores_by_account` (farcaster `zaal` only)
+- `https://api.connect.quid.li/price`, `/chains`, `/openapi.json` - **[FULL, method: curl, JSON parsed]**
+- `https://quidli.xyz` - **[FULL, method: curl + HTML strip]**; `https://quid.li` - **[FULL]**, unchanged title; `https://connect.quid.li` - **[PARTIAL, JS shell, 17 bytes of visible text]**; `https://docs.quid.li` - **[FAILED, HTTP 403]**
+- `github.com/Quidli/connect-mcp` - **[FULL, method: `gh api` for repo, commits, issues; codeload tarball of `main` for `src/` and `README.md`]**
+- `registry.npmjs.org/@quidli/connect-mcp`, `api.npmjs.org/downloads/point/last-month/@quidli/connect-mcp` - **[FULL, method: curl, JSON]**
+- `mainnet.base.org`, `ethereum-rpc.publicnode.com` - **[FULL, method: JSON-RPC with a known-active control address]**
+- ZAOOS `origin/main` files cited by path in Part 2 - **[FULL, method: `git show`]**
+
 ## Delta, 2026-10-12: re-run on Zaal's own handle, nothing spent
 
 This is the re-run the Next Actions table asked for, done on the evening of
-2026-10-12 for a try-it guide (vault `notes/quidli-try-it-2026-10-13.md`). The
+2026-10-12 for a private try-it guide written for Zaal. The
 only identity looked up was Zaal's own (`farcaster/zaal`, FID 19640). His X and
 GitHub handles were scored, not looked up, because `connect_lookup` now says it
 provisions a wallet for anyone who has none. **The Key Decisions above stand
@@ -475,10 +598,12 @@ adjudicate. The ETH answer, by contrast, matches Neynar's primary exactly.
 
 ## Next Actions
 
+**Superseded on 2026-10-22** by the Next Actions table in the 2026-10-22 delta near the top of this doc. Kept as the record of what was asked on 2026-10-12.
+
 | Action | Owner | Type | By When |
 |--------|-------|------|---------|
 | Add `EVM_PRIVATE_KEY` and `CONNECT_API_KEY` to the variables no lane may hold. SHIPPED = the line exists in AGENTS.md | @Zaal | PR | 2026-10-10 |
-| Decide the KYC and reporting question for ZAOstock artist payouts with whoever advises on finance, independent of any payment rail. SHIPPED = a written answer in the vault decisions folder | @Zaal | Decision | 2026-10-17 |
+| Decide the KYC and reporting question for ZAOstock artist payouts with whoever advises on finance, independent of any payment rail. SHIPPED = a written decision on record | @Zaal | Decision | 2026-10-17 |
 | If artist payouts by handle are still wanted, test coverage for the 8 ZAOstock acts YOURSELF (not via a lane) and check every returned address's nonce before sending anything. SHIPPED = a result table appended here with 8 rows and a nonce per address | @Zaal | Test | 2026-10-24 |
 | Re-run the `/scores` comparison and the nonce check. **Invalidation condition, not just a date:** this doc's decisions change if Quidli adds a provenance or confidence field to `/lookup`, or if `quidliScore` stops tracking Ethos. SHIPPED = a delta section appended here | @Zaal | Re-research | 2026-10-29 |
 

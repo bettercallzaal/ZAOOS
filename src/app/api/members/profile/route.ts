@@ -47,7 +47,8 @@ export async function GET(req: NextRequest) {
       proposalsResult,
       votesResult,
     ] = await Promise.allSettled([
-      // 1. Neynar user data
+      // 1. Neynar user data. Stays on Neynar: reads power_badge and viewer_context,
+      // which Hypersnap does not return (doc 2418 D6 PR 3)
       fetch(`${NEYNAR_BASE}/user/bulk?fids=${fid}&viewer_fid=${session.fid}`, {
         headers: {
           'Content-Type': 'application/json',
@@ -74,7 +75,7 @@ export async function GET(req: NextRequest) {
         .eq('is_active', true)
         .maybeSingle(),
 
-      // 4. Active Farcaster channels
+      // 4. Active Farcaster channels. Stays on Neynar: Hypersnap's channels carry no image_url
       fetch(`${NEYNAR_BASE}/user/channels?fid=${fid}&limit=20`, {
         headers: {
           'Content-Type': 'application/json',

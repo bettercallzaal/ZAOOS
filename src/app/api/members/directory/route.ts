@@ -1,7 +1,14 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { logger } from '@/lib/logger';
+import {
+  applyWalletVisibility,
+  isPublicProfileColumnMissing,
+  memberScope,
+  projectPublicMember,
+} from '@/lib/members/public-profile';
 
 const querySchema = z.object({
   search: z.string().max(200).optional(),
@@ -19,9 +26,50 @@ const querySchema = z.object({
   offset: z.coerce.number().int().min(0).default(0),
 });
 
+type Text = string | null;
+
+/** One row of the users select below. */
+interface DirectoryUser {
+  id: string;
+  fid: number | null;
+  username: Text;
+  display_name: Text;
+  pfp_url: Text;
+  primary_wallet: Text;
+  preferred_wallet: Text;
+  custody_address: Text;
+  verified_addresses: string[] | null;
+  ens_name: Text;
+  bio: Text;
+  role: Text;
+  member_tier: Text;
+  zid: number | null;
+  real_name: Text;
+  discord_id: Text;
+  tags: string[] | null;
+  bluesky_handle: Text;
+  x_handle: Text;
+  instagram_handle: Text;
+  soundcloud_url: Text;
+  spotify_url: Text;
+  audius_handle: Text;
+  solana_wallet: Text;
+  location: Text;
+  last_login_at: Text;
+  last_active_at: Text;
+  created_at: string;
+  respect_member_id: Text;
+  hidden_wallets: string[] | null;
+  public_name?: Text;
+  public_fields?: string[] | null;
+}
+
 /**
  * GET /api/members/directory — Unified member directory
- * PUBLIC — no auth required. Used by /members page.
+ * PUBLIC: no auth required. Used by /members page. Without a member session it
+ * lists only members who picked a public name and only the fields they turned on.
+ * Filters and sorts on hidden columns would reveal them, so that view filters the
+ * projected records and always sorts by public name.
  * Joins users + respect_members + community_profiles into one response.
  */
 export async function GET(req: NextRequest) {
@@ -47,6 +95,9 @@ export async function GET(req: NextRequest) {
   } = parsed.data;
 
   try {
+    const session = await getSessionData();
+    const isPublicView = !session;
+
     // ── Step 1: Fetch base user list ─────────────────────────────────────────
     let query = supabaseAdmin
       .from('users')
@@ -80,38 +131,46 @@ export async function GET(req: NextRequest) {
         last_login_at,
         last_active_at,
         created_at,
-        respect_member_id
+        respect_member_id,
+        hidden_wallets${isPublicView ? ', public_name, public_fields' : ''}
       `,
         { count: 'exact' },
       )
       .eq('is_active', true);
 
+    if (isPublicView) {
+      query = query.not('public_name', 'is', null).order('public_name', { ascending: true });
+      if (search) {
+        query = query.ilike('public_name', `%${search.replace(/[\\%_]/g, '\\$&')}%`);
+      }
+    }
+
     // Filters
-    if (tier && tier !== 'all') {
+    if (!isPublicView && tier && tier !== 'all') {
       query = query.eq('member_tier', tier);
     }
 
-    if (search) {
+    if (!isPublicView && search) {
       query = query.or(
         `display_name.ilike.%${search}%,username.ilike.%${search}%,real_name.ilike.%${search}%,ens_name.ilike.%${search}%`,
       );
     }
 
-    if (location) {
+    if (!isPublicView && location) {
       query = query.ilike('location', `%${location}%`);
     }
 
-    if (active_since) {
+    if (!isPublicView && active_since) {
       const days = active_since === '7d' ? 7 : active_since === '30d' ? 30 : 90;
       const since = new Date(Date.now() - days * 86400000).toISOString();
       query = query.gte('last_active_at', since);
     }
 
-    if (has_ens === 'true') {
+    if (!isPublicView && has_ens === 'true') {
       query = query.not('ens_name', 'is', null);
     }
 
-    if (platform) {
+    if (!isPublicView && platform) {
       const platformCol: Record<string, string> = {
         audius: 'audius_handle',
         spotify: 'spotify_url',
@@ -125,26 +184,38 @@ export async function GET(req: NextRequest) {
     }
 
     // Sort
-    switch (sort) {
-      case 'name':
-        query = query.order('display_name', { ascending: true, nullsFirst: false });
-        break;
-      case 'recent':
-        query = query.order('created_at', { ascending: false });
-        break;
-      case 'active':
-        query = query.order('last_active_at', { ascending: false, nullsFirst: false });
-        break;
-      case 'respect':
-      default:
-        query = query.order('zid', { ascending: true, nullsFirst: false });
-        break;
+    if (!isPublicView) {
+      switch (sort) {
+        case 'name':
+          query = query.order('display_name', { ascending: true, nullsFirst: false });
+          break;
+        case 'recent':
+          query = query.order('created_at', { ascending: false });
+          break;
+        case 'active':
+          query = query.order('last_active_at', { ascending: false, nullsFirst: false });
+          break;
+        default:
+          query = query.order('zid', { ascending: true, nullsFirst: false });
+          break;
+      }
     }
 
     const { data: users, error, count } = await query.range(offset, offset + parseInt(limit) - 1);
+    // Before the migration nobody can have opted in, so the public list is empty.
+    if (isPublicView && isPublicProfileColumnMissing(error)) {
+      return NextResponse.json({
+        members: [],
+        total: 0,
+        tiers: { respectHolders: 0, community: 0 },
+        filterOptions: { categories: [], locations: [] },
+        pagination: { limit: parseInt(limit, 10), offset, hasMore: false },
+      });
+    }
     if (error) throw error;
 
-    const userList = users || [];
+    // The select string is built at runtime, so Supabase cannot infer the row type.
+    const userList = (users || []) as unknown as DirectoryUser[];
     const fids = userList.map((u) => u.fid).filter(Boolean) as number[];
     const wallets = userList
       .map((u) => u.primary_wallet?.toLowerCase())
@@ -226,7 +297,7 @@ export async function GET(req: NextRequest) {
     }
 
     // ── Step 3: Build unified records with DB-level filters applied ───────────
-    let members = userList.map((u) => {
+    const fullMembers = userList.map((u) => {
       const respect =
         (u.fid ? respectMap[`fid:${u.fid}`] : null) ||
         (u.primary_wallet ? respectMap[`wallet:${u.primary_wallet.toLowerCase()}`] : null) ||
@@ -288,6 +359,27 @@ export async function GET(req: NextRequest) {
       };
     });
 
+    let members = fullMembers.map((m, i) => {
+      const u = userList[i];
+      if (isPublicView) return projectPublicMember(u, m);
+      return memberScope(session, u.fid) === 'full' ? m : applyWalletVisibility(u, m);
+    });
+
+    if (isPublicView) {
+      const since = active_since
+        ? Date.now() - { '7d': 7, '30d': 30, '90d': 90 }[active_since] * 86400000
+        : null;
+      const needle = location?.toLowerCase();
+      members = members.filter(
+        (m) =>
+          (!tier || tier === 'all' || m.tier === tier) &&
+          (!needle || m.location?.toLowerCase().includes(needle)) &&
+          (has_ens !== 'true' || !!m.ensName) &&
+          (!platform || !!m.platforms[platform]) &&
+          (since === null || (!!m.lastActiveAt && new Date(m.lastActiveAt).getTime() >= since)),
+      );
+    }
+
     // ── Step 4: Post-query filters (category, featured, min_respect) ───────
     if (category) {
       members = members.filter(
@@ -304,7 +396,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Respect sort (needs joined data not in SQL)
-    if (sort === 'respect') {
+    if (!isPublicView && sort === 'respect') {
       members.sort((a, b) => (b.respect?.total ?? 0) - (a.respect?.total ?? 0));
     }
 
@@ -314,20 +406,23 @@ export async function GET(req: NextRequest) {
     ] as string[];
     const locations = [...new Set(members.map((m) => m.location).filter(Boolean))] as string[];
 
-    return NextResponse.json({
-      members,
-      total: count ?? members.length,
-      tiers: {
-        respectHolders: members.filter((m) => m.tier === 'respect_holder').length,
-        community: members.filter((m) => m.tier === 'community').length,
+    return NextResponse.json(
+      {
+        members,
+        total: count ?? members.length,
+        tiers: {
+          respectHolders: members.filter((m) => m.tier === 'respect_holder').length,
+          community: members.filter((m) => m.tier === 'community').length,
+        },
+        filterOptions: { categories, locations },
+        pagination: {
+          limit: parseInt(limit, 10),
+          offset,
+          hasMore: (count ?? 0) > offset + members.length,
+        },
       },
-      filterOptions: { categories, locations },
-      pagination: {
-        limit: parseInt(limit),
-        offset,
-        hasMore: (count ?? 0) > offset + members.length,
-      },
-    });
+      isPublicView ? undefined : { headers: { 'Cache-Control': 'private, no-store' } },
+    );
   } catch (err) {
     logger.error('[directory] error:', err);
     return NextResponse.json({ error: 'Failed to load directory' }, { status: 500 });

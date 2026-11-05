@@ -1,5 +1,7 @@
 # Claude Usage - surface tiering
 
+mechanism: bot/src/zoe/models/free-tier.ts, bin/zao-triage (partial: the free-tier line only)
+
 **Match each task to the cheapest surface that can do it well, and reserve the Claude Code weekly cap for grounded live-code work.** Origin and rationale: `research/dev-workflows/2649-rules-history/archive/claude-usage.md`.
 
 | Work | Use | Boundary |

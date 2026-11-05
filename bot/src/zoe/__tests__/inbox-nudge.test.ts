@@ -12,6 +12,7 @@ import {
   emptyState,
   formatPrList,
   formatTotals,
+  handPrs,
   mergeCommand,
   nudgeConfig,
   parsePrCallback,
@@ -183,15 +184,16 @@ describe('runInboxNudgeTick - sources, state file, sends', () => {
     expect(r).toBe('before-from');
     expect(reads).toBe(0);
   });
-  it('first tick after 05:15: the totals go out (hold PR not counted) and the state records it', async () => {
+  it('first tick after 05:15: the totals go out, the hold PR on its own line, and the state records it', async () => {
     const r = await runInboxNudgeTick({ send, env, now: at('05:30'), sources: sources() });
     expect(r).toBe('send');
     expect(sends).toHaveLength(1);
-    expect(sends[0].text).toContain('Waiting on you today: 7');
-    expect(sends[0].text).toContain('PRs on your hand: 1');
+    expect(sends[0].text).toContain('Waiting on you today: 8');
+    expect(sends[0].text).toContain('PRs on your hand: 1: ZAOOS #1');
+    expect(sends[0].text).toContain('On hold for you: 1: c #2');
     const s = await readState('2026-10-14');
     expect(s.sends).toHaveLength(1);
-    expect(s.sends[0].total).toBe(7);
+    expect(s.sends[0].total).toBe(8);
   });
   it('the next tick is not due; two hours on with the same count it is unchanged; with a new count it repeats', async () => {
     await runInboxNudgeTick({ send, env, now: at('05:30'), sources: sources() });
@@ -199,13 +201,13 @@ describe('runInboxNudgeTick - sources, state file, sends', () => {
     expect(await runInboxNudgeTick({ send, env, now: at('07:30'), sources: sources() })).toBe('unchanged');
     expect(await runInboxNudgeTick({ send, env, now: at('07:30'), sources: sources({ lanes: async () => 0 } as never) })).toBe('send');
     expect(sends).toHaveLength(2);
-    expect(sends[1].text).toContain('Still waiting on you: 4 (update 2)');
+    expect(sends[1].text).toContain('Still waiting on you: 5 (update 2)');
   });
   it('a source that fails counts 0, is named, and does not stop the send', async () => {
     const r = await runInboxNudgeTick({ send, env, now: at('05:30'), sources: sources({ board: async () => { throw new Error('tracker down'); } }) });
     expect(r).toBe('send');
     expect(sends[0].text).toContain('Could not read: board (counted as 0)');
-    expect(sends[0].text).toContain('Waiting on you today: 6');
+    expect(sends[0].text).toContain('Waiting on you today: 7');
   });
   it('every source down after the morning send: unread, nothing sent, the clear is not spent', async () => {
     await runInboxNudgeTick({ send, env, now: at('05:30'), sources: sources() });
@@ -234,11 +236,86 @@ describe('runInboxNudgeTick - sources, state file, sends', () => {
     await runInboxNudgeTick({ send, env, now: at('05:30'), sources: sources() });
     expect(await runInboxNudgeTick({ send, env, now: at('05:30', '2026-10-15'), sources: sources() })).toBe('send');
     expect(sends).toHaveLength(2);
-    expect(sends[1].text).toContain('Waiting on you today: 7');
+    expect(sends[1].text).toContain('Waiting on you today: 8');
   });
   it('readTotals sums the four sources and keeps the PR list for the buttons', async () => {
     const t = await readTotals(sources());
-    expect(t).toMatchObject({ lanes: 3, page: 2, board: 1, prs: 1, total: 7, failed: [] });
+    expect(t).toMatchObject({ lanes: 3, page: 2, board: 1, prs: 1, total: 8, failed: [] });
     expect(t.prList.map((p) => p.number)).toEqual([1]);
+    expect(t.holdList?.map((p) => p.number)).toEqual([2]);
+  });
+});
+
+describe('PRs on his hand under the 2026-10-20 merge rule', () => {
+  // 2026-10-21 05:30: "PRs on your hand: 24", most of them agent merges.
+  const files: Record<number, string[]> = {
+    1: ['research/agents/2700-x/README.md'],
+    2: ['bot/src/zoe/inbox-nudge.ts', 'bot/src/zoe/__tests__/inbox-nudge.test.ts'],
+    3: ['supabase/migrations/20261021_x.sql'],
+    4: ['.claude/settings.json', '.github/workflows/ci.yml'],
+  };
+  const prFiles = async (p: ReviewPR): Promise<string[]> => {
+    if (p.number === 5) throw new Error('HTTP 502');
+    return files[p.number] ?? [];
+  };
+  it('only reserved PRs stay; the rest are counted as agent merges', async () => {
+    const { hand, agent } = await handPrs([pr(1), pr(2), pr(3), pr(4)], prFiles);
+    expect(hand.map((p) => [p.number, p.reserved])).toEqual([
+      [3, ['db/schema']],
+      [4, ['settings', 'ci']],
+    ]);
+    expect(agent).toBe(2);
+  });
+  it('a PR whose files cannot be read stays on his hand, marked, never dropped', async () => {
+    const { hand, agent } = await handPrs([pr(1), pr(5)], prFiles);
+    expect(hand.map((p) => [p.number, p.reserved])).toEqual([[5, ['files unread']]]);
+    expect(agent).toBe(1);
+  });
+  it('no files source at all counts every PR as unread, not as agent merges', async () => {
+    const { hand, agent } = await handPrs([pr(1), pr(2)]);
+    expect(hand).toHaveLength(2);
+    expect(agent).toBe(0);
+  });
+  it('the totals and list say how many are his and why', async () => {
+    const t = await readTotals({
+      lanes: async () => 0,
+      page: async () => 0,
+      board: async () => 0,
+      prs: async () => [pr(1), pr(2), pr(3), pr(4)],
+      prFiles,
+    });
+    expect(t).toMatchObject({ prs: 2, agentPrs: 2, total: 2, failed: [] });
+    expect(formatTotals(t, 1, new Date()).text).toContain('PRs on your hand: 2: ZAOOS #3, ZAOOS #4 (2 more are agent merges)');
+    const list = formatPrList(t.prList, new Date('2026-10-14T12:00:00Z'));
+    expect(list.text).toContain('[settings, ci]: PR 4');
+    expect(list.text).toContain('[db/schema]: PR 3');
+  });
+});
+
+describe('on hold for you (seat, 2026-10-21)', () => {
+  it('any hold label parks a PR: it leaves the merge line and gets its own, with numbers', async () => {
+    const t = await readTotals({
+      lanes: async () => 0,
+      page: async () => 0,
+      board: async () => 0,
+      prs: async () => [
+        pr(4070, 'bettercallzaal/ZAOOS', { labels: ['hold'] }),
+        pr(4071, 'bettercallzaal/ZAOOS', { labels: ['hold:licence'] }),
+        pr(4066, 'bettercallzaal/ZAOOS'),
+        pr(9, 'bettercallzaal/ZAOOS', { draft: true, labels: ['hold'] }),
+      ],
+      prFiles: async (p) => (p.number === 4066 ? ['scripts/zoe-autodeploy.sh'] : ['README.md']),
+    });
+    expect(t).toMatchObject({ prs: 1, total: 3 });
+    const text = formatTotals(t, 1, new Date()).text;
+    expect(text).toContain('PRs on your hand: 1: ZAOOS #4066');
+    expect(text).toContain('On hold for you: 2: ZAOOS #4070, ZAOOS #4071');
+  });
+  it('no hold PRs, no hold line; a long list is cut with a count', () => {
+    const base = { lanes: 0, page: 0, board: 0, failed: [] };
+    expect(formatTotals({ ...base, prs: 0, total: 0, prList: [], holdList: [] }, 1, new Date()).text).not.toContain('On hold');
+    const many = Array.from({ length: 10 }, (_, i) => pr(i + 1, 'a/R', { labels: ['hold'] }));
+    const text = formatTotals({ ...base, prs: 0, total: 10, prList: [], holdList: many }, 1, new Date()).text;
+    expect(text).toContain('On hold for you: 10: R #1, R #2, R #3, R #4, R #5, R #6, R #7, R #8, +2 more');
   });
 });

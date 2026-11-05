@@ -1,5 +1,7 @@
 # Anti-Fabrication
 
+mechanism: none yet (since 2026-10-23, #4151)
+
 **A claim is not a fact until it is checked against ground truth.** The orchestrator verifies every load-bearing subagent claim before trusting, reporting, or PR-ing it. Rule numbers are stable. History: `research/dev-workflows/2649-rules-history/archive/anti-fabrication.md`.
 
 1. **Subagents do not write repo files by default.** They RETURN content; the orchestrator writes it at the right path/number and reads back the diff. If a subagent must write (worktree isolation), it reports the exact path and the orchestrator `ls`-confirms it.
@@ -10,5 +12,7 @@
 6. **Distinguish DONE from PLANNED.** "Shipped/merged/applied/fixed" needs proof (an existing PR number, a green run, a verified row). A design is "design/spec, not built". Never let a plan read as an accomplishment.
 7. **Grounding preamble for every audit/research subagent prompt:**
    > Cite file:line (or a fetched URL) for every claim; quote the evidence. If you cannot verify something, write UNVERIFIED - do not guess. Return only what you actually read/ran; never invent numbers, paths, or URLs. Do NOT write repo files; return the content. Grade findings to the LOWEST severity the evidence supports.
+
+8. **A test count or measurement from a subagent or another lane is written down only with the command, the cwd and the ref it ran on.** Otherwise re-run it yourself or write UNVERIFIED. On 2026-10-21 a reported "210 passed, 2 failed" was withdrawn: the same suite gave 212/0 on main and on the live tree, and nobody had recorded where the 210 came from.
 
 **Verify checklist before any loop artifact ships:** claimed file written? `ls` it; absent = the claim is false, author it yourself. Claimed file:line? `grep` it; not there = drop or downgrade the finding. Critical/security finding? Read the source. Number/URL/doc number? Traced to a real measurement? "Done"? Proof exists, or say "not verified".

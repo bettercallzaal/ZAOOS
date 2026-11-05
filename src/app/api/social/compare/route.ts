@@ -1,10 +1,8 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
-import { ENV } from '@/lib/env';
+import { neynarRead } from '@/lib/farcaster/neynar';
 import { logger } from '@/lib/logger';
-
-const NEYNAR_BASE = 'https://api.neynar.com/v2/farcaster';
 
 // Per-pair cache — 5 minute TTL
 const compareCache = new Map<string, { data: unknown; timestamp: number }>();
@@ -77,8 +75,7 @@ export async function GET(req: NextRequest) {
     let topShared: { fid: number; username: string; pfpUrl: string | null }[] = [];
 
     if (topSharedFids.length > 0) {
-      const res = await fetch(`${NEYNAR_BASE}/user/bulk?fids=${topSharedFids.join(',')}`, {
-        headers: { 'x-api-key': ENV.NEYNAR_API_KEY },
+      const res = await neynarRead(`/user/bulk?fids=${topSharedFids.join(',')}`, {
         signal: AbortSignal.timeout(10000),
       });
       if (res.ok) {
@@ -128,15 +125,16 @@ async function fetchAllFollowing(fid: number, maxCount: number) {
     const params = new URLSearchParams({ fid: String(fid), limit: String(limit) });
     if (cursor) params.set('cursor', cursor);
 
-    const res = await fetch(`${NEYNAR_BASE}/following?${params}`, {
-      headers: { 'x-api-key': ENV.NEYNAR_API_KEY },
+    const res = await neynarRead(`/following?${params}`, {
       signal: AbortSignal.timeout(10000),
     });
     if (!res.ok) break;
     const data = await res.json();
-    const batch = (data.users || []).map((u: Record<string, unknown>) => ({
-      fid: u.fid as number,
-    }));
+    // Neynar wraps each item as { user }; Hypersnap returns the user flat
+    const batch = (data.users || []).map((r: Record<string, unknown>) => {
+      const u = r.user || r;
+      return { fid: (u as Record<string, unknown>).fid as number };
+    });
     users.push(...batch);
     cursor = data.next?.cursor;
     if (!cursor || batch.length < limit) break;
@@ -155,8 +153,7 @@ async function fetchAllFollowers(fid: number, maxCount: number) {
     const params = new URLSearchParams({ fid: String(fid), limit: String(limit) });
     if (cursor) params.set('cursor', cursor);
 
-    const res = await fetch(`${NEYNAR_BASE}/followers?${params}`, {
-      headers: { 'x-api-key': ENV.NEYNAR_API_KEY },
+    const res = await neynarRead(`/followers?${params}`, {
       signal: AbortSignal.timeout(10000),
     });
     if (!res.ok) break;

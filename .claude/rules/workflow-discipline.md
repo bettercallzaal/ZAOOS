@@ -1,5 +1,7 @@
 # Workflow Discipline
 
+mechanism: none yet (since 2026-10-23, #4152)
+
 From the 2026-07-27 workflow re-audit (incidents: `research/dev-workflows/2649-rules-history/archive/workflow-discipline.md`).
 
 1. **One thread, finished, then the next.** Do not juggle many threads at once: build -> verify -> ship -> confirm with Zaal, then start the next. A mid-thread request is captured (board/todo) unless genuinely urgent (prod down, a gated ask Zaal is waiting on).

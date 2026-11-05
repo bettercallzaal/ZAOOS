@@ -1,5 +1,7 @@
 # Skill Enhancements
 
+mechanism: none yet (since 2026-10-23, #4155)
+
 ## Brainstorming: Reverse Prompting
 
 When the `superpowers:brainstorming` skill is active, during the "Ask clarifying questions" phase, start with reverse prompting before asking individual questions:

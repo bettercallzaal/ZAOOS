@@ -43,3 +43,15 @@ account that owns it; the routine list on the thezao account was empty on
 
 Until that line is in the prompt, the files will keep landing one day ahead;
 this README and the helper make the fix a one-line paste rather than a rewrite.
+
+## The gate (2026-10-19)
+
+The prompt line above was still missing on 2026-10-19: #4005 and #4034 were
+both one day ahead, #4034 re-published a night main already held, and every
+nightly file since 2026-10-16 carried em dashes, because the run calls neither
+helper. `.github/workflows/nightly-check.yml` now runs
+`scripts/zoe/nightly-check.mjs` on every PR. It fails a PR that adds a
+docs/daily nightly file whose date is not the one `nightly-dates.mjs` gives for
+the PR's open time, whose correct file is already on main, or whose content
+still carries a `nightly-redact.mjs` class. Until the prompt line is pasted,
+expect the nightly PR to go red rather than land wrong.

@@ -1,7 +1,8 @@
 ---
 topic: infrastructure
 type: manifest
-status: research-draft
+status: superseded
+superseded-by: 2691
 last-validated: 2026-07-15
 related-docs: 1025, 1027, 836, 1021
 original-query: "build the export manifest for the ZAOOS estate split - map every directory to its destination repo, move NOTHING"
@@ -9,6 +10,9 @@ tier: DEEP
 ---
 
 # 1124 - ZAOOS Estate Split: Export Manifest
+
+
+> **Superseded 2026-10-20 by [doc 2691](../2691-zaoos-graduation-map-2026-10/)** (execution manifest for doc 1025, no stage started). Kept as the record of what was planned.
 
 > **Goal:** Map every ZAOOS directory to its destination home per doc 1025 design + doc 1027 staging plan. This manifest is READ-ONLY - it names destinations, identifies risks, and gates each stage. Execution follows this map; no code moves until all dependencies are resolved per stage sequence.
 

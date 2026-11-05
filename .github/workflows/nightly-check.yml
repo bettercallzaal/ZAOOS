@@ -1,0 +1,36 @@
+name: Nightly docs check
+
+# WHY THIS EXISTS
+#
+# The ZOE nightly processing run is a cloud scheduled session whose prompt is
+# not in this repo. scripts/zoe/nightly-dates.mjs (Eastern dates, card 9919)
+# and scripts/zoe/nightly-redact.mjs (#3957) are correct and tested, and the
+# run calls neither: #4005 and #4034 were both dated one day ahead, #4034
+# re-published a night main already had, and every nightly file since
+# 2026-10-16 carries em dashes. This job runs scripts/zoe/nightly-check.mjs,
+# which fails the PR on any of the three, using the PR's own open time as the
+# run's clock.
+#
+# No `paths:` filter, for the reason doc-collision-guard.yml gives: a
+# path-filtered check cannot be made required. With no docs/daily files added
+# it prints "Nothing to check" and exits 0.
+
+on:
+  pull_request:
+
+jobs:
+  nightly:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check nightly dates, duplicates and redaction
+        run: |
+          set -uo pipefail
+          git fetch origin "${{ github.base_ref }}" --quiet \
+            || { echo "::error title=nightly-check::git fetch failed, failing closed"; exit 1; }
+          node scripts/zoe/nightly-check.mjs \
+            --instant "${{ github.event.pull_request.created_at }}" \
+            --base "origin/${{ github.base_ref }}"

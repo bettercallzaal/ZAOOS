@@ -1,10 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { ENV } from '@/lib/env';
+import { neynarRead } from '@/lib/farcaster/neynar';
 import { logger } from '@/lib/logger';
-
-const NEYNAR_BASE = 'https://api.neynar.com/v2/farcaster';
 
 /**
  * Returns all active ZAO allowlist members with their profile info
@@ -63,12 +61,7 @@ export async function GET() {
       await Promise.allSettled(
         batches.map(async (batch) => {
           try {
-            const res = await fetch(`${NEYNAR_BASE}/user/bulk?fids=${batch.join(',')}`, {
-              headers: {
-                'Content-Type': 'application/json',
-                'x-api-key': ENV.NEYNAR_API_KEY,
-              },
-            });
+            const res = await neynarRead(`/user/bulk?fids=${batch.join(',')}`);
             if (res.ok) {
               const json = await res.json();
               for (const u of json.users || []) {

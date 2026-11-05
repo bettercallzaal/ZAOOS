@@ -1,15 +1,18 @@
 ---
 topic: infrastructure
 type: decision
-status: research-complete
+status: superseded
 last-validated: 2026-08-11
-superseded-by:
+superseded-by: 2691
 related-docs: 836, 2258
 original-query: "Then research github.com/ZAODEVZ/ZAOresearch itself and the PDF at ~/Downloads/ZAOresearch-for-zaal.pdf"
 tier: STANDARD
 ---
 
 # 2263 - The research library graduated, and the two calls are still open
+
+
+> **Superseded 2026-10-20 by [doc 2691](../2691-zaoos-graduation-map-2026-10/)** (ZAOOS research/ stayed live and canonical; ZAOresearch is the private working library). Kept as the record of what was planned.
 
 > **Goal:** Answer IMan's two questions about the ZAOresearch migration, and verify the claims in the handover PDF against the live repos rather than accepting them.
 

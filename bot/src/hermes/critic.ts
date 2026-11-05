@@ -105,6 +105,15 @@ export async function runCritic(input: CritiqueInput): Promise<CritiqueOutput> {
     };
   }
 
+  return runCriticOnDiff(input, diff);
+}
+
+/**
+ * Score a diff the caller already holds. runCritic's body from here on, split
+ * out unchanged so the ZOE final reviewer can grade a PR head's diff fetched
+ * from GitHub without a local checkout. Same routing, panel and shadow rules.
+ */
+export async function runCriticOnDiff(input: CritiqueInput, diff: string): Promise<CritiqueOutput> {
   const userPrompt = buildCriticUserPrompt(input, diff);
   const crossFamilyAvailable = hasCodexCli() || hasCapFallbackProvider();
   // Complexity gate (doc 2215 #4): the 2-3 model panel is 2-3x the cost/latency,

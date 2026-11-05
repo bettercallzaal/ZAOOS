@@ -1,5 +1,7 @@
 # Noisy-Signal Guard - a check that always fires is a check nobody reads
 
+mechanism: none yet (since 2026-10-23, #4091)
+
 Mirror of `silent-failure-guard.md`: red while fine. The four 2026-08-07 instances: `research/dev-workflows/2649-rules-history/archive/noisy-signal-guard.md`.
 
 **A signal must be able to reach zero, and must not fire on the expected case.** Before shipping any check, flag, count, or alert:

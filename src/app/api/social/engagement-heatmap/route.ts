@@ -1,10 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
-import { ENV } from '@/lib/env';
+import { neynarRead } from '@/lib/farcaster/neynar';
 import { logger } from '@/lib/logger';
-
-const NEYNAR_BASE = 'https://api.neynar.com/v2/farcaster';
-const headers = () => ({ 'Content-Type': 'application/json', 'x-api-key': ENV.NEYNAR_API_KEY });
 
 // In-memory cache — 1 hour TTL, keyed by FID
 const cache = new Map<number, { data: number[][]; ts: number }>();
@@ -22,14 +19,14 @@ export async function GET() {
     }
 
     // Fetch up to 50 followers
-    const fRes = await fetch(`${NEYNAR_BASE}/followers?fid=${fid}&limit=50`, {
-      headers: headers(),
+    const fRes = await neynarRead(`/followers?fid=${fid}&limit=50`, {
       signal: AbortSignal.timeout(10000),
     });
     if (!fRes.ok) throw new Error(`Followers fetch failed: ${fRes.status}`);
     const fData = await fRes.json();
+    // Neynar wraps each follower as { user }; Hypersnap returns the user flat
     const followerFids: number[] = (fData.users || [])
-      .map((u: { user: { fid: number } }) => u.user?.fid)
+      .map((u: { user?: { fid: number }; fid?: number }) => (u.user ?? u).fid)
       .filter(Boolean)
       .slice(0, 50);
 
@@ -43,9 +40,9 @@ export async function GET() {
     for (const batch of batches) {
       const results = await Promise.allSettled(
         batch.map(async (followerFid) => {
-          const res = await fetch(
-            `${NEYNAR_BASE}/feed?feed_type=filter&filter_type=fids&fids=${followerFid}&limit=25`,
-            { headers: headers(), signal: AbortSignal.timeout(8000) },
+          const res = await neynarRead(
+            `/feed?feed_type=filter&filter_type=fids&fids=${followerFid}&limit=25`,
+            { signal: AbortSignal.timeout(8000) },
           );
           if (!res.ok) return [];
           const data = await res.json();

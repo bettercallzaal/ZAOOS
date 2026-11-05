@@ -1,4 +1,5 @@
 import { ENV } from '@/lib/env';
+import { logger } from '@/lib/logger';
 
 const NEYNAR_BASE = 'https://api.neynar.com/v2/farcaster';
 const READ_BASE = ENV.FARCASTER_READ_API_BASE
@@ -20,17 +21,25 @@ function readHeaders() {
   return headers();
 }
 
-/** Fetch with failover: try READ_BASE first, fall back to NEYNAR_BASE on error */
+/**
+ * Fetch with failover: try READ_BASE first, fall back to NEYNAR_BASE on error.
+ * Each failover logs one warn line (path without query, proxy status or error)
+ * so a read base that 404s or 503s is visible instead of silently paid for.
+ */
 async function fetchWithFailover(path: string, init: RequestInit): Promise<Response> {
   if (READ_BASE === NEYNAR_BASE) {
     return fetch(`${NEYNAR_BASE}${path}`, init);
   }
+  const route = path.split('?')[0];
   try {
     const res = await fetch(`${READ_BASE}${path}`, init);
     if (res.ok) return res;
-    // Non-OK from proxy — fall back to Neynar
-  } catch {
-    // Network error from proxy — fall back to Neynar
+    logger.warn(
+      `[neynar/failover] ${route} read base returned ${res.status}, falling back to Neynar`,
+    );
+  } catch (error: unknown) {
+    const reason = error instanceof Error ? error.message : String(error);
+    logger.warn(`[neynar/failover] ${route} read base threw (${reason}), falling back to Neynar`);
   }
   return fetch(`${NEYNAR_BASE}${path}`, {
     ...init,
@@ -532,10 +541,16 @@ export async function deleteCast(signerUuid: string, castHash: string) {
   return res.json();
 }
 
+/**
+ * Conversation summary goes straight to Neynar. Hypersnap answers this path
+ * with HTTP 200 and a placeholder ("Conversation summaries require LLM
+ * integration which is not available on this node."), so fetchWithFailover
+ * would return the placeholder as the summary (doc 2418 D3).
+ */
 export async function getCastConversationSummary(castHash: string) {
   const params = new URLSearchParams({ identifier: castHash, type: 'hash' });
-  const res = await fetchWithFailover(`/cast/conversation/summary?${params}`, {
-    headers: readHeaders(),
+  const res = await fetch(`${NEYNAR_BASE}/cast/conversation/summary?${params}`, {
+    headers: headers(),
     signal: AbortSignal.timeout(10000),
   });
   if (!res.ok) {
@@ -556,7 +571,7 @@ export async function getPopularCasts(fid: number) {
 
 export async function getBestFriends(fid: number, limit = 10) {
   const params = new URLSearchParams({ fid: String(fid), limit: String(limit) });
-  const res = await fetchWithFailover(`/user/best-friends?${params}`, {
+  const res = await fetchWithFailover(`/user/best_friends?${params}`, {
     headers: readHeaders(),
     signal: AbortSignal.timeout(10000),
   });
@@ -566,7 +581,7 @@ export async function getBestFriends(fid: number, limit = 10) {
 
 export async function getTrendingTopics(limit = 10) {
   const params = new URLSearchParams({ limit: String(limit) });
-  const res = await fetchWithFailover(`/trending/topics?${params}`, {
+  const res = await fetchWithFailover(`/topic/trending?${params}`, {
     headers: readHeaders(),
     signal: AbortSignal.timeout(10000),
   });
@@ -584,7 +599,7 @@ export async function getAccountVerifications(fid: number) {
 
 export async function getFollowSuggestions(fid: number, limit = 20) {
   const params = new URLSearchParams({ fid: String(fid), limit: String(limit) });
-  const res = await fetchWithFailover(`/user/suggestions?${params}`, {
+  const res = await fetchWithFailover(`/following/suggested?${params}`, {
     headers: readHeaders(),
     signal: AbortSignal.timeout(10000),
   });
@@ -592,11 +607,18 @@ export async function getFollowSuggestions(fid: number, limit = 20) {
   return res.json();
 }
 
+/**
+ * Frame (mini app) reads go straight to Neynar. Hypersnap lists /frame/catalog,
+ * /frame/search and /frame/relevant as not implemented and answers HTTP 501
+ * (src/api/http.rs), so through fetchWithFailover every call paid a failed
+ * read-base round trip and a failover warning before reaching Neynar. Measured
+ * on haatz 2026-10-23: 501 on all three paths, 6 of 6 calls each.
+ */
 export async function getFrameCatalog(limit = 20, cursor?: string) {
   const params = new URLSearchParams({ limit: String(limit) });
   if (cursor) params.set('cursor', cursor);
-  const res = await fetchWithFailover(`/frame/catalog?${params}`, {
-    headers: readHeaders(),
+  const res = await fetch(`${NEYNAR_BASE}/frame/catalog?${params}`, {
+    headers: headers(),
     signal: AbortSignal.timeout(10000),
   });
   if (!res.ok) throw new Error(`Neynar frame catalog error: ${res.status}`);
@@ -605,8 +627,8 @@ export async function getFrameCatalog(limit = 20, cursor?: string) {
 
 export async function searchFrames(query: string, limit = 20) {
   const params = new URLSearchParams({ q: query, limit: String(limit) });
-  const res = await fetchWithFailover(`/frame/search?${params}`, {
-    headers: readHeaders(),
+  const res = await fetch(`${NEYNAR_BASE}/frame/search?${params}`, {
+    headers: headers(),
     signal: AbortSignal.timeout(10000),
   });
   if (!res.ok) throw new Error(`Neynar frame search error: ${res.status}`);
@@ -615,10 +637,22 @@ export async function searchFrames(query: string, limit = 20) {
 
 export async function getRelevantFrames(fid: number, limit = 20) {
   const params = new URLSearchParams({ fid: String(fid), limit: String(limit) });
-  const res = await fetchWithFailover(`/frame/relevant?${params}`, {
-    headers: readHeaders(),
+  const res = await fetch(`${NEYNAR_BASE}/frame/relevant?${params}`, {
+    headers: headers(),
     signal: AbortSignal.timeout(10000),
   });
   if (!res.ok) throw new Error(`Neynar relevant frames error: ${res.status}`);
   return res.json();
+}
+
+/**
+ * Read through the seam from a route: READ_BASE first, Neynar on failover.
+ * Only for calls whose fields the read base serves. Hypersnap omits
+ * `viewer_context` and `power_badge`, leaves a cast's `channel` null, sets its
+ * `root_parent_url` to its own `parent_url` (so a reply in a channel has none),
+ * and returns followers/following as flat users, so check the fields a caller
+ * reads first (doc 2418 D6 PR 3).
+ */
+export function neynarRead(path: string, init: RequestInit = {}): Promise<Response> {
+  return fetchWithFailover(path, { ...init, headers: readHeaders() });
 }

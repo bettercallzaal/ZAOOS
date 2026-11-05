@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { ENV } from '@/lib/env';
+import { neynarRead } from '@/lib/farcaster/neynar';
 import { logger } from '@/lib/logger';
 
 const NEYNAR_BASE = 'https://api.neynar.com/v2/farcaster';
@@ -58,9 +59,9 @@ export async function GET() {
     // Phase 1: Get profiles with session user as viewer (for follower/following counts)
     for (const chunk of fidChunks) {
       try {
-        const res = await fetch(
-          `${NEYNAR_BASE}/user/bulk?fids=${chunk.join(',')}&viewer_fid=${session.fid}`,
-          { headers: { 'x-api-key': ENV.NEYNAR_API_KEY }, signal: AbortSignal.timeout(10000) },
+        const res = await neynarRead(
+          `/user/bulk?fids=${chunk.join(',')}&viewer_fid=${session.fid}`,
+          { signal: AbortSignal.timeout(10000) },
         );
         if (res.ok) {
           const data = await res.json();
@@ -87,6 +88,7 @@ export async function GET() {
             if (otherFids.length === 0) continue;
 
             try {
+              // Stays on Neynar: reads viewer_context, which Hypersnap does not return
               const res = await fetch(
                 `${NEYNAR_BASE}/user/bulk?fids=${otherFids.join(',')}&viewer_fid=${viewerFid}`,
                 {

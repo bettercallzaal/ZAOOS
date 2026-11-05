@@ -1,5 +1,7 @@
 # Documentation lives in the repo, not in an artifact
 
+mechanism: none yet (since 2026-10-23, #4155)
+
 An artifact's lifetime is tied to an account, and the account changed 2026-09-01 (one cited audit artifact is already unreachable). Measurement: `research/dev-workflows/2649-rules-history/archive/documentation-in-repo.md`.
 
 **Anything a future session, a teammate, or Zaal will need to read again is written into a git repo. An artifact is a VIEW, never the copy of record.**

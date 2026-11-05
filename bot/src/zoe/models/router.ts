@@ -115,8 +115,15 @@ function hasClaudeApiKey(): boolean {
   return Boolean(process.env.ANTHROPIC_API_KEY?.trim());
 }
 
-function hasOpenRouterApiKey(): boolean {
-  return Boolean(process.env.OPENROUTER_API_KEY?.trim());
+/**
+ * OpenRouter is OFF in ZOE's live routing order unless ZOE_OPENROUTER_RUNG=1 is set.
+ * Ruling, item 194 (Zaal, 2026-11-04): "for now lets keep using claude"; the
+ * OpenRouter balance was $0.11 against a $5 floor, and no top-up is planned. The
+ * code path stays intact behind this opt-in so it can be restored by one env var.
+ * Both the key and the flag are required; the key alone no longer enables it.
+ */
+function hasOpenRouterRung(): boolean {
+  return process.env.ZOE_OPENROUTER_RUNG?.trim() === '1' && Boolean(process.env.OPENROUTER_API_KEY?.trim());
 }
 
 /**
@@ -307,7 +314,7 @@ async function callOpenRouter(
   userMessage: string,
   modelOverride?: string,
 ): Promise<ClaudeCliResult> {
-  if (!hasOpenRouterApiKey()) {
+  if (!hasOpenRouterRung()) {
     throw new Error('OPENROUTER_API_KEY not set');
   }
 
@@ -605,7 +612,8 @@ async function callOllama(systemPrompt: string, userMessage: string): Promise<Cl
 /**
  * CAP FALLBACK: the Claude CLI is rate-limited or over its weekly cap, so run
  * this concierge turn on the best available non-Claude provider instead of
- * failing. Order: OpenRouter, then Surplus Intelligence, then Grok, then GPT.
+ * failing. Order: OpenRouter (only with ZOE_OPENROUTER_RUNG=1, ruling item 194),
+ * then Surplus Intelligence, then Grok, then GPT.
  *
  * Surplus sits SECOND on purpose. On 2026-08-21 the entire fleet went silent -
  * 17 loops, zero output - because OpenRouter ran out of credits and the next
@@ -632,7 +640,7 @@ export function capFallbackProviders(): string[] {
   const names: string[] = [];
   // Prepaid credits first: they cost nothing until the month's credit is spent.
   if (hasAnthropicCreditsRung()) names.push('anthropic-credits');
-  if (hasOpenRouterApiKey()) names.push('openrouter');
+  if (hasOpenRouterRung()) names.push('openrouter');
   if (hasSurplusApiKey()) names.push('surplus');
   if (hasGrokApiKey()) names.push('grok');
   if (hasGptApiKey()) names.push('gpt');
@@ -652,14 +660,14 @@ export async function callCapFallback(
   const orModel = opts?.tier === 'high' ? OPENROUTER_HIGH_MODEL : undefined;
   const attempts: Array<{ name: string; fn: () => Promise<ClaudeCliResult> }> = [];
   if (hasAnthropicCreditsRung()) attempts.push({ name: 'anthropic-credits', fn: () => callAnthropicCredits(systemPrompt, userMessage) });
-  if (hasOpenRouterApiKey()) attempts.push({ name: 'openrouter', fn: () => callOpenRouter(systemPrompt, userMessage, orModel) });
+  if (hasOpenRouterRung()) attempts.push({ name: 'openrouter', fn: () => callOpenRouter(systemPrompt, userMessage, orModel) });
   if (hasSurplusApiKey()) attempts.push({ name: 'surplus', fn: () => callSurplus(systemPrompt, userMessage) });
   if (hasGrokApiKey()) attempts.push({ name: 'grok', fn: () => callGrok(systemPrompt, userMessage) });
   if (hasGptApiKey()) attempts.push({ name: 'gpt', fn: () => callGpt(systemPrompt, userMessage) });
   if (hasOllama()) attempts.push({ name: 'ollama', fn: () => callOllama(systemPrompt, userMessage) });
 
   if (attempts.length === 0) {
-    throw new Error('no cap-fallback provider configured (set ZOE_ANTHROPIC_API_RUNG=1 + ZOE_ANTHROPIC_CREDITS_KEY, OPENROUTER_API_KEY, SURPLUS_API_KEY, XAI_API_KEY, OPENAI_API_KEY, or OLLAMA_ENABLED=1)');
+    throw new Error('no cap-fallback provider configured (set ZOE_ANTHROPIC_API_RUNG=1 + ZOE_ANTHROPIC_CREDITS_KEY, ZOE_OPENROUTER_RUNG=1 + OPENROUTER_API_KEY, SURPLUS_API_KEY, XAI_API_KEY, OPENAI_API_KEY, or OLLAMA_ENABLED=1)');
   }
 
   const prioritizedNames = prioritizeProviders(attempts.map((a) => a.name));

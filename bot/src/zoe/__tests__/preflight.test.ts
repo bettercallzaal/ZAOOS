@@ -16,6 +16,7 @@ const FULL_ENV: Record<string, string> = {
   SUPABASE_URL: 'https://x.supabase.co',
   SUPABASE_SERVICE_ROLE_KEY: 'k',
   OPENROUTER_API_KEY: 'o',
+  ZOE_OPENROUTER_RUNG: '1',
   ZAAL_BOTZ_GROUP_ID: '-100',
 };
 
@@ -118,16 +119,16 @@ describe('runPreflight', () => {
 
 describe('cap-fallback ladder depth', () => {
   it('lists the rungs in the order the router tries them', () => {
-    expect(fallbackLadder({ OPENROUTER_API_KEY: 'a', XAI_API_KEY: 'b', OLLAMA_ENABLED: '1' }))
+    expect(fallbackLadder({ OPENROUTER_API_KEY: 'a', ZOE_OPENROUTER_RUNG: '1', XAI_API_KEY: 'b', OLLAMA_ENABLED: '1' }))
       .toEqual(['openrouter', 'grok', 'ollama']);
   });
 
   it('two rungs or more is quiet', () => {
-    expect(formatFallbackDepth({ OPENROUTER_API_KEY: 'a', OLLAMA_ENABLED: '1' })).toBeNull();
+    expect(formatFallbackDepth({ OPENROUTER_API_KEY: 'a', ZOE_OPENROUTER_RUNG: '1', OLLAMA_ENABLED: '1' })).toBeNull();
   });
 
   it('ONE rung warns and names it - the live VPS on 2026-09-11', () => {
-    const line = formatFallbackDepth({ OPENROUTER_API_KEY: 'a' });
+    const line = formatFallbackDepth({ OPENROUTER_API_KEY: 'a', ZOE_OPENROUTER_RUNG: '1' });
     expect(line).toContain('one rung (openrouter)');
     expect(line).toContain('second single point of failure');
     expect(line).toContain('OLLAMA_ENABLED=1');
@@ -138,7 +139,7 @@ describe('cap-fallback ladder depth', () => {
   });
 
   it('an empty or whitespace key is not a rung', () => {
-    expect(fallbackLadder({ OPENROUTER_API_KEY: '   ', OLLAMA_ENABLED: '1' })).toEqual(['ollama']);
+    expect(fallbackLadder({ OPENROUTER_API_KEY: '   ', ZOE_OPENROUTER_RUNG: '1', OLLAMA_ENABLED: '1' })).toEqual(['ollama']);
   });
 
   it('OLLAMA_ENABLED counts only when it is exactly 1', () => {

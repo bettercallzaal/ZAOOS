@@ -1,5 +1,7 @@
 # State Claims - name the source, or do not make the claim
 
+mechanism: none yet (since 2026-10-23, #3390)
+
 The proxy always wins on effort and is wrong exactly when the answer matters. The eight-wrong-claims session and every dated incident below: `research/dev-workflows/2649-rules-history/archive/state-claims.md`. Instance list: `measurement-traps.md`. Rule numbers are stable.
 
 1. **A state claim carries its source, in the sentence.** "The lockfile pins 1.42.0", not "we're on 1.42.0". "A grep for call sites outside the module and its tests found nothing", not "nothing imports it".

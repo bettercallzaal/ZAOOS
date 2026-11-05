@@ -1,5 +1,7 @@
 # Code Over Inference - pay once to build it, or pay every time to think it
 
+mechanism: none yet (since 2026-10-23, #4154)
+
 Measurement ($56.64/PR vs $0 scripts) and history: `research/dev-workflows/2649-rules-history/archive/code-over-inference.md`.
 
 **The test, before an agent does anything repeatable: does this need fresh judgment each time, or the same judgment every time?** Same judgment = a SCRIPT, written once, run free. Fresh judgment = inference, worth paying for.

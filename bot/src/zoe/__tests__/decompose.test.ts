@@ -173,3 +173,9 @@ test('modelForCostClass: routing ON maps cost class to model tier', () => {
     else process.env.ZOE_TASK_COMPLEXITY_ROUTING = prev;
   }
 });
+
+test('shouldDecompose reads the inner reply, not the quote-reply wrapper', () => {
+  // Verbatim shape from bot/src/zoe/index.ts (DM quote-reply turnText, ~line 2446).
+  const wrapped = '[Zaal is replying to your earlier message:\n"Plan: draft the brief, then send it and also post it"]\n\nHis reply: yes';
+  assert.equal(shouldDecompose(wrapped), false);
+});

@@ -40,6 +40,9 @@ function cells(line: string): string[] {
 /** A block of consecutive pipe-table lines, rendered one line per data row. */
 function renderTable(lines: string[]): string[] {
   const rows = lines.filter((l) => !SEPARATOR_ROW.test(l)).map(cells);
+  // A block made only of separator rows (`|---|`) has no content to render;
+  // keep it verbatim rather than emit nothing.
+  if (rows.length === 0) return lines;
   const hasHeader = lines.length > 1 && SEPARATOR_ROW.test(lines[1]);
   if (!hasHeader) return rows.map((r) => `- ${r.filter(Boolean).join('; ')}`);
   const [head, ...body] = rows;
@@ -96,7 +99,10 @@ export function toTelegramPlain(text: string): string {
     }
     out.push(inline(line.replace(/^(\s*)\*\s+/, '$1- ')));
   }
-  return out.join('\n');
+  const result = out.join('\n');
+  // Never turn a non-empty message into an empty one (a lone `- - -` rule, a
+  // fence with nothing in it): send the original instead.
+  return result.trim() === '' && text.trim() !== '' ? text : result;
 }
 
 const TEXT_FIELDS = {
@@ -115,15 +121,26 @@ export function formatOutboundPayload(method: string, payload: Record<string, un
   const body = payload[field];
   if (typeof body !== 'string') return null;
   const text = toTelegramPlain(body);
-  return text === body ? null : { field, text };
+  if (text === body || (text.trim() === '' && body.trim() !== '')) return null;
+  return { field, text };
 }
 
-/** Install on ZOE's bot at boot, beside installAgentMarkupGuard. */
-export function installTelegramFormat(bot: Bot<Context>): void {
+type Formatter = typeof formatOutboundPayload;
+
+/**
+ * Install on ZOE's bot at boot, beside installAgentMarkupGuard. Fail safe: any
+ * error while formatting sends the ORIGINAL text, never drops or blanks a reply.
+ * `format` is injectable so a test can make it throw.
+ */
+export function installTelegramFormat(bot: Bot<Context>, format: Formatter = formatOutboundPayload): void {
   bot.api.config.use(async (prev, method, payload, signal) => {
-    const p = payload as Record<string, unknown>;
-    const change = formatOutboundPayload(method, p);
-    if (change) p[change.field] = change.text;
+    try {
+      const p = payload as Record<string, unknown>;
+      const change = format(method, p);
+      if (change && change.text.trim() !== '') p[change.field] = change.text;
+    } catch (e) {
+      console.error('[zoe/tg-format] formatting failed, sending original text:', (e as Error)?.message);
+    }
     return prev(method, payload, signal);
   });
 }

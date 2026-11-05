@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { formatOutboundPayload, toTelegramPlain } from '../tg-format';
+import { formatOutboundPayload, installTelegramFormat, toTelegramPlain } from '../tg-format';
 
 describe('toTelegramPlain', () => {
   it('turns a pipe table into one line per row with header labels', () => {
@@ -66,6 +66,23 @@ describe('toTelegramPlain', () => {
   it('does not treat a lone asterisk or arithmetic as markup', () => {
     expect(toTelegramPlain('2 * 3 = 6 and a*b')).toBe('2 * 3 = 6 and a*b');
   });
+
+  // Fail-safe: a non-empty message never becomes empty (PR 4246 review).
+  it('a separator-only table keeps its text instead of throwing', () => {
+    expect(toTelegramPlain('|---|---|\n|---|---|')).toBe('|---|---|\n|---|---|');
+  });
+
+  it('a lone |---| keeps its text instead of vanishing', () => {
+    expect(toTelegramPlain('|---|')).toBe('|---|');
+  });
+
+  it('a lone "- - -" rule line comes back verbatim, not empty', () => {
+    expect(toTelegramPlain('- - -')).toBe('- - -');
+  });
+
+  it('a separator-only table inside other text leaves the other text alone', () => {
+    expect(toTelegramPlain('before\n|---|\nafter')).toBe('before\n|---|\nafter');
+  });
 });
 
 describe('formatOutboundPayload', () => {
@@ -92,5 +109,49 @@ describe('formatOutboundPayload', () => {
   it('passes plain text and other methods untouched', () => {
     expect(formatOutboundPayload('sendMessage', { chat_id: 1, text: 'plain' })).toBeNull();
     expect(formatOutboundPayload('answerCallbackQuery', { text: '**x**' })).toBeNull();
+  });
+
+  it('never rewrites a non-empty body to empty', () => {
+    for (const text of ['|---|', '- - -', '|---|---|\n|---|---|']) {
+      expect(formatOutboundPayload('sendMessage', { chat_id: 1, text })).toBeNull();
+    }
+  });
+});
+
+describe('installTelegramFormat', () => {
+  type Transformer = (
+    prev: (m: string, p: Record<string, unknown>, s?: unknown) => Promise<unknown>,
+    method: string,
+    payload: Record<string, unknown>,
+    signal?: unknown,
+  ) => Promise<unknown>;
+
+  function install(format?: typeof formatOutboundPayload): Transformer {
+    let t: Transformer | undefined;
+    const bot = { api: { config: { use: (fn: Transformer) => { t = fn; } } } };
+    installTelegramFormat(bot as never, format);
+    return t as Transformer;
+  }
+
+  it('sends the formatted text on the normal path', async () => {
+    const sent: Array<Record<string, unknown>> = [];
+    const t = install();
+    await t(async (_m, p) => { sent.push({ ...p }); return {}; }, 'sendMessage', { chat_id: 1, text: '**hi**' });
+    expect(sent[0].text).toBe('hi');
+  });
+
+  it('sends the ORIGINAL text when formatting throws', async () => {
+    const sent: Array<Record<string, unknown>> = [];
+    const t = install(() => { throw new Error('boom'); });
+    await t(async (_m, p) => { sent.push({ ...p }); return {}; }, 'sendMessage', { chat_id: 1, text: '**hi**' });
+    expect(sent).toHaveLength(1);
+    expect(sent[0].text).toBe('**hi**');
+  });
+
+  it('never sends an empty replacement', async () => {
+    const sent: Array<Record<string, unknown>> = [];
+    const t = install(() => ({ field: 'text', text: '  ' }));
+    await t(async (_m, p) => { sent.push({ ...p }); return {}; }, 'sendMessage', { chat_id: 1, text: '- - -' });
+    expect(sent[0].text).toBe('- - -');
   });
 });

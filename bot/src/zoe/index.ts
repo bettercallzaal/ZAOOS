@@ -271,6 +271,7 @@ import {
 import type { PendingBonfireSubmission } from './approvals';
 import { attachCaster } from './caster';
 import { handleCastTrigger } from './caster/trigger';
+import { registerFinalReview } from './final-review/wire';
 import { subscribeToCasts } from './farcaster/event-stream';
 import {
   getPendingReply,
@@ -900,6 +901,10 @@ bot.callbackQuery(/^inb:cmd:/, async (ctx) => {
   await ctx.reply(`${pr.repo} #${pr.number}, your call, run it yourself:\n${mergeCommand({ repo: pr.repo, number: pr.number, title: '', url: '', draft: false, createdAt: null })}`).catch(() => {});
   featureRan('inbox-nudge', 'merge command');
 });
+
+// ZOE final reviewer (ZOE_FINAL_REVIEW=1, default OFF): one merge-request card,
+// a tap re-checks head + CI and replies the pinned zao-merge line. Never merges.
+registerFinalReview(bot, { zaalId, ownerOnly, isFromZaal, scopeOf: chatScopeFor });
 
 bot.command(['grill', 'needsme'], async (ctx) => {
   if (!(await ownerOnly(ctx))) return;

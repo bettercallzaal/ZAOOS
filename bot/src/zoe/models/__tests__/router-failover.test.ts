@@ -20,7 +20,7 @@ import {
  * (openrouter fails -> grok succeeds) without hitting any provider.
  */
 
-const KEYS = ['XAI_API_KEY', 'OPENAI_API_KEY', 'OPENROUTER_API_KEY', 'ANTHROPIC_API_KEY', 'MODEL_ROUTING_ENABLED', 'OPENROUTER_MODEL', 'OPENROUTER_HIGH_MODEL', 'SURPLUS_API_KEY', 'SURPLUS_BASE_URL', 'SURPLUS_MODEL', 'OLLAMA_ENABLED', 'OLLAMA_URL', 'OLLAMA_MODEL'];
+const KEYS = ['XAI_API_KEY', 'OPENAI_API_KEY', 'OPENROUTER_API_KEY', 'ZOE_OPENROUTER_RUNG', 'ANTHROPIC_API_KEY', 'MODEL_ROUTING_ENABLED', 'OPENROUTER_MODEL', 'OPENROUTER_HIGH_MODEL', 'SURPLUS_API_KEY', 'SURPLUS_BASE_URL', 'SURPLUS_MODEL', 'OLLAMA_ENABLED', 'OLLAMA_URL', 'OLLAMA_MODEL'];
 const saved: Record<string, string | undefined> = {};
 const realFetch = globalThis.fetch;
 
@@ -60,7 +60,7 @@ describe('hasCapFallbackProvider', () => {
   it('false when no non-Claude provider is configured', () => {
     expect(hasCapFallbackProvider()).toBe(false);
   });
-  it.each(['OPENROUTER_API_KEY', 'XAI_API_KEY', 'OPENAI_API_KEY'])('true when %s is set', (k) => {
+  it.each(['XAI_API_KEY', 'OPENAI_API_KEY'])('true when %s is set', (k) => {
     setEnv({ [k]: 'x' });
     expect(hasCapFallbackProvider()).toBe(true);
   });
@@ -72,7 +72,7 @@ describe('callCapFallback', () => {
   });
 
   it('uses OpenRouter first when available', async () => {
-    setEnv({ OPENROUTER_API_KEY: 'or', XAI_API_KEY: 'xai' });
+    setEnv({ OPENROUTER_API_KEY: 'or', ZOE_OPENROUTER_RUNG: '1', XAI_API_KEY: 'xai' });
     const fetchMock = vi.fn(async () => okResponse('from-openrouter'));
     globalThis.fetch = fetchMock as unknown as typeof fetch;
     const { result, provider } = await callCapFallback('sys', 'msg');
@@ -82,7 +82,7 @@ describe('callCapFallback', () => {
   });
 
   it('LADDER: falls through OpenRouter failure to Grok success', async () => {
-    setEnv({ OPENROUTER_API_KEY: 'or', XAI_API_KEY: 'xai' });
+    setEnv({ OPENROUTER_API_KEY: 'or', ZOE_OPENROUTER_RUNG: '1', XAI_API_KEY: 'xai' });
     let call = 0;
     globalThis.fetch = vi.fn(async () => {
       call++;
@@ -95,7 +95,7 @@ describe('callCapFallback', () => {
   });
 
   it('throws an aggregate error when EVERY provider fails', async () => {
-    setEnv({ OPENROUTER_API_KEY: 'or', XAI_API_KEY: 'xai', OPENAI_API_KEY: 'oai' });
+    setEnv({ OPENROUTER_API_KEY: 'or', ZOE_OPENROUTER_RUNG: '1', XAI_API_KEY: 'xai', OPENAI_API_KEY: 'oai' });
     globalThis.fetch = vi.fn(async () => {
       throw new Error('boom');
     }) as unknown as typeof fetch;
@@ -154,7 +154,7 @@ describe('callCapFallback tier routing (high-tier escalation, doc 2217)', () => 
   }
 
   it("default tier uses the cheap OpenRouter model (deepseek)", async () => {
-    setEnv({ OPENROUTER_API_KEY: 'or' });
+    setEnv({ OPENROUTER_API_KEY: 'or', ZOE_OPENROUTER_RUNG: '1' });
     const fetchMock = vi.fn(async () => okResponse('ok'));
     globalThis.fetch = fetchMock as unknown as typeof fetch;
     await callCapFallback('sys', 'msg');
@@ -162,7 +162,7 @@ describe('callCapFallback tier routing (high-tier escalation, doc 2217)', () => 
   });
 
   it("tier 'high' escalates to the frontier cross-family model (OPENROUTER_HIGH_MODEL)", async () => {
-    setEnv({ OPENROUTER_API_KEY: 'or' });
+    setEnv({ OPENROUTER_API_KEY: 'or', ZOE_OPENROUTER_RUNG: '1' });
     const fetchMock = vi.fn(async () => okResponse('ok'));
     globalThis.fetch = fetchMock as unknown as typeof fetch;
     await callCapFallback('sys', 'msg', { tier: 'high' });
@@ -171,7 +171,7 @@ describe('callCapFallback tier routing (high-tier escalation, doc 2217)', () => 
   });
 
   it('OPENROUTER_MODEL still overrides the cheap default', async () => {
-    setEnv({ OPENROUTER_API_KEY: 'or', OPENROUTER_MODEL: 'meta-llama/llama-4' });
+    setEnv({ OPENROUTER_API_KEY: 'or', ZOE_OPENROUTER_RUNG: '1', OPENROUTER_MODEL: 'meta-llama/llama-4' });
     const fetchMock = vi.fn(async () => okResponse('ok'));
     globalThis.fetch = fetchMock as unknown as typeof fetch;
     await callCapFallback('sys', 'msg');
@@ -195,7 +195,7 @@ describe('surplus intelligence fallback rung', () => {
   });
 
   it('carries the call when OpenRouter is out of credits - the 2026-08-21 case', async () => {
-    setEnv({ OPENROUTER_API_KEY: 'sk-or-test', SURPLUS_API_KEY: 'sk-surplus-test', XAI_API_KEY: undefined, OPENAI_API_KEY: undefined });
+    setEnv({ OPENROUTER_API_KEY: 'sk-or-test', ZOE_OPENROUTER_RUNG: '1', SURPLUS_API_KEY: 'sk-surplus-test', XAI_API_KEY: undefined, OPENAI_API_KEY: undefined });
     const seen: string[] = [];
     globalThis.fetch = vi.fn(async (url: string | URL | Request) => {
       const href = String(url);
@@ -273,7 +273,7 @@ describe('the local rung: Ollama, last and keyless', () => {
   });
 
   it('sits LAST: it serves only when every paid rung has failed', async () => {
-    setEnv({ OPENROUTER_API_KEY: 'or', OLLAMA_ENABLED: '1' });
+    setEnv({ OPENROUTER_API_KEY: 'or', ZOE_OPENROUTER_RUNG: '1', OLLAMA_ENABLED: '1' });
     expect(capFallbackProviders()).toEqual(['openrouter', 'ollama']);
     const tried: string[] = [];
     globalThis.fetch = vi.fn(async (url: string | URL | Request) => {
@@ -330,7 +330,7 @@ describe('the local rung: Ollama, last and keyless', () => {
   });
 
   it('reports ladder DEPTH, because one rung is a second single point of failure', () => {
-    setEnv({ OPENROUTER_API_KEY: 'or' });
+    setEnv({ OPENROUTER_API_KEY: 'or', ZOE_OPENROUTER_RUNG: '1' });
     expect(capFallbackProviders()).toEqual(['openrouter']); // what the estate had on 2026-09-11
     setEnv({ OLLAMA_ENABLED: '1' });
     expect(capFallbackProviders()).toEqual(['openrouter', 'ollama']);
@@ -356,7 +356,7 @@ describe('free-tier models never receive this path\'s traffic', () => {
   });
 
   it('a :free OPENROUTER_MODEL sends nothing to OpenRouter and falls through to the next rung', async () => {
-    setEnv({ OPENROUTER_API_KEY: 'test', OPENROUTER_MODEL: 'poolside/laguna-s-2.1:free', XAI_API_KEY: 'test' });
+    setEnv({ OPENROUTER_API_KEY: 'test', ZOE_OPENROUTER_RUNG: '1', OPENROUTER_MODEL: 'poolside/laguna-s-2.1:free', XAI_API_KEY: 'test' });
     const urls: string[] = [];
     globalThis.fetch = vi.fn(async (url: string | URL | Request) => {
       urls.push(String(url));
@@ -369,7 +369,7 @@ describe('free-tier models never receive this path\'s traffic', () => {
   });
 
   it('a :free OPENROUTER_HIGH_MODEL is refused on the high tier too', async () => {
-    setEnv({ OPENROUTER_API_KEY: 'test' });
+    setEnv({ OPENROUTER_API_KEY: 'test', ZOE_OPENROUTER_RUNG: '1' });
     vi.resetModules();
     process.env.OPENROUTER_HIGH_MODEL = 'nvidia/nemotron-3-super-120b-a12b:free';
     const fresh = await import('../router');
@@ -378,5 +378,42 @@ describe('free-tier models never receive this path\'s traffic', () => {
     globalThis.fetch = fetchMock as unknown as typeof fetch;
     await expect(fresh.callCapFallback('sys', 'private', { tier: 'high' })).rejects.toThrow(/refusing free-tier model/);
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+});
+
+/**
+ * OpenRouter is opt-in (ruling item 194, Zaal 2026-11-04: "for now lets keep
+ * using claude"). A key alone must not put it in the live order; ZOE_OPENROUTER_RUNG=1
+ * restores it. The default is asserted here so a flipped literal fails a test.
+ */
+describe('OpenRouter is opt-in (ruling item 194)', () => {
+  it('the flag defaults OFF: an OpenRouter key alone is not a rung', () => {
+    setEnv({ OPENROUTER_API_KEY: 'or' });
+    expect(process.env.ZOE_OPENROUTER_RUNG).toBeUndefined();
+    expect(capFallbackProviders()).not.toContain('openrouter');
+    expect(hasCapFallbackProvider()).toBe(false);
+  });
+
+  it('flag OFF: a call with only an OpenRouter key never reaches OpenRouter', async () => {
+    setEnv({ OPENROUTER_API_KEY: 'or' });
+    const fetchMock = vi.fn(async () => okResponse('should-not-happen'));
+    globalThis.fetch = fetchMock as unknown as typeof fetch;
+    await expect(callCapFallback('sys', 'msg')).rejects.toThrow(/no cap-fallback provider configured/);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('flag OFF: where OpenRouter would have been chosen, the next rung (Grok) takes the call', async () => {
+    setEnv({ OPENROUTER_API_KEY: 'or', XAI_API_KEY: 'xai' });
+    const fetchMock = vi.fn(async () => okResponse('from-grok'));
+    globalThis.fetch = fetchMock as unknown as typeof fetch;
+    const { provider } = await callCapFallback('sys', 'msg');
+    expect(provider).toBe('grok');
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(String((fetchMock.mock.calls[0] as unknown as [string])[0])).not.toContain('openrouter.ai');
+  });
+
+  it('flag ON (ZOE_OPENROUTER_RUNG=1): OpenRouter is the first rung again', () => {
+    setEnv({ OPENROUTER_API_KEY: 'or', ZOE_OPENROUTER_RUNG: '1', XAI_API_KEY: 'xai' });
+    expect(capFallbackProviders()).toEqual(['openrouter', 'grok']);
   });
 });

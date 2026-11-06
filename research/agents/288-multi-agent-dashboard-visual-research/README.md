@@ -2,7 +2,7 @@
 topic: agents
 type: research
 status: research-complete
-last-validated: 2026-05-21
+last-validated: 2026-11-06
 original-query: Find real visual examples of multi-agent dashboards, extract UI patterns, and recommend an approach for ZAO's 7-agent admin dashboard (reconstructed)
 tier: high
 ---
@@ -401,6 +401,40 @@ Four stat cards:
 4. **ZAO's unique angle is the named squad with personalities** — no existing dashboard treats agents as characters with names, roles, and relationships. Building this creates something genuinely new.
 
 5. **Start with a status.json file on the VPS** — the simplest possible data pipeline. ZOE already writes task files and results. Adding a structured status.json to the heartbeat routine takes 30 minutes and unlocks the entire dashboard.
+
+---
+
+## Updated 2026-11-06
+
+Six material developments since last validation (2026-05-21). Note: the 2026-11-04 radar run documented three of these in `_radar/2026-11-04.md` but did not update this doc.
+
+### 1. Langfuse acquired by ClickHouse (January 16, 2026) - MISSED IN MAY VALIDATION
+
+ClickHouse acquired Langfuse on January 16, 2026, alongside a $400M Series D. The MIT license, self-hosting, and Cloud endpoints are unchanged (ClickHouse had already been Langfuse's storage backend since v3). Introduces strategic uncertainty about direction, but Langfuse Cloud continues as a standalone service. Source: [ClickHouse blog](https://clickhouse.com/blog/clickhouse-acquires-langfuse-open-source-llm-observability) (PARTIAL - blocked by network policy, claims consistent across multiple search results), [Orrick legal advisory](https://www.orrick.com/de-DE/news/2026/01/open-source-llm-observability-langfuse-acquired-by-clickhouse-inc) (PARTIAL).
+
+### 2. Langfuse v4 (August 13-17, 2026)
+
+Langfuse v4 released with up to 165x faster table loads over large datasets (milliseconds vs. seconds for initial loads). Key additions: full-text search, Observations API v2, Metrics API v2, code evaluators (deterministic Python/TypeScript checks on live observations), and monitors/alerts (June 2026, pre-v4). Monitors watch cost, quality, and latency metrics and notify over Slack, webhooks, or GitHub Actions. Langfuse Cloud becomes v4-only on 2026-11-16. Source: [Langfuse changelog](https://langfuse.com/changelog/2026-08-17-langfuse-v4) (PARTIAL - blocked, claims consistent across search results).
+
+### 3. Opik (Comet) adds native Claude Code plugin (June 2026)
+
+Comet's open-source Opik observability platform added a Claude Code plugin: `/plugin marketplace add comet-ml/opik-claude-code-plugin`. After install, every turn, tool call, and subagent is logged to Opik with subagent invocations nested under their parent Task span. Alternative path via Claude Code's native OTel export to Opik's OTLP endpoint. Beta-labeled as of search date. Directly relevant to ZAO's Claude Code-based agent stack (BUILDER, ZOE sessions). Source: [Opik Claude Code docs](https://www.comet.com/docs/opik/integrations/claude-code.md) (PARTIAL - blocked), [Claude Marketplace listing](https://claudemarketplaces.com/skills/comet-ml/opik-skills/instrument) (PARTIAL).
+
+### 4. Honeycomb Agent Timeline GA (May 12, 2026 launch, GA shortly after)
+
+Honeycomb launched Agent Timeline at Innovation Week on May 12, 2026. It renders multi-agent, multi-trace workflows as a single coherent view, connecting every LLM call, tool invocation, agent handoff, and downstream system impact in real time. OTel-native - uses OpenTelemetry GenAI semantic conventions v1.40.0 without proprietary SDKs. Also launched: Canvas Agent and Canvas Skills. Agent Timeline is now generally available to all Honeycomb customers. Source: Search snippet from [Honeycomb blog](https://www.honeycomb.io/blog/agent-timeline-generally-available) (UNVERIFIED - site blocked by network policy).
+
+### 5. Cisco acquires Galileo (closed May 22, 2026)
+
+Cisco announced acquisition of Galileo on April 9, 2026; closed May 22. Galileo's AI agent evaluation platform (hallucinations, bias, security metrics, cost/usage tracking) now feeds Cisco's Splunk observability portfolio. Galileo had contributed to Cisco's open-source AGNTCY initiative. Impact on independent Galileo as a tool is uncertain; integration with Splunk UX is the key signal to watch. Source: [Cisco blog](https://blogs.cisco.com/news/Cisco-announces-the-intent-to-acquire-galileo) (PARTIAL - blocked), claims consistent across multiple search results.
+
+### 6. Claude Code Agent View (May 11, 2026, Research Preview)
+
+Anthropic launched a built-in multi-agent dashboard inside Claude Code on May 11-12, 2026. Access via `claude agents` (requires Claude Code 2.1.139+). Available on Pro, Max, Team, Enterprise, and API plans. Shows all background sessions grouped by status (running, needs input, done). Dispatching tasks, peeking status, and replying inline all supported. Enterprise admins can disable it. DIRECTLY RELEVANT: This is the first-party dashboard for monitoring concurrent Claude Code agent sessions - exactly what ZAO needs for BUILDER/ZOE monitoring. Source: [Anthropic resources](https://claude.com/resources/articles/agent-view-in-claude-code) (PARTIAL - blocked), claims consistent across multiple secondary sources.
+
+### 7. OTel GenAI Semantic Conventions v1.41 (May-June 2026)
+
+OpenTelemetry GenAI semantic conventions added agent-specific span types in v1.41: `invoke_agent` split into CLIENT/INTERNAL, `execute_tool` requires tool name, `invoke_workflow`, reasoning tokens, streaming metrics. Core chat/embedding attributes are production-stable; agent and multi-agent attributes remain in development status (conflicting reports on whether they stabilized in June 2026). The parent-child span model for multi-agent correlation (supervisor span contains sub-agent invocation spans) is the standard pattern. Cross-agent correlation across service boundaries remains the open problem. Source: [GreptTime analysis](https://greptime.com/blogs/2026-05-09-opentelemetry-genai-semantic-conventions) (PARTIAL - blocked), search results consistent.
 
 ---
 

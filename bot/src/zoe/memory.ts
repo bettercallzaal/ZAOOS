@@ -799,6 +799,36 @@ export async function appendTriageContext(
  */
 
 /**
+ * The ZAO Devz group profile (Zaal, 2026-11-07, vault
+ * decisions/seat-2026-11-07-zoe-devz-rulings.md item 2.3). On 7 Nov ZOE was
+ * asked in the group "what do you know about zaodevz" and could only say "I
+ * don't have specific detail on current projects". Facts are from the seat's
+ * 7 Nov review of the group's own chat, cut to what is safe in a public repo:
+ * first names and what each person builds, no handles, ids or circumstances.
+ * Update it here when a project starts or ends; it is code, so it is reviewed.
+ */
+export const DEVZ_GROUP_PROFILE: string = [
+  'Group Profile: ZAO Devz',
+  'What it is: the working chat where The ZAO builders coordinate, test and ship. Each member has a topic for their own project.',
+  'Bots here: ZAO Devz (the Coder) and Hermes (the Critic) run the /fix code loop as two voices; ZOE (you) answers when tagged or replied to.',
+  'People and what they build:',
+  '- Zaal: founder of The ZAO, sets priorities, merges and publishes.',
+  "- Iman: builds and runs the ZAO Desk, posts the daily 'on desk' update, reviews newsletter facts, leads the shorts pipeline.",
+  '- Jose: tester and reader-perspective reviewer, masters audio for the shorts.',
+  '- Tom Fellenz, Thy Revolution, Danny, James Mage and others: builders and artists with their own topics.',
+  'Live projects: MixZ (DJ decks and streams), RewindZ (Space recaps), Sparkz project pages, the ZAO Desk dashboard, the ZAOstock shorts pipeline, gifted stock, the P2E quest.',
+  'Daily newsletter themes: Sun fractal prep, Mon week ahead, Tue music, Wed builders, Thu artist, Fri Respect, Sat WaveWarZ.',
+  'House rules: share here, not in DMs; tag or reply so the right person sees it; keep a message to one screen; long text goes to a readme or a Paragraph link, not the chat.',
+  "What you cannot do here: you cannot open Paragraph editor links (app.paragraph.com) or read GitHub, and you do not remember earlier days in this group. Say so plainly and ask for the text to be pasted; never guess at a project's status.",
+].join('\n');
+
+/** The ZAO Devz chat, by the devz process's own chat id or by its title. */
+export function isDevzGroup(chatId: string, title: string, devzChatId: string | undefined = process.env.ZAO_DEVZ_CHAT_ID): boolean {
+  if (devzChatId && devzChatId.trim() === chatId) return true;
+  return /\bzao\s*devz\b/i.test(title);
+}
+
+/**
  * Build sanitized context for groups (e.g. COC, ZAO Civilization), ensuring
  * private human profiles, private tasks, and internal decisions are never leaked.
  */
@@ -809,7 +839,9 @@ export function buildGroupContext(chatId: string, chatTitle?: string, personaOve
     /community\s+of\s+communities/i.test(title) ||
     /\bcoc\b/i.test(title);
 
-  const partnerContext = isCoc
+  const partnerContext = isDevzGroup(chatId, title)
+    ? DEVZ_GROUP_PROFILE
+    : isCoc
     ? [
         'Group Profile: Community of Communities (COC)',
         'Key Partners: Craig (@thyrevolution) and core COC collaborators.',

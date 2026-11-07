@@ -22,6 +22,7 @@ import {
   removeAllowlistMember,
   setGroupMode,
   shouldRespond,
+  groupUntaggedAllowed,
   upsertGroup,
   ENGAGED_MAX_TURNS,
   ENGAGED_WINDOW_MS,
@@ -303,7 +304,7 @@ describe("autoRegisterGroup", () => {
 // then types two more lines without a mention; both were skipped as
 // "mode=mention + no mention/reply". Ids below are made up.
 
-describe('shouldRespond engaged window', () => {
+describe('shouldRespond engaged window (only with ZOE_GROUP_UNTAGGED=1)', () => {
   const CHAT = -1000000000001;
   const MEMBER = 424242;
   const OTHER = 515151;
@@ -327,14 +328,14 @@ describe('shouldRespond engaged window', () => {
 
   it('allows a follow-up with no mention while the window is open', () => {
     const now = 1_000_000;
-    const r = shouldRespond(mentionCfg, { ...base, engagedUntil: now + 60_000, nowMs: now });
+    const r = shouldRespond(mentionCfg, { ...base, engagedUntil: now + 60_000, nowMs: now }, true);
     expect(r.allow).toBe(true);
     expect(r.reason).toBe('mode=mention + engaged window');
   });
 
   it('skips the same follow-up once the window has passed', () => {
     const now = 1_000_000;
-    const r = shouldRespond(mentionCfg, { ...base, engagedUntil: now - 1, nowMs: now });
+    const r = shouldRespond(mentionCfg, { ...base, engagedUntil: now - 1, nowMs: now }, true);
     expect(r.allow).toBe(false);
     expect(r.reason).toBe('mode=mention + no mention/reply');
   });
@@ -369,7 +370,7 @@ describe('shouldRespond engaged window', () => {
   it('a member with no mention passes the gate once anyone in the chat was answered', () => {
     const now = 10_000;
     markEngaged(CHAT, MEMBER, now);
-    const r = shouldRespond(mentionCfg, { ...base, fromId: OTHER, engagedUntil: engagedUntilFor(CHAT, OTHER), nowMs: now + 1_000 });
+    const r = shouldRespond(mentionCfg, { ...base, fromId: OTHER, engagedUntil: engagedUntilFor(CHAT, OTHER), nowMs: now + 1_000 }, true);
     expect(r.allow).toBe(true);
     expect(r.reason).toBe('mode=mention + engaged window');
   });
@@ -404,5 +405,49 @@ describe('shouldRespond engaged window', () => {
     const later = ENGAGED_MAX_TURNS * 1_000 + ENGAGED_WINDOW_MS + 1;
     markEngaged(CHAT, MEMBER, later);
     expect(engagedUntilFor(CHAT, MEMBER)).toBe(later + ENGAGED_WINDOW_MS);
+  });
+});
+
+// Ruling 300 (Zaal, 2026-11-07): in a group ZOE replies only when @-mentioned or
+// replied to. Red controls: each "refused" case below was allowed before.
+describe('shouldRespond: mention or reply only (untagged off, the default)', () => {
+  const cfgOf = (mode: 'mention' | 'all') => ({
+    chat_id: 1, chat_title: 'g', mode, member_allowlist: [], created_at: '', updated_at: '',
+  });
+  const plain = {
+    fromId: 42, botUsername: 'zaoclaw_bot', botId: 999,
+    messageText: 'talking to someone else, not to ZOE', entities: [],
+  };
+
+  it('refuses an untagged message in mode=all', () => {
+    const r = shouldRespond(cfgOf('all'), plain, false);
+    expect(r.allow).toBe(false);
+    expect(r.reason).toBe('mode=all + no mention/reply (untagged replies off)');
+  });
+
+  it('refuses an untagged message inside an open engaged window', () => {
+    const now = 1_000_000;
+    const r = shouldRespond(cfgOf('mention'), { ...plain, engagedUntil: now + 60_000, nowMs: now }, false);
+    expect(r.allow).toBe(false);
+  });
+
+  it.each(['mention', 'all'] as const)('mode=%s still answers an @-mention', (mode) => {
+    const text = '@zaoclaw_bot what is on today';
+    const r = shouldRespond(cfgOf(mode), { ...plain, messageText: text, entities: [{ type: 'mention', offset: 0, length: 12 }] }, false);
+    expect(r.allow).toBe(true);
+  });
+
+  it.each(['mention', 'all'] as const)('mode=%s still answers a reply to ZOE', (mode) => {
+    expect(shouldRespond(cfgOf(mode), { ...plain, replyToFromId: 999 }, false).allow).toBe(true);
+  });
+
+  it('/ask counts as an explicit address', () => {
+    expect(shouldRespond(cfgOf('mention'), { ...plain, isCommand: true }, false).allow).toBe(true);
+  });
+
+  it('the default comes from ZOE_GROUP_UNTAGGED, off unless exactly 1', () => {
+    expect(groupUntaggedAllowed({})).toBe(false);
+    expect(groupUntaggedAllowed({ ZOE_GROUP_UNTAGGED: 'true' })).toBe(false);
+    expect(groupUntaggedAllowed({ ZOE_GROUP_UNTAGGED: '1' })).toBe(true);
   });
 });

@@ -15,7 +15,7 @@
  *   OR: systemd user unit zoe-bot.service
  */
 import { groupIds } from './env';
-import { OWNER_ONLY_LINE, newOwnerOnlyState, privateScopeAllowed, shouldSendOwnerOnlyLine } from './owner-only';
+import { OWNER_ONLY_LINE, newOwnerOnlyState, privateScopeAllowed, shouldSendOwnerOnlyLine, voiceGate } from './owner-only';
 import { config as loadEnv } from 'dotenv';
 import { sendChunkedToTelegram } from './tg-chunk';
 loadEnv();
@@ -628,6 +628,7 @@ bot.command("ask", async (ctx) => {
     botId: botIdHolder.value,
     messageText: prompt,
     entities: [],
+    isCommand: true,
   });
   if (!gate.allow) {
     console.log(`[zoe/groups] /ask in ${chatId} skipped: ${gate.reason}`);
@@ -2112,11 +2113,9 @@ bot.on("message:new_chat_members", async (ctx) => {
     }
   }
   if (added.length > 0) {
+    // No welcome line: ZOE speaks in a group only when tagged or replied to
+    // (ruling 300, 2026-11-07). The allowlisting itself is unchanged.
     console.log(`[zoe] auto-allowlisted ${added.length} new member(s) in ${cfg.chat_title}: ${added.join(', ')}`);
-    const threadId = ctx.message?.message_thread_id;
-    await ctx
-      .reply(`Welcome ${added.join(', ')} - you can talk to me right here.`, threadId ? { message_thread_id: threadId } : {})
-      .catch(() => undefined);
   }
 });
 
@@ -2752,12 +2751,16 @@ bot.on('message:text', async (ctx) => {
 // Voice / audio intake (Zaal DM only): transcribe via Groq Whisper, then run it
 // through the exact same turn path as a typed message. Lets Zaal voice-answer.
 bot.on(['message:voice', 'message:audio'], async (ctx) => {
-  if (!(await ownerOnly(ctx))) return;
   const zaalBotzGroupIdV = groupIds().zaalBotzGroup;
   const isZaalBotzV = zaalBotzGroupIdV !== 0 && ctx.chat.id === zaalBotzGroupIdV;
-  // Voice is handled in Zaal's DM and in the ZAAL BOTZ group (voice-answer a
-  // question / voice-drop into a topic). Ignore any other chat.
-  if (ctx.chat.type !== 'private' && !isZaalBotzV) return;
+  // Scope before owner (voiceGate, owner-only.ts): voice is handled in Zaal's DM
+  // and in the ZAAL BOTZ group; anyone else's voice note in a group gets silence.
+  const gate = voiceGate(ctx.chat.type, isFromZaal(ctx), isZaalBotzV);
+  if (gate === 'owner-line') {
+    await ownerOnly(ctx);
+    return;
+  }
+  if (gate === 'silent') return;
   const chatId = ctx.chat.id;
   const fileId = ctx.message.voice?.file_id ?? ctx.message.audio?.file_id;
   if (!fileId) return;

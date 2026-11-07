@@ -42,6 +42,8 @@ export interface GateContext {
   engagedUntil?: number;
   /** Clock for the engaged check; tests pass it, callers leave it to Date.now(). */
   nowMs?: number;
+  /** A slash command addressed to ZOE (/ask): an explicit ask, counted like a mention. */
+  isCommand?: boolean;
 }
 
 export interface GateResult {
@@ -159,7 +161,22 @@ export async function autoRegisterGroup(
   });
 }
 
-export function shouldRespond(config: GroupConfig | null, gctx: GateContext): GateResult {
+/**
+ * Untagged group replies (mode=all, the engaged window) are OFF unless
+ * ZOE_GROUP_UNTAGGED=1. Zaal, 2026-11-07, ruling 300: "i dont like if it
+ * responds when not tagged cause sometimes im responding to someone else and it
+ * interrupts". That ruling is newer than item 135 (2026-11-02, the chat-wide
+ * engaged window) and wins; the flag is the cheap way back.
+ */
+export function groupUntaggedAllowed(env: NodeJS.ProcessEnv = process.env): boolean {
+  return env.ZOE_GROUP_UNTAGGED === '1';
+}
+
+export function shouldRespond(
+  config: GroupConfig | null,
+  gctx: GateContext,
+  untagged: boolean = groupUntaggedAllowed(),
+): GateResult {
   if (!config) return { allow: false, reason: 'group not configured (default silent)' };
   if (config.mode === 'silent') return { allow: false, reason: 'group mode=silent' };
   const isRestricted =
@@ -167,14 +184,16 @@ export function shouldRespond(config: GroupConfig | null, gctx: GateContext): Ga
   if (isRestricted && !config.member_allowlist.includes(gctx.fromId)) {
     return { allow: false, reason: `sender ${gctx.fromId} not in member_allowlist` };
   }
+  // Mention or reply first, in every mode: the only triggers when untagged is off.
+  const mentioned = isBotMentioned(gctx);
+  const isReplyToBot = gctx.botId !== null && gctx.replyToFromId === gctx.botId;
+  if (mentioned) return { allow: true, reason: `mode=${config.mode} + @-mention` };
+  if (isReplyToBot) return { allow: true, reason: `mode=${config.mode} + reply-to-bot` };
+  if (gctx.isCommand) return { allow: true, reason: `mode=${config.mode} + command` };
+  if (!untagged) return { allow: false, reason: `mode=${config.mode} + no mention/reply (untagged replies off)` };
   if (config.mode === 'all') {
     return { allow: true, reason: 'mode=all' };
   }
-  // mode === 'mention'
-  const mentioned = isBotMentioned(gctx);
-  const isReplyToBot = gctx.botId !== null && gctx.replyToFromId === gctx.botId;
-  if (mentioned) return { allow: true, reason: 'mode=mention + @-mention' };
-  if (isReplyToBot) return { allow: true, reason: 'mode=mention + reply-to-bot' };
   // A member who just got an answer from ZOE is still talking to her. Zaal,
   // 1 Nov 2026: give ZOE "more ability to talk to community members,
   // especially groups they're talking back with it in". Measured on the VPS

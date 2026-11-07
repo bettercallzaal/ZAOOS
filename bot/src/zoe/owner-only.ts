@@ -48,3 +48,22 @@ export function shouldSendOwnerOnlyLine(state: OwnerOnlyState, userId: number, n
 export function privateScopeAllowed(scope: string, fromZaal: boolean): boolean {
   return scope !== 'private' || fromZaal;
 }
+
+/**
+ * Who a voice note or audio file is answered for (Zaal, 2026-11-07).
+ *
+ * The voice handler used to run the owner gate FIRST, so a voice note from
+ * anyone else in ANY group got "That one is Zaal's." (the ZAO Devz chat review
+ * of 7 Nov found it). The scope comes first now:
+ * - a group or channel never hears from ZOE about someone else's voice note,
+ *   the same silence the photo/document handler already keeps;
+ * - Zaal's voice is handled in his DM and in the ZAAL BOTZ group only;
+ * - a non-owner DM keeps the owner-only line, as every other DM path does.
+ */
+export type VoiceGate = 'handle' | 'silent' | 'owner-line';
+
+export function voiceGate(chatType: string, fromZaal: boolean, isZaalBotzGroup: boolean): VoiceGate {
+  if (chatType === 'private') return fromZaal ? 'handle' : 'owner-line';
+  if (!fromZaal) return 'silent';
+  return isZaalBotzGroup ? 'handle' : 'silent';
+}

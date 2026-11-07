@@ -1,12 +1,14 @@
 /**
  * Caster pipeline (doc 761, Phase 2) under ZOE.
  *
- * Pipeline: draftCast (OpenRouter) -> safetyCheck (Klearu PRE) -> Telegram approval (human
- * gate) -> publishCast (sign -> write endpoint) -> optional Klearu POST.
+ * Pipeline: draftCast (OpenRouter) -> safetyCheck (Klearu PRE) -> Telegram card to Zaal ->
+ * on "Ready to post", the draft is handed back to him as text to post himself.
  *
- * The human-approval gate is mandatory and stack-independent: every drafted cast/reply goes to
- * the lead in Telegram for y/n before submitMessage. Reads/likes auto-allow; casts/replies and
- * all onchain $ZABAL actions require approval (doc 761).
+ * ZOE does not post to Farcaster (ruling 305, 2026-11-07). The card used to publish on Approve,
+ * through FFX or publishCast (sign -> paid write endpoint). It no longer calls either: the
+ * approve tap edits the card into the final text plus, for a reply, the cast to reply to, and
+ * Zaal posts it from his own account. publishCast itself refuses (farcaster/write.ts), so no
+ * other path can post either.
  *
  * Integration: call attachCaster(bot, { zaalId }) once at boot to register the approval
  * callback handler. The event stream (or a manual trigger) calls runCasterPipeline(...).
@@ -14,8 +16,8 @@
 import { Bot, Context, InlineKeyboard } from 'grammy';
 import { checkCast, type SafetyVerdict } from '../safety/klearu';
 import { draftCast } from './reason';
-import { publishCast } from '../farcaster/write';
-import { ffxAvailable, executeActionOnFfx } from '../exec/ffx';
+import { FARCASTER_WRITE_REFUSED } from '../farcaster/write';
+import { featureRan } from '../feature-ran';
 import { wasSendBlocked } from '../send-budget';
 
 export interface CasterTrigger {
@@ -89,7 +91,7 @@ export async function runCasterPipeline(
 
   const kind = trigger.parent ? 'reply' : 'cast';
   const kb = new InlineKeyboard()
-    .text('Approve', `cast-approve:${id}`)
+    .text('Ready to post', `cast-approve:${id}`)
     .text('Reject', `cast-reject:${id}`)
     .text('Regen', `cast-regen:${id}`);
 
@@ -112,6 +114,17 @@ export async function runCasterPipeline(
   }
 
   return { status: 'awaiting_approval', id, verdict };
+}
+
+/** The card text after "Ready to post": the draft, ready for Zaal to post himself. */
+export function handOffText(entry: Pick<PendingCast, 'trigger' | 'draftText'>): string {
+  const where = entry.trigger.parent
+    ? `Reply to cast ${entry.trigger.parent.hash} (fid ${entry.trigger.parent.fid}).`
+    : 'A new cast.';
+  return (
+    `[caster:${entry.trigger.agentId}] ready for you to post. ${FARCASTER_WRITE_REFUSED}\n` +
+    `${where}\n\n${entry.draftText}`
+  );
 }
 
 /** Register the approval callback handler. Call once at boot. */
@@ -151,30 +164,11 @@ export function attachCaster(bot: Bot, opts: { zaalId: number }): void {
       return;
     }
 
-    // approve -> publish. Phase 4: execution moves onto FFX when available (the human gate
-    // above is unchanged); otherwise publish in-process.
-    await ctx.answerCallbackQuery('publishing...');
-    try {
-      let line: string;
-      if (ffxAvailable()) {
-        await executeActionOnFfx({
-          agentId: entry.trigger.agentId,
-          kind: entry.trigger.parent ? 'reply' : 'cast',
-          text: entry.draftText,
-          parent: entry.trigger.parent,
-        });
-        line = 'PUBLISHED via FFX.';
-      } else {
-        const result = await publishCast({ text: entry.draftText, parent: entry.trigger.parent });
-        line = `PUBLISHED.\nhash: ${result.hash}\nfid: ${result.fid}`;
-      }
-      pending.delete(id);
-      await ctx.editMessageText(`[caster:${entry.trigger.agentId}] ${line}\n\n${entry.draftText}`);
-    } catch (e) {
-      await ctx.editMessageText(
-        `[caster:${entry.trigger.agentId}] publish FAILED: ${e instanceof Error ? e.message : e}\n\n` +
-          `Draft kept. Try Regen or fix the write endpoint.\n\n${entry.draftText}`,
-      );
-    }
+    // approve -> hand the draft to Zaal. Never publish (ruling 305): no FFX call, no
+    // publishCast. The final text is what he copies into Farcaster himself.
+    pending.delete(id);
+    await ctx.answerCallbackQuery('draft ready');
+    featureRan('caster-draft-handed-off', entry.trigger.agentId);
+    await ctx.editMessageText(handOffText(entry));
   });
 }

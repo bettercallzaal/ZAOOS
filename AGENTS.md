@@ -150,8 +150,8 @@ The `bot/` tree houses Telegram bots running on VPS 1 (Hostinger KVM 2). Hermes 
 | Bot | Source | Purpose |
 |-----|--------|---------|
 | ZOE (`@zaoclaw_bot`) | `bot/src/zoe/` | Single concierge: tasks, captures, brief/reflect, recall, newsletter, social drafts |
-| Hermes (`@zoe_hermes_bot`) | `bot/src/hermes/` | Autonomous fix-PR pipeline (coder + critic + auto-PR) |
-| ZAO Devz (`@zaodevz_bot`) | `bot/src/devz/` | Group dispatch + hourly learning tip cron |
+| Hermes (`@zoe_hermes_bot`) | `bot/src/hermes/` | Autonomous fix-PR pipeline (coder + critic + auto-PR). The Telegram identity is live only as the Critic voice inside the ZAO Devz process (measured 2026-11-07) |
+| ZAO Devz (`@zaodevz_bot`) | `bot/src/devz/` | Group dispatch: `/fix`, @mention, `/fix_status`, loopback `/hermes-dispatch`. No tip cron: the hourly tip was a separate Python cron, gone from the VPS crontab (measured 2026-11-07) |
 | ZAOstock (`@ZAOstockTeamBot`) | `bot/` (root, separate) | Festival team coordination - graduates with ZAOstock spinout |
 
 Conventions inside `bot/`:

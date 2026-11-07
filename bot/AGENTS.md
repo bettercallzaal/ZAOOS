@@ -16,7 +16,7 @@ If you are about to wire a new LLM call directly to the Anthropic API, **stop**.
 |-----|--------|----------|---------|
 | ZOE | `bot/src/zoe/` | `@zaoclaw_bot` | Single concierge: tasks, captures, brief/reflect, recall, newsletter, social drafts |
 | Hermes | `bot/src/hermes/` | `@zoe_hermes_bot` | Autonomous fix-PR pipeline (coder + critic + auto-PR) |
-| ZAO Devz | `bot/src/devz/` | `@zaodevz_bot` | Group dispatch + hourly learning tip cron |
+| ZAO Devz | `bot/src/devz/` | `@zaodevz_bot` | Group dispatch (`/fix`, @mention, `/fix_status`, loopback `/hermes-dispatch`); no tip cron (none on the VPS, measured 2026-11-07) |
 | ZAOstock | `bot/src/index.ts` (root) | `@ZAOstockTeamBot` | Festival team coordination - graduates with ZAOstock spinout |
 
 **Rule: no new bots without a numbered research doc + Zaal sign-off.** New brand voices = persona block in `bot/src/zoe/persona.md` or `brand.md`, NOT a new process. Reference `research/agents/601-agent-stack-cleanup-decision/`.
@@ -80,7 +80,7 @@ ZOE persists state at `~/.zao/zoe/` on the VPS (Letta-style memory blocks):
 - **Reply-aware UX.** ZOE detects Telegram reply-to-bot-message and routes to the matching agent's edit mode (see `bot/src/zoe/index.ts` reply handler).
 - **Idempotent crons.** Every scheduled trigger writes a sentinel at `~/.zao/zoe/sentinels/<trigger>-<date>.flag` to prevent double-fires on restart.
 - **No API-key LLM calls.** Use `callClaudeCli()` (Max plan auth) for writing tasks. Use Ollama for free classify/short-answer (`ollamaClassify`, 90s timeout for cold start).
-- **Group vs DM.** Hourly learning tips go to ZAO Devz group (`devzChatId`). Brief + reflect go to Zaal DM. Don't cross the streams.
+- **Group vs DM.** Brief + reflect go to Zaal DM. ZOE posts nothing on a schedule into the ZAO Devz group: the hourly tip cron is gone (2026-07-26 in code, absent from the VPS crontab on 2026-11-07). Don't cross the streams.
 
 ## Boundaries
 

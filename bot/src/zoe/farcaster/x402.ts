@@ -13,7 +13,10 @@
  *
  * Env:
  *   X402_PAYMENT_PRIVATE_KEY  Base wallet holding USDC (signs the EIP-3009 authorization).
- *                             Defaults to CUSTODY_PRIVATE_KEY if unset (must hold USDC on Base).
+ *                             REQUIRED. There is no fallback to CUSTODY_PRIVATE_KEY: that
+ *                             fallback was removed 2026-11-07 (seat rulings item 2.5, from
+ *                             Iman's finding in iman-desk #168), so the Farcaster custody key
+ *                             can never sign a USDC payment. Unset = refuse, nothing signed.
  *   X402_PAY_TO               override recipient (default Neynar address above)
  *   X402_USDC_ADDRESS         override USDC token (default Base USDC)
  *   X402_VALUE                override micro-amount string (default '10000' = 0.01 USDC)
@@ -25,6 +28,9 @@ import { randomBytes } from 'node:crypto';
 const BASE_CHAIN_ID = 8453;
 const BASE_USDC = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913'; // USDC on Base
 const NEYNAR_PAY_TO = '0xA6a8736f18f383f1cc2d938576933E5eA7Df01A1';
+
+export const X402_KEY_MISSING =
+  'X402_PAYMENT_PRIVATE_KEY is not set; there is no CUSTODY_PRIVATE_KEY fallback, so no payment is signed';
 
 const EIP3009_TYPES = {
   TransferWithAuthorization: [
@@ -42,10 +48,11 @@ const EIP3009_TYPES = {
  * transferWithAuthorization over Base USDC.
  */
 export async function buildX402Header(): Promise<string> {
-  const pk = (process.env.X402_PAYMENT_PRIVATE_KEY ?? process.env.CUSTODY_PRIVATE_KEY) as
-    | `0x${string}`
-    | undefined;
-  if (!pk) throw new Error('X402_PAYMENT_PRIVATE_KEY (or CUSTODY_PRIVATE_KEY) required for x402 write payment');
+  const pk = process.env.X402_PAYMENT_PRIVATE_KEY as `0x${string}` | undefined;
+  if (!pk) {
+    console.error(`[zoe/x402] refused: ${X402_KEY_MISSING}`);
+    throw new Error(X402_KEY_MISSING);
+  }
   const account = privateKeyToAccount(pk);
 
   const usdc = (process.env.X402_USDC_ADDRESS ?? BASE_USDC) as `0x${string}`;

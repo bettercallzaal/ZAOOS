@@ -28,6 +28,7 @@ import { startHeartbeat, startHeartbeatAs } from '../lib/cowork';
 import { installAgentMarkupGuard } from '../agent-markup';
 import { safeEqual, isValidDocPath } from './dispatch-auth';
 import { newTracker, pollStatus, startBeat, trackPolling } from './liveness';
+import { featureRan } from '../zoe/feature-ran';
 
 const devzToken = process.env.ZAO_DEVZ_BOT_TOKEN;
 const hermesToken = process.env.HERMES_BOT_TOKEN;
@@ -229,7 +230,7 @@ devz.command('whoami', async (ctx) => {
  * Shared kickoff: validates admin + chat + claude CLI, then fires the Hermes
  * dispatch loop. Used by both `/fix` and the natural-language @mention handler.
  */
-async function kickOffFix(ctx: Context, issueText: string): Promise<void> {
+async function kickOffFix(ctx: Context, issueText: string, source: 'command' | 'mention'): Promise<void> {
   if (!isAdmin(ctx)) {
     await ctx.reply('Hermes is admin-only. Add yourself to BOT_ADMIN_TELEGRAM_IDS.');
     return;
@@ -254,6 +255,8 @@ async function kickOffFix(ctx: Context, issueText: string): Promise<void> {
   }
 
   await ctx.reply('Got it. Spinning up the loop. Updates incoming from me + HermesBot.');
+  // Success path: every gate passed and the run is about to start.
+  featureRan('devz-fix', source);
 
   // Fire-and-forget. Narrator surfaces progress.
   void runWithGuard({
@@ -269,7 +272,7 @@ devz.command('fix', async (ctx) => {
     await ctx.reply('Usage: /fix <issue> - or just @mention me with a description in plain English. Min 10 chars.');
     return;
   }
-  await kickOffFix(ctx, text);
+  await kickOffFix(ctx, text, 'command');
 });
 
 /**
@@ -290,7 +293,7 @@ devz.on('message:text', async (ctx) => {
     await ctx.reply('Hi - mention me with a description (10+ chars) of what to build or fix and I will run the Coder + Critic loop.');
     return;
   }
-  await kickOffFix(ctx, issue);
+  await kickOffFix(ctx, issue, 'mention');
 });
 
 devz.command('fix_status', async (ctx) => {
@@ -302,6 +305,7 @@ devz.command('fix_status', async (ctx) => {
       return;
     }
     await ctx.reply(formatRun(matches));
+    featureRan('devz-fix-status', 'devz one run');
     return;
   }
   const open = await listOpenRuns(10);
@@ -310,6 +314,7 @@ devz.command('fix_status', async (ctx) => {
     return;
   }
   await ctx.reply(open.map(formatRun).join('\n\n'));
+  featureRan('devz-fix-status', 'list');
 });
 
 // ---- HermesBot is mostly observer; expose a status command for visibility -----
@@ -340,6 +345,7 @@ hermes.command('fix_status', async (ctx) => {
       return;
     }
     await ctx.reply(formatRun(r));
+    featureRan('devz-fix-status', 'hermes one run');
     return;
   }
   const open = await listOpenRuns(10);
@@ -348,6 +354,7 @@ hermes.command('fix_status', async (ctx) => {
     return;
   }
   await ctx.reply(open.map(formatRun).join('\n\n'));
+  featureRan('devz-fix-status', 'list');
 });
 
 // ---- Helpers ---------------------------------------------------------------
@@ -388,6 +395,7 @@ async function runWithGuard(input: {
 }): Promise<void> {
   try {
     await dispatchHermesRun(input, buildNarrator());
+    featureRan('devz-run-finished');
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     try {
@@ -483,6 +491,7 @@ function startHermesHttpListener(): void {
         void runWithGuard(dispatchInput);
         res.writeHead(202, { 'content-type': 'application/json' });
         res.end(JSON.stringify({ accepted: true, doc, intent }));
+        featureRan('devz-hermes-dispatch', intent);
       });
     })
     .listen(port, '127.0.0.1', () => {

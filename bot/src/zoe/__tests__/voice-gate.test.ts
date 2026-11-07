@@ -54,3 +54,13 @@ describe('voice handler wiring in index.ts', () => {
     expect(body).toMatch(/if \(gate === 'owner-line'\) \{\s*await ownerOnly\(ctx\);\s*return;\s*\}/);
   });
 });
+
+describe('newcomer welcome (ruling 300)', () => {
+  const src = readFileSync(join(__dirname, '..', 'index.ts'), 'utf8');
+  it('ZOE no longer greets each auto-allowlisted newcomer in the group', () => {
+    expect(src).not.toContain('you can talk to me right here');
+  });
+  it('the allowlisting itself still happens', () => {
+    expect(src).toContain('await addAllowlistMember(chatId, member.id);');
+  });
+});

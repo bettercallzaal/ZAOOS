@@ -628,6 +628,7 @@ bot.command("ask", async (ctx) => {
     botId: botIdHolder.value,
     messageText: prompt,
     entities: [],
+    isCommand: true,
   });
   if (!gate.allow) {
     console.log(`[zoe/groups] /ask in ${chatId} skipped: ${gate.reason}`);
@@ -2112,11 +2113,9 @@ bot.on("message:new_chat_members", async (ctx) => {
     }
   }
   if (added.length > 0) {
+    // No welcome line: ZOE speaks in a group only when tagged or replied to
+    // (ruling 300, 2026-11-07). The allowlisting itself is unchanged.
     console.log(`[zoe] auto-allowlisted ${added.length} new member(s) in ${cfg.chat_title}: ${added.join(', ')}`);
-    const threadId = ctx.message?.message_thread_id;
-    await ctx
-      .reply(`Welcome ${added.join(', ')} - you can talk to me right here.`, threadId ? { message_thread_id: threadId } : {})
-      .catch(() => undefined);
   }
 });
 

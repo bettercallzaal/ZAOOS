@@ -15,7 +15,7 @@ If you are about to wire a new LLM call directly to the Anthropic API, **stop**.
 | Bot | Source | Telegram | Purpose |
 |-----|--------|----------|---------|
 | ZOE | `bot/src/zoe/` | `@zaoclaw_bot` | Single concierge: tasks, captures, brief/reflect, recall, newsletter, social drafts |
-| Hermes | `bot/src/hermes/` | `@zoe_hermes_bot` | Autonomous fix-PR pipeline (coder + critic + auto-PR) |
+| Hermes | `bot/src/hermes/` | `@zoe_hermes_bot` | Autonomous fix-PR pipeline (coder + critic + auto-PR). Not a standalone bot: its Telegram identity is live only as the Critic voice inside `zao-devz-stack.service` (measured 2026-11-07) |
 | ZAO Devz | `bot/src/devz/` | `@zaodevz_bot` | Group dispatch (`/fix`, @mention, `/fix_status`, loopback `/hermes-dispatch`); no tip cron (none on the VPS, measured 2026-11-07) |
 | ZAOstock | `bot/src/index.ts` (root) | `@ZAOstockTeamBot` | Festival team coordination - graduates with ZAOstock spinout |
 
@@ -33,7 +33,7 @@ npm run start:devz     # ZAO Devz production
 npm run typecheck      # tsc --noEmit
 ```
 
-ZOE + Hermes have their own systemd units on VPS:
+ZOE has its own systemd unit on the VPS (`zoe-bot`). Hermes has none: its Telegram identity runs inside `zao-devz-stack` as the Devz Critic voice (measured 2026-11-07):
 
 ```bash
 ssh zaal@31.97.148.88 'systemctl --user status zoe-bot zaostock-bot zao-devz-stack'
@@ -114,7 +114,7 @@ ZOE persists state at `~/.zao/zoe/` on the VPS (Letta-style memory blocks):
 bash bot/scripts/sync-supabase-env.sh   # pulls keys from local .env.local
 ```
 
-Required vars: `TELEGRAM_BOT_TOKEN`, `ZOE_TELEGRAM_BOT_TOKEN`, `HERMES_TELEGRAM_BOT_TOKEN`, `ZAOSTOCK_BOT_TOKEN`, `ZAAL_TELEGRAM_ID`, `DEVZ_CHAT_ID`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `BONFIRE_API_KEY`, `BONFIRE_AGENT_ID`.
+Required vars: `TELEGRAM_BOT_TOKEN`, `ZOE_TELEGRAM_BOT_TOKEN`, `HERMES_BOT_TOKEN` (read by `bot/src/devz/index.ts`), `ZAOSTOCK_BOT_TOKEN`, `ZAAL_TELEGRAM_ID`, `DEVZ_CHAT_ID`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `BONFIRE_API_KEY`, `BONFIRE_AGENT_ID`.
 
 Follow `.claude/rules/secret-hygiene.md` for any commit that touches `.env`-adjacent code.
 

@@ -1,21 +1,30 @@
 /**
- * Farcaster write path (doc 761, Phase 2). Signs a CastAdd with the configured Ed25519 signer
- * and submits it to the WRITE endpoint - NOT the read node (the self-hosted Hypersnap node is
- * read-only; doc 586 / doc 761 caveat 1).
+ * Farcaster write path: REFUSED. ZOE does not post to Farcaster.
  *
- * Shared by the caster pipeline. scripts/first-cast.ts mirrors this for the standalone Phase 1
- * smoke test.
+ * Ruling 305 (Zaal, 2026-11-07): "no zoe doesnt post to farcaster and we dont need to pos to
+ * farcaster it should help us post to farcaster adn reivew things on farcaster and tell us to
+ * comment on it etc". ZOE drafts casts and suggested replies; Zaal posts them himself.
  *
- * Env:
- *   FARCASTER_BOT_FID
- *   FARCASTER_WRITE_API_BASE   write-enabled hub base (NOT :3381)
- *   FARCASTER_WRITE_API_KEY    optional
- *   FC_NETWORK_ID              1 = MAINNET
- *   + signer env (see signer.ts)
+ * Until this change, publishCast signed a CastAdd with FARCASTER_SIGNER_PRIVATE_KEY and paid the
+ * Neynar hub per call via x402 (a USDC signature from X402_PAYMENT_PRIVATE_KEY, falling back to
+ * CUSTODY_PRIVATE_KEY). That implementation is in git history (doc 761, doc 762) if a later
+ * ruling ever wants it back; it is not kept here as dead code.
+ *
+ * publishCast stays exported so any caller, old or new, fails closed at this one gate: it logs
+ * one line and throws BEFORE it reads any env var, key or signer, and before any network call.
+ * Reads are unaffected (read-node.ts, event-stream.ts, wiki.ts).
  */
-import { makeCastAdd, FarcasterNetwork, Message, CastType } from '@farcaster/hub-nodejs';
-import { makeSigner } from './signer';
-import { buildX402Header, isX402Enabled } from './x402';
+
+export const FARCASTER_WRITE_REFUSED =
+  'ZOE does not post to Farcaster (ruling 305): the draft goes to Zaal and he posts it himself.';
+
+/** Thrown by publishCast on every call. A distinct type so a caller can tell refusal from failure. */
+export class FarcasterWriteRefusedError extends Error {
+  constructor() {
+    super(FARCASTER_WRITE_REFUSED);
+    this.name = 'FarcasterWriteRefusedError';
+  }
+}
 
 export interface PublishResult {
   hash: `0x${string}`;
@@ -29,55 +38,8 @@ export interface CastInput {
   parent?: { fid: number; hash: `0x${string}` };
 }
 
-export async function publishCast(input: CastInput): Promise<PublishResult> {
-  const text = input.text;
-  if (!text) throw new Error('cast text required');
-  if (text.length > 320) throw new Error(`cast too long: ${text.length} bytes (max 320)`);
-
-  const fid = Number(process.env.FARCASTER_BOT_FID);
-  if (!fid) throw new Error('FARCASTER_BOT_FID not set');
-  const writeBase = process.env.FARCASTER_WRITE_API_BASE?.replace(/\/$/, '');
-  if (!writeBase) throw new Error('FARCASTER_WRITE_API_BASE not set');
-
-  const network =
-    (process.env.FC_NETWORK_ID ?? '1') === '1' ? FarcasterNetwork.MAINNET : FarcasterNetwork.TESTNET;
-  const signer = makeSigner();
-
-  const castBody: Parameters<typeof makeCastAdd>[0] = {
-    text,
-    embeds: [],
-    embedsDeprecated: [],
-    mentions: [],
-    mentionsPositions: [],
-    type: CastType.CAST,
-  };
-  if (input.parent) {
-    // parentCastId expects { fid, hash: Uint8Array }
-    castBody.parentCastId = {
-      fid: input.parent.fid,
-      hash: Buffer.from(input.parent.hash.replace(/^0x/, ''), 'hex'),
-    };
-  }
-
-  const result = await makeCastAdd(castBody, { fid, network }, signer);
-  if (result.isErr()) throw result.error;
-  const message = result.value;
-
-  const bytes = Message.encode(message).finish();
-  const headers: Record<string, string> = { 'Content-Type': 'application/octet-stream' };
-  // Neynar hub is paid per call via x402 (EIP-3009 USDC on Base) - NOT a bearer key (doc 762).
-  // Set FARCASTER_WRITE_MODE=bearer only for a self-hosted/3rd-party hub that uses key auth.
-  if (isX402Enabled()) {
-    headers['X-PAYMENT'] = await buildX402Header();
-  } else if (process.env.FARCASTER_WRITE_API_KEY) {
-    headers['api_key'] = process.env.FARCASTER_WRITE_API_KEY;
-    headers['Authorization'] = `Bearer ${process.env.FARCASTER_WRITE_API_KEY}`;
-  }
-
-  const endpoint = `${writeBase}/v1/submitMessage`;
-  const res = await fetch(endpoint, { method: 'POST', headers, body: Buffer.from(bytes) });
-  const respBody = await res.text();
-  if (!res.ok) throw new Error(`submitMessage failed: ${res.status} ${respBody}`);
-
-  return { hash: `0x${Buffer.from(message.hash).toString('hex')}`, fid, endpoint };
+/** Always refuses. See the file header. */
+export async function publishCast(_input: CastInput): Promise<PublishResult> {
+  console.error(`[zoe/farcaster] write refused: ${FARCASTER_WRITE_REFUSED}`);
+  throw new FarcasterWriteRefusedError();
 }

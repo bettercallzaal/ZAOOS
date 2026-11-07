@@ -19,7 +19,8 @@ import type { Bot, Context } from 'grammy';
 import { featureRan } from '../feature-ran';
 import { ZOE_PATHS } from '../memory';
 import { CardStore, cardTtlMs, type Card, type CardPersistence } from './card';
-import { handleTap, reviewPr, type FlowDeps } from './flow';
+import { handleTap, reviewPr, type CardView, type FlowDeps } from './flow';
+import { autoOfferEnabled, autoOfferIntervalMs, autoOfferRepos, listOpenPrs, runAutoOfferTick } from './auto-offer';
 import { makeHermesGrade } from './critic-adapter';
 import type { GradeFn } from './grade';
 import { isRepoSlug } from './merge-line';
@@ -77,6 +78,13 @@ export function registerFinalReview(bot: Bot<Context>, hooks: FinalReviewHooks):
     ttlMs: cardTtlMs(),
   };
 
+  const sendCard = async (view: CardView): Promise<void> => {
+    await bot.api.sendMessage(hooks.zaalId, view.text, {
+      reply_markup: { inline_keyboard: view.buttons.map((row) => row.map((b) => ({ text: b.text, callback_data: b.data }))) },
+      zoeSendClass: 'gated',
+    } as never);
+  };
+
   bot.command('finalreview', async (ctx) => {
     if (!(await hooks.ownerOnly(ctx))) return;
     if (hooks.scopeOf(ctx) !== 'private') return;
@@ -94,10 +102,7 @@ export function registerFinalReview(bot: Bot<Context>, hooks: FinalReviewHooks):
     }
     console.log(`[zoe/final-review] draft comment (not posted):\n${out.comment}`);
     for (const old of out.superseded) console.log(`[zoe/final-review] card ${old.id} superseded by ${out.view.card.id}`);
-    await bot.api.sendMessage(hooks.zaalId, out.view.text, {
-      reply_markup: { inline_keyboard: out.view.buttons.map((row) => row.map((b) => ({ text: b.text, callback_data: b.data }))) },
-      zoeSendClass: 'gated',
-    } as never);
+    await sendCard(out.view);
   });
 
   bot.callbackQuery(/^fr:/, async (ctx) => {
@@ -111,5 +116,49 @@ export function registerFinalReview(bot: Bot<Context>, hooks: FinalReviewHooks):
     featureRan('final-review', out.mergeLine ? 'merge line shown' : 'tap refused');
   });
 
+  startAutoOffer(deps, sendCard);
   return true;
+}
+
+/**
+ * The auto-offer interval (auto-offer.ts). Starts only with ZOE_FINAL_REVIEW=1
+ * AND ZOE_FINAL_REVIEW_AUTO=1, and reads only the repos in
+ * ZOE_FINAL_REVIEW_REPOS. One tick at a time; a tick that throws is logged and
+ * the next one runs. Returns the timer, or null when nothing was scheduled.
+ */
+export function startAutoOffer(
+  deps: FlowDeps,
+  sendCard: (view: CardView) => Promise<void>,
+  env: NodeJS.ProcessEnv = process.env,
+): ReturnType<typeof setInterval> | null {
+  if (!autoOfferEnabled(env)) return null;
+  const repos = autoOfferRepos(env);
+  if (repos.length === 0) {
+    console.error('[zoe/final-review-auto] ZOE_FINAL_REVIEW_AUTO=1 but ZOE_FINAL_REVIEW_REPOS names no valid repo; not scheduled');
+    return null;
+  }
+  const settled = new Set<string>();
+  let running = false;
+  const tick = async (): Promise<void> => {
+    if (running) return;
+    running = true;
+    try {
+      const r = await runAutoOfferTick({
+        repos,
+        list: (repo) => listOpenPrs(repo, defaultGhRunner),
+        review: (repo, n) => reviewPr(repo, n, deps),
+        send: sendCard,
+        settled,
+        log: (line) => console.error(line),
+      });
+      featureRan('final-review-auto', `tick listed=${r.listed} reviewed=${r.reviewed} graded=${r.graded} carded=${r.carded}`);
+    } catch (e) {
+      console.error('[zoe/final-review-auto] tick failed:', (e as Error)?.message);
+    } finally {
+      running = false;
+    }
+  };
+  const timer = setInterval(() => void tick(), autoOfferIntervalMs(env));
+  timer.unref?.();
+  return timer;
 }

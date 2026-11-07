@@ -3,18 +3,34 @@ import { DEVZ_GROUP_PROFILE, buildGroupContext, isDevzGroup } from '../memory';
 
 describe('isDevzGroup', () => {
   it.each([
-    ['the export title', '-100111', 'ZAO DEVZ', undefined, true],
-    ['a spaced title', '-100111', 'ZAO Devz', undefined, true],
-    ['the devz chat id, any title', '-100222', 'Builders', '-100222', true],
-    ['another group', '-100333', 'General Web3 Chat', '-100222', false],
-    ['a title that only contains devz inside a word', '-100444', 'zaodevzz fans', undefined, false],
-  ] as const)('%s', (_l, id, title, env, expected) => {
-    expect(isDevzGroup(id, title, env)).toBe(expected);
+    ['the devz chat id', '-100222', '-100222', true],
+    ['the devz chat id with spaces in env', '-100222', ' -100222 ', true],
+    ['another chat id', '-100333', '-100222', false],
+    ['env unset', '-100222', undefined, false],
+    ['env empty', '-100222', '', false],
+  ] as const)('%s', (_l, id, env, expected) => {
+    expect(isDevzGroup(id, env)).toBe(expected);
+  });
+
+  it('does not match by title, so a look-alike group stays generic', () => {
+    const prev = process.env.ZAO_DEVZ_CHAT_ID;
+    process.env.ZAO_DEVZ_CHAT_ID = '-100222';
+    try {
+      expect(buildGroupContext('-100999', 'ZAO Devz Alumni')).not.toContain('Group Profile: ZAO Devz\n');
+      expect(buildGroupContext('-100999', 'ZAO Devz Alumni')).toContain('Group Profile: ZAO Devz Alumni');
+    } finally {
+      if (prev === undefined) delete process.env.ZAO_DEVZ_CHAT_ID;
+      else process.env.ZAO_DEVZ_CHAT_ID = prev;
+    }
   });
 });
 
 describe('buildGroupContext for ZAO Devz', () => {
+  const prev = process.env.ZAO_DEVZ_CHAT_ID;
+  process.env.ZAO_DEVZ_CHAT_ID = '-100111';
   const ctx = buildGroupContext('-100111', 'ZAO DEVZ', undefined);
+  if (prev === undefined) delete process.env.ZAO_DEVZ_CHAT_ID;
+  else process.env.ZAO_DEVZ_CHAT_ID = prev;
 
   it('carries the Devz profile, not the generic one-liner', () => {
     expect(ctx).toContain('Group Profile: ZAO Devz');

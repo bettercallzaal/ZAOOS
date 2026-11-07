@@ -799,8 +799,7 @@ export async function appendTriageContext(
  */
 
 /**
- * The ZAO Devz group profile (Zaal, 2026-11-07, vault
- * decisions/seat-2026-11-07-zoe-devz-rulings.md item 2.3). On 7 Nov ZOE was
+ * The ZAO Devz group profile (Zaal, 2026-11-07). On 7 Nov ZOE was
  * asked in the group "what do you know about zaodevz" and could only say "I
  * don't have specific detail on current projects". Facts are from the seat's
  * 7 Nov review of the group's own chat, cut to what is safe in a public repo:
@@ -822,10 +821,13 @@ export const DEVZ_GROUP_PROFILE: string = [
   "What you cannot do here: you cannot open Paragraph editor links (app.paragraph.com) or read GitHub, and you do not remember earlier days in this group. Say so plainly and ask for the text to be pasted; never guess at a project's status.",
 ].join('\n');
 
-/** The ZAO Devz chat, by the devz process's own chat id or by its title. */
-export function isDevzGroup(chatId: string, title: string, devzChatId: string | undefined = process.env.ZAO_DEVZ_CHAT_ID): boolean {
-  if (devzChatId && devzChatId.trim() === chatId) return true;
-  return /\bzao\s*devz\b/i.test(title);
+/**
+ * The ZAO Devz chat, by ZAO_DEVZ_CHAT_ID only (the id the devz process uses).
+ * No title fallback: a title match would also catch a group named, say, "ZAO
+ * Devz Alumni". Unset means no group gets this profile.
+ */
+export function isDevzGroup(chatId: string, devzChatId: string | undefined = process.env.ZAO_DEVZ_CHAT_ID): boolean {
+  return Boolean(devzChatId && devzChatId.trim() === chatId);
 }
 
 /**
@@ -839,7 +841,7 @@ export function buildGroupContext(chatId: string, chatTitle?: string, personaOve
     /community\s+of\s+communities/i.test(title) ||
     /\bcoc\b/i.test(title);
 
-  const partnerContext = isDevzGroup(chatId, title)
+  const partnerContext = isDevzGroup(chatId)
     ? DEVZ_GROUP_PROFILE
     : isCoc
     ? [

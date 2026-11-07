@@ -2,7 +2,7 @@
 topic: agents
 type: design-guide
 status: research-complete
-last-validated: 2026-05-21
+last-validated: 2026-11-07
 original-query: "UX patterns for ZOE dashboard as chat-based command center, mobile-first design for agent orchestration (reconstructed)"
 tier: production
 ---
@@ -439,6 +439,50 @@ The key insight from Superhuman: **always show the shortcut after the conversati
 3. **Agent status indicators** — real-time dots showing agent state
 4. **Inline action buttons on cards** — every rich card has contextual actions
 5. **Confirmation for destructive actions** — chip-based confirm/cancel
+
+---
+
+---
+
+## Updated 2026-11-07
+
+Three developments since last validation (2026-05-21) that affect ZOE dashboard decisions:
+
+### 1. assistant-ui went multi-platform in March 2026 (CONFIRMED)
+
+The doc's tech-stack recommendation of assistant-ui was conditional on React Native support "coming." It shipped. The March 2026 launch week delivered:
+
+- `@assistant-ui/react-native` -- native React Native package with Thread, Composer, Message, ThreadList primitives. Web UI components (`@assistant-ui/ui`) do not render on mobile; the native package exposes separate primitives for the same slots.
+- `@assistant-ui/react-ink` -- terminal UI via React Ink, for CLI contexts.
+- Shared core: `@assistant-ui/react-ai-sdk` now depends on `@assistant-ui/core` rather than `@assistant-ui/react`, so tool definitions and model adapters are portable across web, mobile, and terminal without duplication.
+- April 2026 minor releases added `MessagePrimitive.GroupedParts` (grouping adjacent message parts), a `uiComponents` option for data renderers, and a typed `composer.attachmentAddError` payload.
+- As of mid-2026 the package is at v0.1.26 -- pre-1.0, API may still change.
+- Source: https://www.assistant-ui.com/blog/2026-03-launch-week (PARTIAL -- site unreachable from session, confirmed via search result snippets); https://socket.dev/npm/package/@assistant-ui/react (PARTIAL -- search snippet).
+
+**ZOE implication:** The tech-stack table's "React Native (Expo) or PWA" row can now be resolved: use `@assistant-ui/react-native` directly. The shared core means ZOE's tool cards and model adapters written for web port to mobile without rewrite.
+
+### 2. AG-UI: a new open protocol for agent-to-frontend communication (NEW)
+
+AG-UI (Agent-User Interaction Protocol) emerged as an event-based standard for connecting AI agents to front-end apps, filling the gap between MCP (tools/context) and A2A (agent-to-agent). Key properties:
+
+- Transport-agnostic: SSE is most common for one-way server push; WebSockets and webhooks also supported.
+- State sync via JSON Patch (RFC 6902): agents send state deltas, not full replacements.
+- First-class HITL: interrupt events let an agent pause execution mid-task, request human approval or input, receive edits, and resume. This is the protocol-level foundation for the confirmation chips in Part 5 and 7 of this doc.
+- LangGraph is a supported integration.
+- Distinct from MCP and A2A: AG-UI handles the UI delivery layer.
+- Sources: https://docs.ag-ui.com/building (UNVERIFIED -- site unreachable from session, confirmed via search result snippet); https://techcommunity.microsoft.com/blog/appsonazureblog/ag-ui-the-future-of-agent-driven-user-interfaces/4515769 (UNVERIFIED -- not fetched).
+
+**ZOE implication:** When ZOE's real-time agent status updates and HITL confirmation flows are built, adopting AG-UI as the event protocol would make the front end compatible with any AG-UI-compliant agent backend. The interrupt-event pattern replaces the hand-rolled "Confirm?" chip approach in Part 7 with a durable, protocol-backed pattern.
+
+### 3. HITL approval patterns are formalizing (NEW)
+
+Practitioner sources from 2026 converge on three additions to the confirmation patterns in Part 5 and 7:
+
+- **Risk-tiered gates:** Confidence-based soft review for medium-risk reversible actions; mandatory hard gates for high-risk or irreversible actions. The existing doc covers only the "confirm before destructive" pattern; the tiered model extends this to all action types.
+- **Show the resolved action:** An approval UI should display what the agent will actually do (resolved parameters, actual target), not what it might do. "I'll post this exact draft to Farcaster" is approvable; "I'll post something" is not.
+- **Durable approval waits:** For long-running agents, approval gates should be backed by persistent storage (Cloudflare Workflows or equivalent) so the agent can wait hours or days without holding a live session. Source: Cloudflare agent docs, updated 2026-08-27 (UNVERIFIED -- site unreachable from session, confirmed via search snippet).
+
+**ZOE implication:** The error/action card pattern in Part 5 (`[Retry] [Force] [Skip]`) should be extended to include the resolved action preview (e.g., show the exact wallet address and amount before a WALLET transaction), and long-lived approval waits for async WALLET or CASTER actions should be durable, not in-memory.
 
 ---
 

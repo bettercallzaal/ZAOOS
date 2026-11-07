@@ -32,7 +32,14 @@ export interface CardView {
 
 export type ReviewOutcome =
   | { kind: 'card'; view: CardView; comment: string; superseded: Card[] }
-  | { kind: 'no-card'; reason: string; comment?: string };
+  | { kind: 'no-card'; reason: string; comment?: string; stage: NoCardStage };
+
+/**
+ * Where a review stopped. 'read' and 'gates' cost no model call and may pass on
+ * a later read; 'carded' and 'graded' mean this head is settled (auto-offer.ts
+ * uses this to grade each head at most once).
+ */
+export type NoCardStage = 'read' | 'gates' | 'carded' | 'graded';
 
 export function renderCardText(card: Card, snap: PrSnapshot, gates: GateResult, grade: GradeResult): string {
   const lines = [
@@ -54,28 +61,28 @@ export async function reviewPr(repo: string, number: number, deps: FlowDeps): Pr
   } catch {
     snap = null;
   }
-  if (!snap) return { kind: 'no-card', reason: 'could not read the PR or its CI; nothing raised' };
+  if (!snap) return { kind: 'no-card', reason: 'could not read the PR or its CI; nothing raised', stage: 'read' };
 
   const gates = evaluateGates(snap, deps.allowedLogins);
   if (!gates.ready) {
-    return { kind: 'no-card', reason: gates.blocks.join('; '), comment: renderFinalReviewComment(snap, gates, null) };
+    return { kind: 'no-card', reason: gates.blocks.join('; '), comment: renderFinalReviewComment(snap, gates, null), stage: 'gates' };
   }
 
   const now = deps.now();
   const live = deps.store.findLive(`${repo}#${number}@${snap.headSha}`, now);
-  if (live) return { kind: 'no-card', reason: `already carded at this head (${live.state})` };
+  if (live) return { kind: 'no-card', reason: `already carded at this head (${live.state})`, stage: 'carded' };
 
   let grade: GradeResult;
   try {
     grade = gradeOutcome(await deps.grade(snap));
   } catch {
-    return { kind: 'no-card', reason: 'critic call failed; nothing raised' };
+    return { kind: 'no-card', reason: 'critic call failed; nothing raised', stage: 'graded' };
   }
   const comment = renderFinalReviewComment(snap, gates, grade);
-  if (!grade.pass) return { kind: 'no-card', reason: `ZOE grade ${grade.score}/100 below the pass bar or has critical issues`, comment };
+  if (!grade.pass) return { kind: 'no-card', reason: `ZOE grade ${grade.score}/100 below the pass bar or has critical issues`, comment, stage: 'graded' };
 
   const issued = deps.store.issue(repo, number, snap.headSha, gates.reserved, now, deps.ttlMs);
-  if (issued.kind === 'duplicate') return { kind: 'no-card', reason: 'already carded at this head' };
+  if (issued.kind === 'duplicate') return { kind: 'no-card', reason: 'already carded at this head', stage: 'carded' };
   return {
     kind: 'card',
     comment,

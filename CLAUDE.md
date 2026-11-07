@@ -183,7 +183,7 @@ ZAO operating surfaces collapsed from 12+ systems to 4. Hermes was adapted into 
 | Surface | What | Source of truth |
 |---------|------|-----------------|
 | **ZOE** (`@zaoclaw_bot`) | The orchestrator. Concierge (tasks, captures, brief/reflect, recall) + the autonomous fix-PR pipeline (coder + critic + auto-PR) folded in from Hermes | `bot/src/zoe/` + reuses `bot/src/hermes/` coder/critic/pr modules |
-| **ZAO Devz** (`@zaodevz_bot` + `@zoe_hermes_bot`) | **Dual-bot Coder + Critic runner** - boots two grammY bots in one process that narrate Hermes phases as distinct identities in the ZAO Devz chat, so the conversation reads like two agents checking each other's work. `/fix` runs Coder | `bot/src/devz/` (3 files; fold-in to ZOE as a group context pending) |
+| **ZAO Devz** (`@zaodevz_bot` + `@zoe_hermes_bot`) | **Dual-bot Coder + Critic runner** - boots two grammY bots in one process that narrate Hermes phases as distinct identities in the ZAO Devz chat, so the conversation reads like two agents checking each other's work. `/fix` runs Coder. Both identities are live: `zao-devz-stack.service` active on the VPS and `bot/src/devz/index.ts` boots `HERMES_BOT_TOKEN` as the Critic voice (measured 2026-11-07, VPS read by Zaal) | `bot/src/devz/` (3 files; fold-in to ZOE as a group context pending) |
 | **Bonfire** (`@zabal_bonfire`) | Knowledge graph recall + multi-corpus ingest | bonfires.ai (Genesis tier, wallet-gated) |
 | **ZAOstock bot** (`@ZAOstockTeamBot`) | Festival team coordination, graduates with ZAOstock spinout | `bot/` (root, separate from `bot/src/zoe/`) |
 
@@ -194,9 +194,9 @@ ZAO operating surfaces collapsed from 12+ systems to 4. Hermes was adapted into 
 - ZOE v2 / Agent Zero migration plan
 - 10-bot branded fleet (a retired partner, Research, WaveWarZ and POIDH as own bots) - folds into ZOE memory blocks
 - zao-team-bots (a retired partner's bot + AttaBotty brand bots) - retired 2026-06-29, brand voices live as ZOE persona blocks, not separate bots
-- Hermes as a SEPARATE bot (`@zoe_hermes_bot`) - adapted into ZOE 2026-06-29; the coder/critic/auto-PR code in `bot/src/hermes/` is reused BY ZOE, do not run it as its own Telegram bot
+- Hermes as a STANDALONE bot with its own command surface - adapted into ZOE 2026-06-29; the coder/critic/auto-PR code in `bot/src/hermes/` is reused BY ZOE. Not the same thing as the Hermes identity in ZAO Devz: that one is the Critic voice of the Devz dual-bot and is live (see the ZAO Devz row above; corrected 2026-11-07, this line used to read as if the Hermes identity were off)
 - FISHBOWLZ (paused 2026-04-16, killed 2026-05-04 - Juke partnership stands)
-- **farscout** - superseded by `ZAODEVZ/ZAOscout` per [doc 882](research/agents/882-zaoscout-audit-and-roadmap/) (2026-06-20, DEEP: "`bettercallzaal/farscout` (old bot) ... superseded. Retire the duplicates."). Was still running as `farscout.service` on the VPS as of 2026-08-22, a zombie heartbeating `up` while doing nothing - do not treat its heartbeat as evidence the fleet is working. Stopping it is Zaal's (`systemctl --user stop farscout && systemctl --user disable farscout`). Prior docs: 774, 864.
+- **farscout** - superseded by `ZAODEVZ/ZAOscout` per [doc 882](research/agents/882-zaoscout-audit-and-roadmap/) (2026-06-20, DEEP: "`bettercallzaal/farscout` (old bot) ... superseded. Retire the duplicates."). Was still running as `farscout.service` on the VPS as of 2026-08-22, a zombie heartbeating `up` while doing nothing. **Stopped and disabled by Zaal on 2026-11-07** over his own ssh (`is-active` inactive, `is-enabled` disabled). Do not restart it; any old heartbeat from it is not evidence the fleet is working. Prior docs: 774, 864.
 
 **Rule: no new bots without doc.** Before adding a new Telegram bot, agent process, or autonomous loop, write a numbered research doc + get explicit Zaal approval. New brand voices = a persona block in ZOE's runtime memory at `~/.zao/zoe/persona.md` / `~/.zao/zoe/human.md` (seeded from `PERSONA_DEFAULT` in `bot/src/zoe/memory.ts`; content voice lives in `bot/src/zoe/brand.md`), NOT a new bot. Reference `research/agents/601-agent-stack-cleanup-decision/`.
 

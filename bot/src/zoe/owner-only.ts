@@ -50,8 +50,7 @@ export function privateScopeAllowed(scope: string, fromZaal: boolean): boolean {
 }
 
 /**
- * Who a voice note or audio file is answered for (Zaal, 2026-11-07, vault
- * decisions/seat-2026-11-07-zoe-devz-rulings.md item 2.2).
+ * Who a voice note or audio file is answered for (Zaal, 2026-11-07).
  *
  * The voice handler used to run the owner gate FIRST, so a voice note from
  * anyone else in ANY group got "That one is Zaal's." (the ZAO Devz chat review

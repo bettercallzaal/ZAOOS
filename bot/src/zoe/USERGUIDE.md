@@ -1,4 +1,6 @@
-# ZOE userguide (May 4 2026)
+# ZOE userguide (May 4 2026, command table re-validated 2026-11-07)
+
+> The slash-command table below was rebuilt on 2026-11-07 from every `bot.command(...)` registration under `bot/src/zoe/` on origin/main f6f3edfb2. The rest of this guide is the May 4 text and may be stale; "What's coming next" is historical. To re-check the list: `grep -rn "bot.command('" bot/src/zoe --include='*.ts' | grep -v __tests__`.
 
 Open Telegram. Find `@zaoclaw_bot`. That is ZOE.
 
@@ -22,11 +24,41 @@ Examples:
 
 ### Slash commands
 
+All are owner-only unless the row says otherwise. Source is `bot/src/zoe/index.ts` unless named.
+
 | Command | What it does |
 |---------|--------------|
-| `/start` | Wakes ZOE, confirms identity |
-| `/tasks` | Lists open tasks from `~/.zao/zoe/tasks.json` |
-| `/seed` | Re-seeds the 8 doc-601 starter tasks if your queue is empty |
+| `/start` | Wakes ZOE, confirms identity, shows the button bar |
+| `/menu` | Re-shows the tap-first cockpit bar |
+| `/cockpit` | The 5am operator brief, on demand |
+| `/status` | The last ten things ZOE did (features that ran, sends, things she could not do). Off with `ZOE_STATUS_COMMAND=0` |
+| `/tasks` | Open tasks from her memory block |
+| `/working` | Tasks in progress and how long each has been in that state |
+| `/seed` | Seeds the doc-601 starter tasks if the queue is empty |
+| `/agenda`, `/list` | Board items (`/list` is an alias) |
+| `/pulse` | Board state summary |
+| `/team` | The team board (needs `COWORK_TRACKER_URL` and `COWORK_TRACKER_KEY`) |
+| `/teamadd <title>` or `/teamadd <project> \| <title>` | Add a task to the team board; project defaults to `zaodevz` |
+| `/board` | Per-owner team digest, made to forward to the team |
+| `/lanes` | Lane snapshot |
+| `/terminals` | How every Orca terminal is doing, from the seat's vault page (flag-gated) |
+| `/companion` | Companion status, says STALE rather than show an old read |
+| `/loops`, `/loop <name>` | Fleet loop status from the keepalive supervisor |
+| `/shadow [YYYY-MM-DD]` | Critic-panel vs single-critic agreement on a day's Hermes reviews |
+| `/finalreview owner/repo N` | ZOE's final PR review card; private chat only, and only when `ZOE_FINAL_REVIEW=1` (`final-review/wire.ts`). Never merges |
+| `/focus`, `/focus off` | Hyperfocus mode on or off |
+| `/quest`, `/quests` | Quests block and quest list |
+| `/drafts` | Next queued post draft into the POST / REGEN / SKIP review |
+| `/draftdemo` | A sample draft to tap-test the approve buttons |
+| `/zoldraft` | Receive a ZOL cast draft with approve buttons |
+| `/bonfire` | ZABAL Gamez community submission queue |
+| `/notes` | Notes captured with the `note:` prefix |
+| `/fa` | Fractured Atlas walkthrough, one step per message |
+| `/chatid` | This chat's id and topic thread id (works in groups too) |
+| `/inittopics` | Creates the standard ZAAL BOTZ forum topics (run inside the group) |
+| `/zg ...` | Group config: status, enable, mode, add, remove, list (see README "DMs vs groups") |
+
+Text commands that are not slash commands (`bot/src/zoe/commands.ts`, first match wins): `note:` / `cc:` / `claude:`, `queue:`, `plan:` / `decompose:`, `/checkpoint <note>`, `/audit`, `/budget`, and "stop nudges" / "start nudges".
 
 ### Note prefix — the feedback loop
 

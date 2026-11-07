@@ -1,5 +1,12 @@
 # ZAO Devz Dual-Bot Stack
 
+> **Status as of 2026-11-07 (code read on origin/main f6f3edfb2; nothing on the VPS was read).** The setup and deploy steps below are the 2026-04-25 text: the paths (`~/zaostock-bot`) and bot names are UNVERIFIED against what runs today.
+>
+> - **Entry points** (`index.ts`): `/fix <issue>`, an @mention of the Devz bot with 10+ characters (same loop as `/fix`), `/fix_status [id]` on both bots, `/whoami`, `/help`, `/start`, and a loopback HTTP listener `POST /hermes-dispatch` on `127.0.0.1:${HERMES_DISPATCH_PORT:-3007}`, off unless `HERMES_DISPATCH_SECRET` is set. The only caller of that listener in this repo is `infra/portal/bin/bot.mjs` (last changed 2026-04-27).
+> - **Same pipeline as ZOE.** Devz and ZOE both call `dispatchHermesRun` in `bot/src/hermes/runner.ts`; Devz adds the two-identity narrator.
+> - **Observability:** PR #4252 adds `featureRan` lines `devz-fix`, `devz-run-finished`, `devz-fix-status` and `devz-hermes-dispatch` (grep `[zoe/ran]` in the devz unit's journal). Before it, only the heartbeat in `liveness.ts` existed.
+> - **Plan:** ZAO Devz is to fold into ZOE as a group context (CLAUDE.md, Primary Surfaces). Not started.
+
 Two Telegram bots, one Node process, one chat. They narrate the Hermes Coder + Critic loop as separate identities so the conversation reads like two agents reviewing each other's work.
 
 ## Architecture

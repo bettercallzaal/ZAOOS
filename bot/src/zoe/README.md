@@ -89,7 +89,7 @@ Unconfigured groups log non-Zaal sender IDs to journal so Zaal can discover Tele
 | `ZOE_BOT_TOKEN` or `TELEGRAM_BOT_TOKEN` | yes | @zaoclaw_bot Telegram token |
 | `ZAAL_TELEGRAM_ID` | yes | Zaal's Telegram user_id (allowlist guard) |
 | `ZOE_REPO_DIR` | no | default `/home/zaal/zao-os` |
-| `ZAO_DEVZ_CHAT_ID` | no | for hourly tip cron (Phase 4) |
+| `ZAO_DEVZ_CHAT_ID` | no | used by the devz process; ZOE has not used it since the hourly tip cron was removed (2026-07-26), and PR #4253 removes its unused read |
 | `BONFIRE_API_KEY` | no | once Joshua.eth provisions, recall.ts uses SDK |
 | `BONFIRE_ID` | no | bonfire UUID |
 | `BONFIRE_AGENT_ID` | no | agent UUID |
@@ -152,7 +152,7 @@ Add to existing `zao-devz-stack.service` systemd user unit, or create separate `
 - [x] Phase 2.1 — wire memory blocks into concierge (was bypassed pre-2026-05-13)
 - [x] Phase 2.2 — group support (per-chat config, mention gating, member allowlist)
 - [x] Phase 2.3 — elder + lineage layer in persona, bootloader-template.md for child bots
-- [ ] Phase 3 - fold Devz bot into Hermes webhook. As of 2026-11-07 still open; CLAUDE.md now describes it as folding ZAO Devz into ZOE as a group context. ZOE does not read or post in the ZAO Devz chat today (the unused scheduler option is removed in PR #4253). Audit: vault `notes/zoe-devz-upgrade-2026-11-07.md`.
+- [ ] Phase 3 - fold Devz bot into Hermes webhook. As of 2026-11-07 still open; CLAUDE.md now describes it as folding ZAO Devz into ZOE as a group context. ZOE does not read or post in the ZAO Devz chat today (the unused scheduler option is removed in PR #4253). The 2026-11-07 ZOE + ZAO Devz audit with the ranked upgrade list is in Zaal's private vault, not in this repo.
 - [x] Final PR reviewer, built and merged in PR #4242, OFF unless `ZOE_FINAL_REVIEW=1` (`final-review/`). Manual `/finalreview` trigger only.
 - [ ] Phase 4 — replace zoe-learning-pings python cron
 - [ ] Phase 5 — Letta-style self-improving `human` block updates

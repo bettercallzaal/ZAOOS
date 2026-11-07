@@ -1,6 +1,6 @@
 # ZOE userguide (May 4 2026, command table re-validated 2026-11-07)
 
-> The slash-command table below was rebuilt on 2026-11-07 from every `bot.command(...)` registration under `bot/src/zoe/` on origin/main f6f3edfb2. The rest of this guide is the May 4 text and may be stale; "What's coming next" is historical. To re-check the list: `grep -rn "bot.command('" bot/src/zoe --include='*.ts' | grep -v __tests__`.
+> The slash-command table below was rebuilt on 2026-11-07 from every `bot.command(...)` registration under `bot/src/zoe/` on origin/main f6f3edfb2 (37 registrations, 40 command names, counting single quotes, double quotes and arrays). The rest of this guide is the May 4 text and may be stale; "What's coming next" is historical. To re-check the list: `grep -rnE 'bot\.command\(' bot/src/zoe --include='*.ts' | grep -v __tests__`.
 
 Open Telegram. Find `@zaoclaw_bot`. That is ZOE.
 
@@ -24,11 +24,14 @@ Examples:
 
 ### Slash commands
 
-All are owner-only unless the row says otherwise. Source is `bot/src/zoe/index.ts` unless named.
+All are owner-only unless the row says otherwise (`/help` and `/ask` also answer in groups). Source is `bot/src/zoe/index.ts` unless named.
 
 | Command | What it does |
 |---------|--------------|
 | `/start` | Wakes ZOE, confirms identity, shows the button bar |
+| `/help` | Command overview; a fuller list for you in DM, a short one in groups |
+| `/ask <question>` | Ask ZOE directly, in a DM or a group (tagging her works too) |
+| `/grill`, `/needsme` | Next item that needs you: a terminal item first, else the next grill question |
 | `/menu` | Re-shows the tap-first cockpit bar |
 | `/cockpit` | The 5am operator brief, on demand |
 | `/status` | The last ten things ZOE did (features that ran, sends, things she could not do). Off with `ZOE_STATUS_COMMAND=0` |
@@ -53,6 +56,8 @@ All are owner-only unless the row says otherwise. Source is `bot/src/zoe/index.t
 | `/zoldraft` | Receive a ZOL cast draft with approve buttons |
 | `/bonfire` | ZABAL Gamez community submission queue |
 | `/notes` | Notes captured with the `note:` prefix |
+| `/voicememo <text>`, `/vm <text>` | Capture a voice memo line for the personal-post drafter |
+| `/resume <thing>`, `/cv <thing>` | Capture a resume or bio credential |
 | `/fa` | Fractured Atlas walkthrough, one step per message |
 | `/chatid` | This chat's id and topic thread id (works in groups too) |
 | `/inittopics` | Creates the standard ZAAL BOTZ forum topics (run inside the group) |

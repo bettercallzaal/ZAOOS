@@ -282,8 +282,6 @@ export interface SchedulerOptions {
   bot: Bot;
   zaalTgId: number;
   repoDir: string;
-  devzChatId?: number;
-  devzTopicId?: number;
   routingDeps?: ReturnType<typeof constructRoutingDeps>; // for message routing
 }
 

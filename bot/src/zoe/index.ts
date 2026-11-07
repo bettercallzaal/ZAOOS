@@ -429,7 +429,6 @@ async function appendClaudeNote(body: string): Promise<number> {
 const token = process.env.ZOE_BOT_TOKEN ?? process.env.TELEGRAM_BOT_TOKEN;
 const zaalIdRaw = process.env.ZAAL_TELEGRAM_ID;
 const repoDir = process.env.ZOE_REPO_DIR ?? '/home/zaal/zao-os';
-const devzChatRaw = process.env.ZAO_DEVZ_CHAT_ID;
 
 if (!token) {
   console.error('Missing ZOE_BOT_TOKEN or TELEGRAM_BOT_TOKEN');
@@ -441,7 +440,6 @@ if (!zaalIdRaw) {
 }
 
 const zaalId = Number(zaalIdRaw);
-const devzChatId = devzChatRaw ? Number(devzChatRaw) : undefined;
 
 // Fail-loud crash guard: catches uncaught exceptions & unhandled rejections,
 // pings Zaal on Telegram before dying, and exits 0 on SIGTERM/SIGINT.
@@ -4928,7 +4926,7 @@ async function main(): Promise<void> {
     console.error("[zoe/index] setMyCommands group failed:", (err as Error).message);
   });
 
-  startScheduler({ bot, zaalTgId: zaalId, repoDir, devzChatId, routingDeps });
+  startScheduler({ bot, zaalTgId: zaalId, repoDir, routingDeps });
 
   // Caster (doc 761, Phase 2). Approval callback always attached; the event-stream subscriber
   // only starts when a node gRPC is configured. Single-agent persona via CASTER_PERSONA.

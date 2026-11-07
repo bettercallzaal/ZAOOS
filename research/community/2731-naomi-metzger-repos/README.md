@@ -106,9 +106,9 @@ Searches run this session, with results: `~/.claude/skills` for "brand voice" in
 ### 7. Verified numbers (all as of 2026-11-07)
 
 - 14 public repos on the profile (`public_repos`).
-- cookbook: 9 stars, 5 recipes, 2 of them with licence text forbidding resale.
+- cookbook: 9 stars, 5 recipes. One LICENSE file (`cookbook/LICENSE`, 425 bytes) covers all five; its text forbids resale and redistribution.
 - 8 video formats and 60+ coded hook formulas in viral-script (its README).
-- 12 repos read via LICENSE and README; 3 with no LICENSE file (transcript, accountable, capsule-fhe) plus the fork.
+- 12 repos read via README and LICENSE. Four LICENSE lookups returned 404: transcript, accountable, capsule-fhe, and the cofhe-hardhat-starter fork (whose upstream lookup also returned 404).
 - HN: 0 hits for two exact-name queries; control 1229 hits.
 
 ## Sources

@@ -59,6 +59,8 @@
  */
 
 import { readFileSync, writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 // A private path: anything under ~/.zao or ~/.claude, a dotenv file in a home
 // subfolder (~/n8n/.env), or any absolute path under /Users/<name> or
@@ -142,7 +144,10 @@ export function parsePublicNames(fileText, envList = '') {
 function loadPublicNames() {
   let text = '';
   try {
-    text = readFileSync(new URL('./nightly-public-names.json', import.meta.url), 'utf8');
+    // A path, not a URL object: under vitest the URL class is another realm's
+    // and readFileSync rejects it (ERR_INVALID_URL_SCHEME), which read as an
+    // empty list and kept only Zaal and ZOE.
+    text = readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'nightly-public-names.json'), 'utf8');
   } catch {
     text = '';
   }

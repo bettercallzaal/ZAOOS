@@ -1,4 +1,6 @@
 {
-  "about": "Public names the nightly redactor keeps in a to-do (task-person class, nightly-redact.mjs). Zaal and ZOE are always kept. Add a name only when its owner has chosen it as their public name (Zaal, misc F17, 2026-11-08). Later this list can come from member-chosen ZID names.",
-  "names": []
+  "about": "Public names the nightly redactor keeps in a to-do (task-person class, nightly-redact.mjs). Zaal and ZOE are always kept. Add a name only when its owner has chosen it as their public name (Zaal, misc F17, 2026-11-08). Later this list can come from member-chosen ZID names. Zaal, misc F17, 2026-11-08: \"lets just do me and iman for now and thats it\".",
+  "names": [
+    "Iman"
+  ]
 }

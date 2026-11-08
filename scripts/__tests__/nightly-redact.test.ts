@@ -244,8 +244,9 @@ describe('task-person: a person named in a to-do (seat-merge on #4266 and #4251)
 describe('task-person: public names come from a file or env (misc F17)', () => {
   const line = '- [ ] Reply to Robin about the poster';
 
-  it('always keeps Zaal and ZOE, and the committed file adds nobody else yet', () => {
-    expect([...PUBLIC_NAMES].sort()).toEqual(['ZOE', 'Zaal', 'Zoe']);
+  it('keeps Zaal and ZOE always, and the committed file adds Iman and nobody else (misc F17)', () => {
+    expect([...PUBLIC_NAMES].sort()).toEqual(['Iman', 'ZOE', 'Zaal', 'Zoe']);
+    expect(redact('- [ ] Reply to Iman about the poster').text).toBe('- [ ] Reply to Iman about the poster');
     expect(redact(line).text).toBe('- [ ] Reply to <person in the vault> about the poster');
   });
 

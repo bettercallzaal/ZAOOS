@@ -118,3 +118,17 @@ describe('the private task queue is never on this path', () => {
     expect(imports.join('\n')).not.toMatch(/\.\/memory|readTasks|tasks\.json/);
   });
 });
+
+describe('index.ts wiring (read as text; index.ts boots the bot and is never imported)', () => {
+  const src = readFileSync(join(__dirname, '..', 'index.ts'), 'utf8');
+
+  it('registers /teamview only behind the config, above the generic text handler', () => {
+    const cfgAt = src.indexOf('const teamViewCfg = readTeamViewConfig();');
+    const regAt = src.indexOf('registerTeamView(bot, teamViewCfg');
+    const textAt = src.indexOf("bot.on('message:text'");
+    expect(cfgAt).toBeGreaterThan(-1);
+    expect(src.slice(cfgAt, regAt)).toContain('if (teamViewCfg) {');
+    expect(regAt).toBeGreaterThan(cfgAt);
+    expect(textAt).toBeGreaterThan(regAt);
+  });
+});

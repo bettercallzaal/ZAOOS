@@ -249,6 +249,7 @@ import { dispatchHermesRun } from '../hermes/runner';
 import { getRun as getHermesRun, listOpenRuns as listOpenHermesRuns } from '../hermes/db';
 import { ghOpenIssue, readIdeaConfig, registerIdeaCommand } from './idea-cards';
 import { readGroupGithubConfig, registerGroupGithubCommands } from './group-github';
+import { readTeamViewConfig, registerTeamView } from './team-view';
 import { claudeOnHost, inDevzChat, maybeHandleMentionFix, readDevzFoldConfig, registerDevzFoldCommands, type DevzFoldDeps } from './devz-fold';
 import { groupHelpText, PRIVATE_NON_OWNER_HELP } from './chat-help';
 import { shadowSummary } from '../hermes/critic';
@@ -773,6 +774,24 @@ if (groupGithubCfg) {
     botId: () => botIdHolder.value,
   });
   console.log(`[zoe/index] group GitHub reads ON for ${groupGithubCfg.chats.length} chat(s)`);
+}
+
+// /teamview, a member's own open board rows for allowlisted groups
+// (team-view.ts, iman-desk #168 item 3). OFF unless ZOE_TEAM_VIEW=1 and
+// ZOE_TEAM_VIEW_CHATS. Reads the cowork board only, never Zaal's tasks.json or
+// daily file. Registered above the generic text handler.
+const teamViewCfg = readTeamViewConfig();
+if (teamViewCfg) {
+  registerTeamView(bot, teamViewCfg, {
+    getGroupConfig,
+    trackerConfigured: teamTrackerConfigured,
+    getTasks: getOpenTeamTasks,
+    getMembers: getTeamMemberMap,
+    featureRan,
+    botUsername: () => usernameHolder.value,
+    botId: () => botIdHolder.value,
+  });
+  console.log(`[zoe/index] team view ON for ${teamViewCfg.chats.length} chat(s)`);
 }
 
 async function sendXDeskCard(chatId: number, link: XLink): Promise<void> {

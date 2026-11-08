@@ -86,6 +86,10 @@ import { runPinnedBriefTick } from './pinned-brief-runner';
 import { checkClaudeAuth } from '../hermes/claude-cli';
 import { withTickLock } from './tick-lock';
 import { featureRan } from './feature-ran';
+import { previousUtcDay, readGroupMemoryConfig, rollGroupDay, utcDay, writeGroupSummary } from './group-memory';
+import { readArchive } from './memory';
+import { containsPii } from './pii';
+import { containsSecret, remember } from './recall';
 import {
   assertSendDelivered,
   runWithSendClass,
@@ -283,6 +287,8 @@ export interface SchedulerOptions {
   zaalTgId: number;
   repoDir: string;
   routingDeps?: ReturnType<typeof constructRoutingDeps>; // for message routing
+  /** The model call for the group-memory day roll (index.ts passes the cap-aware CLI route). */
+  groupMemoryDraft?: (prompt: string) => Promise<string>;
 }
 
 export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
@@ -1146,6 +1152,45 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
       { timezone: 'UTC' },
     ),
   );
+
+  // Group memory day roll (group-memory.ts, iman-desk #168 item 2). 00:10 UTC,
+  // once a day by claimFire. For each chat on ZOE_GROUP_MEMORY_CHATS with turns
+  // on the UTC day that just ended: one model call, the summary file, one
+  // Bonfire episode behind containsSecret and containsPii. A chat with no turns
+  // makes no call. OFF unless ZOE_GROUP_MEMORY=1 and a chat is listed. A chat
+  // that fails is logged and skipped; the claim is kept so the chats that
+  // already wrote a Bonfire episode are not written twice.
+  const groupMemoryCfg = readGroupMemoryConfig();
+  const groupMemoryDraft = opts.groupMemoryDraft;
+  if (groupMemoryCfg && groupMemoryDraft) {
+    tasks.push(
+      cron.schedule(
+        '10 0 * * *',
+        async () => {
+          if (!(await claimFire('group-memory-roll'))) return;
+          const day = previousUtcDay(utcDay(new Date()));
+          for (const chatId of groupMemoryCfg.chats) {
+            try {
+              const status = await rollGroupDay(groupMemoryCfg, chatId, day, {
+                readArchive: (scope, month) => readArchive(scope, month),
+                draft: groupMemoryDraft,
+                writeSummary: (id, s) => writeGroupSummary(ZOE_PATHS.home, id, s),
+                remember,
+                containsSecret,
+                containsPii,
+                featureRan,
+                log: (m) => console.warn(m),
+              });
+              console.log(`[zoe/scheduler] group memory ${chatId} ${day}: ${status}`);
+            } catch (err) {
+              console.error(`[zoe/scheduler] group memory ${chatId} ${day} failed:`, (err as Error).message);
+            }
+          }
+        },
+        { timezone: 'UTC' },
+      ),
+    );
+  }
 
   // Daily note rollover — 00:00 America/New_York (EST/EDT midnight, not UTC).
   // Idempotent per (owner_id, note_date): creates today's note for each owner with

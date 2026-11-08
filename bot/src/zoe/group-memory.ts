@@ -147,6 +147,17 @@ export function yesterdayLine(
   return summary.summary;
 }
 
+/** The read-back text for a group turn, read from the file; undefined when off, unlisted or not yesterday's. */
+export async function readYesterdayLine(
+  cfg: GroupMemoryConfig | null,
+  home: string,
+  chatId: string,
+  now: Date,
+): Promise<string | undefined> {
+  if (!isMemoryChat(cfg, chatId)) return undefined;
+  return yesterdayLine(cfg, chatId, await readGroupSummary(home, chatId), utcDay(now));
+}
+
 export interface RollDeps {
   readArchive: (scope: string, month: string) => Promise<RecentTurn[]>;
   draft: (prompt: string) => Promise<string>;

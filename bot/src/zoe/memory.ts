@@ -886,6 +886,7 @@ export async function buildMemoryBlocks(
   scope: ChatScope = 'private',
   chatTitle?: string,
   personaOverride?: string,
+  yesterdaySummary?: string,
 ): Promise<MemoryBlocks> {
   const isPrivate = scope === 'private';
   const [persona, human, recentTurns, tasks, quests, decisions, buildState, inbox, team] = await Promise.all([
@@ -938,7 +939,7 @@ export async function buildMemoryBlocks(
       ? undefined
       : inbox.map((r) => `- ${r.summary}`).join('\n');
 
-  const group_context = isPrivate ? undefined : buildGroupContext(scope, chatTitle, personaOverride);
+  const group_context = isPrivate ? undefined : buildGroupContext(scope, chatTitle, personaOverride, yesterdaySummary);
   return { persona, human, working, tasks: tasksBlock, quests, decisions: decisionsBlock, build_state: buildStateBlock, inbox_context: inboxBlock, team, chat_scope: scope, chat_title: chatTitle, group_context };
 }
 

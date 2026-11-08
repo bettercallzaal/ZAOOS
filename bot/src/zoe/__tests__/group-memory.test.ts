@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterAll, describe, expect, it, vi } from 'vitest';
@@ -10,6 +10,7 @@ import {
   type RollDeps,
   readGroupMemoryConfig,
   readGroupSummary,
+  readYesterdayLine,
   rollGroupDay,
   SUMMARY_MAX,
   safeSender,
@@ -232,5 +233,41 @@ describe('rollGroupDay', () => {
     const d = deps({ remember: vi.fn(async () => ({ ok: false, skipped: 'no-config' })) });
     expect(await rollGroupDay(CFG, CHAT, DAY, d)).toBe('saved-bonfire-not-sent');
     expect(d.log).toHaveBeenCalledWith(expect.stringContaining('no-config'));
+  });
+});
+
+describe('wiring (index.ts, scheduler.ts and memory.ts read as text; index.ts boots the bot and is never imported)', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'zoe-group-memory-wire-'));
+  afterAll(() => {
+    if (dir) rmSync(dir, { recursive: true, force: true });
+  });
+  const src = (f: string) => readFileSync(join(__dirname, '..', f), 'utf8');
+
+  it('readYesterdayLine reads the file for a listed chat, and nothing for an unlisted one or the flag off', async () => {
+    await writeGroupSummary(dir, CHAT, { day: DAY, summary: 'the build call is Thursday' });
+    const now = new Date('2026-11-08T09:00:00Z');
+    expect(await readYesterdayLine(CFG, dir, CHAT, now)).toBe('the build call is Thursday');
+    expect(await readYesterdayLine(CFG, dir, '-100999', now)).toBeUndefined();
+    expect(await readYesterdayLine(null, dir, CHAT, now)).toBeUndefined();
+    expect(await readYesterdayLine(CFG, dir, CHAT, new Date('2026-11-10T09:00:00Z'))).toBeUndefined();
+  });
+
+  it('the group handler passes the read-back into buildMemoryBlocks, and memory.ts hands it to buildGroupContext', () => {
+    const index = src('index.ts');
+    expect(index).toContain('const groupMemoryCfg = readGroupMemoryConfig();');
+    expect(index).toContain('await readYesterdayLine(groupMemoryCfg, ZOE_PATHS.home, scope, new Date())');
+    expect(index).toContain('buildMemoryBlocks(scope, chatTitle, groupCfg?.persona_override, yesterday)');
+    expect(src('memory.ts')).toContain('buildGroupContext(scope, chatTitle, personaOverride, yesterdaySummary)');
+  });
+
+  it('the day roll is scheduled only with the config and a model call, once a day, in UTC', () => {
+    const sched = src('scheduler.ts');
+    const guardAt = sched.indexOf('if (groupMemoryCfg && groupMemoryDraft) {');
+    const claimAt = sched.indexOf("claimFire('group-memory-roll')");
+    expect(guardAt).toBeGreaterThan(-1);
+    expect(claimAt).toBeGreaterThan(guardAt);
+    expect(sched.slice(guardAt, claimAt)).toContain("'10 0 * * *'");
+    expect(sched.slice(claimAt, claimAt + 1600)).toContain("{ timezone: 'UTC' }");
+    expect(src('index.ts')).toMatch(/groupMemoryDraft: groupMemoryCfg\s*\?/);
   });
 });

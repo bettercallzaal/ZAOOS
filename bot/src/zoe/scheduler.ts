@@ -1244,9 +1244,9 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
   );
 
   // Clean-curator Telegram topic posting — 08:00 UTC daily (one hour before
-  // morning brief). Posts curated digests to the ZAO group forum topics
-  // (newsletter, github, artizen, recommendations, general). Disabled by default
-  // (safe no-op) until all 5 topic thread IDs are configured.
+  // morning brief). Posts curated digests to the ZAO group forum topics named
+  // in curator.ts (TopicKey). Disabled by default (safe no-op) until every
+  // required topic thread ID is configured (curatorEnabled).
   tasks.push(
     cron.schedule(
       '0 8 * * *',

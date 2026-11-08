@@ -1,5 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
-import type { GroupConfig } from '../groups';
 import {
   BODY_MAX_CHARS,
   docPath,
@@ -13,6 +14,7 @@ import {
   readGroupGithubConfig,
   readIssue,
 } from '../group-github';
+import type { GroupConfig } from '../groups';
 
 // iman-desk #168 item 1: read-only GitHub in allowlisted groups.
 
@@ -185,5 +187,19 @@ describe('handleGithubAsk', () => {
     await handleGithubAsk(ctx as never, 'issue', '175', cfg, d);
     expect(ctx.reply).toHaveBeenCalledWith('I could not read that from GitHub just now.');
     expect(d.featureRan).not.toHaveBeenCalled();
+  });
+});
+
+describe('index.ts wiring (read as text; index.ts boots the bot and is never imported)', () => {
+  const src = readFileSync(join(__dirname, '..', 'index.ts'), 'utf8');
+
+  it('registers /issue and /doc only behind the config, above the generic text handler', () => {
+    const cfgAt = src.indexOf('const groupGithubCfg = readGroupGithubConfig();');
+    const regAt = src.indexOf('registerGroupGithubCommands(bot, groupGithubCfg');
+    const textAt = src.indexOf("bot.on('message:text'");
+    expect(cfgAt).toBeGreaterThan(-1);
+    expect(src.slice(cfgAt, regAt)).toContain('if (groupGithubCfg) {');
+    expect(regAt).toBeGreaterThan(cfgAt);
+    expect(textAt).toBeGreaterThan(regAt);
   });
 });

@@ -249,6 +249,7 @@ import { dispatchHermesRun } from '../hermes/runner';
 import { getRun as getHermesRun, listOpenRuns as listOpenHermesRuns } from '../hermes/db';
 import { ghOpenIssue, readIdeaConfig, registerIdeaCommand } from './idea-cards';
 import { readGroupGithubConfig, registerGroupGithubCommands } from './group-github';
+import { readGroupMemoryConfig, readYesterdayLine } from './group-memory';
 import { readTeamViewConfig, registerTeamView } from './team-view';
 import { claudeOnHost, inDevzChat, maybeHandleMentionFix, readDevzFoldConfig, registerDevzFoldCommands, type DevzFoldDeps } from './devz-fold';
 import { groupHelpText, PRIVATE_NON_OWNER_HELP } from './chat-help';
@@ -759,6 +760,12 @@ if (ideaCfg) {
   });
   console.log(`[zoe/index] idea cards ON for chat ${ideaCfg.chatId}${ideaCfg.token ? ' (desk issues on)' : ''}`);
 }
+
+// Group memory (group-memory.ts, iman-desk #168 item 2). OFF unless
+// ZOE_GROUP_MEMORY=1 and ZOE_GROUP_MEMORY_CHATS. Read-back in the group text
+// handler; the day roll is a scheduler.ts cron that gets its model call below.
+const groupMemoryCfg = readGroupMemoryConfig();
+if (groupMemoryCfg) console.log(`[zoe/index] group memory ON for ${groupMemoryCfg.chats.size} chat(s)`);
 
 // /issue and /doc, read-only GitHub for allowlisted groups (group-github.ts,
 // iman-desk #168 item 1). OFF unless ZOE_GROUP_GITHUB=1, its own token
@@ -3915,7 +3922,12 @@ async function dispatchConcierge(
     await pushRecent({ from: label === 'Zaal' ? 'zaal' : 'other', text, sender: label }, scope);
 
     const groupCfg = scope === 'private' ? null : await getGroupConfig(chatId);
-    const blocks = await buildMemoryBlocks(scope, chatTitle, groupCfg?.persona_override);
+    // Group memory read-back (group-memory.ts, #168 item 2): yesterday's
+    // summary for a listed group, read here so memory.ts stays pure.
+    const yesterday =
+      scope === 'private' ? undefined : await readYesterdayLine(groupMemoryCfg, ZOE_PATHS.home, scope, new Date()).catch(() => undefined);
+    if (yesterday) featureRan('group-memory-readback', `chat ${scope}`);
+    const blocks = await buildMemoryBlocks(scope, chatTitle, groupCfg?.persona_override, yesterday);
     // doc 796 Move 2: surface live commitment threads so the concierge can
     // resolve/snooze/drop them by id (DMs with Zaal only).
     if (scope === 'private') {
@@ -5019,7 +5031,15 @@ async function main(): Promise<void> {
     console.error("[zoe/index] setMyCommands group failed:", (err as Error).message);
   });
 
-  startScheduler({ bot, zaalTgId: zaalId, repoDir, routingDeps });
+  startScheduler({
+    bot,
+    zaalTgId: zaalId,
+    repoDir,
+    routingDeps,
+    groupMemoryDraft: groupMemoryCfg
+      ? (prompt) => xDeskDraft('You write short, plain day summaries of a Telegram group for The ZAO.', prompt)
+      : undefined,
+  });
 
   // Caster (doc 761, Phase 2). Approval callback always attached; the event-stream subscriber
   // only starts when a node gRPC is configured. Single-agent persona via CASTER_PERSONA.

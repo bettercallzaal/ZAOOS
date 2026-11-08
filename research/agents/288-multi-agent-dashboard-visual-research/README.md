@@ -406,7 +406,7 @@ Four stat cards:
 
 ## Updated 2026-11-06
 
-Six material developments since last validation (2026-05-21). Note: the 2026-11-04 radar run documented three of these in `_radar/2026-11-04.md` but did not update this doc.
+Seven material developments since last validation (2026-05-21). Note: the 2026-11-04 radar run documented three of these in `_radar/2026-11-04.md` but did not update this doc.
 
 ### 1. Langfuse acquired by ClickHouse (January 16, 2026) - MISSED IN MAY VALIDATION
 

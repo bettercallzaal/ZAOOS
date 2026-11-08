@@ -87,6 +87,24 @@ const IssueSchema = z.object({
   labels: z.array(z.object({ name: z.string() }).passthrough()).default([]),
 });
 const CommentSchema = z.array(z.object({ body: z.string().nullable().optional(), created_at: z.string() }).passthrough());
+const RepoSchema = z.object({ private: z.boolean() }).passthrough();
+
+/**
+ * Zaal, misc F16 amended, 2026-11-08: a private repo is not refused in silence.
+ * ZOE says what it is and how access works, and fetches none of its content:
+ * "it should tell the user that that is a private repo and you need someone to
+ * give access or have zaal allow zoe to review that private repo".
+ */
+export function privateRepoText(repo: string): string {
+  return `${repo} is a private repo, so I cannot show it here. Someone with access has to share it, or Zaal has to allow ZOE to review that repo.`;
+}
+
+/** true or false from GitHub's repo record; null when it could not be read (then nothing else is fetched). */
+async function repoIsPrivate(cfg: GroupGithubConfig, repo: string, fetchFn: FetchFn): Promise<boolean | null> {
+  const r = await getJson(fetchFn, `https://api.github.com/repos/${repo}`, cfg.token, RepoSchema);
+  return r ? r.private : null;
+}
+
 const TreeSchema = z.object({ tree: z.array(z.object({ path: z.string(), type: z.string() }).passthrough()), truncated: z.boolean().optional() });
 
 export type FetchFn = (
@@ -127,6 +145,9 @@ function clip(s: string, max: number): string {
 
 /** An issue and its newest comment as one short plain-text reply, or null when it could not be read. */
 export async function readIssue(cfg: GroupGithubConfig, repo: string, n: number, fetchFn: FetchFn): Promise<string | null> {
+  const isPrivate = await repoIsPrivate(cfg, repo, fetchFn);
+  if (isPrivate === null) return null;
+  if (isPrivate) return privateRepoText(repo);
   const base = `https://api.github.com/repos/${repo}/issues/${n}`;
   const issue = await getJson(fetchFn, base, cfg.token, IssueSchema);
   if (!issue) return null;
@@ -153,6 +174,9 @@ export function docPath(paths: readonly string[], n: number): string | null {
 /** A research doc's title and opening, or null when it could not be found or read. */
 export async function readDoc(cfg: GroupGithubConfig, n: number, fetchFn: FetchFn): Promise<string | null> {
   if (!cfg.docsRepo) return NO_DOCS_REPO;
+  const isPrivate = await repoIsPrivate(cfg, cfg.docsRepo, fetchFn);
+  if (isPrivate === null) return null;
+  if (isPrivate) return privateRepoText(cfg.docsRepo);
   const tree = await getJson(fetchFn, `https://api.github.com/repos/${cfg.docsRepo}/git/trees/HEAD?recursive=1`, cfg.token, TreeSchema);
   if (!tree) return null;
   const path = docPath(

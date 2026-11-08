@@ -11,6 +11,7 @@ import {
   NO_DOCS_REPO,
   NO_ISSUE_REPOS,
   parseAsk,
+  privateRepoText,
   REPLY_MAX_CHARS,
   readDoc,
   readGroupGithubConfig,
@@ -30,7 +31,10 @@ function fakeFetch(routes: Route): FetchFn & { calls: Call[] } {
   const calls: Call[] = [];
   const fn = (async (url: string, init: { headers: Record<string, string>; redirect?: string }) => {
     calls.push({ url, headers: init.headers, redirect: init.redirect });
-    const r = routes[url];
+    // A repo record not named in the routes reads as public, so the content
+    // tests below need no extra route. The private tests name it.
+    const repoRecord = /^https:\/\/api\.github\.com\/repos\/[^/]+\/[^/]+$/.test(url);
+    const r = routes[url] ?? (repoRecord ? { body: { private: false } } : undefined);
     const status = r ? (r.status ?? 200) : 404;
     return { ok: status < 400, status, text: async () => (typeof r?.body === 'string' ? r.body : JSON.stringify(r?.body ?? {})) };
   }) as FetchFn & { calls: typeof calls };
@@ -238,5 +242,31 @@ describe('redirects are refused', () => {
     await readIssue(cfg, 'ZAODEVZ/iman-desk', 175, f);
     expect(f.calls.length).toBeGreaterThan(0);
     for (const c of f.calls) expect(c.redirect).toBe('error');
+  });
+});
+
+describe('a private repo (misc F16 amended)', () => {
+  const REPO_URL = 'https://api.github.com/repos/ZAODEVZ/iman-desk';
+  const DOCS_URL = 'https://api.github.com/repos/ZAODEVZ/ZAOresearch';
+
+  it('says it is private and fetches no issue content', async () => {
+    const f = fakeFetch({ [REPO_URL]: { body: { private: true } }, [ISSUE_URL]: { body: ISSUE } });
+    const ctx = ctxIn(CHAT, MEMBER);
+    await handleGithubAsk(ctx as never, 'issue', '175', cfg, deps(f));
+    expect(ctx.reply.mock.calls[0][0]).toBe(privateRepoText('ZAODEVZ/iman-desk'));
+    expect(ctx.reply.mock.calls[0][0]).toContain('Zaal has to allow ZOE');
+    expect(f.calls.map((c) => c.url)).toEqual([REPO_URL]);
+  });
+
+  it('says it is private and fetches no doc content', async () => {
+    const f = fakeFetch({ [DOCS_URL]: { body: { private: true } } });
+    expect(await readDoc(cfg, 2732, f)).toBe(privateRepoText('ZAODEVZ/ZAOresearch'));
+    expect(f.calls.map((c) => c.url)).toEqual([DOCS_URL]);
+  });
+
+  it('fetches nothing more when the repo record cannot be read', async () => {
+    const f = fakeFetch({ [REPO_URL]: { status: 404, body: {} }, [ISSUE_URL]: { body: ISSUE } });
+    expect(await readIssue(cfg, 'ZAODEVZ/iman-desk', 175, f)).toBeNull();
+    expect(f.calls.map((c) => c.url)).toEqual([REPO_URL]);
   });
 });

@@ -248,6 +248,7 @@ import { enqueueZolCast } from './zol-queue';
 import { dispatchHermesRun } from '../hermes/runner';
 import { getRun as getHermesRun, listOpenRuns as listOpenHermesRuns } from '../hermes/db';
 import { ghOpenIssue, readIdeaConfig, registerIdeaCommand } from './idea-cards';
+import { readGroupGithubConfig, registerGroupGithubCommands } from './group-github';
 import { claudeOnHost, inDevzChat, maybeHandleMentionFix, readDevzFoldConfig, registerDevzFoldCommands, type DevzFoldDeps } from './devz-fold';
 import { groupHelpText, PRIVATE_NON_OWNER_HELP } from './chat-help';
 import { shadowSummary } from '../hermes/critic';
@@ -756,6 +757,22 @@ if (ideaCfg) {
     botId: () => botIdHolder.value,
   });
   console.log(`[zoe/index] idea cards ON for chat ${ideaCfg.chatId}${ideaCfg.token ? ' (desk issues on)' : ''}`);
+}
+
+// /issue and /doc, read-only GitHub for allowlisted groups (group-github.ts,
+// iman-desk #168 item 1). OFF unless ZOE_GROUP_GITHUB=1, its own token
+// ZOE_GROUP_GITHUB_TOKEN (no fallback) and ZOE_GROUP_GITHUB_CHATS. Registered
+// above the generic text handler.
+const groupGithubCfg = readGroupGithubConfig();
+if (groupGithubCfg) {
+  registerGroupGithubCommands(bot, groupGithubCfg, {
+    getGroupConfig,
+    fetch: (url, init) => fetch(url, init),
+    featureRan,
+    botUsername: () => usernameHolder.value,
+    botId: () => botIdHolder.value,
+  });
+  console.log(`[zoe/index] group GitHub reads ON for ${groupGithubCfg.chats.length} chat(s)`);
 }
 
 async function sendXDeskCard(chatId: number, link: XLink): Promise<void> {

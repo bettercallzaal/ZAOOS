@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { groupHelpText, PRIVATE_NON_OWNER_HELP, type ChatHelpInput } from '../chat-help';
+import { type ChatHelpInput, groupHelpText, PRIVATE_NON_OWNER_HELP } from '../chat-help';
 import type { GroupConfig } from '../groups';
 
 // iman-desk #168 item 5: /help renders what ZOE does in THIS chat.

@@ -38,6 +38,18 @@
  *   8. stripe-overdue a task line that is both about Stripe and overdue; the
  *                     text after its list marker                               -> Overdue payment-links task (details in the vault)
  *
+ * Seat-merge's NEEDS_WORK verdicts on #4266 and #4251 (comment ids in the
+ * PR that added this class), 2026-11-08: two nights in a row the tasks file carried "Reply to <First
+ * Last> - post-event follow-up: ..., <First Last> contact, ...", a private
+ * person and a second contact next to event logistics. No class above covers a
+ * person named in a to-do, so:
+ *   9. task-person    on a list line, a name after a contact verb ("Reply to",
+ *                     "Email", "Call", "Follow up with" ...) or a name right
+ *                     before "contact"                                         -> <person in the vault>
+ *                     Only Zaal and ZOE stay, plus the NAME_STOP words. Any
+ *                     other name is redacted, a public one too: a lost name in a
+ *                     public to-do costs less than a private one published.
+ *
  * Usage:
  *   node scripts/zoe/nightly-redact.mjs docs/daily/2026-10-16-tasks.md ...   rewrite in place, print per-file counts
  *   node scripts/zoe/nightly-redact.mjs --check <files...>                    exit 1 if any file still carries a class
@@ -96,6 +108,21 @@ const OVERDUE_WORDS = /overdue|past due|deadline was|if not shipped/i;
 const LIST_MARKER = /^(\s*(?:[-*]\s+(?:\[[ xX]\]\s+)?|\d+\.\s+))/;
 const STRIPE_REPLACEMENT = 'Overdue payment-links task (details in the vault)';
 
+// Class 9: a person named in a to-do. Only on list lines (the task files).
+const CONTACT_VERB = '(?:[Rr]eply to|[Rr]espond to|[Ee]mail|[Cc]all|[Tt]ext|DM|[Mm]essage|[Pp]ing|[Tt]hank|[Aa]sk|[Ii]ntro|[Ff]ollow[ -]up with|[Cc]heck in with|[Mm]eet with|[Ss]end)';
+const PERSON = '[A-Z][a-z]+(?:[ -][A-Z][a-z]+)?';
+const VERB_PERSON = new RegExp(String.raw`\b(${CONTACT_VERB}\s+)(${PERSON})\b`, 'g');
+const PERSON_CONTACT = /\b([A-Z][a-z]+\s+[A-Z][a-z]+)(\s+contact)\b/g;
+const TASK_PERSON_KEEP = new Set([
+  'Zaal', 'ZOE', 'Zoe',
+  // Not people. Measured 2026-11-08 on main's 614 docs/daily files: these were
+  // the only non-person words after a contact verb on a list line.
+  'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday', 'Today', 'Tomorrow', 'Tonight',
+  'Water', 'Green', 'Zoom', 'Atrium', 'Routing', 'Addresses', 'Loom', 'Telegram', 'Discord', 'GitHub',
+]);
+const keepPerson = (name) => TASK_PERSON_KEEP.has(name.split(/[ -]/)[0]) || NAME_STOP.has(name.split(/[ -]/)[0]);
+const isListLine = (line) => LIST_MARKER.test(line);
+
 const lineIsStripeOverdue = (line) => STRIPE_LINE.test(line) && OVERDUE_WORDS.test(line);
 const isNameStop = (name) => NAME_STOP.has(name.split(/\s+/)[0]);
 
@@ -104,7 +131,25 @@ const EMAIL_ALLOW = new Set(['zaal@thezao.com', 'zaalp99@gmail.com', 'zaal@bette
 const EMAIL = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g;
 const thirdPartyEmail = (e) => !EMAIL_ALLOW.has(e.toLowerCase());
 
-export const CLASSES = ['private-path', '1password-item', 'name-amount', 'dash', 'email', 'payee-name', 'deal-names', 'stripe-overdue'];
+export const CLASSES = ['private-path', '1password-item', 'name-amount', 'dash', 'email', 'payee-name', 'deal-names', 'stripe-overdue', 'task-person'];
+
+/** Class 9 on one line. Returns the line and the hit count. */
+function redactTaskPerson(line) {
+  if (!isListLine(line)) return { line, hits: 0 };
+  let hits = 0;
+  const out = line
+    .replace(VERB_PERSON, (m, verb, name) => {
+      if (keepPerson(name)) return m;
+      hits += 1;
+      return `${verb}<person in the vault>`;
+    })
+    .replace(PERSON_CONTACT, (m, name, tail) => {
+      if (keepPerson(name)) return m;
+      hits += 1;
+      return `<person in the vault>${tail}`;
+    });
+  return { line: out, hits };
+}
 
 /** Pure. Returns the redacted text and how many hits of each class were replaced. */
 export function redact(text, only = CLASSES) {
@@ -133,6 +178,16 @@ export function redact(text, only = CLASSES) {
     counts['payee-name'] += 1;
     return 'Payee' + sep + '(amount in the vault)';
   });
+  if (on.has('task-person')) {
+    out = out
+      .split('\n')
+      .map((line) => {
+        const r = redactTaskPerson(line);
+        counts['task-person'] += r.hits;
+        return r.line;
+      })
+      .join('\n');
+  }
   if (on.has('deal-names') || on.has('stripe-overdue')) {
     out = out
       .split('\n')
@@ -190,6 +245,7 @@ export function remaining(text, only = CLASSES) {
   const lines = text.split('\n');
   if (on.has('deal-names') && lines.some((l) => DEAL_LINE.test(l) && (new RegExp(NAME_LIST.source).test(l) || new RegExp(NAME_SENTENCES.source).test(l) || new RegExp(NAME_SLASHES.source).test(l)))) found.push('deal-names');
   if (on.has('stripe-overdue') && lines.some(lineIsStripeOverdue)) found.push('stripe-overdue');
+  if (on.has('task-person') && lines.some((l) => redactTaskPerson(l).hits > 0)) found.push('task-person');
   // The regexes above carry the g flag; reset so a second call starts clean.
   for (const re of [BACKTICK_WITH_PATH, PRIVATE_PATH, OP_ITEM, NAME_AMOUNT, EMAIL, PAYEE_MARKED, NAME_LIST, NAME_SENTENCES, NAME_SLASHES]) re.lastIndex = 0;
   return found;

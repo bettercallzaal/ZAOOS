@@ -6,6 +6,7 @@ import {
   type DevzFoldConfig,
   type DevzFoldDeps,
   fixStatusReply,
+  inDevzChat,
   maybeHandleMentionFix,
   parseMentionFix,
   readDevzFoldConfig,
@@ -223,6 +224,17 @@ describe('registerDevzFoldCommands', () => {
     expect(d.dispatch).not.toHaveBeenCalled();
   });
 
+  it('/fix from a non-admin in the Devz chat is refused and never dispatches', async () => {
+    const { bot, handlers } = fakeBot();
+    const d = deps();
+    registerDevzFoldCommands(bot as never, cfg, d);
+    const ctx = ctxIn(DEVZ, 77, '/fix add a healthcheck command');
+    await handlers.get('fix')?.(ctx);
+    expect(ctx.reply).toHaveBeenCalledWith(expect.stringContaining('admin-only'));
+    expect(d.dispatch).not.toHaveBeenCalled();
+    expect(d.featureRan).not.toHaveBeenCalled();
+  });
+
   it('/fix with no text shows usage and does not dispatch', async () => {
     const { bot, handlers } = fakeBot();
     const d = deps();
@@ -239,5 +251,13 @@ describe('registerDevzFoldCommands', () => {
     const ctx = ctxIn(DEVZ, ADMIN, '/fix_status');
     await handlers.get('fix_status')?.(ctx);
     expect(ctx.reply).toHaveBeenCalledWith('No open Hermes runs.');
+  });
+});
+
+describe('inDevzChat (reuses memory.ts isDevzGroup)', () => {
+  it('is true only for the Devz chat id', () => {
+    expect(inDevzChat(cfg, DEVZ)).toBe(true);
+    expect(inDevzChat(cfg, 42)).toBe(false);
+    expect(inDevzChat(cfg, undefined)).toBe(false);
   });
 });

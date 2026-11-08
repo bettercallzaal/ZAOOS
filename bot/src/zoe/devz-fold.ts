@@ -24,6 +24,7 @@ import { existsSync } from 'node:fs';
 import type { Bot, Context } from 'grammy';
 import type { DispatchInput, HermesNarrator } from '../hermes/runner';
 import type { HermesRun } from '../hermes/types';
+import { isDevzGroup } from './memory';
 
 export interface DevzFoldConfig {
   chatId: number;
@@ -42,6 +43,14 @@ export function readDevzFoldConfig(env: NodeJS.ProcessEnv = process.env): DevzFo
     .filter((n) => Number.isFinite(n) && n > 0);
   const zaalId = Number(env.ZAAL_TELEGRAM_ID ?? '0') || null;
   return { chatId, adminIds, zaalId };
+}
+
+/**
+ * True only in the ZAO Devz chat. Reuses memory.ts isDevzGroup (the gate the group profile uses)
+ * so the fold and the profile cannot disagree about which chat is Devz. An absent chat id is false.
+ */
+export function inDevzChat(cfg: DevzFoldConfig, chatId: number | undefined): boolean {
+  return chatId !== undefined && isDevzGroup(String(chatId), String(cfg.chatId));
 }
 
 /**
@@ -71,7 +80,7 @@ export async function checkFixGates(
   if (!input.fromId || !cfg.adminIds.includes(input.fromId)) {
     return { ok: false, reply: 'Hermes is admin-only. Add yourself to BOT_ADMIN_TELEGRAM_IDS.' };
   }
-  if (input.chatId !== cfg.chatId) {
+  if (!inDevzChat(cfg, input.chatId)) {
     return { ok: false, reply: `/fix only runs from the ZAO Devz chat (id ${cfg.chatId}). You're in ${input.chatId}.` };
   }
   if (!(await claudeAvailable())) {
@@ -222,7 +231,7 @@ export async function startFix(
 /** Register `/fix` and `/fix_status`. Call once at boot, only when readDevzFoldConfig() is not null. */
 export function registerDevzFoldCommands(bot: Bot, cfg: DevzFoldConfig, deps: DevzFoldDeps): void {
   bot.command('fix', async (ctx) => {
-    if (ctx.chat?.id !== cfg.chatId) return; // ZOE's other chats: not a ZOE command there
+    if (!inDevzChat(cfg, ctx.chat?.id)) return; // ZOE's other chats: not a ZOE command there
     const issue = commandArg(ctx.message?.text ?? '', 'fix');
     if (!issue) {
       await ctx.reply('Usage: /fix <issue> - or tag me with "fix: <issue>". Min 10 chars.');
@@ -232,7 +241,7 @@ export function registerDevzFoldCommands(bot: Bot, cfg: DevzFoldConfig, deps: De
   });
 
   bot.command('fix_status', async (ctx) => {
-    if (ctx.chat?.id !== cfg.chatId) return;
+    if (!inDevzChat(cfg, ctx.chat?.id)) return;
     const arg = commandArg(ctx.message?.text ?? '', 'fix_status');
     await ctx.reply(await fixStatusReply(arg, deps));
   });
@@ -250,7 +259,7 @@ export async function maybeHandleMentionFix(
   cfg: DevzFoldConfig | null,
   deps: DevzFoldDeps,
 ): Promise<boolean> {
-  if (!cfg || ctx.chat?.id !== cfg.chatId) return false;
+  if (!cfg || !inDevzChat(cfg, ctx.chat?.id)) return false;
   const issue = parseMentionFix(text, botUsername);
   if (issue === null) return false;
   await startFix(ctx, issue, 'mention', cfg, deps);

@@ -245,6 +245,8 @@ import { brandBoxFor, fetchIcmBrain, brandSystemPreamble } from './brand-brain';
 import { appendApproved } from './outbox';
 import { enqueueZolCast } from './zol-queue';
 import { dispatchHermesRun } from '../hermes/runner';
+import { getRun as getHermesRun, listOpenRuns as listOpenHermesRuns } from '../hermes/db';
+import { claudeOnHost, maybeHandleMentionFix, readDevzFoldConfig, registerDevzFoldCommands, type DevzFoldDeps } from './devz-fold';
 import { shadowSummary } from '../hermes/critic';
 import { getClaudeHeartbeatStatus, readClaudeHealth } from '../hermes/claude-health';
 import { installCrashGuard } from './crash-guard';
@@ -642,6 +644,23 @@ bot.command("ask", async (ctx) => {
     console.error("[zoe/index] /ask turn failed:", (e as Error)?.message),
   );
 });
+
+// ZAO Devz folded into ZOE (ruling 304, plan #4260): /fix and /fix_status in the
+// ZAO Devz chat, plus "@zoe fix: ..." below. OFF unless ZOE_DEVZ_FOLD=1 and
+// ZAO_DEVZ_CHAT_ID is set; when off nothing is registered. Registered here,
+// above the generic text handler, which returns on "/" without calling next.
+const devzFold = readDevzFoldConfig();
+const devzFoldDeps: DevzFoldDeps = {
+  dispatch: dispatchHermesRun,
+  listOpenRuns: listOpenHermesRuns,
+  getRun: getHermesRun,
+  claudeAvailable: claudeOnHost,
+  featureRan,
+};
+if (devzFold) {
+  registerDevzFoldCommands(bot, devzFold, devzFoldDeps);
+  console.log(`[zoe/index] devz fold ON for chat ${devzFold.chatId}`);
+}
 
 
 // The agent's proactive grill deps: DM Zaal the next thing that needs him, one at
@@ -2744,6 +2763,11 @@ bot.on('message:text', async (ctx) => {
     }
     return;
   }
+
+  // "@zoe fix: ..." in the ZAO Devz chat runs the Hermes loop, not the concierge.
+  // The specific route goes first (first-handler-wins.md); a plain mention falls
+  // through. No-op unless the devz fold is on.
+  if (await maybeHandleMentionFix(ctx, text, usernameHolder.value, devzFold, devzFoldDeps)) return;
 
   // Groups: serialize per chat off the poll loop too (no deferred ack - groups
   // are noisy and an extra "queued" line per message would add to the noise).

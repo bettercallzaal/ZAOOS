@@ -17,7 +17,7 @@ tier: DEEP
 
 | # | Decision | Recommendation | Why (measured) |
 |---|----------|----------------|----------------|
-| 1 | Does the Overview page change how the estate's tools read verdicts, pins or head SHAs? | NO. Keep every tool as is. | `zao-merge` reads verdicts through the REST endpoint `issues/N/comments?per_page=100 --paginate --slurp`, oldest first, from the first 400 characters of a comment by `bettercallzaal` (`/Users/zaalpanthaki/bin/zao-merge`, `clean_verdict_at`, line 1785). Sort order in the web page never reaches that call. Pin lines go to the PR lead through Orca, not through GitHub. `--match-head-commit` is an API parameter. |
+| 1 | Does the Overview page change how the estate's tools read verdicts, pins or head SHAs? | NO. Keep every tool as is. | `zao-merge` reads verdicts through the REST endpoint `issues/N/comments?per_page=100 --paginate --slurp`, oldest first, from the first 400 characters of a comment by `bettercallzaal` (`zaal-dotfiles bin/zao-merge`, `clean_verdict_at`, line 1785). Sort order in the web page never reaches that call. Pin lines go to the PR lead through Orca, not through GitHub. `--match-head-commit` is an API parameter. |
 | 2 | Is the panel "Ready to merge / All requirements are met / No approvals required" truthful for us? | NO, it is vacuous on zao-vault and half-true on ZAOOS. Treat it as "GitHub's own rules pass", never as "the seat gate passed". | zao-vault is a private repo on a plan where `gh api .../rulesets` and `.../branches/main/protection` both return HTTP 403 "Upgrade to GitHub Pro or make this repository public" (checked 2026-11-08). Zero rules are configured, so "all requirements are met" is a ratio with zero in the denominator. ZAOOS (public) requires 3 checks (`Lint & Typecheck`, `Test`, `Bot Tests`) and 0 approvals, with `enforce_admins` true. In the last 12 closed PRs of each repo there were 0 GitHub reviews and 17 (vault) and 16 (ZAOOS) seat verdict comments. The real gate is invisible to the panel in 24 of 24 closed-PR samples. |
 | 3 | What should we adopt so the panel mirrors the real gate? | ADOPT a commit status named `seat/verdict` posted by the caller of `zao-evaluate` at the exact head SHA (success on CLEAN, failure on NEEDS_WORK). Keep the comment as the human record. Mark it required on ZAOOS only (Zaal's tap). | A status is bound to one SHA by GitHub itself: a new push has no status, so the panel returns to pending without any code from us. It works on the private free repo too (statuses need no protection feature), where it shows in the Checks count but cannot block. It avoids the self-approval ban (docs: "Pull request authors cannot approve their own pull requests"). |
 | 4 | Post verdicts as real PR reviews? | NO for now. | All lanes post as `bettercallzaal`, the PR author, and GitHub forbids approving your own PR. A review would need a second identity or a GitHub App, which one source calls "a poor idea generally, since it satisfies a human-review requirement with no human" (Modern Git Academy). `pulls/493/reviews` returns 0 today. |
@@ -45,7 +45,7 @@ Current as of 2026-11-08.
 
 ## Community reaction
 
-Counts as of 2026-11-08: Hacker News 175 points, 122 comments by the Algolia API (an earlier mirror showed 166 and 113); GitHub feedback discussion 212186 with 38 comments and reaction counts 14 thumbs up, 6 thumbs down, 6 tada, 1 confused; r/github 36 points, 5 comments.
+Counts as of 2026-11-08: Hacker News 175 points, 122 comments by the Algolia API (an earlier mirror showed 166 and 113); GitHub feedback discussion 212186 with about 38 comments and reaction counts 14 thumbs up, about 6 thumbs down (read 8 Nov 2026; a second read the same day by the reviewer saw 34 comments and 5 thumbs down, so these live counts move), 6 tada, 1 confused; r/github 36 points, 5 comments.
 
 | Theme | Who | Evidence |
 |-------|-----|----------|
@@ -67,7 +67,7 @@ Contradiction, left unresolved: HN mirrors disagree on the score (166/113, 172/1
 
 ### Finding 1 - Tools read the API, not the page
 
-`zao-merge` (2,801 lines) merges only when a non-author seat verdict reads CLEAN at the full 40-character head. `VERDICT_LINE` is a regex over the first 400 characters of a comment by `bettercallzaal`; the newest matching verdict at that head wins; an unreadable comment list refuses rather than reading as "no verdict" (`clean_verdict_at`, `check_author`, `/Users/zaalpanthaki/bin/zao-merge` lines 1777-1870). `zao-pr-open` (894 lines) runs the same gates before the PR exists. `zao-review-dispatch` (197 lines) pins the head SHA (rule 7c) and sends to the evaluator pane found by worktree path. `zao-evaluate` step 3 sends the PR lead "Condition: verdict ... at head <FULL_SHA>, comment <id>" through Orca. None of these touch the PR web page. The Overview page changes nothing for the machines.
+`zao-merge` (2,801 lines) merges only when a non-author seat verdict reads CLEAN at the full 40-character head. `VERDICT_LINE` is a regex over the first 400 characters of a comment by `bettercallzaal`; the newest matching verdict at that head wins; an unreadable comment list refuses rather than reading as "no verdict" (`clean_verdict_at`, `check_author`, `zaal-dotfiles bin/zao-merge` lines 1777-1870). `zao-pr-open` (894 lines) runs the same gates before the PR exists. `zao-review-dispatch` (197 lines) pins the head SHA (rule 7c) and sends to the evaluator pane found by worktree path. `zao-evaluate` step 3 sends the PR lead "Condition: verdict ... at head <FULL_SHA>, comment <id>" through Orca. None of these touch the PR web page. The Overview page changes nothing for the machines.
 
 ### Finding 2 - The panel is vacuous on zao-vault and partial on ZAOOS
 
@@ -116,7 +116,7 @@ Option B costs one write per verdict and leaves `zao-merge` unchanged, so the re
 - [Doc 2655](../2655-agent-pr-management-merge-queues-stacks-fork-ci/) - agent PR management, merge queues, stacks
 - [Doc 2663](../2663-merge-policy-one-tier-table/) - merge policy
 - [Doc 2581](../2581-orca-how-others-use-it/) and [Doc 2725](../2725-orca-fundamentals-tutorials/) - Orca is our session surface, not the Agents tab
-- Files: `/Users/zaalpanthaki/bin/zao-merge`, `/Users/zaalpanthaki/bin/zao-pr-open`, `/Users/zaalpanthaki/bin/zao-review-dispatch`; `/Users/zaalpanthaki/Documents/ZAO OS V1/.github/workflows/ci.yml` (the workflow that produces the required contexts)
+- Files: `zaal-dotfiles bin/zao-merge`, `zaal-dotfiles bin/zao-pr-open`, `zaal-dotfiles bin/zao-review-dispatch`; `.github/workflows/ci.yml` (the workflow that produces the required contexts)
 
 ## Next Actions
 
@@ -161,6 +161,6 @@ Method key: curl = raw HTML fetched and tag-stripped; API = official JSON; exa =
 25. [FULL, exa] [msoftnews, GitHub ships new pull request overview page](https://msoftnews.com/posts/github-ships-new-pull-request-overview-page-in-public-preview)
 26. [FULL, exa] [Stack Overflow, Why can't I approve my own PR](https://stackoverflow.com/questions/74332878/why-cant-i-approve-my-own-pr-in-github-even-when-i-have-disabled-the-setting-f)
 27. [FULL, exa] [Modern Git Academy, Required Reviews (the solo-maintainer problem)](https://moderngitacademy.com/github/pull-requests/required-reviews/)
-28. Local, measured 2026-11-08: `gh api repos/bettercallzaal/{zao-vault,ZAOOS}/{rulesets,branches/main/protection,pulls,issues/N/comments}`; one seat verdict comment on zao-vault PR 493 read via `gh api .../issues/comments/<id>`; source of `/Users/zaalpanthaki/bin/zao-merge`, `zao-pr-open`, `zao-review-dispatch`; `zao-evaluate` SKILL.md steps 0.5 to 3.
+28. Local, measured 2026-11-08: `gh api repos/bettercallzaal/{zao-vault,ZAOOS}/{rulesets,branches/main/protection,pulls,issues/N/comments}`; one seat verdict comment on zao-vault PR 493 read via `gh api .../issues/comments/<id>`; source of `zaal-dotfiles bin/zao-merge`, `zao-pr-open`, `zao-review-dispatch`; `zao-evaluate` SKILL.md steps 0.5 to 3.
 
 URL liveness: sources 1-4 and 6-9 fetched live on 2026-11-08; the others were returned by exa on 2026-11-08 and not separately re-opened. Source 5 (X) and the Reddit thread count are the weakest links. Not searched: Bluesky, Mastodon, Lobsters, r/ExperiencedDevs (an Arctic Shift query on r/programming, r/ExperiencedDevs and r/webdev for "overview" since 4 Nov returned no matching posts).

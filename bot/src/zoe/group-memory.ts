@@ -158,6 +158,38 @@ export async function readYesterdayLine(
   return yesterdayLine(cfg, chatId, await readGroupSummary(home, chatId), utcDay(now));
 }
 
+/**
+ * Seat-merge NEEDS_WORK on #4281: containsPii is a regex for emails, phones and
+ * addresses, so "Sarah Johnson from Acme asked about the budget" passed it, and
+ * only the prompt's "first names only" line held names back. The nightly
+ * redactor's task-person class does not catch that sentence either (it reads
+ * names after a to-do verb; measured: remaining() returns nothing for it), and
+ * scripts/ is outside the bot's tsconfig, so this is a gate of its own: any
+ * "First Last" pair whose first word is not a kept public name refuses the
+ * Bonfire write. The summary file stays on ZOE's disk. The kept names mirror
+ * scripts/zoe/nightly-public-names.json plus Zaal and ZOE (Zaal, misc F17); a
+ * test fails if the two lists drift.
+ */
+export const BONFIRE_PUBLIC_NAMES: ReadonlySet<string> = new Set(['Zaal', 'ZOE', 'Zoe', 'Iman']);
+const NOT_A_NAME = new Set([
+  'The', 'This', 'That', 'These', 'Those', 'A', 'An', 'On', 'In', 'At', 'By', 'For', 'From', 'With', 'And', 'But', 'So',
+  'Then', 'Next', 'Last', 'After', 'Before', 'Yesterday', 'Today', 'Tomorrow', 'Tonight', 'Everyone', 'Someone', 'Nobody',
+  'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday',
+  'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December',
+]);
+const FULL_NAME = /\b([A-Z][a-z]+)\s+([A-Z][a-z]+)\b/g;
+
+/** Capitalised First Last pairs that could be a person's full name. */
+export function fullNameHits(text: string): string[] {
+  const hits: string[] = [];
+  for (const m of text.matchAll(FULL_NAME)) {
+    const [, a, b] = m;
+    if (BONFIRE_PUBLIC_NAMES.has(a) || NOT_A_NAME.has(a) || NOT_A_NAME.has(b)) continue;
+    hits.push(`${a} ${b}`);
+  }
+  return hits;
+}
+
 export interface RollDeps {
   readArchive: (scope: string, month: string) => Promise<RecentTurn[]>;
   draft: (prompt: string) => Promise<string>;
@@ -176,6 +208,7 @@ export type RollStatus =
   | 'saved'
   | 'saved-bonfire-skipped-secret'
   | 'saved-bonfire-skipped-pii'
+  | 'saved-bonfire-skipped-name'
   | 'saved-bonfire-not-sent';
 
 /** Roll one chat's finished day: one model call when it had turns, none when not. */
@@ -203,6 +236,10 @@ export async function rollGroupDay(
   if (deps.containsPii(summary)) {
     deps.log(`[zoe/group-memory] Bonfire write skipped, PII in ${name}`);
     return 'saved-bonfire-skipped-pii';
+  }
+  if (fullNameHits(summary).length > 0) {
+    deps.log(`[zoe/group-memory] Bonfire write skipped, a full name in ${name}`);
+    return 'saved-bonfire-skipped-name';
   }
   const r = await deps.remember({ body: summary, name, sourceTag: 'zoe:group-memory' });
   if (!r.ok) {

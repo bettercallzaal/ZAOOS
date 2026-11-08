@@ -3,6 +3,8 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterAll, describe, expect, it, vi } from 'vitest';
 import {
+  BONFIRE_PUBLIC_NAMES,
+  fullNameHits,
   type GroupMemoryConfig,
   isMemoryChat,
   parseSummary,
@@ -269,5 +271,28 @@ describe('wiring (index.ts, scheduler.ts and memory.ts read as text; index.ts bo
     expect(sched.slice(guardAt, claimAt)).toContain("'10 0 * * *'");
     expect(sched.slice(claimAt, claimAt + 1600)).toContain("{ timezone: 'UTC' }");
     expect(src('index.ts')).toMatch(/groupMemoryDraft: groupMemoryCfg\s*\?/);
+  });
+});
+
+describe('a full name never reaches Bonfire (seat-merge on #4281)', () => {
+  it('fullNameHits flags a First Last pair and lets first names, kept names and dates through', () => {
+    expect(fullNameHits('Sarah Johnson from Acme asked about the budget.')).toEqual(['Sarah Johnson']);
+    expect(fullNameHits('Sam asked about the build call; ZOE said Thursday.')).toEqual([]);
+    expect(fullNameHits('On Thursday Iman Ali shipped the hub and Zaal Panthaki reviewed it.')).toEqual([]);
+    expect(fullNameHits('Next Monday the group meets.')).toEqual([]);
+  });
+
+  it('a summary with a full name is saved on disk but not sent to Bonfire', async () => {
+    const d = deps({ draft: vi.fn(async () => 'Sarah Johnson from Acme asked about the budget.') });
+    expect(await rollGroupDay(CFG, CHAT, DAY, d)).toBe('saved-bonfire-skipped-name');
+    expect(d.writeSummary).toHaveBeenCalledTimes(1);
+    expect(d.remember).not.toHaveBeenCalled();
+    expect(d.log).toHaveBeenCalledWith(expect.stringContaining('a full name'));
+    expect(d.log.mock.calls[0][0]).not.toContain('Sarah');
+  });
+
+  it('the kept names match scripts/zoe/nightly-public-names.json plus Zaal and ZOE', () => {
+    const file = JSON.parse(readFileSync(join(__dirname, '..', '..', '..', '..', 'scripts', 'zoe', 'nightly-public-names.json'), 'utf8'));
+    expect([...BONFIRE_PUBLIC_NAMES].sort()).toEqual([...new Set(['Zaal', 'ZOE', 'Zoe', ...file.names])].sort());
   });
 });

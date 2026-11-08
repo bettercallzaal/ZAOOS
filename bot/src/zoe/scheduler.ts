@@ -86,6 +86,7 @@ import { runPinnedBriefTick } from './pinned-brief-runner';
 import { checkClaudeAuth } from '../hermes/claude-cli';
 import { withTickLock } from './tick-lock';
 import { featureRan } from './feature-ran';
+import { claimFireIn, releaseFireIn } from './fire-claim';
 import { previousUtcDay, readGroupMemoryConfig, rollGroupDay, utcDay, writeGroupSummary } from './group-memory';
 import { readArchive } from './memory';
 import { containsPii } from './pii';
@@ -123,35 +124,13 @@ const SENTINEL_DIR = join(ZOE_PATHS.home, 'sentinels');
 /** The morning brief and the backlog batch run on Zaal's clock, not UTC. */
 export const MORNING_TZ = 'America/New_York';
 
-function sentinelPath(trigger: string): string {
-  const today = new Date().toISOString().slice(0, 10);
-  return join(SENTINEL_DIR, `${trigger}-${today}.flag`);
+// claimFire / releaseFire: fire-claim.ts, so they are tested by behaviour.
+function claimFire(trigger: string): Promise<boolean> {
+  return claimFireIn(SENTINEL_DIR, trigger);
 }
 
-/**
- * Atomically claim a trigger for today (doc 770 MED). Writes the sentinel with
- * O_EXCL ('wx') BEFORE the side-effecting send, so a restart mid-send can't
- * double-fire and two racing ticks can't both proceed. Returns true iff THIS
- * call won the claim. On send failure the caller calls releaseFire() so a later
- * tick can retry.
- */
-async function claimFire(trigger: string): Promise<boolean> {
-  await fs.mkdir(SENTINEL_DIR, { recursive: true });
-  try {
-    await fs.writeFile(sentinelPath(trigger), new Date().toISOString(), { flag: 'wx' });
-    return true;
-  } catch {
-    return false; // sentinel already exists → already fired today
-  }
-}
-
-/** Release a claim so a later tick can retry (used when the send itself fails). */
-async function releaseFire(trigger: string): Promise<void> {
-  try {
-    await fs.unlink(sentinelPath(trigger));
-  } catch {
-    // already gone — nothing to release
-  }
+function releaseFire(trigger: string): Promise<void> {
+  return releaseFireIn(SENTINEL_DIR, trigger);
 }
 
 /** Flag to enable repo-improver scout through the Heart lease layer. Default OFF. */

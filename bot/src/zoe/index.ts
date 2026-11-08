@@ -153,6 +153,7 @@ import {
   engagedUntilFor,
   markEngaged,
   getGroupConfig,
+  groupUntaggedAllowed,
   isBotMentioned,
   removeAllowlistMember,
   setGroupMode,
@@ -246,7 +247,8 @@ import { appendApproved } from './outbox';
 import { enqueueZolCast } from './zol-queue';
 import { dispatchHermesRun } from '../hermes/runner';
 import { getRun as getHermesRun, listOpenRuns as listOpenHermesRuns } from '../hermes/db';
-import { claudeOnHost, maybeHandleMentionFix, readDevzFoldConfig, registerDevzFoldCommands, type DevzFoldDeps } from './devz-fold';
+import { claudeOnHost, inDevzChat, maybeHandleMentionFix, readDevzFoldConfig, registerDevzFoldCommands, type DevzFoldDeps } from './devz-fold';
+import { groupHelpText, PRIVATE_NON_OWNER_HELP } from './chat-help';
 import { shadowSummary } from '../hermes/critic';
 import { getClaudeHeartbeatStatus, readClaudeHealth } from '../hermes/claude-health';
 import { installCrashGuard } from './crash-guard';
@@ -598,16 +600,22 @@ bot.command("help", async (ctx) => {
     return;
   }
 
-  // Group help
-  const groupHelp = [
-    "ZOE Group Assistant:",
-    "",
-    "• Tag @zaoclaw_bot with your question or reply directly to any message from ZOE.",
-    "• Or use `/ask <question>` to prompt directly.",
-    "• ZOE can answer questions about The ZAO, COC Concertz, music collaborations, and roadmap.",
-    "• To leave a message for Zaal: \"Please let Zaal know...\" and ZOE will deliver it to his priority inbox.",
-  ].join("\n");
-  await ctx.reply(groupHelp);
+  if (isPrivate) {
+    await ctx.reply(PRIVATE_NON_OWNER_HELP);
+    featureRan('chat-help', 'private non-owner');
+    return;
+  }
+  // Group help, rendered from THIS chat's config (chat-help.ts, #168 item 5).
+  const cfg = await getGroupConfig(ctx.chat.id);
+  await ctx.reply(
+    groupHelpText({
+      config: cfg,
+      untagged: groupUntaggedAllowed(),
+      devzFold: devzFold !== null && inDevzChat(devzFold, ctx.chat.id),
+      botUsername: usernameHolder.value,
+    }),
+  );
+  featureRan('chat-help', `group mode=${cfg?.mode ?? 'unconfigured'}`);
 });
 
 // /ask - ask ZOE a question directly in groups or DMs

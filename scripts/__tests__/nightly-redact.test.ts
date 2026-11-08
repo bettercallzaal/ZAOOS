@@ -6,7 +6,7 @@
  * redactor that quietly does nothing fails here.
  */
 import { describe, expect, it } from 'vitest';
-import { redact, remaining } from '../zoe/nightly-redact.mjs';
+import { CLASSES, PUBLIC_NAMES, parsePublicNames, redact, remaining } from '../zoe/nightly-redact.mjs';
 
 const KEY_LINE = '- [ ] **AgentMail env var - Day 149** - `echo "AGENTMAIL_API_KEY=<key>" >> ~/.zao/zao.env`. Key in 1Password "Example Item".';
 const DASH_LINE = '- AgentMail inbox inaccessible — Day 149. One-command fix: `echo "AGENTMAIL_API_KEY=<key>" >> ~/.zao/zao.env`';
@@ -239,4 +239,38 @@ describe('task-person: a person named in a to-do (seat-merge on #4266 and #4251)
     expect(redact(input, ['task-person']).text).toBe(input);
     expect(remaining(input, ['task-person'])).toEqual([]);
   });
+});
+
+describe('task-person: public names come from a file or env (misc F17)', () => {
+  const line = '- [ ] Reply to Robin about the poster';
+
+  it('keeps Zaal and ZOE always, and the committed file adds Iman and nobody else (misc F17)', () => {
+    expect([...PUBLIC_NAMES].sort()).toEqual(['Iman', 'ZOE', 'Zaal', 'Zoe']);
+    expect(redact('- [ ] Reply to Iman about the poster').text).toBe('- [ ] Reply to Iman about the poster');
+    expect(redact(line).text).toBe('- [ ] Reply to <person in the vault> about the poster');
+  });
+
+  it('keeps a name the file lists', () => {
+    const keep = parsePublicNames(JSON.stringify({ names: ['Robin'] }));
+    expect(redact(line, CLASSES, keep).text).toBe(line);
+    expect(remaining(line, CLASSES, keep)).not.toContain('task-person');
+  });
+
+  it('keeps a name the env lists', () => {
+    const keep = parsePublicNames('', ' Robin, Casey ');
+    expect(keep.has('Robin') && keep.has('Casey')).toBe(true);
+    expect(redact(line, ['task-person'], keep).text).toBe(line);
+  });
+
+  it('a name on no list is still redacted', () => {
+    const keep = parsePublicNames(JSON.stringify({ names: ['Casey'] }));
+    expect(redact(line, ['task-person'], keep).text).toContain('<person in the vault>');
+  });
+
+  it.each([['not json'], ['{}'], [JSON.stringify({ names: 'Robin' })], [JSON.stringify({ names: ['robin', '', 'x'.repeat(40), 7] })]])(
+    'junk %j keeps only Zaal and ZOE',
+    (raw) => {
+      expect([...parsePublicNames(raw)].sort()).toEqual(['ZOE', 'Zaal', 'Zoe']);
+    },
+  );
 });

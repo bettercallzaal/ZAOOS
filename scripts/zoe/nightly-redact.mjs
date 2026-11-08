@@ -113,14 +113,54 @@ const CONTACT_VERB = '(?:[Rr]eply to|[Rr]espond to|[Ee]mail|[Cc]all|[Tt]ext|DM|[
 const PERSON = '[A-Z][a-z]+(?:[ -][A-Z][a-z]+)?';
 const VERB_PERSON = new RegExp(String.raw`\b(${CONTACT_VERB}\s+)(${PERSON})\b`, 'g');
 const PERSON_CONTACT = /\b([A-Z][a-z]+\s+[A-Z][a-z]+)(\s+contact)\b/g;
-const TASK_PERSON_KEEP = new Set([
-  'Zaal', 'ZOE', 'Zoe',
+// Public names that stay in a to-do (Zaal, misc F17, 2026-11-08: "add the
+// TASK_PERSON_KEEP allowlist"). The list lives in nightly-public-names.json
+// beside this file, plus NIGHTLY_PUBLIC_NAMES (comma separated), so its source
+// can later move to the names members choose for themselves (a ZID profile
+// field) without touching this code. Zaal and ZOE are always kept. A missing or
+// junk file keeps only those two: the safe side is to redact more.
+const ALWAYS_PUBLIC = ['Zaal', 'ZOE', 'Zoe'];
+const PUBLIC_NAME_RE = /^[A-Z][A-Za-z'-]{1,30}$/;
+
+/** Pure. The public-name set from the file's text and the env list. */
+export function parsePublicNames(fileText, envList = '') {
+  const names = new Set(ALWAYS_PUBLIC);
+  let listed = [];
+  try {
+    const parsed = JSON.parse(fileText);
+    if (parsed && Array.isArray(parsed.names)) listed = parsed.names;
+  } catch {
+    listed = [];
+  }
+  for (const n of [...listed, ...String(envList).split(',')]) {
+    const name = typeof n === 'string' ? n.trim() : '';
+    if (PUBLIC_NAME_RE.test(name)) names.add(name);
+  }
+  return names;
+}
+
+function loadPublicNames() {
+  let text = '';
+  try {
+    text = readFileSync(new URL('./nightly-public-names.json', import.meta.url), 'utf8');
+  } catch {
+    text = '';
+  }
+  return parsePublicNames(text, process.env.NIGHTLY_PUBLIC_NAMES ?? '');
+}
+
+export const PUBLIC_NAMES = loadPublicNames();
+
+const NOT_PEOPLE = new Set([
   // Not people. Measured 2026-11-08 on main's 614 docs/daily files: these were
   // the only non-person words after a contact verb on a list line.
   'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday', 'Today', 'Tomorrow', 'Tonight',
   'Water', 'Green', 'Zoom', 'Atrium', 'Routing', 'Addresses', 'Loom', 'Telegram', 'Discord', 'GitHub',
 ]);
-const keepPerson = (name) => TASK_PERSON_KEEP.has(name.split(/[ -]/)[0]) || NAME_STOP.has(name.split(/[ -]/)[0]);
+const keepPerson = (name, keep) => {
+  const first = name.split(/[ -]/)[0];
+  return keep.has(first) || NOT_PEOPLE.has(first) || NAME_STOP.has(first);
+};
 const isListLine = (line) => LIST_MARKER.test(line);
 
 const lineIsStripeOverdue = (line) => STRIPE_LINE.test(line) && OVERDUE_WORDS.test(line);
@@ -134,17 +174,17 @@ const thirdPartyEmail = (e) => !EMAIL_ALLOW.has(e.toLowerCase());
 export const CLASSES = ['private-path', '1password-item', 'name-amount', 'dash', 'email', 'payee-name', 'deal-names', 'stripe-overdue', 'task-person'];
 
 /** Class 9 on one line. Returns the line and the hit count. */
-function redactTaskPerson(line) {
+function redactTaskPerson(line, keep = PUBLIC_NAMES) {
   if (!isListLine(line)) return { line, hits: 0 };
   let hits = 0;
   const out = line
     .replace(VERB_PERSON, (m, verb, name) => {
-      if (keepPerson(name)) return m;
+      if (keepPerson(name, keep)) return m;
       hits += 1;
       return `${verb}<person in the vault>`;
     })
     .replace(PERSON_CONTACT, (m, name, tail) => {
-      if (keepPerson(name)) return m;
+      if (keepPerson(name, keep)) return m;
       hits += 1;
       return `<person in the vault>${tail}`;
     });
@@ -152,7 +192,7 @@ function redactTaskPerson(line) {
 }
 
 /** Pure. Returns the redacted text and how many hits of each class were replaced. */
-export function redact(text, only = CLASSES) {
+export function redact(text, only = CLASSES, keep = PUBLIC_NAMES) {
   const on = new Set(only);
   const counts = Object.fromEntries(CLASSES.map((c) => [c, 0]));
   let out = text;
@@ -182,7 +222,7 @@ export function redact(text, only = CLASSES) {
     out = out
       .split('\n')
       .map((line) => {
-        const r = redactTaskPerson(line);
+        const r = redactTaskPerson(line, keep);
         counts['task-person'] += r.hits;
         return r.line;
       })
@@ -232,7 +272,7 @@ export function redact(text, only = CLASSES) {
 }
 
 /** Pure. The classes still present in a text, for --check. */
-export function remaining(text, only = CLASSES) {
+export function remaining(text, only = CLASSES, keep = PUBLIC_NAMES) {
   const on = new Set(only);
   const found = [];
   if (on.has('private-path') && (BACKTICK_WITH_PATH.test(text) || PRIVATE_PATH.test(text))) found.push('private-path');
@@ -245,7 +285,7 @@ export function remaining(text, only = CLASSES) {
   const lines = text.split('\n');
   if (on.has('deal-names') && lines.some((l) => DEAL_LINE.test(l) && (new RegExp(NAME_LIST.source).test(l) || new RegExp(NAME_SENTENCES.source).test(l) || new RegExp(NAME_SLASHES.source).test(l)))) found.push('deal-names');
   if (on.has('stripe-overdue') && lines.some(lineIsStripeOverdue)) found.push('stripe-overdue');
-  if (on.has('task-person') && lines.some((l) => redactTaskPerson(l).hits > 0)) found.push('task-person');
+  if (on.has('task-person') && lines.some((l) => redactTaskPerson(l, keep).hits > 0)) found.push('task-person');
   // The regexes above carry the g flag; reset so a second call starts clean.
   for (const re of [BACKTICK_WITH_PATH, PRIVATE_PATH, OP_ITEM, NAME_AMOUNT, EMAIL, PAYEE_MARKED, NAME_LIST, NAME_SENTENCES, NAME_SLASHES]) re.lastIndex = 0;
   return found;

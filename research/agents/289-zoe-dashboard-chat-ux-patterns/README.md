@@ -459,7 +459,7 @@ The doc's tech-stack recommendation of assistant-ui was conditional on React Nat
 - As of mid-2026 the package is at v0.1.26 -- pre-1.0, API may still change.
 - Source: https://www.assistant-ui.com/blog/2026-03-launch-week (PARTIAL -- site unreachable from session, confirmed via search result snippets); https://socket.dev/npm/package/@assistant-ui/react (PARTIAL -- search snippet).
 
-**ZOE implication:** The tech-stack table's "React Native (Expo) or PWA" row can now be resolved: use `@assistant-ui/react-native` directly. The shared core means ZOE's tool cards and model adapters written for web port to mobile without rewrite.
+**ZOE implication:** The tech-stack table's "React Native (Expo) or PWA" row can now be resolved: use `@assistant-ui/react-native` directly. The shared core means ZOE's tool cards and model adapters written for web would port to mobile without rewrite.
 
 ### 2. AG-UI: a new open protocol for agent-to-frontend communication (NEW)
 
@@ -478,8 +478,8 @@ AG-UI (Agent-User Interaction Protocol) emerged as an event-based standard for c
 
 Practitioner sources from 2026 converge on three additions to the confirmation patterns in Part 5 and 7:
 
-- **Risk-tiered gates:** Confidence-based soft review for medium-risk reversible actions; mandatory hard gates for high-risk or irreversible actions. The existing doc covers only the "confirm before destructive" pattern; the tiered model extends this to all action types.
-- **Show the resolved action:** An approval UI should display what the agent will actually do (resolved parameters, actual target), not what it might do. "I'll post this exact draft to Farcaster" is approvable; "I'll post something" is not.
+- **Risk-tiered gates:** Confidence-based soft review for medium-risk reversible actions; mandatory hard gates for high-risk or irreversible actions. The existing doc covers only the "confirm before destructive" pattern; the tiered model extends this to all action types. (UNVERIFIED -- no source fetched this run)
+- **Show the resolved action:** An approval UI should display what the agent will actually do (resolved parameters, actual target), not what it might do. "I'll post this exact draft to Farcaster" is approvable; "I'll post something" is not. (UNVERIFIED -- no source fetched this run)
 - **Durable approval waits:** For long-running agents, approval gates should be backed by persistent storage (Cloudflare Workflows or equivalent) so the agent can wait hours or days without holding a live session. Source: Cloudflare agent docs, updated 2026-08-27 (UNVERIFIED -- site unreachable from session, confirmed via search snippet).
 
 **ZOE implication:** The error/action card pattern in Part 5 (`[Retry] [Force] [Skip]`) should be extended to include the resolved action preview (e.g., show the exact wallet address and amount before a WALLET transaction), and long-lived approval waits for async WALLET or CASTER actions should be durable, not in-memory.

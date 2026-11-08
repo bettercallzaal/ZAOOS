@@ -246,6 +246,7 @@ import { appendApproved } from './outbox';
 import { enqueueZolCast } from './zol-queue';
 import { dispatchHermesRun } from '../hermes/runner';
 import { getRun as getHermesRun, listOpenRuns as listOpenHermesRuns } from '../hermes/db';
+import { ghOpenIssue, readIdeaConfig, registerIdeaCommand } from './idea-cards';
 import { claudeOnHost, maybeHandleMentionFix, readDevzFoldConfig, registerDevzFoldCommands, type DevzFoldDeps } from './devz-fold';
 import { shadowSummary } from '../hermes/critic';
 import { getClaudeHeartbeatStatus, readClaudeHealth } from '../hermes/claude-health';
@@ -731,6 +732,23 @@ const xDeskDraft = async (system: string, prompt: string): Promise<string> =>
       timeoutMs: 120_000,
     })
   ).text;
+
+// /idea cards (idea-cards.ts, iman-desk #162 and #168 item 4). OFF unless
+// ZOE_IDEA_CARDS=1 and ZOE_IDEA_CHAT_ID; the desk issue only with
+// ZOE_IDEA_GITHUB_TOKEN. Registered above the generic text handler.
+const ideaCfg = readIdeaConfig();
+if (ideaCfg) {
+  registerIdeaCommand(bot, ideaCfg, {
+    getGroupConfig,
+    draft: (prompt) => xDeskDraft('You write short, plain idea cards for The ZAO team.', prompt),
+    board: mirrorCapturesToTracker,
+    openIssue: ghOpenIssue,
+    featureRan,
+    botUsername: () => usernameHolder.value,
+    botId: () => botIdHolder.value,
+  });
+  console.log(`[zoe/index] idea cards ON for chat ${ideaCfg.chatId}${ideaCfg.token ? ' (desk issues on)' : ''}`);
+}
 
 async function sendXDeskCard(chatId: number, link: XLink): Promise<void> {
   const result = await runDesk(link, { draft: xDeskDraft });

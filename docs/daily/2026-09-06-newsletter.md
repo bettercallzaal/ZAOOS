@@ -6,7 +6,7 @@
 
 ## Draft
 
-Saturday was a rest day for the codebase. Zero commits. The repo didn't move, which means it was actually doing what a Saturday should do — holding steady while the human side of the operation had a chance to breathe. The real work happening this weekend isn't in the terminal, it's in the five deal memos that need to find their way to five confirmed acts. Crown Vics, Acadia Rising, Dcoop, Fellenz, Michael Anderson — all verbal, all real, none yet on paper. ZAOstock is 29 days out. That gap closes this weekend.
+Saturday was a rest day for the codebase. Zero commits. The repo didn't move, which means it was actually doing what a Saturday should do — holding steady while the human side of the operation had a chance to breathe. The real work happening this weekend isn't in the terminal, it's in the five deal memos that need to find their way to five confirmed acts. <names in the vault> — all verbal, all real, none yet on paper. ZAOstock is 29 days out. That gap closes this weekend.
 
 Three PRs opened quietly Friday night (#3407, #3408, #3410) that didn't make it into Saturday morning's task file. The pattern keeps showing up: late Friday work that lands after the daily briefing and sits invisible until someone looks at the PR queue. That's the argument for Sunday as a light review day — not to grind, but to clear the queue before Monday so the week starts with a clean merge state instead of four stacked fixes waiting for attention. Two of them are settings/scripts cleanup. The third brings the ZAO Devz bots into the agent-markup guard that ZOE got last week.
 

@@ -202,3 +202,41 @@ describe('item 203: the sweep only touches its own classes', () => {
     expect(out).toBe(['# Tasks', '', '- [ ] **Payee (amount in the vault) — Day 9**', '- unrelated line — with a dash', ''].join('\n'));
   });
 });
+
+describe('task-person: a person named in a to-do (seat-merge on #4266 and #4251); names are stand-ins', () => {
+  // The shape of the line both nights carried, with stand-in names.
+  const line =
+    '- [ ] **Reply to Alex Rivera** - Post-event follow-up: porta potties, the DJ, Sam Ortiz contact, the poster.';
+
+  it('redacts the person after the verb and the person before "contact"', () => {
+    const r = redact(line);
+    expect(r.text).toBe(
+      '- [ ] **Reply to <person in the vault>** - Post-event follow-up: porta potties, the DJ, <person in the vault> contact, the poster.',
+    );
+    expect(r.counts['task-person']).toBe(2);
+    expect(remaining(line)).toContain('task-person');
+    expect(remaining(r.text)).not.toContain('task-person');
+  });
+
+  it.each([
+    ['- Call Jordan about the venue', '- Call <person in the vault> about the venue'],
+    ['1. Follow up with Casey Lin on the poster', '1. Follow up with <person in the vault> on the poster'],
+    ['* Send Robin the deck', '* Send <person in the vault> the deck'],
+    ['- [x] Ask Morgan for the file', '- [x] Ask <person in the vault> for the file'],
+  ])('redacts %j', (input, out) => {
+    expect(redact(input, ['task-person']).text).toBe(out);
+  });
+
+  it.each([
+    ['- [ ] Reply to Zaal about the poster'],
+    ['- Send ZOE the log'],
+    ['- Call Friday at noon'],
+    ['- Send Zoom link to the group'],
+    ['- Follow up with Water and Music on the brief'],
+    ['Reply to Alex Rivera in a sentence that is not a list item'],
+    ['- [ ] Reply to the venue contact (post-event follow-up)'],
+  ])('leaves %j alone', (input) => {
+    expect(redact(input, ['task-person']).text).toBe(input);
+    expect(remaining(input, ['task-person'])).toEqual([]);
+  });
+});

@@ -8,6 +8,8 @@ import {
   type GroupGithubConfig,
   type GroupGithubDeps,
   handleGithubAsk,
+  NO_DOCS_REPO,
+  NO_ISSUE_REPOS,
   parseAsk,
   REPLY_MAX_CHARS,
   readDoc,
@@ -23,10 +25,11 @@ const MEMBER = 31;
 const cfg: GroupGithubConfig = { token: 'stub-token', chats: [CHAT], repos: ['ZAODEVZ/iman-desk'], docsRepo: 'ZAODEVZ/ZAOresearch' };
 
 type Route = Record<string, { status?: number; body: unknown }>;
-function fakeFetch(routes: Route): FetchFn & { calls: Array<{ url: string; headers: Record<string, string> }> } {
-  const calls: Array<{ url: string; headers: Record<string, string> }> = [];
-  const fn = (async (url: string, init: { headers: Record<string, string> }) => {
-    calls.push({ url, headers: init.headers });
+type Call = { url: string; headers: Record<string, string>; redirect?: string };
+function fakeFetch(routes: Route): FetchFn & { calls: Call[] } {
+  const calls: Call[] = [];
+  const fn = (async (url: string, init: { headers: Record<string, string>; redirect?: string }) => {
+    calls.push({ url, headers: init.headers, redirect: init.redirect });
     const r = routes[url];
     const status = r ? (r.status ?? 200) : 404;
     return { ok: status < 400, status, text: async () => (typeof r?.body === 'string' ? r.body : JSON.stringify(r?.body ?? {})) };
@@ -68,13 +71,17 @@ describe('readGroupGithubConfig', () => {
   ])('is off for %j', (env) => {
     expect(readGroupGithubConfig(env as NodeJS.ProcessEnv)).toBeNull();
   });
-  it('reads chats and the default repos', () => {
+  it('has no default repo at all: an unset list stays empty', () => {
     expect(readGroupGithubConfig(on as NodeJS.ProcessEnv)).toEqual({
       token: 'stub-a',
       chats: [-5, -6],
-      repos: ['ZAODEVZ/iman-desk'],
-      docsRepo: 'ZAODEVZ/ZAOresearch',
+      repos: [],
+      docsRepo: null,
     });
+  });
+  it('reads the repos Zaal sets', () => {
+    const env = { ...on, ZOE_GROUP_GITHUB_REPOS: 'owner/one, bad repo', ZOE_GROUP_GITHUB_DOCS_REPO: 'owner/docs' };
+    expect(readGroupGithubConfig(env as NodeJS.ProcessEnv)).toMatchObject({ repos: ['owner/one'], docsRepo: 'owner/docs' });
   });
   it('never falls back to another token', () => {
     const env = { ...on, ZOE_GROUP_GITHUB_TOKEN: undefined, GH_TOKEN: 'stub-b', GITHUB_TOKEN: 'stub-c' };
@@ -201,5 +208,35 @@ describe('index.ts wiring (read as text; index.ts boots the bot and is never imp
     expect(src.slice(cfgAt, regAt)).toContain('if (groupGithubCfg) {');
     expect(regAt).toBeGreaterThan(cfgAt);
     expect(textAt).toBeGreaterThan(regAt);
+  });
+});
+
+describe('no repos configured (seat-merge on #4273)', () => {
+  const bare: GroupGithubConfig = { token: 'stub-token', chats: [CHAT], repos: [], docsRepo: null };
+
+  it('/issue answers that no repos are configured and fetches nothing', async () => {
+    const f = fakeFetch({ [ISSUE_URL]: { body: {} } });
+    const ctx = ctxIn(CHAT, MEMBER);
+    await handleGithubAsk(ctx as never, 'issue', '175', bare, deps(f));
+    expect(f.calls).toHaveLength(0);
+    expect(ctx.reply.mock.calls[0][0]).toBe(NO_ISSUE_REPOS);
+  });
+
+  it('/doc answers that no docs repo is configured and fetches nothing', async () => {
+    const f = fakeFetch({});
+    const ctx = ctxIn(CHAT, MEMBER);
+    await handleGithubAsk(ctx as never, 'doc', '2732', bare, deps(f));
+    expect(f.calls).toHaveLength(0);
+    expect(ctx.reply.mock.calls[0][0]).toBe(NO_DOCS_REPO);
+    expect(await readDoc(bare, 2732, f)).toBe(NO_DOCS_REPO);
+  });
+});
+
+describe('redirects are refused', () => {
+  it("every request passes redirect: 'error', so the token never leaves api.github.com", async () => {
+    const f = fakeFetch({ [ISSUE_URL]: { body: ISSUE }, [`${ISSUE_URL}/comments?per_page=1&page=2`]: { body: [] } });
+    await readIssue(cfg, 'ZAODEVZ/iman-desk', 175, f);
+    expect(f.calls.length).toBeGreaterThan(0);
+    for (const c of f.calls) expect(c.redirect).toBe('error');
   });
 });

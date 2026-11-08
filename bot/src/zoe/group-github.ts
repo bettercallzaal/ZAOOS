@@ -9,8 +9,13 @@
  * no fallback to GH_TOKEN, GITHUB_TOKEN or the gh CLI login. No token, no
  * chats, or the flag unset: the feature is off and registers nothing.
  *
- * Repos are an allowlist (ZOE_GROUP_GITHUB_REPOS, default the desk repo; docs
- * from ZOE_GROUP_GITHUB_DOCS_REPO, default the research library). Responses are
+ * Repos are an allowlist with NO default (seat-merge on #4273: the desk repo
+ * is private, so a default would put private issue bodies into a group). Issue
+ * repos come only from ZOE_GROUP_GITHUB_REPOS and the docs repo only from
+ * ZOE_GROUP_GITHUB_DOCS_REPO, both set by Zaal; an empty list makes the command
+ * answer "no repos configured". Reading a private repo in a group is his
+ * ruling, never a default. Every fetch passes redirect: 'error', so the token
+ * never follows a redirect off api.github.com. Responses are
  * Zod-checked (the self-scout.ts pattern) and every reply is capped at
  * REPLY_MAX_CHARS. The group gate is groups.ts shouldRespond.
  */
@@ -21,15 +26,15 @@ import { type GroupConfig, shouldRespond } from './groups';
 export const REPLY_MAX_CHARS = 1500;
 export const BODY_MAX_CHARS = 600;
 export const COMMENT_MAX_CHARS = 400;
-export const DEFAULT_ISSUE_REPOS = ['ZAODEVZ/iman-desk'];
-export const DEFAULT_DOCS_REPO = 'ZAODEVZ/ZAOresearch';
+export const NO_ISSUE_REPOS = 'No issue repos are configured for this chat.';
+export const NO_DOCS_REPO = 'No docs repo is configured for this chat.';
 const REPO_RE = /^[A-Za-z0-9-]+\/[A-Za-z0-9._-]+$/;
 
 export interface GroupGithubConfig {
   token: string;
   chats: number[];
   repos: string[];
-  docsRepo: string;
+  docsRepo: string | null;
 }
 
 /** The config, or null when off. Fails closed: no flag, no token or no valid chat means off. */
@@ -46,9 +51,9 @@ export function readGroupGithubConfig(env: NodeJS.ProcessEnv = process.env): Gro
     .split(',')
     .map((s) => s.trim())
     .filter((s) => REPO_RE.test(s));
-  const docsRepo = (env.ZOE_GROUP_GITHUB_DOCS_REPO ?? DEFAULT_DOCS_REPO).trim();
-  if (!REPO_RE.test(docsRepo)) return null;
-  return { token, chats, repos: listed.length ? listed : [...DEFAULT_ISSUE_REPOS], docsRepo };
+  const docsRaw = (env.ZOE_GROUP_GITHUB_DOCS_REPO ?? '').trim();
+  if (docsRaw && !REPO_RE.test(docsRaw)) return null;
+  return { token, chats, repos: listed, docsRepo: docsRaw || null };
 }
 
 export type GithubAsk = { kind: 'issue'; repo: string; number: number } | { kind: 'doc'; number: number } | { kind: 'usage'; text: string };
@@ -57,9 +62,11 @@ export type GithubAsk = { kind: 'issue'; repo: string; number: number } | { kind
 export function parseAsk(command: 'issue' | 'doc', arg: string, cfg: GroupGithubConfig): GithubAsk {
   const parts = arg.trim().split(/\s+/).filter(Boolean);
   if (command === 'doc') {
+    if (!cfg.docsRepo) return { kind: 'usage', text: NO_DOCS_REPO };
     const n = Number((parts[0] ?? '').replace(/^#/, ''));
     return parts.length === 1 && Number.isInteger(n) && n > 0 ? { kind: 'doc', number: n } : { kind: 'usage', text: 'Use: /doc 2732' };
   }
+  if (cfg.repos.length === 0) return { kind: 'usage', text: NO_ISSUE_REPOS };
   const usage = `Use: /issue 175, or /issue owner/repo 175 for one of: ${cfg.repos.join(', ')}`;
   const [a, b] = parts;
   const repo = parts.length === 2 ? a : cfg.repos[0];
@@ -82,7 +89,10 @@ const IssueSchema = z.object({
 const CommentSchema = z.array(z.object({ body: z.string().nullable().optional(), created_at: z.string() }).passthrough());
 const TreeSchema = z.object({ tree: z.array(z.object({ path: z.string(), type: z.string() }).passthrough()), truncated: z.boolean().optional() });
 
-export type FetchFn = (url: string, init: { headers: Record<string, string>; signal?: AbortSignal }) => Promise<{ ok: boolean; status: number; text: () => Promise<string> }>;
+export type FetchFn = (
+  url: string,
+  init: { headers: Record<string, string>; signal?: AbortSignal; redirect: 'error' },
+) => Promise<{ ok: boolean; status: number; text: () => Promise<string> }>;
 
 function headers(token: string, raw = false): Record<string, string> {
   return {
@@ -94,7 +104,7 @@ function headers(token: string, raw = false): Record<string, string> {
 
 async function getText(fetchFn: FetchFn, url: string, token: string, raw = false): Promise<string | null> {
   if (!url.startsWith('https://api.github.com/')) return null;
-  const res = await fetchFn(url, { headers: headers(token, raw), signal: AbortSignal.timeout(15_000) });
+  const res = await fetchFn(url, { headers: headers(token, raw), signal: AbortSignal.timeout(15_000), redirect: 'error' });
   if (!res.ok) return null;
   return res.text();
 }
@@ -142,6 +152,7 @@ export function docPath(paths: readonly string[], n: number): string | null {
 
 /** A research doc's title and opening, or null when it could not be found or read. */
 export async function readDoc(cfg: GroupGithubConfig, n: number, fetchFn: FetchFn): Promise<string | null> {
+  if (!cfg.docsRepo) return NO_DOCS_REPO;
   const tree = await getJson(fetchFn, `https://api.github.com/repos/${cfg.docsRepo}/git/trees/HEAD?recursive=1`, cfg.token, TreeSchema);
   if (!tree) return null;
   const path = docPath(

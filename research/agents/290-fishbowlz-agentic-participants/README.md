@@ -2,7 +2,7 @@
 topic: agents
 type: research
 status: research-complete
-last-validated: 2026-05-21
+last-validated: 2026-11-08
 original-query: Design how AI agents join FISHBOWLZ rooms as live participants - consuming transcript streams in real-time, contributing to conversations, and providing richer context than post-hoc transcript analysis (reconstructed)
 tier: archive-candidate
 notes: FISHBOWLZ paused 2026-04-16, killed 2026-05-04. This research on FISHBOWLZ agent features is now superseded by partnership with Juke. Archive recommended.
@@ -109,6 +109,25 @@ The [Farcaster Agentic Bootcamp](https://rifio.dev/events/05ff846c-1b33-47fe-8f3
 - Agents interact with the social graph (cast, react, follow)
 - FISHBOWLZ agent could cast room summaries to `/fishbowlz` channel
 - See also: doc 278 (Agentic Bootcamp ZAO Agent Squad), doc 281 (Farcaster Agents Landscape)
+
+## Updated 2026-11-08: Framework Maturity
+
+FISHBOWLZ remains dead. The underlying frameworks referenced here have shipped significant updates since 2026-05-21, relevant if ZAO revisits real-time agent audio (e.g. a Juke integration or future audio room product).
+
+**LiveKit Agents** (source: github.com/livekit/agents/releases, fetched 2026-11-08):
+- Now at v1.8.11 (released Nov 5, 2026). The 1.5-to-1.8 line shipped adaptive interruption handling, MCP tool support, and native SIP telephony without a Twilio bridge.
+- Added Claude Opus 5, Opus 5.5, and Sonnet 5.5 as LLM backends (v1.8.7, Oct 14, 2026).
+- LiveKit Inference: a managed agent platform now sits on top of the open framework, adding Responses API, structured output, and web search.
+- Security: PII filtering for tool errors, participant restrictions for RoomIO (v1.8.9).
+- Assessment: the doc's v2 recommendation for LiveKit Agents for voice agents remains sound; the managed platform lowers the ops burden.
+
+**Pipecat** (source: github.com/pipecat-ai/pipecat/releases, fetched 2026-11-08):
+- Shipped stable v1.0.0 in April 2026; now at v1.15.0 (Oct 29, 2026). The doc cited ~5K stars; UNVERIFIED: a third-party July 2026 comparison reported ~13,400 GitHub stars (source: search snippet only, not a full page fetch -- UNVERIFIED exact count).
+- Key additions: MCP tool integration via MCPClient.tools() (v1.8.0, Aug 26), Pipecat Classifiers for yes/no and scoring decisions (v1.12.0, Sep 26), LLMWithBackend for a fast frontend LLM plus a deeper backend LLM (v1.13.0, Oct 19), expressive conversation with TTS emotion tags (v1.15.0, Oct 29).
+- Pipecat Flows merged into the main package; the separate pipecat-ai-flows package is no longer needed.
+- Assessment: Pipecat's MCP integration is directly relevant to ZAO's tooling (ZOE already uses MCP). If a live-audio agent is revisited, Pipecat is now the more integrated choice.
+
+**No change to recommendations.** The doc's archive-candidate status is unchanged. FISHBOWLZ is dead. The framework landscape has matured, which strengthens the doc's v2 and v3 patterns for any future audio product.
 
 ## Sources
 

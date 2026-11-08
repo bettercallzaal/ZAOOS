@@ -10,6 +10,15 @@
  * (memory.ts tasks.json) or Zaal's daily file; it imports neither, and a test
  * holds that line. OFF unless ZOE_TEAM_VIEW=1 and at least one chat is listed.
  * The group gate is groups.ts shouldRespond.
+ *
+ * Seat-merge NEEDS_WORK on #4276: formatOwnerDigest matches members by
+ * substring, so `/teamview a` merged many people's rows into a group. Here a
+ * name resolves to exactly ONE member, by case-insensitive equality with the
+ * member's full display name or its first word, or by the member id; zero or
+ * several matches get a short reply and no rows. ZOE_TEAM_VIEW_EXCLUDE (names
+ * or ids, comma separated) keeps a member's rows out of every group: whether
+ * Zaal's own rows stay out is his ruling, so it is one env value, empty by
+ * default. Zaal's /board <person> keeps its own substring match.
  */
 import type { Bot, Context } from 'grammy';
 import { type GroupConfig, shouldRespond } from './groups';
@@ -19,6 +28,8 @@ export const TEAM_VIEW_MAX_CHARS = 1500;
 
 export interface TeamViewConfig {
   chats: number[];
+  /** Lower-cased names or ids whose rows never show in a group. */
+  exclude?: string[];
 }
 
 /** The config, or null when off. */
@@ -28,7 +39,11 @@ export function readTeamViewConfig(env: NodeJS.ProcessEnv = process.env): TeamVi
     .split(',')
     .map((s) => Number(s.trim()))
     .filter((n) => Number.isInteger(n) && n !== 0);
-  return chats.length ? { chats } : null;
+  const exclude = (env.ZOE_TEAM_VIEW_EXCLUDE ?? '')
+    .split(',')
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean);
+  return chats.length ? { chats, exclude } : null;
 }
 
 export interface TeamViewDeps {
@@ -39,6 +54,29 @@ export interface TeamViewDeps {
   featureRan: (name: string, detail?: string) => void;
   botUsername: () => string | null;
   botId: () => number | null;
+}
+
+export type MemberMatch = { kind: 'one'; id: string; name: string } | { kind: 'none' } | { kind: 'many' };
+
+/** Exactly one member by case-insensitive equality (full name, first name, or id). Never a substring. */
+export function resolveMember(members: Map<string, string>, who: string): MemberMatch {
+  const q = who.trim().toLowerCase();
+  if (!q) return { kind: 'none' };
+  const hits: Array<[string, string]> = [];
+  for (const [id, name] of members) {
+    const full = name.trim().toLowerCase();
+    const first = full.split(/\s+/)[0] ?? '';
+    if (full === q || first === q || id.toLowerCase() === q) hits.push([id, name]);
+  }
+  if (hits.length === 0) return { kind: 'none' };
+  if (hits.length > 1) return { kind: 'many' };
+  return { kind: 'one', id: hits[0][0], name: hits[0][1] };
+}
+
+function isExcluded(cfg: TeamViewConfig, id: string, name: string): boolean {
+  const ex = cfg.exclude ?? [];
+  const full = name.trim().toLowerCase();
+  return ex.includes(id.toLowerCase()) || ex.includes(full) || ex.includes(full.split(/\s+/)[0] ?? '');
 }
 
 function cap(s: string): string {
@@ -68,7 +106,22 @@ export async function handleTeamView(ctx: Context, arg: string, cfg: TeamViewCon
   let text: string;
   try {
     const [tasks, members] = await Promise.all([deps.getTasks(), deps.getMembers()]);
-    text = formatOwnerDigest(tasks, members, who).replace('Usage: /board <person> - e.g. /board iman', 'Use: /teamview <name>');
+    const match = resolveMember(members, who);
+    if (match.kind === 'none') {
+      await ctx.reply(`No teammate named "${who.slice(0, 40)}" on the board.`);
+      return;
+    }
+    if (match.kind === 'many') {
+      await ctx.reply(`More than one teammate matches "${who.slice(0, 40)}". Use the full name.`);
+      return;
+    }
+    if (isExcluded(cfg, match.id, match.name)) {
+      await ctx.reply('That board is not shown in this chat.');
+      return;
+    }
+    // Only the one matched member goes in, so formatOwnerDigest's own
+    // substring match has nobody else to find; the id query matches exactly.
+    text = formatOwnerDigest(tasks, new Map([[match.id, match.name]]), match.id);
   } catch (e) {
     console.error('[zoe/team-view] board read failed:', (e as Error)?.message);
     await ctx.reply('I could not read the team board just now.');

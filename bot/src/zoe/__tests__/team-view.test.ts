@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import type { GroupConfig } from '../groups';
 import type { TeamTask } from '../team-tracker';
-import { handleTeamView, readTeamViewConfig, TEAM_VIEW_MAX_CHARS, type TeamViewConfig, type TeamViewDeps } from '../team-view';
+import { handleTeamView, readTeamViewConfig, resolveMember, TEAM_VIEW_MAX_CHARS, type TeamViewConfig, type TeamViewDeps } from '../team-view';
 
 // iman-desk #168 item 3: the per-person team view in allowlisted groups.
 
@@ -47,7 +47,7 @@ describe('readTeamViewConfig', () => {
     },
   );
   it('reads the chat list', () => {
-    expect(readTeamViewConfig({ ZOE_TEAM_VIEW: '1', ZOE_TEAM_VIEW_CHATS: '-5, -6' } as NodeJS.ProcessEnv)).toEqual({ chats: [-5, -6] });
+    expect(readTeamViewConfig({ ZOE_TEAM_VIEW: '1', ZOE_TEAM_VIEW_CHATS: '-5, -6' } as NodeJS.ProcessEnv)).toEqual({ chats: [-5, -6], exclude: [] });
   });
 });
 
@@ -130,5 +130,67 @@ describe('index.ts wiring (read as text; index.ts boots the bot and is never imp
     expect(src.slice(cfgAt, regAt)).toContain('if (teamViewCfg) {');
     expect(regAt).toBeGreaterThan(cfgAt);
     expect(textAt).toBeGreaterThan(regAt);
+  });
+});
+
+describe('one member only, never a substring (seat-merge on #4276)', () => {
+  const WIDE = new Map([
+    ['m-iman', 'Iman Ali'],
+    ['m-gc', 'GC'],
+    ['m-ana', 'Ana'],
+    ['m-sam1', 'Sam Lee'],
+    ['m-sam2', 'Sam Ortiz'],
+    ['m-zaal', 'Zaal'],
+  ]);
+  const WIDE_TASKS = [task('Hub repo files', 'm-iman'), task('Mix the set', 'm-gc'), task('Poster', 'm-ana'), task('Private row', 'm-zaal')];
+  const wideDeps = (over: Partial<TeamViewDeps> = {}) => deps({ getMembers: vi.fn(async () => WIDE), getTasks: vi.fn(async () => WIDE_TASKS), ...over });
+
+  it('resolveMember matches full name, first name or id, ignoring case', () => {
+    expect(resolveMember(WIDE, 'iman')).toEqual({ kind: 'one', id: 'm-iman', name: 'Iman Ali' });
+    expect(resolveMember(WIDE, 'Iman Ali')).toMatchObject({ kind: 'one', id: 'm-iman' });
+    expect(resolveMember(WIDE, 'M-GC')).toMatchObject({ kind: 'one', id: 'm-gc' });
+    expect(resolveMember(WIDE, 'a')).toEqual({ kind: 'none' });
+    expect(resolveMember(WIDE, 'im')).toEqual({ kind: 'none' });
+    expect(resolveMember(WIDE, 'sam')).toEqual({ kind: 'many' });
+  });
+
+  it('/teamview a posts nobody\'s rows', async () => {
+    const ctx = ctxIn(CHAT, MEMBER);
+    const d = wideDeps();
+    await handleTeamView(ctx as never, 'a', cfg, d);
+    const text = ctx.reply.mock.calls[0][0];
+    expect(text).toBe('No teammate named "a" on the board.');
+    for (const t of WIDE_TASKS) expect(text).not.toContain(t.title);
+    expect(d.featureRan).not.toHaveBeenCalled();
+  });
+
+  it('two members with the same first name: asks for the full name, no rows', async () => {
+    const ctx = ctxIn(CHAT, MEMBER);
+    await handleTeamView(ctx as never, 'sam', cfg, wideDeps());
+    expect(ctx.reply.mock.calls[0][0]).toBe('More than one teammate matches "sam". Use the full name.');
+  });
+
+  it('a named member gets only their own rows', async () => {
+    const ctx = ctxIn(CHAT, MEMBER);
+    await handleTeamView(ctx as never, 'iman', cfg, wideDeps());
+    const text = ctx.reply.mock.calls[0][0];
+    expect(text).toContain('Hub repo files');
+    for (const t of ['Mix the set', 'Poster', 'Private row']) expect(text).not.toContain(t);
+  });
+
+  it('ZOE_TEAM_VIEW_EXCLUDE keeps a member out; empty by default', async () => {
+    expect(readTeamViewConfig({ ZOE_TEAM_VIEW: '1', ZOE_TEAM_VIEW_CHATS: '-5', ZOE_TEAM_VIEW_EXCLUDE: ' Zaal ' } as NodeJS.ProcessEnv)).toEqual({
+      chats: [-5],
+      exclude: ['zaal'],
+    });
+    const ex: TeamViewConfig = { chats: [CHAT], exclude: ['zaal'] };
+    const ctx = ctxIn(CHAT, MEMBER);
+    const d = wideDeps();
+    await handleTeamView(ctx as never, 'zaal', ex, d);
+    expect(ctx.reply.mock.calls[0][0]).toBe('That board is not shown in this chat.');
+    expect(d.featureRan).not.toHaveBeenCalled();
+    const open = ctxIn(CHAT, MEMBER);
+    await handleTeamView(open as never, 'zaal', cfg, wideDeps());
+    expect(open.reply.mock.calls[0][0]).toContain('Private row');
   });
 });

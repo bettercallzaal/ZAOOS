@@ -31,7 +31,7 @@ Measured with `gh` on 2026-11-09 23:10 UTC (`date -u` in the same command):
 
 So nothing may be copied yet. No licence means all rights reserved
 (`.claude/rules/credit-attribution.md`). A message for Zaal to send Papi asking where the
-licence landed is on his clipboard (vault `inbox/clips/clip-20261109-181000-papi-licence-where.md`).
+licence landed is drafted for Zaal to send.
 
 ## Key Decisions (proposed defaults, Zaal confirms)
 
@@ -69,17 +69,17 @@ From papertrailOS `.env.example` and `package.json` on master at `1c0d837` (read
 `gh api`, 2026-11-09). Build is `prisma generate && next build`, Next 15, Prisma 6 on
 Postgres, NextAuth 5 beta.
 
-| Variable | Preview value | Who sets it |
+| Variable | Preview state | Who sets it |
 |---|---|---|
-| `DATABASE_URL`, `DIRECT_URL` | a **new, empty** Supabase project just for this (pooled 6543 and direct 5432). Never a ZAO production database | Zaal |
-| `NEXTAUTH_SECRET` | `openssl rand -base64 32`, typed by Zaal | Zaal |
-| `NEXTAUTH_URL`, `APP_URL` | the preview URL | Zaal |
-| `ENCRYPTION_KEY` | generated, even though unused today (F4) | Zaal |
-| `ANTHROPIC_API_KEY` | optional. Without it drafts fall back to templates (`draftEngine.ts:77-82`); with it, spend is real money | Zaal, only if he wants AI drafts |
-| `GOOGLE_PLACES_API_KEY`, `GOOGLE_SEARCH_API_KEY`, `GOOGLE_SEARCH_CX` | optional, paid per call. Leave unset for the first test; enter leads by hand or CSV | Zaal, later |
-| `AUTOMATION_TOKEN` | **unset**. The route returns 503 when unset (doc 2730 F6) | nobody |
-| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GMAIL_REDIRECT_URI` | **unset**. No Gmail connection, so no mailbox | nobody |
-| `SENDS_ENABLED` (new, first PR) | **unset** | nobody |
+| `DATABASE_URL`, `DIRECT_URL` | set, pointing at a new, empty Supabase project made only for this preview; never a ZAO production database | set by Zaal's hand |
+| `NEXTAUTH_SECRET` | set | set by Zaal's hand |
+| `NEXTAUTH_URL`, `APP_URL` | set | set by Zaal's hand |
+| `ENCRYPTION_KEY` | set, though unused today (F4) | set by Zaal's hand |
+| `ANTHROPIC_API_KEY` | optional; without it drafts fall back to templates (`draftEngine.ts:77-82`), with it spend is real money | set by Zaal's hand, only if he wants AI drafts |
+| `GOOGLE_PLACES_API_KEY`, `GOOGLE_SEARCH_API_KEY`, `GOOGLE_SEARCH_CX` | optional, paid per call; left unset for the first test, leads entered by hand or CSV | set by Zaal's hand, later |
+| `AUTOMATION_TOKEN` | unset; the route returns 503 when unset (doc 2730 F6) | nobody |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GMAIL_REDIRECT_URI` | unset; no Gmail connection, so no mailbox | nobody |
+| `SENDS_ENABLED` (new, first PR) | unset | nobody |
 
 Every secret is entered by Zaal (Vercel dashboard or `/secret`), never through a lane or a
 chat. The DB schema push (`prisma db push` against the new project) is his step too: it is

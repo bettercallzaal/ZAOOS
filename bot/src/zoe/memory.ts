@@ -834,7 +834,14 @@ export function isDevzGroup(chatId: string, devzChatId: string | undefined = pro
  * Build sanitized context for groups (e.g. COC, ZAO Civilization), ensuring
  * private human profiles, private tasks, and internal decisions are never leaked.
  */
-export function buildGroupContext(chatId: string, chatTitle?: string, personaOverride?: string): string {
+// yesterdaySummary: group-memory.ts (#168 item 2). The CALLER reads the
+// per-group summary file and passes the text in, so this stays pure.
+export function buildGroupContext(
+  chatId: string,
+  chatTitle?: string,
+  personaOverride?: string,
+  yesterdaySummary?: string,
+): string {
   const title = chatTitle || '(unnamed group)';
   const isCoc =
     chatId === '-1001609766705' ||
@@ -869,6 +876,9 @@ export function buildGroupContext(chatId: string, chatTitle?: string, personaOve
     ...(personaOverride && personaOverride.trim()
       ? ['', 'Group persona, set by Zaal for this group:', personaOverride.trim()]
       : []),
+    ...(yesterdaySummary?.trim()
+      ? ['', `Yesterday in this group: ${yesterdaySummary.trim()}`]
+      : []),
   ].join('\n');
 }
 
@@ -876,6 +886,7 @@ export async function buildMemoryBlocks(
   scope: ChatScope = 'private',
   chatTitle?: string,
   personaOverride?: string,
+  yesterdaySummary?: string,
 ): Promise<MemoryBlocks> {
   const isPrivate = scope === 'private';
   const [persona, human, recentTurns, tasks, quests, decisions, buildState, inbox, team] = await Promise.all([
@@ -928,7 +939,7 @@ export async function buildMemoryBlocks(
       ? undefined
       : inbox.map((r) => `- ${r.summary}`).join('\n');
 
-  const group_context = isPrivate ? undefined : buildGroupContext(scope, chatTitle, personaOverride);
+  const group_context = isPrivate ? undefined : buildGroupContext(scope, chatTitle, personaOverride, yesterdaySummary);
   return { persona, human, working, tasks: tasksBlock, quests, decisions: decisionsBlock, build_state: buildStateBlock, inbox_context: inboxBlock, team, chat_scope: scope, chat_title: chatTitle, group_context };
 }
 

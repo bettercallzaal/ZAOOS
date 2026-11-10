@@ -2,7 +2,7 @@
 topic: security
 type: plan
 status: plan-awaiting-zaal
-last-validated: 2026-11-09
+last-validated: 2026-11-10
 related-docs: "security/2730-papertrailos-lead-crm-audit"
 original-query: "i sent it to him we should revie wit and make a zao version of it and make a repo and make a vercel and test it out (Zaal, 2026-11-03)"
 tier: QUICK
@@ -15,7 +15,21 @@ tier: QUICK
 > forked, licensed, fixed, previewed on Vercel with sending switched off, and tested by
 > Zaal. This note is the deliverable. The fork starts only after Zaal says go on it.
 
-## Status as of 2026-11-09 - the fork is BLOCKED on the licence
+## Status as of 2026-11-10 - licence landed 2026-11-10, fork may start on Zaal's word
+
+Measured with `gh` on 2026-11-10 01:36 UTC (`date -u` in the same command):
+
+- PR 1 (Zaal's MIT licence PR) was reopened and merged by bettercallzaal at
+  2026-11-10T01:26:25Z (`merged_at`), merge commit
+  `37d9a493998a1aa36b35cae3e004720861ead361`, now the head of `master`.
+- `LICENSE` on `master` reads "MIT License / Copyright (c) 2026 paperhand (papioshu)".
+  The repo's licence field reads `mit` (MIT License).
+
+Nothing may be copied yet all the same: the fork waits on Zaal's lane-now or backlog call
+(decision 0). The message to Papi asking where the licence landed is moot and was not
+needed.
+
+### History: the 2026-11-09 reading, before the licence landed
 
 Measured with `gh` on 2026-11-09 23:10 UTC (`date -u` in the same command):
 
@@ -29,16 +43,15 @@ Measured with `gh` on 2026-11-09 23:10 UTC (`date -u` in the same command):
 - PR 1 (Zaal's MIT licence PR): closed by papioshu at 2026-11-07T21:51:36Z with the comment
   "Added ", `mergedAt` null, `mergeCommit` null.
 
-So nothing may be copied yet. No licence means all rights reserved
-(`.claude/rules/credit-attribution.md`). A message for Zaal to send Papi asking where the
-licence landed is drafted for Zaal to send.
+At that reading nothing could be copied: no licence means all rights reserved
+(`.claude/rules/credit-attribution.md`).
 
 ## Key Decisions (proposed defaults, Zaal confirms)
 
 | # | Decision | Default | Why |
 |---|---|---|---|
 | 0 | Is this a lane at all now? | **Zaal decides.** It is a new project, and the lock-in rule (cash goal first, no new projects) puts it in the backlog unless he says it outranks that. | Lock-in rule, 2026-10-29 |
-| 1 | Fork source | papioshu/papertrailOS **at the commit that adds the licence on master**, recorded by SHA in the fork's first commit message and README. Not `1c0d837` (no licence there). | Copying is only allowed from a licensed commit |
+| 1 | Fork source | papioshu/papertrailOS at `37d9a493998a1aa36b35cae3e004720861ead361` (the 2026-11-10 merge that adds the MIT licence on master), or a later master commit, recorded by SHA in the fork's first commit message and README. Not `1c0d837` (no licence there). | Copying is only allowed from a licensed commit |
 | 2 | Repo | `bettercallzaal/zao-papertrail`, **private**. Created by Zaal's hand, not a lane. | A new repo is Zaal-gated (misc-open-items 33) |
 | 3 | Licence and credit | Keep Papi's LICENSE file unchanged at the root. README top line: "Forked from papioshu/papertrailOS by Papi Oshu at `<sha>`, under `<licence>`." If the licence is share-alike (AGPL/GPL), the fork stays under it. | `credit-attribution.md` |
 | 4 | First PR in the fork | Fix F1 and F3 from doc 2730, plus a hard send kill switch. Nothing else. | F1 is CRITICAL; F3 sends to opted-out leads |
@@ -105,22 +118,21 @@ a schema change.
 - Does, after go: clone the fork Zaal created, write the first PR in it, run its typecheck
   and the new tests, open the PR ready for review.
 - Does not: create the repo or the Vercel project, set any secret, connect any mailbox, push
-  to or comment on papioshu's repo, contact Papi, copy any code before a licence is on
-  master.
+  to or comment on papioshu's repo, contact Papi, copy any code before Zaal says go.
 
 ## Next Actions
 
 | # | Action | Owner | By |
 |---|---|---|---|
-| 1 | Send Papi the clipboard message (where did the licence land, or reopen PR 1) | Zaal | when he chooses |
-| 2 | Decide: lane now, or backlog under the lock-in rule (decision 0) | Zaal | with item 1 |
-| 3 | When a LICENSE is on master: fill doc 2730's licence lines (drafts in ZAOOS PR 4227 comment 6601962715) as a follow-up doc PR | papertrail lane | after licence |
+| 1 | ~~Send Papi the clipboard message~~ moot: Zaal merged PR 1 himself, 2026-11-10T01:26:25Z | Zaal | done |
+| 2 | Decide: lane now, or backlog under the lock-in rule (decision 0) | Zaal | when he chooses |
+| 3 | LICENSE is on master as of 2026-11-10: fill doc 2730's licence lines (drafts in ZAOOS PR 4227 comment 6601962715) as a follow-up doc PR | papertrail lane | after licence |
 | 4 | On go: Zaal creates `bettercallzaal/zao-papertrail` (private) and the Supabase + Vercel projects; lane writes the first PR | Zaal, then lane | after 2 and 3 |
 
 ## Sources
 
 | Source | Method | Status |
 |---|---|---|
-| papioshu/papertrailOS licence state | `gh api` contents, git trees, branches, commits, PR 1 timeline, 2026-11-07 and 2026-11-09 | [FULL] |
+| papioshu/papertrailOS licence state | `gh api` contents, git trees, branches, commits, PR 1 timeline, 2026-11-07, 2026-11-09 and 2026-11-10 (PR 1 merge, LICENSE contents, repo licence field) | [FULL] |
 | papertrailOS `.env.example`, `package.json`, `prisma/schema.prisma` lines 1-20 at master | `gh api .../contents?ref=master`, base64-decoded, read only; nothing copied into ZAO code | [FULL] |
 | doc 2730 findings F1, F3, F6 and file:line cites | `git show origin/main:research/security/2730-papertrailos-lead-crm-audit/README.md` | [FULL] for what doc 2730 says; the cited lines were not re-read at head this run |

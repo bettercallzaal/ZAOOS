@@ -160,3 +160,68 @@ Method is stated per source. Quotes are from raw text (curl of the `.md` docs, o
 13. [r/ClaudeCode](https://www.reddit.com/r/ClaudeCode/) [FAILED: WebSearch refused reddit.com ("not accessible to our user agent"); not retried with the keyless fetcher]
 
 Credit: the away-mode sweep rules and the 2026-10-29 idle measurement are from the author of the dotfiles branch above; the cost-per-wake method is doc 2647's.
+
+## Addendum, 10 Nov 2026. The seat's context window, and what Zaal can do to get more orchestrator out of it
+
+Appended on Zaal's word in the seat pane on 10 Nov 2026 (he picked option A: check the auto-compact window against the seat's numbers and write it up as an extension of this doc). Nothing above this line was edited. The away loop in Parts 1 to 5 stands; this addendum is about the session that runs the seat.
+
+### A1. What was measured (10 Nov 2026, seat transcript `f4863de1`, lane `orchestrator2`)
+
+| Measure | Reading | Surface |
+|---|---|---|
+| Auto compactions between 9 Nov 22:48 and 10 Nov 07:37 Eastern | 5, all `trigger: auto` | `compact_boundary` rows in the transcript |
+| Context on the last turn before each | 160,126 to 163,169 tokens | assistant `usage` (input + cache read + cache creation) |
+| Context on the first turn after each | 134,036 to 145,252 tokens | same |
+| Working room bought per compaction | about 20,000 tokens | difference of the two rows above |
+| Time per compaction | 73 to 83 s | `durationMs` on the boundary rows |
+| Three of the five | inside 11 minutes | boundary timestamps 12:26Z, 12:29Z, 12:37Z |
+| Same session after `claude --continue` (resumed about 07:55 Eastern) | 254,073 tokens on one turn, no compaction | last assistant `usage` row, read 08:40 Eastern |
+| Other lanes, largest context seen in their newest transcript | messenger 481,439; seat-merge 881,836; seat-misc 265,823; paragraph 278,978 (all `claude-opus-5-5`) | same field, same read |
+| Always-loaded instruction files | 126,801 bytes: rules 76,202, project CLAUDE.md 14,125, global CLAUDE.md 15,207, MEMORY.md 21,267 | `wc -c` |
+| Compaction settings in force | `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE=90`; no `autoCompactWindow`, no `CLAUDE_CODE_AUTO_COMPACT_WINDOW`, no `CLAUDE_CODE_DISABLE_1M_CONTEXT` | session env and both user settings files |
+
+Reading. Before the restart the seat process behaved as a 200K-window session: it compacted near 163,000 tokens, and because its floor after a compaction was 134,000 to 145,000 (fixed load plus a 30,000 to 36,000 token summary) each compaction bought about 20,000 tokens. After `claude --continue` the same conversation held 254,073 tokens without compacting, which is what the docs describe for this model family ("Fable models ... run with the 1M window by default", model-config.md). So the thrash ended with the restart, not with a settings change.
+
+Not established: why the earlier process ran at the smaller window. The session was started on 9 Nov, the day Zaal moved the seat to the newer model; a process started before that switch is the likeliest cause and it is a guess, not a measurement. Not measured: tool schemas, the skills listing, MCP instructions and hook injections (`/context` in the pane gives that split). The settings file names `claude-opus-5-5` as the model while the seat's turns are recorded as `claude-fable-5-2`; where the override comes from was not traced.
+
+### A2. The other half of the finding: the window is now too big, not too small
+
+With a 1M window and the percentage override at 90, a lane compacts near 900,000 tokens. seat-merge reached 881,836. The cost docs say "Token costs scale with context size: the more context Claude processes, the more tokens you use", and the context-engineering piece says a model has an "attention budget" where "every new token introduced depletes this budget". A seat at 250,000 tokens pays for all of it on every turn and reads its own rules through more noise.
+
+The control for this is documented: "run `/autocompact` with a value, like `/autocompact 500k`", saved per model in user settings; or `"autoCompactWindow": 200000` in a settings file for every model; "the command and the flag accept a window size from 100K to 1M tokens". A percentage override is not that control. Changing either is a settings write, so it is Zaal's hand or a (0p) permissions PR, never a lane edit.
+
+### A3. Steps, ordered by expected effect. Each is his action.
+
+| # | Step | Why (source) | His action |
+|---|---|---|---|
+| 1 | Bound the window per lane role | A2 above; costs.md, model-config.md | In the seat pane: `/autocompact 300k`. Seat floor is about 140,000 tokens, so 300k leaves about 160,000 of room, eight times what the thrash had. Helpers with a small floor can sit lower. |
+| 2 | Cut the floor | 126,801 bytes of instructions load before any work; "attention budget" | `/context` in the seat pane; then the tool trim he already holds as a command list (open item M9 on the misc list). A rules or memory trim goes as a PR. |
+| 3 | Fresh session per work block | costs.md: "Use `/clear` to start fresh when switching to unrelated work. Stale context wastes tokens on every subsequent message. Use `/rename` before clearing" | Say "handoff", then `/clear`. The seat's status file carries a section that `zao-handoff-check` passes, and the resume hook injects it. |
+| 4 | Make recurring hand-steps into approved tools | On 10 Nov the grading queue stopped on one delete (evaluator scratch: 14G by `du` on the scratch folder that morning, against the 6 GiB budget on which the merge lane reported `zao-eval-extract` refusing) that only he may run | Approve a guarded eviction command with a fixed root and a checked plan file, run by him once per fill, instead of a pasted loop. |
+| 5 | Keep lanes few and briefs whole | "multi-agent systems use about 15x more tokens than chats"; a subagent "needs an objective, an output format, guidance on the tools and sources to use, and clear task boundaries" or agents "duplicate work, leave gaps" (multi-agent research system) | Hold the one-to-two focus lane rule; give asks as outcome plus done-when. |
+| 6 | Grade by end state | "We found success focusing on end-state evaluation rather than turn-by-turn analysis" (same source) | Already his rule (DONE means he saw it); test cards stay the unit. |
+
+The token multiple in row 5 is printed as "15×" in the source.
+
+### A4. Decided against
+
+Claude Code agent teams as a replacement for Orca lanes plus cross-session messages. The docs call them "experimental and disabled by default" with "known limitations around session resumption, task coordination, and shutdown behavior", and "after you resume a session, teammates aren't brought back". The seat resumes daily.
+
+### A5. Fixed the same morning
+
+`zao-seat-role` printed `unknown` for every cwd because it matched only a workspace named `orchestrator` and the seat's folder is `orchestrator2` with the row `(0) seat`. Both SessionStart callers fell back to pre-seat wording. Fix: zaal-dotfiles PR 892 (open, CI green on both shards, ungraded at the time of writing; red control 19 of 24, new code 24 of 24).
+
+### A6. Sources for this addendum
+
+All fetched 10 Nov 2026 with `curl`, HTTP 200, and read as raw text (HTML stripped for the three anthropic.com pages; the docs pages serve markdown).
+
+1. [Anthropic: How we built our multi-agent research system](https://www.anthropic.com/engineering/built-multi-agent-research-system) [PARTIAL: read by keyword across the token-cost, delegation, effort-scaling, evaluation and artifact sections]
+2. [Anthropic: Building effective agents](https://www.anthropic.com/engineering/building-effective-agents) [PARTIAL: the simplicity advice and workflow definitions]
+3. [Anthropic: Effective context engineering for AI agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents) [PARTIAL: attention budget, compaction, note-taking, sub-agent sections]
+4. [Claude Code docs: model configuration](https://code.claude.com/docs/en/model-config.md) [PARTIAL: Extended context, and Context window and auto-compaction]
+5. [Claude Code docs: costs](https://code.claude.com/docs/en/costs.md) [PARTIAL: agent teams and reduce-token-usage sections]
+6. [Claude Code docs: agent teams](https://code.claude.com/docs/en/agent-teams.md) [PARTIAL: overview, comparison table, limitations]
+7. [Claude Code docs: subagents](https://code.claude.com/docs/en/sub-agents.md) [PARTIAL: frontmatter fields and isolation]
+8. Local, read-only, 10 Nov 2026: the five lanes' newest transcripts; session env; both user settings files; `orca worktree list --json` [FULL for the fields named in A1]
+
+Not searched: frameworks outside Anthropic (LangGraph, OpenAI Agents, CrewAI) and community threads. Not re-read for this addendum: doc 2686 (orchestrator skill review) and docs 2640 and 2647.

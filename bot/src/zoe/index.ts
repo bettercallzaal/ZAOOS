@@ -110,7 +110,7 @@ import { applyQuestOps, buildQuestsBlock, formatQuestList } from './sidequests';
 import { runBotRelayOps, summarizeRelayResults } from './relay';
 import { runCrmOps, summarizeCrmResults } from './crm';
 import { getOpenTeamTasks, formatTeamTasks, teamTrackerConfigured, addTeamTask, mirrorCapturesToTracker, splitCapturesByQuality, runTeamDigest, getTeamMemberMap, formatOwnerDigest } from './team-tracker';
-import { decomposeGoal, renderPlanForApproval, shouldDecompose } from './decompose';
+import { decomposeGoal, renderPlanForApproval, shouldDecompose, wrapQuotedReply } from './decompose';
 import {
   buildMemoryBlocks,
   ensureZoeHome,
@@ -2537,9 +2537,7 @@ bot.on('message:text', async (ctx) => {
     // into the turn so a short reply ("zol yes") anchors to the right draft
     // instead of arriving context-free. Telegram only gives us the quoted text.
     const quoted = ctx.message.reply_to_message?.text ?? ctx.message.reply_to_message?.caption;
-    const turnText = quoted
-      ? `[Zaal is replying to your earlier message:\n"${quoted.slice(0, 1200)}"]\n\nHis reply: ${text}`
-      : text;
+    const turnText = quoted ? wrapQuotedReply(quoted, text) : text;
     // doc 872 (live steering / "finish then apply"): run the turn OFF the poll
     // loop so a new message is received mid-turn instead of blocking the bot.
     // Same-chat turns are serialized in turn-queue; a deferred turn gets a quick
@@ -2762,9 +2760,7 @@ bot.on('message:text', async (ctx) => {
     // action.kind === 'chat': normal ZOE conversation (Handoffs, Claude Code, etc).
     // May include brand-masked responses with ICM context injected.
     const quotedG = ctx.message.reply_to_message?.text ?? ctx.message.reply_to_message?.caption;
-    const turnTextG = quotedG
-      ? `[Zaal is replying to your earlier message:\n"${quotedG.slice(0, 1200)}"]\n\nHis reply: ${text}`
-      : text;
+    const turnTextG = quotedG ? wrapQuotedReply(quotedG, text) : text;
     enqueueTurn(chatId, () => handlePrivateMessage(ctx, turnTextG, brandContext)).catch((e) =>
       console.error('[zoe/index] zaalbotz turn failed:', (e as Error)?.message),
     );

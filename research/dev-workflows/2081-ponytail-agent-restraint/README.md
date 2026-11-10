@@ -104,7 +104,7 @@ The July ecosystem bets (ponystack, scalpel, lite) all stopped moving within a m
 | Action | Owner | Type | By When |
 |--------|-------|------|---------|
 | PR to ZAOOS `.claude/rules/code-restraint.md`: add the five Ponytail 5 lines (scope before writing; skipped/not-checked/risk closing lines; bug fix greps callers and fixes the root once; non-trivial logic leaves one small test; `shortcut:` comment form) and merge rungs 3 and 4 with the house-component wording; held, Zaal merges | seat (orchestrator2), merge Zaal | PR | 2026-11-12 |
-| Mirror the same five lines into the dotfiles `~/.claude/CLAUDE.md` or a global rule so every Mac session loads them, not only ZAOOS; held, Zaal merges | seat, merge Zaal | PR | 2026-11-12 |
+| Mirror the same five lines into the dotfiles global CLAUDE.md (the one every Mac session loads) or a global rule, so they bind beyond ZAOOS; held, Zaal merges | seat, merge Zaal | PR | 2026-11-12 |
 | Decide: run `npx chisle tools` once, read-only, to size unused tool-schema tokens per request against the MCP trim card; A yes (his shell), B skip | @Zaal | Decision | 2026-11-12 |
 | Measure the rule on the fleet: `zao-spend --days 7` cost per merged PR before and after the rule PR lands, noted in a comment on this doc; expect about 10%, not 54% | seat | Measurement | 2026-11-23 |
 | Re-validate this doc or mark superseded | seat | Re-research | 2026-12-09 |

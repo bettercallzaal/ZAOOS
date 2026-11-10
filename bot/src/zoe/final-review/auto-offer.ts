@@ -24,9 +24,9 @@
  * file starts a fresh day with nothing settled; it never blocks the tick.
  */
 
-import type { GhRunner } from './snapshot';
-import { isFullSha, isRepoSlug } from './merge-line';
 import type { CardView, ReviewOutcome } from './flow';
+import { isFullSha, isRepoSlug } from './merge-line';
+import type { GhRunner } from './snapshot';
 
 export const MAX_READS_PER_TICK = 20;
 export const MAX_GRADES_PER_TICK = 3;
@@ -50,14 +50,17 @@ export function autoOfferRepos(env: NodeJS.ProcessEnv = process.env): string[] {
 /** Interval in ms, from ZOE_FINAL_REVIEW_AUTO_MIN clamped to 10..120 minutes. */
 export function autoOfferIntervalMs(env: NodeJS.ProcessEnv = process.env): number {
   const n = Number(env.ZOE_FINAL_REVIEW_AUTO_MIN);
-  const min = Number.isFinite(n) && n > 0 ? Math.min(120, Math.max(10, Math.round(n))) : DEFAULT_INTERVAL_MIN;
+  const min =
+    Number.isFinite(n) && n > 0 ? Math.min(120, Math.max(10, Math.round(n))) : DEFAULT_INTERVAL_MIN;
   return min * 60_000;
 }
 
 /** Model grades allowed per UTC day, from ZOE_FINAL_REVIEW_AUTO_DAY_MAX clamped to 1..48. */
 export function autoOfferDailyMax(env: NodeJS.ProcessEnv = process.env): number {
   const n = Number(env.ZOE_FINAL_REVIEW_AUTO_DAY_MAX);
-  return Number.isFinite(n) && n > 0 ? Math.min(48, Math.max(1, Math.round(n))) : DEFAULT_GRADES_PER_DAY;
+  return Number.isFinite(n) && n > 0
+    ? Math.min(48, Math.max(1, Math.round(n)))
+    : DEFAULT_GRADES_PER_DAY;
 }
 
 /** What survives a restart: the day's grade count and the settled head keys. */
@@ -73,14 +76,30 @@ export function utcDay(now: Date): string {
 
 /** Saved state for today. Junk gives a fresh day; another day keeps settled and resets the count. */
 export function parseAutoOfferState(raw: unknown, today: string): AutoOfferState {
-  const r = (raw && typeof raw === 'object' ? raw : {}) as Partial<Record<keyof AutoOfferState, unknown>>;
-  const settled = Array.isArray(r.settled) ? r.settled.filter((k): k is string => typeof k === 'string') : [];
-  const count = typeof r.gradedToday === 'number' && Number.isFinite(r.gradedToday) && r.gradedToday > 0 ? Math.floor(r.gradedToday) : 0;
-  return { day: today, gradedToday: r.day === today ? count : 0, settled: settled.slice(-SETTLED_KEEP) };
+  const r = (raw && typeof raw === 'object' ? raw : {}) as Partial<
+    Record<keyof AutoOfferState, unknown>
+  >;
+  const settled = Array.isArray(r.settled)
+    ? r.settled.filter((k): k is string => typeof k === 'string')
+    : [];
+  const count =
+    typeof r.gradedToday === 'number' && Number.isFinite(r.gradedToday) && r.gradedToday > 0
+      ? Math.floor(r.gradedToday)
+      : 0;
+  return {
+    day: today,
+    gradedToday: r.day === today ? count : 0,
+    settled: settled.slice(-SETTLED_KEEP),
+  };
 }
 
 /** State after a tick that graded `graded` heads, rolled to `today`, settled trimmed to SETTLED_KEEP. */
-export function recordTick(state: AutoOfferState, today: string, graded: number, settled: Iterable<string>): AutoOfferState {
+export function recordTick(
+  state: AutoOfferState,
+  today: string,
+  graded: number,
+  settled: Iterable<string>,
+): AutoOfferState {
   const base = state.day === today ? state.gradedToday : 0;
   return { day: today, gradedToday: base + graded, settled: [...settled].slice(-SETTLED_KEEP) };
 }
@@ -99,7 +118,18 @@ interface RawListed {
 
 /** Open PRs of one repo, or null when gh failed (an error is not an empty list). */
 export async function listOpenPrs(repo: string, run: GhRunner): Promise<OpenPr[] | null> {
-  const res = await run(['pr', 'list', '-R', repo, '--state', 'open', '--limit', '50', '--json', 'number,headRefOid,isDraft,labels']);
+  const res = await run([
+    'pr',
+    'list',
+    '-R',
+    repo,
+    '--state',
+    'open',
+    '--limit',
+    '50',
+    '--json',
+    'number,headRefOid,isDraft,labels',
+  ]);
   if (res.code !== 0) return null;
   try {
     const raw = JSON.parse(res.stdout) as RawListed[];

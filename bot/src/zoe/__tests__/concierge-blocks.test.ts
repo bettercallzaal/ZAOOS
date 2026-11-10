@@ -296,3 +296,28 @@ describe('buildSystemBlocks — community block for group chats', () => {
     for (const s of ['private', '424242', 'member-dm-424242', 'discord:-1', '-', '']) expect(isTelegramGroupScope(s)).toBe(false);
   });
 });
+
+// ── scope-true capability lines (card 10668, upgrade rows 3A and 5, 2026-11-10) ──
+
+describe('buildSystemBlocks — capabilities line matches the scope', () => {
+  const REPO_LINE = 'You can read the ZAO repo, the research library, the tasks board, and the ZABAL Bonfire graph';
+
+  it('keeps the repo/board/Bonfire line in Zaal\'s DM', () => {
+    expect(buildSystemBlocks(BASE_BLOCKS, DATE)).toContain(REPO_LINE);
+  });
+
+  it.each(['-1001234567890', 'member-dm-42', 'discord:123'])('drops it outside the DM (%s), where turns have no tools', (scope) => {
+    const out = buildSystemBlocks({ ...BASE_BLOCKS, chat_scope: scope }, DATE);
+    expect(out).not.toContain(REPO_LINE);
+    expect(out).toContain('In this chat you have no tools');
+  });
+});
+
+describe('PERSONA_DEFAULT — no stale group-capture claim', () => {
+  it('does not say group captures are kept, and names the "tell Zaal" path', async () => {
+    const { PERSONA_DEFAULT } = await import('../memory');
+    expect(PERSONA_DEFAULT).not.toContain('Captures from group chats include the chat title');
+    expect(PERSONA_DEFAULT).toContain('Nothing from a group chat is captured or logged');
+    expect(PERSONA_DEFAULT).toContain('tell Zaal');
+  });
+});

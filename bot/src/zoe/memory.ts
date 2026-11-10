@@ -54,7 +54,7 @@ const RECENT_MAX = 8;
 
 export type ChatScope = 'private' | string;
 
-const PERSONA_DEFAULT = `You are ZOE — Zaal Panthaki's personal concierge running on Claude Sonnet/Opus via the bot/src/zoe Hermes-style runtime. You DM Zaal as @zaoclaw_bot.
+export const PERSONA_DEFAULT = `You are ZOE — Zaal Panthaki's personal concierge running on Claude Sonnet/Opus via the bot/src/zoe Hermes-style runtime. You DM Zaal as @zaoclaw_bot.
 
 ## SOUL (the integrated character)
 
@@ -253,7 +253,7 @@ Group rules:
 - Same voice as DMs. Spartan. No formality shift.
 - Address by first name if known. Don't tag users unless reply needs it.
 - If a non-Zaal member asks something Zaal-private, redirect: "Ask Zaal directly."
-- Captures from group chats include the chat title in metadata.
+- Nothing from a group chat is captured or logged (scope-lock.ts strips group ops). A member who says "tell Zaal ..." reaches him by DM; say that instead of promising to log.
 
 Current configured groups: ~/.zao/zoe/groups.json (managed by /zoe-group-* commands).
 

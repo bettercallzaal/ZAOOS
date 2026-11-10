@@ -69,17 +69,17 @@ From papertrailOS `.env.example` and `package.json` on master at `1c0d837` (read
 `gh api`, 2026-11-09). Build is `prisma generate && next build`, Next 15, Prisma 6 on
 Postgres, NextAuth 5 beta.
 
-| Variable | Preview state | Who sets it |
+| Variable | Planned preview state | Who sets it |
 |---|---|---|
-| `DATABASE_URL`, `DIRECT_URL` | set, pointing at a new, empty Supabase project made only for this preview; never a ZAO production database | set by Zaal's hand |
-| `NEXTAUTH_SECRET` | set | set by Zaal's hand |
-| `NEXTAUTH_URL`, `APP_URL` | set | set by Zaal's hand |
-| `ENCRYPTION_KEY` | set, though unused today (F4) | set by Zaal's hand |
-| `ANTHROPIC_API_KEY` | optional; without it drafts fall back to templates (`draftEngine.ts:77-82`), with it spend is real money | set by Zaal's hand, only if he wants AI drafts |
-| `GOOGLE_PLACES_API_KEY`, `GOOGLE_SEARCH_API_KEY`, `GOOGLE_SEARCH_CX` | optional, paid per call; left unset for the first test, leads entered by hand or CSV | set by Zaal's hand, later |
-| `AUTOMATION_TOKEN` | unset; the route returns 503 when unset (doc 2730 F6) | nobody |
-| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GMAIL_REDIRECT_URI` | unset; no Gmail connection, so no mailbox | nobody |
-| `SENDS_ENABLED` (new, first PR) | unset | nobody |
+| `DATABASE_URL`, `DIRECT_URL` | to be set, pointing at a new, empty Supabase project made only for this preview; never a ZAO production database | set by Zaal's hand |
+| `NEXTAUTH_SECRET` | to be set | set by Zaal's hand |
+| `NEXTAUTH_URL`, `APP_URL` | to be set | set by Zaal's hand |
+| `ENCRYPTION_KEY` | to be set, though unused today (F4) | set by Zaal's hand |
+| `ANTHROPIC_API_KEY` | optional, to be set only if Zaal wants AI drafts; without it drafts fall back to templates (`draftEngine.ts:77-82`), with it spend is real money | set by Zaal's hand, only if he wants AI drafts |
+| `GOOGLE_PLACES_API_KEY`, `GOOGLE_SEARCH_API_KEY`, `GOOGLE_SEARCH_CX` | optional, paid per call; to stay unset for the first test, leads entered by hand or CSV | set by Zaal's hand, later |
+| `AUTOMATION_TOKEN` | to stay unset; the route returns 503 when unset (doc 2730 F6) | nobody |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GMAIL_REDIRECT_URI` | to stay unset; no Gmail connection, so no mailbox | nobody |
+| `SENDS_ENABLED` (new, first PR) | to stay unset | nobody |
 
 Every secret is entered by Zaal (Vercel dashboard or `/secret`), never through a lane or a
 chat. The DB schema push (`prisma db push` against the new project) is his step too: it is

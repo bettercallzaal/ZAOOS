@@ -4,11 +4,11 @@
 
 ---
 
-The lab is in a weird good phase where the agent is teaching itself to be more careful. Today's big batch: Hermes can now enforce a declared write-set - meaning before a build starts, it names the files it's allowed to touch, and anything outside that list is refused. That's the kind of constraint you add after you've seen a build go sideways in exactly that way, and now it's baked in. Watching a system get smarter about its own blast radius in real time is one of the cooler things about building in this direction.
+The lab is in a weird good phase where the agent is teaching itself to be more careful. Tonight's headline PR: Hermes has a proposed write-set enforcement (#4295, open) - meaning before a build starts, it names the files it's allowed to touch, and anything outside that list is refused. That's the kind of constraint you add after you've seen a build go sideways in exactly that way, and now it's written and waiting for review. Watching a system get smarter about its own blast radius in real time is one of the cooler things about building in this direction.
 
 Yesterday's context window docs (2735 + the 2721 addendum) are worth noting too - not flashy, but they represent something real. The ZAO fleet has been running into compaction walls on longer lanes, and now there's a written framework for how to manage that. Six concrete steps. The difference between a lane that recovers and one that loses its thread is usually just whether someone thought about this ahead of time. The papertrail licence also resolved yesterday, which unlocks a fork we've been waiting on. That one starts when Zaal says go.
 
-The ZOE group features are quietly stacking up - group memory (remembers yesterday's conversation), /teamview (see your open board items from Telegram), read-only GitHub inside approved groups, and /idea cards all shipped this week. Each one is flag-off until Zaal flips it. The pattern is: build it clean, land it, let it sit until there's a reason to turn it on. Slower than "ship everything at once" but the pile of live flags stays manageable.
+The ZOE group features are quietly stacking up - group memory (remembers yesterday's conversation), /teamview (see your open board items from Telegram), read-only GitHub inside approved groups, and /idea cards (#4272, merged) all shipped this week. Each one is flag-off until Zaal flips it. The pattern is: build it clean, land it, let it sit until there's a reason to turn it on. Slower than "ship everything at once" but the pile of live flags stays manageable.
 
 ---
 

@@ -18,6 +18,7 @@ import { groupIds } from './env';
 import { OWNER_ONLY_LINE, newOwnerOnlyState, privateScopeAllowed, shouldSendOwnerOnlyLine, voiceGate } from './owner-only';
 import { config as loadEnv } from 'dotenv';
 import { sendChunkedToTelegram } from './tg-chunk';
+import { conciergeErrorReply } from './concierge-error-reply';
 import { installTelegramFormat } from './tg-format';
 loadEnv();
 
@@ -4246,7 +4247,9 @@ async function dispatchConcierge(
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error('[zoe/index] concierge turn failed:', msg);
-    await ctx.reply(`(concierge error - ${msg.slice(0, 200)})`);
+    // An auth failure is one plain sentence, not raw CLI JSON in a group
+    // (concierge-error-reply.ts, 2026-11-10). Every other error is unchanged.
+    await ctx.reply(conciergeErrorReply(err, scope));
   } finally {
     progress.stop();
   }

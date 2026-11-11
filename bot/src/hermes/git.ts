@@ -294,19 +294,26 @@ export async function diffAgainstMain(workdir: string): Promise<string> {
  * caller checking forbidden paths fails closed instead of reading "none".
  */
 export async function listUntrackedFiles(workdir: string): Promise<string[]> {
-  const r = await runCmd('git', ['ls-files', '--others', '--exclude-standard'], workdir);
+  // -z: NUL-separated and unquoted, so a name is read exactly as it is on disk.
+  const r = await runCmd('git', ['ls-files', '--others', '--exclude-standard', '-z'], workdir);
   if (r.exitCode !== 0) throw new Error(`git ls-files failed: ${r.stderr.slice(0, 200)}`);
-  return r.stdout
-    .split('\n')
-    .map((s) => s.trim())
-    .filter(Boolean);
+  return splitNul(r.stdout);
+}
+
+/**
+ * Split git's -z output. Names are NOT trimmed: "a.ts " is a different file
+ * from "a.ts", and trimming let a file named like an allowed path plus a space
+ * pass a path check while the real file shipped (#4295 review, 2026-11-10).
+ */
+export function splitNul(out: string): string[] {
+  return out.split('\0').filter((s) => s.length > 0);
 }
 
 export async function listChangedFiles(workdir: string): Promise<string[]> {
-  const r = await runCmd('git', ['diff', 'origin/main', '--name-only'], workdir);
+  // --no-renames: a move lists BOTH the old path (deleted) and the new one.
+  // With rename detection only the destination printed, so moving a forbidden
+  // file to an allowed path hid the forbidden side (#4295 review, 2026-11-10).
+  const r = await runCmd('git', ['diff', 'origin/main', '--name-only', '--no-renames', '-z'], workdir);
   if (r.exitCode !== 0) return [];
-  return r.stdout
-    .split('\n')
-    .map((s) => s.trim())
-    .filter(Boolean);
+  return splitNul(r.stdout);
 }

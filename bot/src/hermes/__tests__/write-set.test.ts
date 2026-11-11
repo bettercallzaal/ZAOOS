@@ -51,10 +51,12 @@ describe('listTouchedFiles', () => {
   it('unions tracked edits and untracked new files, deduped', async () => {
     mockRunCmd.mockImplementation(async (_cmd: string, args: string[]) =>
       args[0] === 'diff'
-        ? { stdout: 'a.ts\nb.ts\n', stderr: '', exitCode: 0 }
-        : { stdout: 'new.ts\na.ts\n', stderr: '', exitCode: 0 },
+        ? { stdout: 'a.ts\0b.ts\0', stderr: '', exitCode: 0 }
+        : { stdout: 'new.ts\0a.ts\0', stderr: '', exitCode: 0 },
     );
     expect(await listTouchedFiles('/w')).toEqual(['a.ts', 'b.ts', 'new.ts']);
+    expect(mockRunCmd.mock.calls[0][1]).toEqual(['diff', 'origin/main', '--name-only', '--no-renames', '-z']);
+    expect(mockRunCmd.mock.calls[1][1]).toEqual(['ls-files', '--others', '--exclude-standard', '-z']);
   });
   it('throws when git fails, so the caller fails closed', async () => {
     mockRunCmd.mockResolvedValue({ stdout: '', stderr: 'not a repo', exitCode: 128 });

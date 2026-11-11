@@ -74,13 +74,15 @@ export function writeSetBrief(set: string[]): string {
  * changed".
  */
 export async function listTouchedFiles(workdir: string): Promise<string[]> {
-  const tracked = await runCmd('git', ['diff', 'origin/main', '--name-only'], workdir);
+  // --no-renames: a move lists BOTH its source (deleted) and destination; with
+  // rename detection only the destination printed, so moving an out-of-set
+  // file to an in-set path hid the out-of-set side. -z: NUL-separated and
+  // unquoted, and names are NOT trimmed, because "a.ts " is a different file
+  // from "a.ts" (both found in the #4295 seat review, 2026-11-10).
+  const tracked = await runCmd('git', ['diff', 'origin/main', '--name-only', '--no-renames', '-z'], workdir);
   if (tracked.exitCode !== 0) throw new WriteSetError(`git diff failed: ${tracked.stderr.slice(0, 200)}`);
-  const untracked = await runCmd('git', ['ls-files', '--others', '--exclude-standard'], workdir);
+  const untracked = await runCmd('git', ['ls-files', '--others', '--exclude-standard', '-z'], workdir);
   if (untracked.exitCode !== 0) throw new WriteSetError(`git ls-files failed: ${untracked.stderr.slice(0, 200)}`);
-  const all = `${tracked.stdout}\n${untracked.stdout}`
-    .split('\n')
-    .map((s) => s.trim())
-    .filter(Boolean);
+  const all = `${tracked.stdout}\0${untracked.stdout}`.split('\0').filter((s) => s.length > 0);
   return [...new Set(all)];
 }

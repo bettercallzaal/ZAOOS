@@ -61,11 +61,11 @@ beforeEach(() => {
 
 const INPUT = { triggered_by_telegram_id: 1, triggered_in_chat_id: 2, issue_text: 'add a /health route' };
 
-/** The work tree git reports: tracked diff and untracked files. */
+/** The work tree git reports (-z, NUL-separated): tracked diff and untracked files. */
 function tree(tracked: string[], untracked: string[] = []) {
   mockRunCmd.mockImplementation(async (_cmd: string, args: string[]) => {
-    if (args[0] === 'diff') return { stdout: tracked.join('\n'), stderr: '', exitCode: 0 };
-    if (args[0] === 'ls-files') return { stdout: untracked.join('\n'), stderr: '', exitCode: 0 };
+    if (args[0] === 'diff') return { stdout: tracked.join('\0'), stderr: '', exitCode: 0 };
+    if (args[0] === 'ls-files') return { stdout: untracked.join('\0'), stderr: '', exitCode: 0 };
     return { stdout: '', stderr: '', exitCode: 0 };
   });
 }
@@ -103,7 +103,7 @@ describe('dispatchHermesRun write-set', () => {
     mockRunCmd.mockImplementation(async (_cmd: string, args: string[]) => {
       if (args[0] === 'diff') {
         calls += 1;
-        return { stdout: calls === 1 ? 'src/foo.ts' : 'src/foo.ts\npackage.json', stderr: '', exitCode: 0 };
+        return { stdout: calls === 1 ? 'src/foo.ts' : 'src/foo.ts\0package.json', stderr: '', exitCode: 0 };
       }
       return { stdout: '', stderr: '', exitCode: 0 };
     });

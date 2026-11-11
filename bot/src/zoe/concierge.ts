@@ -17,7 +17,8 @@ import { recordCall } from './cost-ledger';
 import { runConciergeGuardrails } from './guardrail-adapters';
 import { redactPii } from './pii';
 import type { ConciergeOptions, ConciergeResult, TaskOp, QuestOp, ZoeCaptureNote, BotRelayOp, CrmOp, ThreadOp } from './types';
-import { selectModel, ZOE_DEFAULT_MODEL } from './types';
+import { ZOE_DEFAULT_MODEL } from './types';
+import { pickModel } from './model-classifier';
 import type { MemoryBlocks } from './memory';
 import { shouldUseRouting, selectBestModel, routeAndCall, callCapFallback, hasCapFallbackProvider } from './models/router';
 
@@ -321,7 +322,7 @@ async function runConciergeTurnIn(
       } catch (error: unknown) {
         // Routing failed - fall back to Claude CLI
         console.warn('[zoe/concierge] routed call failed, falling back to Claude CLI:', error instanceof Error ? error.message : String(error));
-        selectedModel = opts.model ?? selectModel(opts.message);
+        selectedModel = opts.model ?? await pickModel(opts.message);
         result = await callModelWithCliRouting({
           model: selectedModel,
           prompt: userPrompt,
@@ -337,7 +338,7 @@ async function runConciergeTurnIn(
       }
     } else {
       // Routing selected Claude - use CLI normally
-      selectedModel = opts.model ?? selectModel(opts.message);
+      selectedModel = opts.model ?? await pickModel(opts.message);
       result = await callModelWithCliRouting({
         model: selectedModel,
         prompt: userPrompt,
@@ -353,7 +354,7 @@ async function runConciergeTurnIn(
     }
   } else {
     // Routing disabled - use default Claude path
-    selectedModel = opts.model ?? selectModel(opts.message);
+    selectedModel = opts.model ?? await pickModel(opts.message);
     result = await callModelWithCliRouting({
       model: selectedModel,
       prompt: userPrompt,

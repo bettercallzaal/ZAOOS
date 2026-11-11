@@ -4,7 +4,7 @@ import {
   HERMES_FIXER_MODEL,
   HERMES_ROUTING_ENABLED,
 } from './claude-cli';
-import { listChangedFiles, runCmd } from './git';
+import { listChangedFiles, listUntrackedFiles, runCmd } from './git';
 import { HERMES_FORBIDDEN_PATHS, type FixerInput, type FixerOutput, type HermesRepoTarget } from './types';
 import { detectPromptInjection } from '../lib/injection-guard';
 
@@ -199,13 +199,22 @@ export async function runFixer(input: FixerInput): Promise<FixerOutput> {
     }
   }
 
-  // Verify the diff actually matches what Coder claims (defense in depth)
-  const actualChanged = await listChangedFiles(input.workTreePath);
+  // Verify the diff actually matches what Coder claims (defense in depth).
+  // NEW files count too: `git diff origin/main` does not list an untracked
+  // file, but commitAndPush's `git add -A` ships it, so a new file under a
+  // forbidden path used to pass this check (found 2026-11-10, #4295 review).
+  const trackedChanged = await listChangedFiles(input.workTreePath);
+  const created = await listUntrackedFiles(input.workTreePath);
+  const actualChanged = [...new Set([...trackedChanged, ...created])];
   if (actualChanged.length === 0) {
     throw new Error('Stock-Coder claimed changes but git diff shows none');
   }
   for (const f of actualChanged) {
     if (HERMES_FORBIDDEN_PATHS.some((p) => f === p || f.startsWith(`${p}/`))) {
+      if (created.includes(f)) {
+        // Not restorable with checkout; the runner's resetToMain (git clean -fd) removes it.
+        throw new Error(`Stock-Coder created a file in a forbidden path despite system prompt: ${f}`);
+      }
       await runCmd('git', ['checkout', '--', f], input.workTreePath);
       throw new Error(`Stock-Coder wrote to forbidden path despite system prompt: ${f}`);
     }

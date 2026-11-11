@@ -19,6 +19,7 @@ import {
   diffAgainstMain,
   getRepoProfile,
   listChangedFiles,
+  listUntrackedFiles,
   makeWorkdir,
 } from '../git';
 
@@ -97,21 +98,36 @@ describe('cleanupWorkdir', () => {
 
 describe('listChangedFiles', () => {
   it('parses changed filenames from git diff output', async () => {
-    mockSpawn.mockReturnValue(makeSpawnResult('src/foo.ts\nbot/src/bar.ts\n', '', 0));
+    mockSpawn.mockReturnValue(makeSpawnResult('src/foo.ts\0bot/src/bar.ts\0', '', 0));
     const files = await listChangedFiles('/tmp/wt');
     expect(files).toEqual(['src/foo.ts', 'bot/src/bar.ts']);
+    expect(mockSpawn.mock.calls[0][1]).toEqual(['diff', 'origin/main', '--name-only', '--no-renames', '-z']);
   });
 
-  it('returns [] when git diff exits non-zero', async () => {
+  it('throws when git diff exits non-zero (fails closed, never [])', async () => {
     mockSpawn.mockReturnValue(makeSpawnResult('', 'not a git repo', 1));
-    const files = await listChangedFiles('/tmp/wt');
-    expect(files).toEqual([]);
+    await expect(listChangedFiles('/tmp/wt')).rejects.toThrow('git diff failed');
   });
 
-  it('filters empty lines from diff output', async () => {
-    mockSpawn.mockReturnValue(makeSpawnResult('src/a.ts\n\n  \nsrc/b.ts\n', '', 0));
+  it('drops empty entries but never trims a name (a trailing space is a different file)', async () => {
+    mockSpawn.mockReturnValue(makeSpawnResult('src/a.ts\0\0src/b.ts \0', '', 0));
     const files = await listChangedFiles('/tmp/wt');
-    expect(files).toEqual(['src/a.ts', 'src/b.ts']);
+    expect(files).toEqual(['src/a.ts', 'src/b.ts ']);
+  });
+});
+
+// ── listUntrackedFiles ────────────────────────────────────────────────────────
+
+describe('listUntrackedFiles', () => {
+  it('runs git ls-files --others --exclude-standard and parses the names', async () => {
+    mockSpawn.mockReturnValue(makeSpawnResult('src/new.ts\0\0scripts/x.sh\0', '', 0));
+    expect(await listUntrackedFiles('/tmp/wt')).toEqual(['src/new.ts', 'scripts/x.sh']);
+    expect(mockSpawn.mock.calls[0][1]).toEqual(['ls-files', '--others', '--exclude-standard', '-z']);
+  });
+
+  it('throws on a git error instead of returning []', async () => {
+    mockSpawn.mockReturnValue(makeSpawnResult('', 'not a git repo', 128));
+    await expect(listUntrackedFiles('/tmp/wt')).rejects.toThrow('git ls-files failed');
   });
 });
 

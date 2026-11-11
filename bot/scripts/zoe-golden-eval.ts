@@ -9,8 +9,10 @@
  *
  * Every case is a TALK-ONLY turn (toolPolicy 'none'): no tools, no MCP, an
  * empty working directory, and the ops ZOE returns are never applied. It reads
- * no live memory and writes nothing to the board. The persona is the repo's
- * PERSONA_DEFAULT, so this scores the code, not the VPS's live persona.md.
+ * no working memory and writes nothing to the board. The persona is the box's
+ * ~/.zao/zoe/persona.md (readPersona), so on the VPS this scores the LIVE
+ * persona. On a box without one, readPersona's ensureZoeHome seeds ~/.zao/zoe
+ * from the repo defaults first: run it on the VPS.
  * Cost: one model call per case (10 today).
  *
  * Output: the report on stdout, and the full JSON (with each reply) at
@@ -25,10 +27,11 @@ import { join } from 'node:path';
 import { runConciergeTurn } from '../src/zoe/concierge';
 import { CONCIERGE_GOLDEN_SET, GOLDEN_CURRENT_DATE, caseForInput } from '../src/zoe/concierge-golden';
 import { formatGoldenReport, runGoldenSet } from '../src/zoe/golden-eval';
-import { PERSONA_DEFAULT } from '../src/zoe/memory';
+import { readPersona } from '../src/zoe/memory';
 
 const model = process.env.ZOE_GOLDEN_MODEL || 'haiku';
 const replies: Record<string, string> = {};
+let persona = '';
 
 async function run(input: string): Promise<string> {
   const c = caseForInput(input);
@@ -39,7 +42,7 @@ async function run(input: string): Promise<string> {
     model,
     toolPolicy: 'none',
     blocks: {
-      persona: PERSONA_DEFAULT,
+      persona,
       human: 'Zaal Panthaki founded The ZAO, a web3 music community.',
       working: '',
       tasks: '',
@@ -54,6 +57,7 @@ async function run(input: string): Promise<string> {
 }
 
 async function main(): Promise<void> {
+  persona = await readPersona();
   const report = await runGoldenSet(CONCIERGE_GOLDEN_SET, run);
   console.log(`model: ${model}`);
   console.log(formatGoldenReport(report));

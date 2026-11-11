@@ -287,6 +287,21 @@ export async function diffAgainstMain(workdir: string): Promise<string> {
   return diff.stdout;
 }
 
+/**
+ * New files the work tree created that git does not track yet (respects
+ * .gitignore). listChangedFiles (`git diff origin/main`) never lists these,
+ * but commitAndPush runs `git add -A`, so they ship. Throws on a git error so a
+ * caller checking forbidden paths fails closed instead of reading "none".
+ */
+export async function listUntrackedFiles(workdir: string): Promise<string[]> {
+  const r = await runCmd('git', ['ls-files', '--others', '--exclude-standard'], workdir);
+  if (r.exitCode !== 0) throw new Error(`git ls-files failed: ${r.stderr.slice(0, 200)}`);
+  return r.stdout
+    .split('\n')
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
 export async function listChangedFiles(workdir: string): Promise<string[]> {
   const r = await runCmd('git', ['diff', 'origin/main', '--name-only'], workdir);
   if (r.exitCode !== 0) return [];

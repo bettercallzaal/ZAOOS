@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 const mocks = vi.hoisted(() => ({
   callClaudeCli: vi.fn(),
   listChangedFiles: vi.fn(),
+  listUntrackedFiles: vi.fn(),
   runCmd: vi.fn(),
 }));
 
@@ -15,6 +16,7 @@ vi.mock('../claude-cli', () => ({
 
 vi.mock('../git', () => ({
   listChangedFiles: mocks.listChangedFiles,
+  listUntrackedFiles: mocks.listUntrackedFiles,
   runCmd: mocks.runCmd,
 }));
 
@@ -46,6 +48,7 @@ function baseCliResult(overrides: Partial<Record<string, unknown>> = {}) {
 beforeEach(() => {
   vi.clearAllMocks();
   mocks.listChangedFiles.mockResolvedValue(['src/foo.ts']);
+  mocks.listUntrackedFiles.mockResolvedValue([]);
 });
 
 describe('runFixer - issueText injection guard (doc 1023)', () => {
@@ -77,5 +80,37 @@ describe('runFixer - issueText injection guard (doc 1023)', () => {
 
     const { prompt } = mocks.callClaudeCli.mock.calls[0][0];
     expect(prompt).not.toContain('SECURITY NOTE');
+  });
+});
+
+describe('runFixer - new (untracked) files', () => {
+  const args = { issueText: 'add a helper', workTreePath: '/tmp/work', branchName: 'fix/3', attemptNumber: 1 };
+
+  it('refuses a NEW file under a forbidden path, which git diff alone never listed', async () => {
+    mocks.callClaudeCli.mockResolvedValue(baseCliResult());
+    mocks.listUntrackedFiles.mockResolvedValue(['bot/src/hermes/evil.ts']);
+    await expect(runFixer(args)).rejects.toThrow('created a file in a forbidden path');
+    expect(mocks.runCmd).not.toHaveBeenCalledWith('git', ['checkout', '--', 'bot/src/hermes/evil.ts'], '/tmp/work');
+  });
+
+  it('accepts a fix made only of new files and reports them', async () => {
+    mocks.callClaudeCli.mockResolvedValue(baseCliResult());
+    mocks.listChangedFiles.mockResolvedValue([]);
+    mocks.listUntrackedFiles.mockResolvedValue(['src/new-helper.ts']);
+    const out = await runFixer(args);
+    expect(out.filesChanged).toEqual(['src/new-helper.ts']);
+  });
+
+  it('reports tracked and new files together, deduped', async () => {
+    mocks.callClaudeCli.mockResolvedValue(baseCliResult());
+    mocks.listUntrackedFiles.mockResolvedValue(['src/new-helper.ts', 'src/foo.ts']);
+    const out = await runFixer(args);
+    expect(out.filesChanged).toEqual(['src/foo.ts', 'src/new-helper.ts']);
+  });
+
+  it('fails closed when git cannot list untracked files', async () => {
+    mocks.callClaudeCli.mockResolvedValue(baseCliResult());
+    mocks.listUntrackedFiles.mockRejectedValue(new Error('git ls-files failed: boom'));
+    await expect(runFixer(args)).rejects.toThrow('git ls-files failed');
   });
 });

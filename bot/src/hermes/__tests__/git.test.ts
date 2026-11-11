@@ -19,6 +19,7 @@ import {
   diffAgainstMain,
   getRepoProfile,
   listChangedFiles,
+  listUntrackedFiles,
   makeWorkdir,
 } from '../git';
 
@@ -112,6 +113,21 @@ describe('listChangedFiles', () => {
     mockSpawn.mockReturnValue(makeSpawnResult('src/a.ts\n\n  \nsrc/b.ts\n', '', 0));
     const files = await listChangedFiles('/tmp/wt');
     expect(files).toEqual(['src/a.ts', 'src/b.ts']);
+  });
+});
+
+// ── listUntrackedFiles ────────────────────────────────────────────────────────
+
+describe('listUntrackedFiles', () => {
+  it('runs git ls-files --others --exclude-standard and parses the names', async () => {
+    mockSpawn.mockReturnValue(makeSpawnResult('src/new.ts\n\nscripts/x.sh\n', '', 0));
+    expect(await listUntrackedFiles('/tmp/wt')).toEqual(['src/new.ts', 'scripts/x.sh']);
+    expect(mockSpawn.mock.calls[0][1]).toEqual(['ls-files', '--others', '--exclude-standard']);
+  });
+
+  it('throws on a git error instead of returning []', async () => {
+    mockSpawn.mockReturnValue(makeSpawnResult('', 'not a git repo', 128));
+    await expect(listUntrackedFiles('/tmp/wt')).rejects.toThrow('git ls-files failed');
   });
 });
 

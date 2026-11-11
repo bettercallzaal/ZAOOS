@@ -114,3 +114,16 @@ describe('runFixer - new (untracked) files', () => {
     await expect(runFixer(args)).rejects.toThrow('git ls-files failed');
   });
 });
+
+describe('runFixer - a failed tracked diff fails closed', () => {
+  // The #4296 review probe: no origin/main ref, so the tracked diff fails, a
+  // forbidden tracked file was edited, and one new ALLOWED file exists. Before
+  // listChangedFiles threw, tracked read [] and untracked read [the new file],
+  // so the set was non-empty, no throw fired, and the forbidden edit shipped.
+  it('rejects the attempt when the diff fails even though a new allowed file exists', async () => {
+    mocks.callClaudeCli.mockResolvedValue(baseCliResult());
+    mocks.listChangedFiles.mockRejectedValue(new Error('git diff failed: unknown revision origin/main'));
+    mocks.listUntrackedFiles.mockResolvedValue(['src/new-helper.ts']);
+    await expect(runFixer({ issueText: 'x', workTreePath: '/tmp/work', branchName: 'fix/4', attemptNumber: 1 })).rejects.toThrow('git diff failed');
+  });
+});

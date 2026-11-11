@@ -50,3 +50,15 @@ describe('real git', () => {
     expect(files).not.toContain('src/foo.ts');
   });
 });
+
+describe('real git, no origin/main ref', () => {
+  it('listChangedFiles throws instead of reporting no tracked changes', async () => {
+    const bare = mkdtempSync(join(tmpdir(), 'hermes-git-noref-'));
+    try {
+      execFileSync('git', ['init', '-q'], { cwd: bare, stdio: 'pipe' });
+      await expect(listChangedFiles(bare)).rejects.toThrow('git diff failed');
+    } finally {
+      rmSync(bare, { recursive: true, force: true });
+    }
+  });
+});

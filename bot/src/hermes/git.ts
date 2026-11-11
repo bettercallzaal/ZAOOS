@@ -314,6 +314,11 @@ export async function listChangedFiles(workdir: string): Promise<string[]> {
   // With rename detection only the destination printed, so moving a forbidden
   // file to an allowed path hid the forbidden side (#4295 review, 2026-11-10).
   const r = await runCmd('git', ['diff', 'origin/main', '--name-only', '--no-renames', '-z'], workdir);
-  if (r.exitCode !== 0) return [];
+  // Throws, never []: once untracked files are added to the coder's changed
+  // set, an empty tracked list no longer trips "claimed changes but none", so
+  // a failed diff (e.g. no origin/main ref) would hide tracked edits to a
+  // forbidden path while a new allowed file kept the set non-empty (#4296
+  // seat review, 2026-11-10). Fail closed, as listUntrackedFiles does.
+  if (r.exitCode !== 0) throw new Error(`git diff failed: ${r.stderr.slice(0, 200)}`);
   return splitNul(r.stdout);
 }

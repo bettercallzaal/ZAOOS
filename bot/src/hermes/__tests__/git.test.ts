@@ -104,10 +104,9 @@ describe('listChangedFiles', () => {
     expect(mockSpawn.mock.calls[0][1]).toEqual(['diff', 'origin/main', '--name-only', '--no-renames', '-z']);
   });
 
-  it('returns [] when git diff exits non-zero', async () => {
+  it('throws when git diff exits non-zero (fails closed, never [])', async () => {
     mockSpawn.mockReturnValue(makeSpawnResult('', 'not a git repo', 1));
-    const files = await listChangedFiles('/tmp/wt');
-    expect(files).toEqual([]);
+    await expect(listChangedFiles('/tmp/wt')).rejects.toThrow('git diff failed');
   });
 
   it('drops empty entries but never trims a name (a trailing space is a different file)', async () => {

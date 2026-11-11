@@ -2,7 +2,7 @@
 topic: agents
 type: research
 status: research-complete
-last-validated: 2026-05-21
+last-validated: 2026-11-11
 original-query: Extract actionable patterns from bootcamp days 3-5 for FISHBOWLZ agent participants - event-driven agents, stateful memory, and ERC-8004 identity (reconstructed)
 tier: high
 notes: Core patterns (event-driven, stateful memory, ERC-8004 identity) remain valuable even though FISHBOWLZ project paused. Apply to ZOE/agent stack.
@@ -105,6 +105,31 @@ src/components/fishbowlz/AgentBadge.tsx  — Bot badge UI indicator
 | Neynar agent guide | [neynar.com/blog](https://neynar.com/blog/building-ai-agents-on-farcaster) | Read/Write APIs, Managed Signers, Webhooks |
 | Builders Garden templates | [GitHub](https://github.com/builders-garden) | base-minikit-starter, miniapp-next-template |
 
+## Updated 2026-11-11
+
+Radar revalidation. Sources: WebSearch + full page fetch of github.com/sudeepb02/awesome-erc8004 (FULL). External hosts neynar.com, miniapps.farcaster.xyz, eips.ethereum.org, ai-sdk.dev, paragraph.com blocked in this session (FAILED); search snippets used for those items and marked accordingly.
+
+**ERC-8004 ecosystem status (FULL — github.com/sudeepb02/awesome-erc8004 fetched 2026-11-11):**
+- Identity and Reputation registries are deployed and audited. The Validation Registry is still under active revision. The 3-registry system is therefore incomplete; the doc's "REGISTER admin agent" recommendation applies to the Identity registry only.
+- Deployed on roughly 20 EVM mainnets as of the resource list, including Ethereum, Base, Arbitrum, Optimism, Polygon, BNB Chain, and Celo. Base deployment confirmed — directly relevant since ZAO is Base-native. The original doc cost estimate (~$5 gas) remains in range for Base.
+- ERC-8004 remains Draft status in the official EIP process as of October 2026 (search snippet, PARTIAL — eips.ethereum.org blocked). Contract deployments are live; the spec itself is not yet Final.
+- The awesome-erc8004 resource list shows no new entries after April 2026, suggesting the community curation slowed after the March 17, 2026 mainnet launch.
+
+**Neynar signer changes (PARTIAL — search snippet, neynar.com blocked):**
+- One search snippet from Neynar's SIWN docs said "new integrations should use Neynar-managed signers instead" with a stop date for new SIWN connections of August 14, 2026. A second search targeting this found no corroborating deadline and found Neynar docs still listing SIWN as a current option. The status is UNVERIFIED — check docs.neynar.com before choosing between SIWN and managed signers for any new ZAO agent integration.
+
+**Vercel AI SDK agent pattern (PARTIAL — search snippets):**
+- The doc recommends "AI SDK 6 ToolLoopAgent." Search results from April and May 2026 conflict: one calls AI SDK 6 beta, another says v5 is the stable line and v6 is in development. The current stable release is UNVERIFIED — check ai-sdk.dev before building a new agent loop against v6.
+
+**Farcaster Mini App SDK (PARTIAL — search snippet, miniapps.farcaster.xyz blocked):**
+- Two changelog entries from post-May 2026: July 30, 2026 — query parameters are now forwarded when a mini app declares its own button.action.url; October 27, 2026 — full-screen actions added (requestFullScreen, exitFullScreen, supportsFullScreen manifest property). These affect mini-app-based agent UIs but are low-impact for server-side agents.
+- Base App (April 9, 2026) separated from Farcaster mini-app spec; Base now treats all apps as standard web apps. If ZAO builds FISHBOWLZ agent surfaces targeting Base App, the Farcaster manifest is no longer needed there.
+
+**ZAO impact summary:**
+- ERC-8004 agent identity registration on Base is now live and confirmed multi-chain. The ZAO gap (no ERC-8004 registration) from the original doc remains open — no evidence it was closed.
+- Verify Neynar signer choice before building new agent casting flows.
+- Verify AI SDK version before building against ToolLoopAgent.
+
 ## Sources
 
 - [Farcaster Agentic Bootcamp — Rifio](https://rifio.dev/events/05ff846c-1b33-47fe-8f30-4922dee8174f)
@@ -115,3 +140,6 @@ src/components/fishbowlz/AgentBadge.tsx  — Bot badge UI indicator
 - [Doc 278 — Agentic Bootcamp Gap Analysis](../278-agentic-bootcamp-zao-agent-squad/)
 - [Doc 227 — Agentic Workflows 2026](../227-agentic-workflows-2026/)
 - [Doc 290 — FISHBOWLZ Agentic Participants](../290-fishbowlz-agentic-participants/)
+- [awesome-erc8004 (fetched 2026-11-11, FULL)](https://github.com/sudeepb02/awesome-erc8004)
+- [Farcaster Mini App SDK changelog (search snippet, PARTIAL)](https://miniapps.farcaster.xyz/docs/sdk/changelog)
+- [Base and Farcaster Split the Mini App Stack (search snippet, PARTIAL)](https://paragraph.com/@arcabot/base-and-farcaster-split-the-mini-app-stack)

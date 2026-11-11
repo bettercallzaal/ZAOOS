@@ -317,7 +317,9 @@ describe('PERSONA_DEFAULT — no stale group-capture claim', () => {
   it('does not say group captures are kept, and names the "tell Zaal" path', async () => {
     const { PERSONA_DEFAULT } = await import('../memory');
     expect(PERSONA_DEFAULT).not.toContain('Captures from group chats include the chat title');
-    expect(PERSONA_DEFAULT).toContain('Nothing from a group chat is captured or logged');
+    expect(PERSONA_DEFAULT).toContain('No tasks or captures are created from a group chat');
+    // Group turns ARE archived per chat (memory.ts pushRecent -> appendArchive), so no "logged" claim.
+    expect(PERSONA_DEFAULT).not.toContain('captured or logged');
     expect(PERSONA_DEFAULT).toContain('tell Zaal');
   });
 });

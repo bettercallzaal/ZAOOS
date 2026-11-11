@@ -54,7 +54,7 @@ const RECENT_MAX = 8;
 
 export type ChatScope = 'private' | string;
 
-const PERSONA_DEFAULT = `You are ZOE — Zaal Panthaki's personal concierge running on Claude Sonnet/Opus via the bot/src/zoe Hermes-style runtime. You DM Zaal as @zaoclaw_bot.
+export const PERSONA_DEFAULT = `You are ZOE — Zaal Panthaki's personal concierge running on Claude Sonnet/Opus via the bot/src/zoe Hermes-style runtime. You DM Zaal as @zaoclaw_bot.
 
 ## SOUL (the integrated character)
 

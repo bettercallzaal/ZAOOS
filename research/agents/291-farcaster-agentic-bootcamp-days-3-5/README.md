@@ -109,24 +109,24 @@ src/components/fishbowlz/AgentBadge.tsx  — Bot badge UI indicator
 
 Radar revalidation. Sources: WebSearch + full page fetch of github.com/sudeepb02/awesome-erc8004 (FULL). External hosts neynar.com, miniapps.farcaster.xyz, eips.ethereum.org, ai-sdk.dev, paragraph.com blocked in this session (FAILED); search snippets used for those items and marked accordingly.
 
-**ERC-8004 ecosystem status (FULL — github.com/sudeepb02/awesome-erc8004 fetched 2026-11-11):**
+**ERC-8004 ecosystem status (FULL - github.com/sudeepb02/awesome-erc8004 fetched 2026-11-11):**
 - Identity and Reputation registries are deployed and audited. The Validation Registry is still under active revision. The 3-registry system is therefore incomplete; the doc's "REGISTER admin agent" recommendation applies to the Identity registry only.
-- Deployed on roughly 20 EVM mainnets as of the resource list, including Ethereum, Base, Arbitrum, Optimism, Polygon, BNB Chain, and Celo. Base deployment confirmed — directly relevant since ZAO is Base-native. The original doc cost estimate (~$5 gas) remains in range for Base.
-- ERC-8004 remains Draft status in the official EIP process as of October 2026 (search snippet, PARTIAL — eips.ethereum.org blocked). Contract deployments are live; the spec itself is not yet Final.
-- The awesome-erc8004 resource list shows no new entries after April 2026, suggesting the community curation slowed after the March 17, 2026 mainnet launch.
+- Deployed on roughly 20 EVM mainnets as of the resource list, including Ethereum, Base, Arbitrum, Optimism, Polygon, BNB Chain, and Celo. Base deployment confirmed - directly relevant since ZAO is Base-native. The original doc cost estimate (~$5 gas) remains in range for Base.
+- ERC-8004 remains Draft status in the official EIP process as of October 2026 (search snippet, PARTIAL - eips.ethereum.org blocked). Contract deployments are live; the spec itself is not yet Final.
+- The awesome-erc8004 resource list shows no new entries after April 2026, suggesting community curation slowed after the initial mainnet launch (date unsourced; the awesome-erc8004 repo itself was the evidence).
 
-**Neynar signer changes (PARTIAL — search snippet, neynar.com blocked):**
-- One search snippet from Neynar's SIWN docs said "new integrations should use Neynar-managed signers instead" with a stop date for new SIWN connections of August 14, 2026. A second search targeting this found no corroborating deadline and found Neynar docs still listing SIWN as a current option. The status is UNVERIFIED — check docs.neynar.com before choosing between SIWN and managed signers for any new ZAO agent integration.
+**Neynar signer changes (PARTIAL - search snippet, neynar.com blocked):**
+- One search snippet from Neynar's SIWN docs said "new integrations should use Neynar-managed signers instead" with a stop date for new SIWN connections of August 14, 2026. A second search targeting this found no corroborating deadline and found Neynar docs still listing SIWN as a current option. The status is UNVERIFIED - check docs.neynar.com before choosing between SIWN and managed signers for any new ZAO agent integration.
 
-**Vercel AI SDK agent pattern (PARTIAL — search snippets):**
-- The doc recommends "AI SDK 6 ToolLoopAgent." Search results from April and May 2026 conflict: one calls AI SDK 6 beta, another says v5 is the stable line and v6 is in development. The current stable release is UNVERIFIED — check ai-sdk.dev before building a new agent loop against v6.
+**Vercel AI SDK agent pattern (PARTIAL - search snippets):**
+- The doc recommends "AI SDK 6 ToolLoopAgent." Search results from April and May 2026 conflict: one calls AI SDK 6 beta, another says v5 is the stable line and v6 is in development. The current stable release is UNVERIFIED - check ai-sdk.dev before building a new agent loop against v6.
 
-**Farcaster Mini App SDK (PARTIAL — search snippet, miniapps.farcaster.xyz blocked):**
-- Two changelog entries from post-May 2026: July 30, 2026 — query parameters are now forwarded when a mini app declares its own button.action.url; October 27, 2026 — full-screen actions added (requestFullScreen, exitFullScreen, supportsFullScreen manifest property). These affect mini-app-based agent UIs but are low-impact for server-side agents.
+**Farcaster Mini App SDK (PARTIAL - search snippet, miniapps.farcaster.xyz blocked):**
+- Two changelog entries from post-May 2026: July 30, 2026 - query parameters are now forwarded when a mini app declares its own button.action.url; October 27, 2026 - full-screen actions added (requestFullScreen, exitFullScreen, supportsFullScreen manifest property). These affect mini-app-based agent UIs but are low-impact for server-side agents.
 - Base App (April 9, 2026) separated from Farcaster mini-app spec; Base now treats all apps as standard web apps. If ZAO builds FISHBOWLZ agent surfaces targeting Base App, the Farcaster manifest is no longer needed there.
 
 **ZAO impact summary:**
-- ERC-8004 agent identity registration on Base is now live and confirmed multi-chain. The ZAO gap (no ERC-8004 registration) from the original doc remains open — no evidence it was closed.
+- ERC-8004 agent identity registration on Base is now live and confirmed multi-chain. The ZAO gap (no ERC-8004 registration) from the original doc remains open - no evidence it was closed.
 - Verify Neynar signer choice before building new agent casting flows.
 - Verify AI SDK version before building against ToolLoopAgent.
 

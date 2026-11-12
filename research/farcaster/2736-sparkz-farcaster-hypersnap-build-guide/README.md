@@ -23,7 +23,7 @@ Written 2026-11-12 by the sparkz lane. It combines three sources: the Sparkz rep
 | 1 | **KEEP Sparkz sign-in as it is: Farcaster's sign-in relay, `verifySignInMessage`, then Sparkz's own HMAC cookie.** Do not move login to Hypersnap. | `verifySignInMessage` checks the FID against Optimism's IdRegistry through an RPC. It never touches a hub, so Hypersnap changes nothing for login [Certain, auth-monorepo source]. The fix shipped today, with `SPARKZ_SESSION_SECRET` set, is live: nonce 200, me 200, and the Farcaster QR code opens [Certain, 16:41 EST]. |
 | 2 | **USE the session-secret cookie (option A) now. Session option C (a Supabase sessions table) waits until "sign out everywhere" is needed.** | Zaal ruled A on 12 Nov (vault #516 item 9). 9 of 19 open-source Farcaster apps sampled use the same pattern: verify once, then a cookie signed with an env secret (iman-desk note 08). C is the only option needing no secret and gives real revocation, but no Farcaster app was found using it, so there is no code to copy. |
 | 3 | **FIX the iPhone sign-in return trip before the next TestFlight build.** That means `redirectUrl` to a link Sparkz owns, plus re-polling the relay on resume. | auth-monorepo #231 is still open: on Expo, sign-in completes only about 20% of the time after the user comes back from the Farcaster app. #108: iOS drops the deep link if the sign-in channel is created on tap. The fix pattern is three steps: create the channel before the tap, save the channel token, and poll on `appStateChange` [Certain, issues read]. |
-| 4 | **USE the Hypersnap `/v2/farcaster/*` read API as a second backend behind one read adapter. Keep Neynar as the first backend for 30 days.** | haatz serves Neynar-shaped JSON with no key and open CORS (40 calls in a row, all 200) [Certain]. Neynar's hosts answer 402 with no key, and the free plan is 10M credits a month [Certain]. The fork (top of doc) means Hypersnap data may drift from Snapchain's, so it is a fallback, not the source of truth yet. |
+| 4 | **SUPERSEDED by Zaal, 12 Nov: "Make sparkz a hypersnap client. Asap." (his DM, quoted in Sparkz PR #344).** Hypersnap is now the primary read source. Sparkz #344 (PR 1 of 3, ZAODEVZ, opened 2026-11-12T23:20:54Z per gh `createdAt`) reads profiles, casts and node health from a Hypersnap node, `HYPERSNAP_NODE_URL` defaulting to haatz. Keep Neynar only as an optional fallback. | The fork (top of doc) still means Hypersnap data may drift from Snapchain's. Watch for it rather than avoiding it. Review notes on #344 are in section 9a. |
 | 5 | **SKIP gRPC. Talk to Hypersnap over HTTP only.** | `@farcaster/hub-nodejs@0.18.0` failed against haatz on both :3383 and :443 [Certain, own test]. The working clients (Quilcast, Fatline) use HTTP `/v1/submitMessage` with protobuf bytes. |
 | 6 | **DO NOT build cast posting off Neynar yet.** | It needs a Sparkz-owned signer: either a gasless `KEY_ADD` or an Optimism KeyRegistry entry. It also needs protobuf message building and a choice of fork. Hypersnap's v2 signer write routes return 501 [Certain, hypersnap-docs-web]. This is a project, not a swap. |
 | 7 | **BORROW patterns from MIT clients (Quilcast, Fatline, `farcasterxyz/client`, auth-monorepo examples). Do not copy code from Herocast (AGPL-3.0) or Space (GPL-3.0).** | Licences read from the LICENSE files [Certain]. Copying AGPL or GPL code into Sparkz would change Sparkz's licence obligations. |
@@ -136,12 +136,21 @@ How these apps keep users signed in (iman-desk note 08, 19 apps sampled): 9 use 
 |---|---|---|---|
 | 1 | Run one real Farcaster sign-in on trysparkz.com/profile and confirm `/api/auth/me` shows the FID | XS | Nothing |
 | 2 | iPhone sign-in return trip: steps 3a to 3d | S | A device test after #1 |
-| 3 | `fcRead()` adapter: Neynar v2 first, Hypersnap haatz `/v2/farcaster/*` second, 2 s timeouts | S | One test each of `/user?fid=` and `/cast/search` |
+| 3 | Superseded by Sparkz #344 (Hypersnap reads, PR 1 of 3). Add a fetch timeout and a Neynar fallback there instead of building a separate adapter | S | #344 |
 | 4 | Mini-app sign-in through `sdk.actions.signIn` into `/api/auth/siwf` (step 3e) | M | #1 |
 | 5 | Handle FIDs as strings or BigInt in new code | S | Nothing |
 | 6 | App Review checklist (step 3f) before an external TestFlight or App Store submit | S | Zaal decides on a public beta |
 | 7 | Session option C (Supabase sessions table) for revocation | M | A need for "sign out everywhere" |
 | 8 | Posting without Neynar (gasless `KEY_ADD`, protobuf, submitMessage) | L | A choice of fork after the 2026-11-12 split |
+
+## 9a. Review notes on Sparkz #344 (read 12 Nov, head b0dcc594)
+
+Read-only notes from the sparkz lane, which did not write #344. They are not a graded verdict.
+
+- **No fetch timeout.** `src/lib/hypersnap.ts` line 131 calls `fetch(u, { next: { revalidate } })` with no `AbortSignal.timeout`. The PR says "a page never waits on it", but a node that accepts the connection and then hangs holds the server render until the platform's own timeout. Add `signal: AbortSignal.timeout(2000)`. [Likely; not tested against a hanging node]
+- **Native FIDs arrive as strings.** Hypersnap sends native FIDs (from 4,294,967,296 up) as JSON strings, but `fid` is typed `number`. Line 174 (`Number.isInteger(raw.fid)`) rejects a string FID, so a native account's name lookup returns null. The values still fit in a JS number (below 2^53), so coerce with `Number()` rather than switching to BigInt. [Certain on the shape, from `/v1/nativeRegistration`; the code path itself was not run]
+- **Like counts stop at 1,000.** `getLikeCount` asks for `pageSize: 1000` and counts the page, so anything above 1,000 reads as 1,000. Hypersnap also had a metrics repair for inflated counts (see section 4), so compare against Neynar before the receipts engine uses these numbers. [Certain on pageSize]
+- **Fork side.** haatz is a Hypersnap validator, so after the 2026-11-12 cutover, reads come from the Hypersnap side of the fork. Messages from native FIDs exist only there. [Certain per docs/shuttle.md and native-registration.md]
 
 ## Also See
 
@@ -159,7 +168,7 @@ How these apps keep users signed in (iman-desk note 08, 19 apps sampled): 9 use 
 | One real Farcaster sign-in on trysparkz.com/profile; done when `/api/auth/me` returns his FID | Iman | Test | 2026-11-14 |
 | Sparkz PR: sign-in channel on mount, `redirectUrl`, resume re-poll and pinned domain (section 3, a to d); done when it is merged and a TestFlight build signs in on a phone | Iman | PR | 2026-11-21 |
 | Sparkz PR: `fcRead()` adapter with a Neynar plus Hypersnap fallback; done when it is merged with a test of each backend | Iman | PR | 2026-11-28 |
-| Decide whether Sparkz reads from the Hypersnap side after the fork, or waits a month to watch drift; done when the ruling is in the vault decisions log | Zaal | Decision | 2026-11-20 |
+| Ruled by Zaal 2026-11-12 by DM: Sparkz becomes a Hypersnap client (Sparkz #344). Remaining: approve the new env var `HYPERSNAP_NODE_URL` (CLAUDE.md asks before env-var changes); done when #344 merges or he declines | Zaal | Decision | 2026-11-16 |
 | Share this doc with Iman through iman-desk; done when iman-desk confirms it has sent it | iman-desk lane | Relay | 2026-11-13 |
 
 ## Sources

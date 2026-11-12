@@ -167,7 +167,7 @@ Read-only notes from the sparkz lane, which did not write #344. They are not a g
 |---|---|---|---|
 | One real Farcaster sign-in on trysparkz.com/profile; done when `/api/auth/me` returns his FID | Iman | Test | 2026-11-14 |
 | Sparkz PR: sign-in channel on mount, `redirectUrl`, resume re-poll and pinned domain (section 3, a to d); done when it is merged and a TestFlight build signs in on a phone | Iman | PR | 2026-11-21 |
-| Sparkz PR: `fcRead()` adapter with a Neynar plus Hypersnap fallback; done when it is merged with a test of each backend | Iman | PR | 2026-11-28 |
+| Sparkz #344 (Hypersnap reads, PR 1 of 3): add a 2 s fetch timeout, coerce string FIDs and fix the 1,000 like cap (section 9a); done when #344 merges with those three fixed | Iman | PR | 2026-11-21 |
 | Ruled by Zaal 2026-11-12 by DM: Sparkz becomes a Hypersnap client (Sparkz #344). Remaining: approve the new env var `HYPERSNAP_NODE_URL` (CLAUDE.md asks before env-var changes); done when #344 merges or he declines | Zaal | Decision | 2026-11-16 |
 | Share this doc with Iman through iman-desk; done when iman-desk confirms it has sent it | iman-desk lane | Relay | 2026-11-13 |
 

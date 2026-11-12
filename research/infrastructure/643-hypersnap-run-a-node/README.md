@@ -2,7 +2,7 @@
 topic: infrastructure
 type: decision
 status: research-complete
-last-validated: 2026-10-22
+last-validated: 2026-11-12
 original-query: Should ZAO run its own Hypersnap node, cost vs benefit analysis (reconstructed)
 related-docs: 309, 489, 597
 tier: STANDARD
@@ -15,7 +15,7 @@ source: zaal-forwarded-url-2026-05-11
 
 ## Recommendation (FIRST)
 
-**Updated 2026-10-22: REVISIT.** haatz.quilibrium.com and hypersnap.org could not be resolved from the cloud container proxy on 2026-10-22 (DNS ENOTFOUND from that network). A second resolver check on 2026-10-23 returned A records for both -- the failure may be proxy-local or transient. Verify from the VPS before drawing conclusions. See Updated findings below.
+**Updated 2026-11-12: ZAO now runs its own read node (on the desktop, upgraded to 0.17.5 for the 12 Nov fork); stay a read node, not a validator. See the 2026-11-12 section below.** **Updated 2026-10-22: REVISIT.** haatz.quilibrium.com and hypersnap.org could not be resolved from the cloud container proxy on 2026-10-22 (DNS ENOTFOUND from that network). A second resolver check on 2026-10-23 returned A records for both -- the failure may be proxy-local or transient. Verify from the VPS before drawing conclusions. See Updated findings below.
 
 **Prior recommendation (2026-05-21): SKIP for now - cost-benefit doesn't close.** Hypersnap is legit infrastructure (not an airdrop farm), but ZAO gets full utility today for free via haatz.quilibrium.com with Neynar fallback. Running our own node opens future benefits (data sovereignty, custom indexing, private queries via Quilibrium privacy layer) but only if ZAO needs to operate independently from any third party. Current state: 188-member community, no token rewards, and a strong dual-provider setup already in place. Revisit Oct 2026 when ZAOstock wind-down analysis happens.
 
@@ -118,6 +118,37 @@ Zaal requested this revalidation via email (thread "Anything to research today? 
 1. Check haatz.quilibrium.com from VPS directly to confirm DNS failure is not cloud-proxy-local.
 2. If haatz is down: find alternative public Hypersnap nodes in the farcasterorg community.
 3. Monitor FIP #19 for adoption -- if rewards go live, the cost-benefit reversal Zaal flagged in May becomes concrete.
+
+## Updated 2026-11-12: we run a read node; the 0.17.5 fork; read node vs validator
+
+The SKIP above is overtaken by events: since mid-October 2026 Zaal runs his own Hypersnap read node on his Windows desktop (in WSL and Docker, reachable privately over Tailscale). This section records the 12 November 2026 fork upgrade and the read node vs validator question Zaal asked that day.
+
+**The fork.** farcasterorg/hypersnap's `validators.toml` at commit `d6997349e8421a755cd2bab3434a6e959103242f` adds the first Hypersnap validator set (8 validators, collected in [issue #51](https://github.com/farcasterorg/hypersnap/issues/51), opened 2026-11-03) at per-shard heights 50,477,529 (shard 0), 51,161,786 (shard 1) and 50,996,940 (shard 2), with the gossip topics and native account registration switching at the same heights. The file projects activation at 2026-11-12 20:52:39 UTC from a measured rate of about 0.99 blocks per second; activation is by height, not time. The release is the Docker image `farcasterorg/hypersnap:0.17.5`, pushed 2026-11-12T09:36:59Z per Docker Hub, the same digest as `latest`. GitHub's Releases page still listed v0.11.8 that day, so it is not the place to look for versions [FULL: Docker Hub tags API, GitHub releases API].
+
+**What the upgrade took** (done on the desktop on 12 Nov on Zaal's word, verified from the Mac by `/v1/info` reads): pull the 0.17.5 image pinned by digest; back up and replace `validators.toml`; recreate the container. One config change was needed: 0.17.5 removes the old `read_node` setting in favour of `force_read_node` (`src/cfg.rs` line 115, default `false` at line 148), so the node's role is inferred from its key unless forced; `force_read_node=true` was set through the `SNAPCHAIN_` environment override so the node stays passive. After the upgrade all three shards advanced at about 1 block per second. The API's `blockDelay` field is **seconds since the shard's last block**, not blocks behind; it spiked to 50 to 150 seconds several times in the first hours (index backfill and host memory pressure both present, cause unconfirmed) and recovered each time.
+
+**Read node vs validator** (sources: `src/cfg.rs` and `src/consensus/consensus.rs` at the commit above, the README, issue #51):
+
+| | Read node | Validator |
+|---|---|---|
+| Does | Syncs and stores the chain, serves the read API, relays messages | Also votes on and produces blocks; consensus depends on it being online |
+| How the code decides | `is_read_node()` = `force_read_node` OR the node's key is not in a scheduled validator set (cfg.rs lines 160-161; consensus.rs line 126) | Its Ed25519 public key appears in a `[[consensus.validator_sets]]` entry with an `effective_at` height |
+| Getting in | Anyone can run one | The first set was taken from replies to issue #51 in the form `<domain or IP> <public key> <farcaster name>`; later sets need a new entry in a release [Likely, not stated as a process upstream] |
+| Requirements (README) | Same hardware works | 16 GB RAM, 4 cores, 1.5 TB free disk, a public IP, ports 3381 to 3383 open on TCP and UDP, always on |
+| First set | | cassie, kmacb.eth, derekhoiem, infinitehomie, arfonzo, ivy, mvr, wake |
+
+**Recommendation: stay a read node.** The desktop has no public IP (home network, Tailscale), its free memory fell under 1 GiB several times on 12 Nov, and it runs only while Windows is awake; a validator that drops offline hurts consensus. A read node already gives ZAO a private Farcaster API with no rate limits and no dependence on a third-party endpoint, which is the data-sovereignty benefit this doc weighed in May. If ZAO wants a validator later: a dedicated server with a public IP, then ask in issue #51 how the next set is chosen.
+
+**Keeping it current.** The desktop pins the image by digest, unlike upstream's compose file (`farcasterorg/hypersnap:latest` with `pull_policy: always`). That is safer but manual: each release needs a pull with a digest check, a `validators.toml` swap when the set changes, and a recreate. Someone has to watch for new tags on Docker Hub.
+
+### Sources added 2026-11-12
+
+- [farcasterorg/hypersnap validators.toml at d6997349](https://github.com/farcasterorg/hypersnap/blob/d6997349e8421a755cd2bab3434a6e959103242f/validators.toml) [FULL] - fork heights, the 8 validators, projected activation line
+- [farcasterorg/hypersnap src/cfg.rs at d6997349](https://github.com/farcasterorg/hypersnap/blob/d6997349e8421a755cd2bab3434a6e959103242f/src/cfg.rs) [FULL] - force_read_node, is_read_node
+- [farcasterorg/hypersnap src/consensus/consensus.rs at d6997349](https://github.com/farcasterorg/hypersnap/blob/d6997349e8421a755cd2bab3434a6e959103242f/src/consensus/consensus.rs) [FULL] - is_scheduled_validator
+- [farcasterorg/hypersnap README](https://github.com/farcasterorg/hypersnap#readme) [FULL] - node requirements and upgrade section
+- [Issue #51: Initial Validators](https://github.com/farcasterorg/hypersnap/issues/51) [FULL] - how the first set was collected, 11 comments as of 12 Nov
+- [Docker Hub: farcasterorg/hypersnap tags](https://hub.docker.com/r/farcasterorg/hypersnap/tags) [FULL] - 0.17.5 pushed 2026-11-12T09:36:59Z, same digest as latest
 
 ## Sources
 

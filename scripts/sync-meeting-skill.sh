@@ -15,8 +15,9 @@
 # 15 files only the newer one has. So:
 #
 #   - There is no default direction. No argument prints usage and exits 2.
-#   - A copy that would REMOVE files the destination has and the source lacks
-#     is refused, and the files are listed, unless --delete-extra is also given.
+#   - A copy that would REMOVE anything the destination has and the source
+#     lacks (a file, a symlink, an empty folder) is refused, and the paths are
+#     listed, unless --delete-extra is also given.
 #   - --from-user writes Zaal's own copy into this repo, which is PUBLIC. The
 #     maintained copy carries private paths and names (.claude/skills-archive/
 #     README.md, 2026-10-24). Do not commit the result without a public scan.
@@ -96,8 +97,19 @@ else
 fi
 [[ -d "$SRC" ]] || { echo "ERROR: source dir not found: $SRC" >&2; exit 2; }
 
-# Files the destination has and the source lacks: a copy with --delete removes
-# them. Listed and refused unless the caller said --delete-extra.
+# Everything the destination has and the source lacks: a copy with --delete
+# removes it. That is regular files, symlinks (never followed) and empty
+# folders; a folder with content is covered by the entries inside it. A path
+# that exists on both sides as a different kind (a file here, a folder there)
+# counts too, because the copy replaces it. Listed and refused unless the
+# caller said --delete-extra.
+kind() {
+  if [[ -L "$1" ]]; then echo link
+  elif [[ -d "$1" ]]; then echo dir
+  elif [[ -e "$1" ]]; then echo file
+  else echo none
+  fi
+}
 EXTRA=()
 if [[ -d "$DST" ]]; then
   while IFS= read -r -d '' f; do
@@ -105,12 +117,21 @@ if [[ -d "$DST" ]]; then
     case "$rel" in
       *__pycache__*|*.pyc|.DS_Store|*/.DS_Store) continue ;;
     esac
-    [[ -e "$SRC/$rel" ]] || EXTRA+=("$rel")
-  done < <(find "$DST" -type f -print0)
+    dk="$(kind "$f")"; sk="$(kind "$SRC/$rel")"
+    if [[ "$sk" == none ]]; then
+      case "$dk" in
+        link) EXTRA+=("$rel (symlink)") ;;
+        dir)  EXTRA+=("$rel/ (empty folder)") ;;
+        *)    EXTRA+=("$rel") ;;
+      esac
+    elif [[ "$sk" != "$dk" ]]; then
+      EXTRA+=("$rel ($dk here, $sk in the source; would be replaced)")
+    fi
+  done < <(find "$DST" -mindepth 1 \( -type f -o -type l -o \( -type d -empty \) \) -print0)
 fi
 
 if [[ "${#EXTRA[@]}" -gt 0 && "$DELETE_EXTRA" -ne 1 ]]; then
-  echo "REFUSED: $LABEL would remove ${#EXTRA[@]} file(s) that only the destination has. Nothing copied." >&2
+  echo "REFUSED: $LABEL would remove ${#EXTRA[@]} path(s) that only the destination has. Nothing copied." >&2
   printf '  only in destination: %s\n' "${EXTRA[@]}" >&2
   echo "  destination: $DST" >&2
   echo "If the destination is the older copy and these should go, rerun with --delete-extra." >&2
@@ -122,7 +143,7 @@ fi
 # --checksum: without it rsync skips a file whose size and timestamp match the
 # destination's even when the bytes differ, and "byte-identical" below is false.
 rsync -a --checksum --delete "${RSYNC_X[@]}" "$SRC/" "$DST/"
-echo "[sync] $LABEL done - copies are now byte-identical (${#EXTRA[@]} destination-only file(s) removed)"
+echo "[sync] $LABEL done - copies are now byte-identical (${#EXTRA[@]} destination-only path(s) removed)"
 if [[ "$MODE" == "--from-user" ]]; then
   echo "[sync] this repo is public: scan the result for private paths and names before committing it" >&2
 fi

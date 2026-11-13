@@ -73,7 +73,7 @@ case "$out" in *"neither copy is the source of truth"*) pass "3 --check says nei
 # 4. --to-user onto a destination with files of its own: refused, files named, nothing copied.
 out="$(bash "$SCRIPT" --to-user 2>&1)"; rc=$?
 [ "$rc" -eq 2 ] && pass "4 --to-user over a newer USER exits 2" || fail "4 --to-user exited $rc, want 2"
-case "$out" in *"would remove 2 file(s)"*) pass "4 it counts the 2 destination-only files" ;; *) fail "4 count line: $out" ;; esac
+case "$out" in *"would remove 2 path(s)"*) pass "4 it counts the 2 destination-only files" ;; *) fail "4 count line: $out" ;; esac
 case "$out" in *"scripts/voiceprints.sh"*) pass "4 it names a file it would have removed" ;; *) fail "4 file not named: $out" ;; esac
 [ "$(snap "$SYNC_MEETING_USER_DIR")" = "$before_u" ] && pass "4 USER is untouched, SKILL.md included (no partial copy)" || fail "4 USER changed on a refused copy"
 
@@ -109,6 +109,61 @@ before_r="$(snap "$SYNC_MEETING_REPO_DIR")"
 out="$(bash "$SCRIPT" --from-user --delete-extra 2>&1)"; rc=$?
 [ "$rc" -eq 2 ] && [ "$(snap "$SYNC_MEETING_REPO_DIR")" = "$before_r" ] \
   && pass "8 a missing source dir exits 2 and empties nothing" || fail "8 exited $rc or REPO changed"
+
+# A pair that differs ONLY by one destination-only entry of a kind `find -type f`
+# does not list. The first version of the guard missed both kinds: it copied,
+# removed them, and printed "0 removed" (seat-merge's verdict on PR 4311).
+same_pair() {
+  local n="$1"
+  export SYNC_MEETING_REPO_DIR="$T/$n/repo/meeting"
+  export SYNC_MEETING_USER_DIR="$T/$n/user/meeting"
+  mkdir -p "$SYNC_MEETING_REPO_DIR" "$SYNC_MEETING_USER_DIR"
+  echo "skill" > "$SYNC_MEETING_REPO_DIR/SKILL.md"
+  echo "skill" > "$SYNC_MEETING_USER_DIR/SKILL.md"
+}
+
+# 9. A destination-only SYMLINK is refused and survives.
+same_pair c9
+ln -s SKILL.md "$SYNC_MEETING_USER_DIR/linkonly"
+out="$(bash "$SCRIPT" --to-user 2>&1)"; rc=$?
+[ "$rc" -eq 2 ] && pass "9 a destination-only symlink: --to-user exits 2" || fail "9 symlink case exited $rc, want 2: $out"
+case "$out" in *"would remove 1 path(s)"*"linkonly (symlink)"*) pass "9 the symlink is counted and named" ;; *) fail "9 symlink not named: $out" ;; esac
+[ -L "$SYNC_MEETING_USER_DIR/linkonly" ] && pass "9 the symlink is still there" || fail "9 the symlink was removed"
+
+# 10. A destination-only EMPTY FOLDER is refused and survives.
+same_pair c10
+mkdir "$SYNC_MEETING_USER_DIR/emptydir"
+out="$(bash "$SCRIPT" --to-user 2>&1)"; rc=$?
+[ "$rc" -eq 2 ] && pass "10 a destination-only empty folder: --to-user exits 2" || fail "10 empty-folder case exited $rc, want 2: $out"
+case "$out" in *"would remove 1 path(s)"*"emptydir/ (empty folder)"*) pass "10 the empty folder is counted and named" ;; *) fail "10 empty folder not named: $out" ;; esac
+[ -d "$SYNC_MEETING_USER_DIR/emptydir" ] && pass "10 the empty folder is still there" || fail "10 the empty folder was removed"
+
+# 11. Both kinds, a dangling symlink too, with --delete-extra: removed, and the count is true.
+same_pair c11
+ln -s SKILL.md "$SYNC_MEETING_USER_DIR/linkonly"
+ln -s nowhere "$SYNC_MEETING_USER_DIR/dangling"
+mkdir "$SYNC_MEETING_USER_DIR/emptydir"
+out="$(bash "$SCRIPT" --to-user 2>&1)"; rc=$?
+case "$out" in *"would remove 3 path(s)"*) pass "11 symlink, dangling symlink and empty folder are all counted (3)" ;; *) fail "11 count: $out" ;; esac
+out="$(bash "$SCRIPT" --to-user --delete-extra 2>&1)"; rc=$?
+[ "$rc" -eq 0 ] && pass "11 --delete-extra exits 0" || fail "11 exited $rc: $out"
+case "$out" in *"(3 destination-only path(s) removed)"*) pass "11 the success line says 3 removed, not 0" ;; *) fail "11 success line: $out" ;; esac
+[ ! -e "$SYNC_MEETING_USER_DIR/emptydir" ] && [ ! -L "$SYNC_MEETING_USER_DIR/linkonly" ] && [ ! -L "$SYNC_MEETING_USER_DIR/dangling" ] \
+  && pass "11 all three are gone after --delete-extra" || fail "11 something survived --delete-extra"
+
+# 12. Same name, different kind (a file here, a folder in the source): refused, named.
+same_pair c12
+mkdir "$SYNC_MEETING_REPO_DIR/refs"; echo "x" > "$SYNC_MEETING_REPO_DIR/refs/a.md"
+echo "i am a file" > "$SYNC_MEETING_USER_DIR/refs"
+out="$(bash "$SCRIPT" --to-user 2>&1)"; rc=$?
+[ "$rc" -eq 2 ] && [ -f "$SYNC_MEETING_USER_DIR/refs" ] && pass "12 a file that the copy would replace with a folder is refused and survives" || fail "12 exited $rc or the file was replaced: $out"
+
+# 13. Nothing destination-only: an in-sync pair with a shared empty folder and a shared symlink copies cleanly.
+same_pair c13
+mkdir "$SYNC_MEETING_REPO_DIR/emptydir" "$SYNC_MEETING_USER_DIR/emptydir"
+ln -s SKILL.md "$SYNC_MEETING_REPO_DIR/link"; ln -s SKILL.md "$SYNC_MEETING_USER_DIR/link"
+out="$(bash "$SCRIPT" --to-user 2>&1)"; rc=$?
+[ "$rc" -eq 0 ] && pass "13 shared symlink and shared empty folder are not counted as destination-only" || fail "13 exited $rc: $out"
 
 echo
 echo "fixtures left in: $T"

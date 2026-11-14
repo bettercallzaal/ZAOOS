@@ -32,6 +32,7 @@ import {
   runCritiqueModel,
   type CritiqueOutput,
 } from './types';
+import { withUrlCheck } from './url-check';
 
 export interface ResearchCritiqueInput {
   /** The research doc markdown to score. */
@@ -127,7 +128,7 @@ export async function runResearchCritic(
     };
   }
 
-  return {
+  const critique: CritiqueOutput = {
     score: parsed.score,
     summary: parsed.summary || `score ${parsed.score}/100`,
     issues: parsed.issues,
@@ -139,4 +140,7 @@ export async function runResearchCritic(
     durationMs: result.durationMs,
     reviewerFamily: result.reviewerFamily,
   };
+  // Requirement 8 by real fetches, not by reading (url-check.ts,
+  // ZOE_RESEARCH_URL_CHECK=1; off = this critique unchanged).
+  return (await withUrlCheck(critique, input.doc)) ?? critique;
 }

@@ -128,13 +128,21 @@ describe('failure memory golden pre-enable gate', () => {
     expect(block).not.toContain('[object Object]');
   });
 
-  // Expected to expose a pre-enable gap on current main: isOpsFailure gets
-  // the raw object and String(object) loses its operational error message.
+  // Guards the operational-failure check on object errors: it must judge the
+  // serialized text that is rendered, not String(object).
   it.each([{ message: '401 unauthorized' }, { detail: '429 rate limit' }])
     ('excludes serialized operational errors %j as well as strings', async (error) => {
       history('2026-11-11', [run({ error: error as unknown as string })]);
       expect(await failureMemoryBlock('research-worker')).toBe('');
     });
+
+  it('keeps a real rejection when only the critic note mentions an operational word', async () => {
+    history('2026-11-11', [run({ error: 'invented a source URL', criticSummary: 'the check hit a timeout' })]);
+    const block = await failureMemoryBlock('research-worker');
+    expect(block.split('\n').filter((line) => line.startsWith('- '))).toEqual([
+      '- 2026-11-11 (goal: "research venue"): "invented a source URL | critic: the check hit a timeout"',
+    ]);
+  });
 
   it('uses runtime Error messages and keeps critic detail when serialization fails', () => {
     const circular: Record<string, unknown> = {};

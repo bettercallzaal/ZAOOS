@@ -43,29 +43,39 @@ export interface FailureEntry {
   reason: string;
 }
 
+/**
+ * The error part of a run's reason, as rendered, or null when there is none.
+ * The critic note is deliberately not part of it: the operational-failure check
+ * runs on this text alone, so a critic note that says "timeout" cannot hide a
+ * real rejection.
+ */
+export function errorText(r: RunRecord): string | null {
+  if (r.error === null || r.error === undefined) return null;
+  if (typeof r.error === 'string') {
+    // An empty string is no reason at all, as before this change.
+    return r.error || null;
+  }
+  if ((r.error as unknown) instanceof Error) {
+    // JSON.stringify(new Error('boom')) is "{}": the message is the reason.
+    return (r.error as unknown as Error).message || null;
+  }
+  try {
+    const json = JSON.stringify(r.error);
+    // "{}" says nothing; skip it rather than record an empty reason.
+    return json !== undefined && json !== '{}' ? json : null;
+  } catch {
+    // A malformed runtime value should not prevent other failure details
+    // from being recorded.
+    return null;
+  }
+}
+
 /** The one-line reason a run went wrong, or null when there is nothing to say. */
 export function failureReason(r: RunRecord): string | null {
   if (r.status === 'completed') return null;
   const parts: string[] = [];
-  if (r.error !== null && r.error !== undefined) {
-    if (typeof r.error === 'string') {
-      // An empty string is no reason at all, as before this change.
-      if (r.error) parts.push(r.error);
-    } else if ((r.error as unknown) instanceof Error) {
-      // JSON.stringify(new Error('boom')) is "{}": the message is the reason.
-      const message = (r.error as unknown as Error).message;
-      if (message) parts.push(message);
-    } else {
-      try {
-        const json = JSON.stringify(r.error);
-        // "{}" says nothing; skip it rather than record an empty reason.
-        if (json !== undefined && json !== '{}') parts.push(json);
-      } catch {
-        // A malformed runtime value should not prevent other failure details
-        // from being recorded.
-      }
-    }
-  }
+  const error = errorText(r);
+  if (error) parts.push(error);
   if (r.criticSummary) parts.push(`critic: ${r.criticSummary}`);
   else if (r.criticIssues?.length) parts.push(`critic: ${r.criticIssues[0]}`);
   if (parts.length === 0) return null;
@@ -90,7 +100,10 @@ export function recentFailuresFor(worker: string, runs: RunRecord[], max: number
     if (r.worker !== worker) continue;
     const reason = failureReason(r);
     if (!reason) continue;
-    if (r.error && isOpsFailure(r.error)) continue;
+    // Test the text that gets rendered, so a serialized object error is judged
+    // like the string it becomes, not as "[object Object]".
+    const error = errorText(r);
+    if (error && isOpsFailure(error)) continue;
     const clean = clip(redactForErrorRow(reason), REASON_MAX);
     const key = clean.toLowerCase().replace(/\d+/g, 'N');
     if (seen.has(key)) continue;

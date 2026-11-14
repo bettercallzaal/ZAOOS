@@ -2,7 +2,7 @@
 topic: agents
 type: research
 status: research-complete
-last-validated: 2026-05-21
+last-validated: 2026-11-14
 original-query: Evaluate three tools found on X/Twitter for ZAO agent squad relevance - (1) Trellis multi-agent framework, (2) GitNexus codebase knowledge graph, (3) exploraX 40 High-Impact Prompts collection (reconstructed)
 tier: high
 ---
@@ -239,12 +239,44 @@ Before submitting any PR:
 
 ---
 
+## Updated 2026-11-14
+
+Revalidation sourced from: GitHub pages for GitNexus (FULL fetch 2026-11-14) and Trellis (FULL fetch 2026-11-14); WebSearch for both tools.
+
+### GitNexus
+
+**Stars as of 2026-11-14:** 48.5K (was 24.2K in April 2026 -- doubled in ~7 months).
+
+**License:** PolyForm Noncommercial 1.0.0 unchanged, but commercial licensing now offered through akonlabs.com (source: github.com/abhigyanpatwari/GitNexus, FULL fetch 2026-11-14). The original concern about commercial use risk has a resolution path.
+
+**Storage backend:** LadybugDB confirmed as current (page notes it is "formerly KuzuDB" -- the rename already happened before the April 2026 doc was written).
+
+**MCP tool count:** Main readme lists 6 tools (`query`, `context`, `impact`, `trace`, `detect_changes`, `rename`). The April 2026 doc cited 16; the current main page shows 6. `trace` appears to be a new addition; full MCP reference count UNVERIFIED (reference doc not fetched).
+
+**ZAO status update -- CRITICAL:** `CLAUDE.md` (project instructions, in-repo) records GitNexus as disabled: "Disabled (do not propose): gitnexus, ECC memory, sequential-thinking -- 0 use, pure context cost." The doc's "INSTALL FOR LOCAL DEV" recommendation was acted on, tried, and reversed. The verdict for ZAO changes from INSTALL to DISABLED/TRIED. The commercial licensing development is noted but does not reopen the ZAO verdict absent Zaal review.
+
+### Trellis
+
+**Stars as of 2026-11-14:** 15.1K (was 4.9K in April 2026 -- tripled).
+
+**Sub-agent workflows added:** Current GitHub page (FULL fetch 2026-11-14) describes `trellis-research`, `trellis-implement`, and `trellis-check` sub-agents invoked within a workflow. This is closer to agent-to-agent coordination than the April 2026 description ("helps a single developer use multiple AI coding tools consistently"). A `trellis channel` command for worker-supervisor runtime was mentioned in web search results (source: vibecodinghub.org and sourcepulse.org, snippet only -- UNVERIFIED via full fetch because docs.trytrellis.app was outside the session's allowed network).
+
+**Platform support:** 22 AI coding platforms (was 13 in April 2026).
+
+**ZAO verdict update:** Still SKIP for ZAO. The sub-agent features are for structured workflows within a single codebase, not autonomous agent-to-agent messaging at the ZOE/BUILDER level. ZAO's surface has consolidated since April 2026 (doc 601 cleanup); ZOE covers the orchestration role Trellis approaches from a human-developer angle.
+
+### exploraX_ Prompts
+
+No material change found. The collection was a static X thread; no new version or update identified.
+
+---
+
 ## Sources
 
-- [Trellis GitHub](https://github.com/mindfold-ai/Trellis) -- 4.9K stars, AGPL-3.0, multi-platform AI coding framework
-- [Trellis on opensourceprojects.dev](https://www.opensourceprojects.dev/post/e954a5d2-5ac6-4c51-9ee3-b2f78131ea4b)
-- [GitNexus GitHub](https://github.com/abhigyanpatwari/GitNexus) -- 24.2K stars, PolyForm Noncommercial, codebase knowledge graph
-- [GitNexus docs](https://gitnexus.vercel.app) -- web UI and documentation
+- [Trellis GitHub](https://github.com/mindfold-ai/Trellis) -- 15.1K stars as of 2026-11-14 (FULL fetch), AGPL-3.0
+- [Trellis review (snippet)](https://vibecodinghub.org/blog/trellis-review) -- mentions v0.6.0 channel command (UNVERIFIED full fetch)
+- [GitNexus GitHub](https://github.com/abhigyanpatwari/GitNexus) -- 48.5K stars as of 2026-11-14 (FULL fetch), PolyForm Noncommercial
+- [GitNexus commercial licensing](https://akonlabs.com) -- commercial license option noted in repo (not fetched)
 - [@exploraX_ on X](https://x.com/exploraX_) -- 40 High-Impact Prompts collection
 - [Doc 202: Multi-Agent Orchestration](../202-multi-agent-orchestration-openclaw-paperclip/) -- existing ZAO agent hierarchy design
 - [Doc 227: Agentic Workflows 2026](../227-agentic-workflows-2026/) -- framework comparison

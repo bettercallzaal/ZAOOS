@@ -17,7 +17,8 @@ import { recordCall } from './cost-ledger';
 import { runConciergeGuardrails } from './guardrail-adapters';
 import { redactPii } from './pii';
 import type { ConciergeOptions, ConciergeResult, TaskOp, QuestOp, ZoeCaptureNote, BotRelayOp, CrmOp, ThreadOp } from './types';
-import { selectModel, ZOE_DEFAULT_MODEL } from './types';
+import { ZOE_DEFAULT_MODEL } from './types';
+import { pickModel } from './model-classifier';
 import type { MemoryBlocks } from './memory';
 import { shouldUseRouting, selectBestModel, routeAndCall, callCapFallback, hasCapFallbackProvider } from './models/router';
 
@@ -121,7 +122,12 @@ export function buildSystemBlocks(blocks: MemoryBlocks, currentDate: string, rec
     ``,
     `<capabilities>`,
     `What you can see and do right now (zoe-conversational spec):`,
-    `- You see THIS chat and its recent turns (<working_memory> below). You can read the ZAO repo, the research library, the tasks board, and the ZABAL Bonfire graph (via recall).`,
+    // Scope-true (card 10668, 2026-11-10): outside Zaal's DM a turn has no
+    // tools (scope-lock.ts toolPolicyForScope) and no Bonfire recall (private
+    // only), so the repo/board/Bonfire line was false there.
+    isPrivate
+      ? `- You see THIS chat and its recent turns (<working_memory> below). You can read the ZAO repo, the research library, the tasks board, and the ZABAL Bonfire graph (via recall).`
+      : `- You see THIS chat and its recent turns (<working_memory> below), plus any blocks below. In this chat you have no tools: you cannot read the ZAO repo, the research library, the tasks board or the Bonfire graph. Answer from what is here.`,
     `- You do NOT have eyes on anything outside this chat: no WhatsApp, no SMS, no email inbox, no phone, no screen, no other Telegram chats. If someone references a file, doc, screenshot, or link they "sent" somewhere else (WhatsApp, a DM, email, another app), you did NOT receive it and cannot open it.`,
     `- The move when that happens: say so plainly in one line and ask them to forward or paste it INTO this chat. Example: "I can't see WhatsApp - forward the docs here and I'll read them." Never pretend to check. Never assume someone is sending YOU a file right now unless it actually arrived in this chat.`,
     `</capabilities>`,
@@ -316,7 +322,7 @@ async function runConciergeTurnIn(
       } catch (error: unknown) {
         // Routing failed - fall back to Claude CLI
         console.warn('[zoe/concierge] routed call failed, falling back to Claude CLI:', error instanceof Error ? error.message : String(error));
-        selectedModel = opts.model ?? selectModel(opts.message);
+        selectedModel = opts.model ?? await pickModel(opts.message);
         result = await callModelWithCliRouting({
           model: selectedModel,
           prompt: userPrompt,
@@ -332,7 +338,7 @@ async function runConciergeTurnIn(
       }
     } else {
       // Routing selected Claude - use CLI normally
-      selectedModel = opts.model ?? selectModel(opts.message);
+      selectedModel = opts.model ?? await pickModel(opts.message);
       result = await callModelWithCliRouting({
         model: selectedModel,
         prompt: userPrompt,
@@ -348,7 +354,7 @@ async function runConciergeTurnIn(
     }
   } else {
     // Routing disabled - use default Claude path
-    selectedModel = opts.model ?? selectModel(opts.message);
+    selectedModel = opts.model ?? await pickModel(opts.message);
     result = await callModelWithCliRouting({
       model: selectedModel,
       prompt: userPrompt,

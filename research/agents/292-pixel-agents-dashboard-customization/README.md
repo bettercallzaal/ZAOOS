@@ -2,7 +2,7 @@
 topic: agents
 type: research
 status: research-complete
-last-validated: 2026-05-21
+last-validated: 2026-11-12
 original-query: Make pixels.zaoos.com interactive - click-to-dispatch, ZAO branding, Supabase integration (reconstructed)
 tier: archive-candidate
 notes: Dashboard research for pixels.zaoos.com (Pixel Agents = FISHBOWLZ-adjacent project). FISHBOWLZ killed 2026-05-04. Archive recommended unless pixels standalone persists.
@@ -131,12 +131,44 @@ The admin dashboard at `/admin` → Squad tab (`src/components/admin/agents/`) p
 
 Pixel Agents is the "fun" visual layer; the admin dashboard is the "data" layer. Both read from the same `agent_events` Supabase table.
 
+## Updated 2026-11-12
+
+The agent visualization space has grown significantly since this doc was written. Key verified changes:
+
+**Star growth on referenced repos (as of 2026-11-12):**
+- pixel-agents (pablodelucca): 10.2k stars (was 6,191 in April 2026, +65%) -- source: github.com/pablodelucca/pixel-agents, page fetch PARTIAL (star count confirmed, commit date not shown)
+
+**New tool - Claude Office Visualizer (paulrobello/claude-office):** 616 stars, v0.25.1 November 2026 -- source: github.com/paulrobello/claude-office, FULL fetch confirmed.
+- Description: "Real-time pixel art office simulation that visualizes Claude Code operations."
+- Multi-floor building view with boss/employee agents (main Claude + subagents), Command Center showing all live sessions, 12-mode whiteboard (todo, kanban, tool usage chart, etc.), context-window trashcan that fills and gets stomped during compaction, git status panel, day/night city skyline, OpenCode plugin.
+- Stack: Next.js + PixiJS + FastAPI + Zustand.
+- More mature than any tool in the original comparison table; the most ZAO-relevant new entrant.
+
+**New tool - Clawffice (ractive/clawffice):** 1 star, Phaser 3 + TypeScript + Bun -- source: github.com/ractive/clawffice, FULL fetch confirmed.
+- Claude Code agents appear as The Office characters (Michael, Dwight, Jim, Pam) in a top-down Dunder Mifflin office. WebSocket connection, MIT. Novelty project; no meaningful traction yet.
+
+**New tool - Moltcraft (askmojo/moltcraft):** Isometric pixel dashboard, zero npm deps, pure vanilla JS, ~2MB, 32 stars, launched January 2026, MIT (README badge only, no LICENSE file) -- source: search engine summary, UNVERIFIED feature details; repo confirmed at github.com/askmojo/moltcraft (2026-11-13). Click-on-buildings shows cron jobs, token usage, skills, channels.
+
+**Updated comparison:**
+
+| Tool | Stars (2026-11-12) | New since doc? | ZAO Fit |
+|------|-------------------|----------------|---------|
+| **Claude Office Visualizer** (paulrobello/claude-office) | 616 | YES | High - WebSocket, subagent support, git panel |
+| **pixel-agents** (pablodelucca) | 10.2k | No (grew) | Low - VS Code extension |
+| **Moltcraft** (askmojo/moltcraft) | 32 | YES | Medium - isometric, zero-dep; feature details unverified |
+| **Clawffice** (ractive/clawffice) | 1 | YES | Low - novelty only |
+
+**Recommendation unchanged:** Doc status remains archive-candidate since FISHBOWLZ is dead and pixels.zaoos.com use is unclear. If ZAO ever revives the pixel dashboard, claude-office (paulrobello) is the strongest new option to evaluate alongside the existing OpenClaw fork.
+
 ## Sources
 
 - [OpenClaw Pixel Agents Fork](https://github.com/jaffer1979/openclaw-pixel-agents-dashboard) — MIT, 2 stars
-- [Original Pixel Agents](https://github.com/pablodelucca/pixel-agents) — MIT, 6,191 stars
+- [Original Pixel Agents](https://github.com/pablodelucca/pixel-agents) - MIT, 6,191 stars (now 10.2k as of 2026-11-12)
 - [Miniverse](https://github.com/ianscott313/miniverse) — MIT, 228 stars
 - [Agent Town](https://github.com/geezerrrr/agent-town) — MIT, 109 stars
 - [Star-Office-UI](https://github.com/ringhyacinth/Star-Office-UI) — MIT, 6,539 stars
 - [Agent Office](https://github.com/harishkotra/agent-office) — MIT, 43 stars
 - [Cursor Office](https://github.com/ofershap/cursor-office) — MIT, 37 stars
+- [Claude Office Visualizer](https://github.com/paulrobello/claude-office) - MIT, 616 stars (added 2026-11-12 revalidation)
+- [Clawffice](https://github.com/ractive/clawffice) - MIT, 1 star (added 2026-11-12 revalidation)
+- [Moltcraft](https://github.com/askmojo/moltcraft) - 32 stars, repo URL verified 2026-11-12; MIT from README badge only, no LICENSE file; launched Jan 2026 (added 2026-11-12 revalidation)

@@ -28,6 +28,8 @@ export interface GoldenExpect {
   minLength?: number;
   /** output (or a {...} block inside it) must JSON-parse. */
   jsonParseable?: boolean;
+  /** at most this many question marks (the "one question, with a default" rule). */
+  maxQuestions?: number;
 }
 
 export interface GoldenCase {
@@ -72,6 +74,10 @@ export function gradeOutput(output: string, expect: GoldenExpect): { pass: boole
       continue;
     }
     if (!re.test(output)) failures.push(`did not match /${src}/i`);
+  }
+  if (typeof expect.maxQuestions === 'number') {
+    const q = (output.match(/\?/g) ?? []).length;
+    if (q > expect.maxQuestions) failures.push(`too many questions (${q} > ${expect.maxQuestions})`);
   }
   if (expect.jsonParseable) {
     const m = output.match(/\{[\s\S]*\}|\[[\s\S]*\]/);

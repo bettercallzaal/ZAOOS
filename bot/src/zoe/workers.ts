@@ -31,6 +31,7 @@ import { runResearchCritic } from './critics/research-critic';
 import { runCommsCritic } from './critics/comms-critic';
 import { runTaskResultCritic } from './critics/task-result-critic';
 import { readLearnings } from './learn';
+import { failureMemoryBlock } from './failure-memory';
 
 /** Workers runnable via direct callClaudeCli here (everything except hermes). */
 export type ClaudeWorkerKind = Exclude<WorkerKind, 'hermes'>;
@@ -286,9 +287,12 @@ async function loadSpec(worker: ClaudeWorkerKind, context: ZoeContext): Promise<
   const spec = stripFrontmatter(raw);
   // Gap 5: fold in any Zaal-approved learnings accrued for this worker.
   const learnings = await readLearnings(worker);
-  return learnings.trim()
+  const withLearnings = learnings.trim()
     ? `${spec}\n\n# Learnings (apply these — accrued from past runs)\n\n${learnings.trim()}`
     : spec;
+  // The worker's own recent failures (failure-memory.ts, ZOE_FAILURE_MEMORY=1).
+  const failures = await failureMemoryBlock(worker);
+  return failures ? `${withLearnings}\n\n${failures}` : withLearnings;
 }
 
 function buildWorkerPrompt(args: RunWorkerArgs, criticFeedback?: string): string {

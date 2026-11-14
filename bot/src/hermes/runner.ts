@@ -5,6 +5,7 @@ import { openPullRequest } from './pr';
 import { runPreFlightGate } from './preflight';
 import { watchPullRequest } from './pr-watcher';
 import { createRun, updateRun } from './db';
+import { listTouchedFiles, normalizeWriteSet, outsideWriteSet, writeSetBrief } from './write-set';
 import { emitReceipt } from '../zoe/receipts';
 import {
   HERMES_DEFAULT_MAX_ATTEMPTS,
@@ -67,6 +68,14 @@ export interface DispatchInput {
    * their behavior is byte-identical.
    */
   shouldCancel?: () => boolean;
+  /**
+   * The only paths this build may change (write-set.ts): exact files, or a
+   * directory ending in "/". Checked against the real work tree after every
+   * coder attempt and again before the push; a change outside it fails the
+   * attempt. Omitted = no limit beyond HERMES_FORBIDDEN_PATHS (today's
+   * behavior for every existing caller). An empty or invalid set fails the run.
+   */
+  writeSet?: string[];
 }
 
 /**
@@ -149,6 +158,15 @@ export async function dispatchHermesRun(
   };
 
   try {
+    // Validated before anything is cloned: a bad write-set fails the run
+    // (WriteSetError, caught below) instead of running with no limit.
+    const writeSet = input.writeSet ? normalizeWriteSet(input.writeSet) : null;
+    const fixerIssueText = writeSet ? `${input.issue_text}\n\n${writeSetBrief(writeSet)}` : input.issue_text;
+    // The out-of-set paths in the work tree right now, or [] with no write-set.
+    // listTouchedFiles throws on a git error, which fails the run closed.
+    const writeSetOffenders = async (): Promise<string[]> =>
+      writeSet ? outsideWriteSet(await listTouchedFiles(workdir), writeSet) : [];
+
     await cloneAndBranch(workdir, branchName, targetRepo);
 
     let attempt = 0;
@@ -167,7 +185,7 @@ export async function dispatchHermesRun(
       let fixerOut;
       try {
         fixerOut = await runFixer({
-          issueText: input.issue_text,
+          issueText: fixerIssueText,
           workTreePath: workdir,
           branchName,
           attemptNumber: attempt,
@@ -190,6 +208,16 @@ export async function dispatchHermesRun(
       if (fixerOut.filesChanged.length === 0) {
         lastFeedback = 'fixer produced no file changes; revise and try again';
         await narrator?.onRetry?.(created.id, attempt + 1, lastFeedback);
+        continue;
+      }
+
+      // Write-set gate, on the real tree (tracked + untracked), not the coder's claim.
+      const offenders = await writeSetOffenders();
+      if (offenders.length > 0) {
+        lastFeedback = `You changed files outside the write-set: ${offenders.join(', ')}. Change only the write-set paths.`;
+        await updateRun(created.id, { critic_feedback: `write-set: ${offenders.join(', ').slice(0, 800)}` });
+        await narrator?.onRetry?.(created.id, attempt + 1, `Write-set violated: ${offenders.join(', ').slice(0, 200)}`);
+        await resetToMain(workdir);
         continue;
       }
 
@@ -240,6 +268,17 @@ export async function dispatchHermesRun(
         // report "Built it: PR #N" one message after "No PR will open".
         const cancelledBeforePr = await finishIfCancelled();
         if (cancelledBeforePr) return cancelledBeforePr;
+
+        // Second write-set check, right before the push: pre-flight and the
+        // critic ran in this tree after the first one.
+        const offendersAtPush = await writeSetOffenders();
+        if (offendersAtPush.length > 0) {
+          lastFeedback = `Files outside the write-set appeared before the push: ${offendersAtPush.join(', ')}.`;
+          await updateRun(created.id, { critic_feedback: `write-set at push: ${offendersAtPush.join(', ').slice(0, 800)}` });
+          await narrator?.onRetry?.(created.id, attempt + 1, lastFeedback.slice(0, 200));
+          await resetToMain(workdir);
+          continue;
+        }
 
         await commitAndPush(workdir, branchName, fixerOut.commitMessage);
         const pr = await openPullRequest({

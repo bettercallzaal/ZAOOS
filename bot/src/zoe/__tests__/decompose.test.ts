@@ -1,7 +1,7 @@
 import { test } from 'vitest';
 import assert from 'node:assert/strict';
 
-import { shouldDecompose, renderPlanForApproval } from '../decompose.ts';
+import { shouldDecompose, renderPlanForApproval, innerText, wrapQuotedReply } from '../decompose.ts';
 import type { DecompositionPlan } from '../decompose.ts';
 
 // =========================
@@ -38,6 +38,64 @@ test('shouldDecompose returns true for multi-step goals', () => {
 test('shouldDecompose returns false for y/n one-word replies', () => {
   assert.equal(shouldDecompose('yes'), false);
   assert.equal(shouldDecompose('no'), false);
+});
+
+// Item 193 (vault decisions, 2026-11-04): plain talk is answered inline. These
+// are Zaal's messages from his 1-4 Nov Telegram export, verbatim; every one got
+// "Decomposing into a routed plan" from the old rule.
+const PLANNED_BY_MISTAKE = [
+  'I want to use text or audio whatever more convient at that time so you should send both',
+  'Honestly we shouldn’t be using open router anyways for our agent. Let’s research what others use.',
+  'I can’t read this at all in telegram',
+  'Priority is upgrading Zoe by identifying gaps fixing and testing them',
+  'Please loop on this task',
+  'Just honestly back and forth conversation and keeping memories',
+  "Okay, I'm gonna start doing voice notes in Telegram. I think that's the most effective way to do things. I also like listening to voice notes from the ZO. So let's start here. What are our cues? What's the to-do's today?",
+];
+
+test.each(PLANNED_BY_MISTAKE)('plain talk stays inline: %s', (msg) => {
+  assert.equal(shouldDecompose(msg), false);
+});
+
+// The quoted message is context, not the ask. A long bot plan full of " and "
+// and " then " used to make any short reply look multi-step.
+const QUOTED_PLAN =
+  'Plan: Upgrade ZOE by auditing for gaps, then fixing and testing them, and then research the routing and build the formatter.';
+
+test.each(PLANNED_BY_MISTAKE)('a quote-reply is judged on his words only: %s', (msg) => {
+  assert.equal(shouldDecompose(wrapQuotedReply(QUOTED_PLAN, msg)), false);
+});
+
+test('the quoted plan alone still reads as multi-step (control for the case above)', () => {
+  assert.equal(shouldDecompose(QUOTED_PLAN), true);
+});
+
+test('a multi-step ask in his own reply still plans when quote-replying', () => {
+  assert.equal(
+    shouldDecompose(wrapQuotedReply('ok', 'research the hosting options and then draft a one-pager for Iman')),
+    true,
+  );
+});
+
+test('an explicit decompose in his own reply plans', () => {
+  assert.equal(shouldDecompose('please decompose the launch checklist for the stage'), true);
+});
+
+test('innerText strips exactly the wrapper wrapQuotedReply builds', () => {
+  assert.equal(innerText(wrapQuotedReply('earlier "message" with ]\n\n inside', 'zol yes')), 'zol yes');
+  assert.equal(innerText('no wrapper here'), 'no wrapper here');
+});
+
+test('wrapQuotedReply keeps the #4244 wrapper shape and caps the quote at 1200 chars', () => {
+  const w = wrapQuotedReply('q'.repeat(1500), 'yes');
+  assert.ok(w.startsWith('[Zaal is replying to your earlier message:\n"'));
+  assert.ok(w.endsWith('"]\n\nHis reply: yes'));
+  assert.equal(w.length, '[Zaal is replying to your earlier message:\n"'.length + 1200 + '"]\n\nHis reply: yes'.length);
+});
+
+test('a work verb without a sequence, or a sequence without a work verb, stays inline', () => {
+  assert.equal(shouldDecompose('can you research what other agent builders use for routing'), false);
+  assert.equal(shouldDecompose('I went to the gym and then had breakfast with my family'), false);
 });
 
 // =========================

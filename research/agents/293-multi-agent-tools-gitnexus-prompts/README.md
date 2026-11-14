@@ -19,7 +19,7 @@ tier: high
 | Decision | Recommendation |
 |----------|----------------|
 | **Trellis (multi-agent orchestration)** | SKIP -- solves a different problem than ZAO needs. Trellis is a spec/task/journal framework for human developers using AI coding tools, not an agent-to-agent orchestrator. ZAO already has OpenClaw + Paperclip (Doc 202) which is purpose-built for autonomous agent hierarchies |
-| **GitNexus (codebase knowledge graph)** | INSTALL FOR LOCAL DEV -- genuine value for Claude Code sessions. `npx gitnexus analyze` indexes ZAO OS into a queryable dependency graph via MCP. BUILDER agent on VPS could also use it. But license is PolyForm Noncommercial -- cannot use in production/commercial contexts |
+| **GitNexus (codebase knowledge graph)** | INSTALL FOR LOCAL DEV -- genuine value for Claude Code sessions. `npx gitnexus analyze` indexes ZAO OS into a queryable dependency graph via MCP. BUILDER agent on VPS could also use it. But license is PolyForm Noncommercial -- cannot use in production/commercial contexts. **Superseded 2026-11-14: tried and disabled (see Updated section below).** |
 | **GitNexus for VPS agents** | DEFER -- the MCP server requires Node.js and local filesystem access. VPS agents (ZOE/ZOEY) run in Docker containers with OpenClaw. Adding another MCP server adds complexity for marginal gain since agents already have Supabase MCP + GitHub MCP |
 | **exploraX_ 40 Prompts** | CHERRY-PICK 5-6 prompts as SOUL.md improvements for specific agents. The full list is a generic prompt collection, but several coding-specific prompts map directly to agent roles |
 | **Overall verdict** | 1 install (GitNexus local), 0 new frameworks, 5-6 prompt extractions for SOUL.md files |
@@ -245,7 +245,7 @@ Revalidation sourced from: GitHub pages for GitNexus (FULL fetch 2026-11-14) and
 
 ### GitNexus
 
-**Stars as of 2026-11-14:** 48.5K (was 24.2K in April 2026 -- doubled in ~7 months).
+**Stars as of 2026-11-14:** 48.5K (was 24.2K as of 2026-04-06 -- doubled in ~7 months).
 
 **License:** PolyForm Noncommercial 1.0.0 unchanged, but commercial licensing now offered through akonlabs.com (source: github.com/abhigyanpatwari/GitNexus, FULL fetch 2026-11-14). The original concern about commercial use risk has a resolution path.
 
@@ -267,7 +267,7 @@ Revalidation sourced from: GitHub pages for GitNexus (FULL fetch 2026-11-14) and
 
 ### exploraX_ Prompts
 
-No material change found. The collection was a static X thread; no new version or update identified.
+Not rechecked. The original source is a static X thread (`@exploraX_`) with no version or release history; no new publication was identified in the 2026-11-14 WebSearch pass.
 
 ---
 

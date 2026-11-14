@@ -36,6 +36,15 @@ jobs:
           echo "exit=$?" >> "$GITHUB_OUTPUT"
           set -e
 
+      # A pull request from a fork gets a read-only GITHUB_TOKEN whatever the
+      # permissions block above asks for, so the comment calls answer 403
+      # "Resource not accessible by integration". That used to fail this step,
+      # which failed the job AND skipped Enforce ratchet below, so a fork PR
+      # was red for the comment and never for its debt. On a fork PR a 403
+      # from the comment calls is now a warning and the report goes to the job
+      # summary instead. Every other error, and any error on a same-repo PR,
+      # still fails the step. The ratchet itself is the next step and is
+      # unchanged: it fails closed on new debt, fork or not.
       - name: Upsert sticky PR comment
         uses: actions/github-script@v7
         with:
@@ -45,12 +54,21 @@ jobs:
             const marker = '<!-- estate-control-plane -->';
             const { owner, repo } = context.repo;
             const issue_number = context.issue.number;
-            const { data: comments } = await github.rest.issues.listComments({ owner, repo, issue_number });
-            const existing = comments.find((c) => c.body && c.body.includes(marker));
-            if (existing) {
-              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
-            } else {
-              await github.rest.issues.createComment({ owner, repo, issue_number, body });
+            const pr = context.payload.pull_request;
+            const headRepo = pr && pr.head && pr.head.repo ? pr.head.repo.full_name : null;
+            const isFork = headRepo !== `${owner}/${repo}`;
+            try {
+              const { data: comments } = await github.rest.issues.listComments({ owner, repo, issue_number });
+              const existing = comments.find((c) => c.body && c.body.includes(marker));
+              if (existing) {
+                await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+              } else {
+                await github.rest.issues.createComment({ owner, repo, issue_number, body });
+              }
+            } catch (err) {
+              if (!(isFork && err && err.status === 403)) throw err;
+              core.warning(`Estate comment not posted: this PR is from a fork (${headRepo || 'head repo gone'}) and its token cannot write comments (${err.message}). The report is in the job summary. The ratchet step still runs.`);
+              await core.summary.addRaw(body, true).write();
             }
 
       - name: Enforce ratchet

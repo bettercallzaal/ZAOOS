@@ -40,6 +40,7 @@
     "includes": [
       "src/**",
       "scripts/**",
+      "bot/**",
       "community.config.ts",
       "next.config.js",
       "tailwind.config.ts",

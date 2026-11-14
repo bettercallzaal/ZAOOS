@@ -17,11 +17,28 @@ function cfg(over: Partial<GroupConfig> = {}): GroupConfig {
 }
 
 function help(over: Partial<ChatHelpInput> = {}): string {
-  return groupHelpText({ config: cfg(), untagged: false, devzFold: false, botUsername: 'zaoclaw_bot', ...over });
+  return groupHelpText({
+    config: cfg(),
+    untagged: false,
+    devzFold: false,
+    botUsername: 'zaoclaw_bot',
+    ...over,
+  });
 }
 
 // Commands that only work in Zaal's DMs: a group /help must never list them.
-const PRIVATE_ONLY = ['/cockpit', '/needsme', '/grill', '/board', '/working', '/status', '/pulse', '/zg', '/menu', '/focus'];
+const PRIVATE_ONLY = [
+  '/cockpit',
+  '/needsme',
+  '/grill',
+  '/board',
+  '/working',
+  '/status',
+  '/pulse',
+  '/zg',
+  '/menu',
+  '/focus',
+];
 
 describe('groupHelpText', () => {
   it.each([
@@ -48,9 +65,15 @@ describe('groupHelpText', () => {
   });
 
   it('mode=all mentions untagged answers only when the untagged flag is on', () => {
-    expect(help({ config: cfg({ mode: 'all' }), untagged: true })).toContain('may also answer messages here that do not tag her');
-    expect(help({ config: cfg({ mode: 'all' }), untagged: false })).toContain('does not answer messages that do not tag her');
-    expect(help({ config: cfg({ mode: 'mention' }), untagged: true })).toContain('does not answer messages that do not tag her');
+    expect(help({ config: cfg({ mode: 'all' }), untagged: true })).toContain(
+      'may also answer messages here that do not tag her',
+    );
+    expect(help({ config: cfg({ mode: 'all' }), untagged: false })).toContain(
+      'does not answer messages that do not tag her',
+    );
+    expect(help({ config: cfg({ mode: 'mention' }), untagged: true })).toContain(
+      'does not answer messages that do not tag her',
+    );
   });
 
   it('lists /fix and /fix_status only in the Devz chat with the fold on', () => {

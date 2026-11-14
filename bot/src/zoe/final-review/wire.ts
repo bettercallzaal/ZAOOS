@@ -13,13 +13,11 @@
  * so a card is never raised on an unreviewed diff.
  */
 
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import type { Bot, Context } from 'grammy';
 import { featureRan } from '../feature-ran';
 import { ZOE_PATHS } from '../memory';
-import { CardStore, cardTtlMs, type Card, type CardPersistence } from './card';
-import { handleTap, reviewPr, type CardView, type FlowDeps, type ReviewOutcome } from './flow';
 import {
   type AutoOfferState,
   autoOfferDailyMax,
@@ -27,14 +25,16 @@ import {
   autoOfferIntervalMs,
   autoOfferRepos,
   listOpenPrs,
+  type OpenPr,
   parseAutoOfferState,
   recordTick,
   runAutoOfferTick,
-  type OpenPr,
   type TickReport,
   utcDay,
 } from './auto-offer';
+import { type Card, type CardPersistence, CardStore, cardTtlMs } from './card';
 import { makeHermesGrade } from './critic-adapter';
+import { type CardView, type FlowDeps, handleTap, type ReviewOutcome, reviewPr } from './flow';
 import type { GradeFn } from './grade';
 import { isRepoSlug } from './merge-line';
 import { defaultGhRunner, readSnapshot } from './snapshot';
@@ -93,7 +93,11 @@ export function registerFinalReview(bot: Bot<Context>, hooks: FinalReviewHooks):
 
   const sendCard = async (view: CardView): Promise<void> => {
     await bot.api.sendMessage(hooks.zaalId, view.text, {
-      reply_markup: { inline_keyboard: view.buttons.map((row) => row.map((b) => ({ text: b.text, callback_data: b.data }))) },
+      reply_markup: {
+        inline_keyboard: view.buttons.map((row) =>
+          row.map((b) => ({ text: b.text, callback_data: b.data })),
+        ),
+      },
       zoeSendClass: 'gated',
     } as never);
   };
@@ -109,18 +113,24 @@ export function registerFinalReview(bot: Bot<Context>, hooks: FinalReviewHooks):
     const out = await reviewPr(m[1], Number(m[2]), deps);
     featureRan('final-review', `review ${out.kind}`);
     if (out.kind === 'no-card') {
-      if (out.comment) console.log(`[zoe/final-review] draft comment (not posted):\n${out.comment}`);
+      if (out.comment)
+        console.log(`[zoe/final-review] draft comment (not posted):\n${out.comment}`);
       await ctx.reply(`No card for ${m[1]} #${m[2]}: ${out.reason}.`);
       return;
     }
     console.log(`[zoe/final-review] draft comment (not posted):\n${out.comment}`);
-    for (const old of out.superseded) console.log(`[zoe/final-review] card ${old.id} superseded by ${out.view.card.id}`);
+    for (const old of out.superseded)
+      console.log(`[zoe/final-review] card ${old.id} superseded by ${out.view.card.id}`);
     await sendCard(out.view);
   });
 
   bot.callbackQuery(/^fr:/, async (ctx) => {
     const out = await handleTap(
-      { data: ctx.callbackQuery.data ?? '', fromZaal: hooks.isFromZaal(ctx), scope: hooks.scopeOf(ctx) },
+      {
+        data: ctx.callbackQuery.data ?? '',
+        fromZaal: hooks.isFromZaal(ctx),
+        scope: hooks.scopeOf(ctx),
+      },
       deps,
     );
     await ctx.answerCallbackQuery().catch(() => {});
@@ -188,7 +198,9 @@ export function makeAutoOfferTick(opts: {
     const left = opts.dailyMax - (state.day === today ? state.gradedToday : 0);
     if (left <= 0) {
       if (capLoggedFor !== today) {
-        log(`[zoe/final-review-auto] daily grade cap ${opts.dailyMax} reached for ${today} (UTC); no reads until the next UTC day`);
+        log(
+          `[zoe/final-review-auto] daily grade cap ${opts.dailyMax} reached for ${today} (UTC); no reads until the next UTC day`,
+        );
         capLoggedFor = today;
       }
       return null;
@@ -222,7 +234,9 @@ export function startAutoOffer(
   if (!autoOfferEnabled(env)) return null;
   const repos = autoOfferRepos(env);
   if (repos.length === 0) {
-    console.error('[zoe/final-review-auto] ZOE_FINAL_REVIEW_AUTO=1 but ZOE_FINAL_REVIEW_REPOS names no valid repo; not scheduled');
+    console.error(
+      '[zoe/final-review-auto] ZOE_FINAL_REVIEW_AUTO=1 but ZOE_FINAL_REVIEW_REPOS names no valid repo; not scheduled',
+    );
     return null;
   }
   const runTick = makeAutoOfferTick({
@@ -239,7 +253,11 @@ export function startAutoOffer(
     running = true;
     try {
       const r = await runTick();
-      if (r) featureRan('final-review-auto', `tick listed=${r.listed} reviewed=${r.reviewed} graded=${r.graded} carded=${r.carded}`);
+      if (r)
+        featureRan(
+          'final-review-auto',
+          `tick listed=${r.listed} reviewed=${r.reviewed} graded=${r.graded} carded=${r.carded}`,
+        );
     } catch (e) {
       console.error('[zoe/final-review-auto] tick failed:', (e as Error)?.message);
     } finally {

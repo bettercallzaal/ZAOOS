@@ -25,18 +25,31 @@ function readHeaders() {
  * Fetch with failover: try READ_BASE first, fall back to NEYNAR_BASE on error.
  * Each failover logs one warn line (path without query, proxy status or error)
  * so a read base that 404s or 503s is visible instead of silently paid for.
+ * With `listKey`, a 200 whose `listKey` is an empty array also fails over: a
+ * read base can serve a path with nothing in it (haatz `topic/trending`
+ * returned `topics: []`, doc 2418), and a 200 would otherwise hide that.
  */
-async function fetchWithFailover(path: string, init: RequestInit): Promise<Response> {
+async function fetchWithFailover(
+  path: string,
+  init: RequestInit,
+  listKey?: string,
+): Promise<Response> {
   if (READ_BASE === NEYNAR_BASE) {
     return fetch(`${NEYNAR_BASE}${path}`, init);
   }
   const route = path.split('?')[0];
   try {
     const res = await fetch(`${READ_BASE}${path}`, init);
-    if (res.ok) return res;
-    logger.warn(
-      `[neynar/failover] ${route} read base returned ${res.status}, falling back to Neynar`,
-    );
+    if (res.ok) {
+      if (!listKey || !(await isEmptyList(res, listKey))) return res;
+      logger.warn(
+        `[neynar/failover] ${route} read base returned an empty "${listKey}" list, falling back to Neynar`,
+      );
+    } else {
+      logger.warn(
+        `[neynar/failover] ${route} read base returned ${res.status}, falling back to Neynar`,
+      );
+    }
   } catch (error: unknown) {
     const reason = error instanceof Error ? error.message : String(error);
     logger.warn(`[neynar/failover] ${route} read base threw (${reason}), falling back to Neynar`);
@@ -45,6 +58,18 @@ async function fetchWithFailover(path: string, init: RequestInit): Promise<Respo
     ...init,
     headers: headers(),
   });
+}
+
+/** True when the body's `key` is an empty array. Reads a clone, so the caller can still read `res`. */
+async function isEmptyList(res: Response, key: string): Promise<boolean> {
+  try {
+    const body: unknown = await res.clone().json();
+    if (typeof body !== 'object' || body === null) return false;
+    const value = (body as Record<string, unknown>)[key];
+    return Array.isArray(value) && value.length === 0;
+  } catch {
+    return false;
+  }
 }
 
 export async function getTrendingFeed(limit = 25, timeWindow = '24h', cursor?: string) {
@@ -581,10 +606,11 @@ export async function getBestFriends(fid: number, limit = 10) {
 
 export async function getTrendingTopics(limit = 10) {
   const params = new URLSearchParams({ limit: String(limit) });
-  const res = await fetchWithFailover(`/topic/trending?${params}`, {
-    headers: readHeaders(),
-    signal: AbortSignal.timeout(10000),
-  });
+  const res = await fetchWithFailover(
+    `/topic/trending?${params}`,
+    { headers: readHeaders(), signal: AbortSignal.timeout(10000) },
+    'topics',
+  );
   if (!res.ok) throw new Error(`Neynar trending topics error: ${res.status}`);
   return res.json();
 }

@@ -251,6 +251,17 @@ import { getRun as getHermesRun, listOpenRuns as listOpenHermesRuns } from '../h
 import { ghOpenIssue, readIdeaConfig, registerIdeaCommand } from './idea-cards';
 import { readGroupGithubConfig, registerGroupGithubCommands } from './group-github';
 import { readGroupMemoryConfig, readYesterdayLine } from './group-memory';
+import {
+  addPending,
+  appendKept as appendGroupSuggestion,
+  dueToSend,
+  makeSuggestion,
+  readGroupSuggestConfig,
+  readPending,
+  renderCard as renderGroupSuggestion,
+  shouldCapture,
+  takePending as takeGroupSuggestion,
+} from './group-suggest';
 import { readTeamViewConfig, registerTeamView } from './team-view';
 import { claudeOnHost, inDevzChat, maybeHandleMentionFix, readDevzFoldConfig, registerDevzFoldCommands, type DevzFoldDeps } from './devz-fold';
 import { groupHelpText, PRIVATE_NON_OWNER_HELP } from './chat-help';
@@ -768,6 +779,32 @@ if (ideaCfg) {
 const groupMemoryCfg = readGroupMemoryConfig();
 if (groupMemoryCfg) console.log(`[zoe/index] group memory ON for ${groupMemoryCfg.chats.size} chat(s)`);
 
+const groupSuggestCfg = readGroupSuggestConfig();
+if (groupSuggestCfg) console.log(`[zoe/index] group suggestions ON for ${groupSuggestCfg.chats.size} chat(s)`);
+let groupSuggestLastSentMs: number | null = null;
+
+bot.command('gs', async (ctx) => {
+  if (ctx.chat.type !== 'private' || !isFromZaal(ctx)) return;
+  try {
+    const pending = await readPending(ZOE_PATHS.home);
+    if (pending.length === 0) {
+      await ctx.reply('No suggestions waiting.');
+      return;
+    }
+    for (const s of pending) {
+      await bot.api.sendMessage(zaalId, renderGroupSuggestion(s), {
+        reply_markup: { inline_keyboard: [[
+          { text: 'Keep', callback_data: 'gs:k:' + s.id },
+          { text: 'Drop', callback_data: 'gs:d:' + s.id },
+        ]] },
+      });
+    }
+    groupSuggestLastSentMs = Date.now();
+  } catch (err) {
+    console.error('[zoe/group-suggest] /gs send failed:', (err as Error)?.message);
+  }
+});
+
 // /issue and /doc, read-only GitHub for allowlisted groups (group-github.ts,
 // iman-desk #168 item 1). OFF unless ZOE_GROUP_GITHUB=1, its own token
 // ZOE_GROUP_GITHUB_TOKEN (no fallback) and ZOE_GROUP_GITHUB_CHATS. Registered
@@ -1248,6 +1285,24 @@ bot.on('callback_query:data', async (ctx, next) => {
       await ctx.editMessageReplyMarkup({ reply_markup: buildCockpitKeyboard(newFocus) }).catch(() => {});
       return;
     }
+  }
+  const groupSuggestTap = /^gs:([kd]):([0-9a-f]{8})$/.exec(data);
+  if (groupSuggestTap) {
+    const [, action, id] = groupSuggestTap;
+    try {
+      const item = await takeGroupSuggestion(ZOE_PATHS.home, id);
+      if (!item) {
+        await ctx.answerCallbackQuery({ text: 'Already handled.' });
+        return;
+      }
+      if (action === 'k') await appendGroupSuggestion(ZOE_PATHS.home, item);
+      await ctx.answerCallbackQuery();
+      await ctx.editMessageText(action === 'k' ? 'Kept.' : 'Dropped.');
+    } catch (err) {
+      console.error('[zoe/group-suggest] callback failed:', (err as Error)?.message);
+      await ctx.answerCallbackQuery().catch(() => {});
+    }
+    return;
   }
   // Orchestrator question buttons ("q:<qid>:<b64>") - the one-question-at-a-time
   // loop. A tap (or the Type button) logs the answer to recent/ so the open
@@ -2771,6 +2826,34 @@ bot.on('message:text', async (ctx) => {
   // Group path: gate by per-group config.
   const fromId = ctx.from?.id;
   if (!fromId) return;
+
+  try {
+    if (shouldCapture(groupSuggestCfg, { chatId, fromId, isBot: ctx.from.is_bot, text })) {
+      const title = 'title' in ctx.chat ? (ctx.chat.title ?? '(untitled)') : '(untitled)';
+      const suggestion = makeSuggestion({
+        chatId: String(chatId),
+        chatTitle: title,
+        sender: [ctx.from.first_name, ctx.from.last_name].filter(Boolean).join(' ') || 'a member',
+        text,
+      });
+      const saved = await addPending(ZOE_PATHS.home, suggestion);
+      if (saved) featureRan('group-suggest-capture', `chat ${chatId}`);
+      const now = Date.now();
+      if (saved && dueToSend(groupSuggestLastSentMs, now)) {
+        for (const s of await readPending(ZOE_PATHS.home)) {
+          await bot.api.sendMessage(zaalId, renderGroupSuggestion(s), {
+            reply_markup: { inline_keyboard: [[
+              { text: 'Keep', callback_data: 'gs:k:' + s.id },
+              { text: 'Drop', callback_data: 'gs:d:' + s.id },
+            ]] },
+          });
+        }
+        groupSuggestLastSentMs = now;
+      }
+    }
+  } catch (err) {
+    console.error('[zoe/group-suggest] capture/send failed:', (err as Error)?.message);
+  }
 
   let cfg = await getGroupConfig(chatId);
   if (!cfg) {

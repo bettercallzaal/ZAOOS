@@ -2,7 +2,7 @@
 topic: agents
 type: research
 status: research-complete
-last-validated: 2026-05-21
+last-validated: 2026-11-16
 original-query: Define the optimal division of labor between Claude Code (Opus on laptop) and VPS agents (Minimax M2.7 on OpenClaw), based on empirical testing and industry patterns (reconstructed)
 tier: high
 ---
@@ -13,6 +13,37 @@ tier: high
 > **Date:** April 7, 2026
 > **Goal:** Define the optimal division of labor between Claude Code (Opus 4.6 on laptop) and VPS agents (Minimax M2.7 on OpenClaw), based on empirical testing and industry patterns
 > **Builds on:** Docs 227 (agentic workflows), 236 (autonomous operator pattern), 245 (ZOE upgrade), 266 (Mission Control), 267 (OpenClaw skills), 278 (bootcamp gap analysis), 293 (multi-agent tools)
+
+---
+
+## Updated 2026-11-16
+
+### ZAO Internal Architecture (VERIFIED from CLAUDE.md, 2026-11-16)
+
+The specific implementation described in this doc has changed substantially since April 2026:
+
+- **OpenClaw 7-agent squad decommissioned May 4, 2026.** The container running SCOUT, CASTER, BUILDER, WALLET, ZOEY, FISHBOWLZ was killed. Source: CLAUDE.md "Decommissioned 2026-05-04 - do NOT propose, build, or restart: openclaw container + 7-agent squad". This happened 17 days before the previous last-validated date, so the Implementation Checklist in Section 11 is no longer actionable.
+- **SCOUT superseded by ZAOscout** (doc 882, 2026-06-20). The farscout.service was stopped and disabled by Zaal on 2026-11-07. Source: CLAUDE.md farscout entry.
+- **BUILDER role (Hermes) folded into ZOE** as of 2026-06-29. The coder/critic/auto-PR brain now lives in ZOE rather than a separate agent. The devz-fold (PR #4265, merged 2026-11-08) gives ZOE a /fix command in the ZAO Devz chat. Source: CLAUDE.md ZAO Devz entry.
+- **Current active surfaces (Nov 2026):** ZOE (`@zaoclaw_bot`), ZAO Devz (`@zaodevz_bot` + `@zoe_hermes_bot`), Bonfire (`@zabal_bonfire`), ZAOstock bot. The 5-agent config (ZOE, SCOUT, CASTER, ROLO, STOCK) is no longer the live topology.
+- **Powerful center model updated:** The doc referenced Claude Opus 4.6. The current Claude 5 family is Fable 5.2, Opus 5.5, Sonnet 5.5, Haiku 5.5. Source: CLAUDE.md Environment section.
+
+### Model Landscape (UNVERIFIED - all sources unreachable from this session's network)
+
+Search results (not fetched) indicate:
+- **MiniMax M2.7 retired October 19, 2026.** Requests to M2.5 and M2.7 on M Plan and Token Plan now route to M3.1 Flash. Final retirement for pay-as-you-go reportedly November 18, 2026. Source: usagepricing.com snippet, NOT fetched (domain blocked).
+- **MiniMax M3** released June 1, 2026 as an open-weights flagship. **M3.1 Flash** released October 19, 2026, targeted at agentic tasks, coding, and computer use. Pricing snippet: $0.15/$0.60 per million tokens input/output. Sources: nextaimodel.com, secondtalent.com snippets, NOT fetched (domains blocked).
+- The benchmarks table in Section 3 references M2.7 scores that are now for a retired model. If ZAO uses MiniMax for edge agents, the successor model (M3.1 Flash) should be re-benchmarked.
+
+### Research Pattern (UNVERIFIED - sources not fetched)
+
+2026 academic work (CASTER arXiv Jan 2026, GraphPlanner ICLR 2026, RouterHGC ACL 2026, AgentGate arXiv Apr 2026) has moved from fixed model-per-role to learned per-step routers - assigning model and agent role at each workflow step rather than statically. The ZAO design uses static assignment (ZOE=M2.7, SCOUT=M2.7, etc.), which is simpler and cheaper to operate. The core "powerful center + cheap edge" pattern remains valid and widely used.
+
+### Recommended Follow-up
+
+1. Verify M3.1 Flash benchmarks against the M2.7 numbers in Section 3 when network access to platform.minimax.io is available.
+2. Write a successor doc covering the current 4-surface topology (ZOE + ZAO Devz + Bonfire + ZAOstock) since Section 4 (agent role definitions) describes a topology that no longer exists.
+3. Confirm whether ZOE still runs on OpenClaw or has migrated.
 
 ---
 

@@ -1,4 +1,4 @@
-import { mkdtemp, readFile, rm } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
@@ -6,6 +6,7 @@ import {
   addPending,
   appendKept,
   dueToSend,
+  keepPending,
   makeSuggestion,
   readGroupSuggestConfig,
   readPending,
@@ -37,11 +38,19 @@ afterEach(async () => {
 describe('readGroupSuggestConfig', () => {
   it('is off unless flag, chats and senders are present', () => {
     expect(readGroupSuggestConfig({})).toBeNull();
-    expect(readGroupSuggestConfig({ ZOE_GROUP_SUGGEST: '1', ZOE_GROUP_SUGGEST_SENDERS: SENDER })).toBeNull();
-    expect(readGroupSuggestConfig({ ZOE_GROUP_SUGGEST: '1', ZOE_GROUP_SUGGEST_CHATS: CHAT })).toBeNull();
-    expect(readGroupSuggestConfig({
-      ZOE_GROUP_SUGGEST: '1', ZOE_GROUP_SUGGEST_CHATS: `${CHAT}, bad`, ZOE_GROUP_SUGGEST_SENDERS: `${SENDER}, nope`,
-    })).toEqual({ chats: new Set([CHAT]), senders: new Set([SENDER]) });
+    expect(
+      readGroupSuggestConfig({ ZOE_GROUP_SUGGEST: '1', ZOE_GROUP_SUGGEST_SENDERS: SENDER }),
+    ).toBeNull();
+    expect(
+      readGroupSuggestConfig({ ZOE_GROUP_SUGGEST: '1', ZOE_GROUP_SUGGEST_CHATS: CHAT }),
+    ).toBeNull();
+    expect(
+      readGroupSuggestConfig({
+        ZOE_GROUP_SUGGEST: '1',
+        ZOE_GROUP_SUGGEST_CHATS: `${CHAT}, bad`,
+        ZOE_GROUP_SUGGEST_SENDERS: `${SENDER}, nope`,
+      }),
+    ).toEqual({ chats: new Set([CHAT]), senders: new Set([SENDER]) });
   });
 });
 
@@ -67,14 +76,50 @@ describe('pending store', () => {
     expect(await takePending(dir, item.id)).toEqual(item);
     expect(await takePending(dir, item.id)).toBeNull();
     await appendKept(dir, item);
-    expect(await readFile(join(dir, 'group-suggest', 'kept.md'), 'utf8')).toContain(`- ${item.at.slice(0, 10)} Sam Rivera in ZAO Group: ${item.text}`);
+    expect(await readFile(join(dir, 'group-suggest', 'kept.md'), 'utf8')).toContain(
+      `- <!-- group-suggestion:${item.id} --> ${item.at.slice(0, 10)} Sam Rivera in ZAO Group: ${item.text}`,
+    );
+  });
+
+  it('keeps the pending item when writing the kept record fails, then retries without duplication', async () => {
+    const dir = await home();
+    const item = suggestion();
+    await addPending(dir, item);
+    const keptPath = join(dir, 'group-suggest', 'kept.md');
+    await mkdir(keptPath);
+
+    await expect(keepPending(dir, item.id)).rejects.toThrow();
+    expect(await readPending(dir)).toEqual([item]);
+
+    await rm(keptPath, { recursive: true });
+    expect(await keepPending(dir, item.id)).toEqual(item);
+    expect(await readPending(dir)).toEqual([]);
+    const kept = await readFile(keptPath, 'utf8');
+    expect(kept.match(new RegExp(item.id, 'g'))).toHaveLength(1);
+  });
+
+  it('serializes simultaneous keep taps and writes one kept record', async () => {
+    const dir = await home();
+    const item = suggestion();
+    await addPending(dir, item);
+
+    const results = await Promise.all([keepPending(dir, item.id), keepPending(dir, item.id)]);
+    expect(results.filter(Boolean)).toHaveLength(1);
+    const kept = await readFile(join(dir, 'group-suggest', 'kept.md'), 'utf8');
+    expect(kept.match(new RegExp(item.id, 'g'))).toHaveLength(1);
+    expect(await readPending(dir)).toEqual([]);
   });
 
   it('keeps only the newest 50 suggestions', async () => {
     const dir = await home();
-    const items = Array.from({ length: 51 }, (_, i) => makeSuggestion({
-      chatId: CHAT, chatTitle: 'Group', sender: 'Sam', text: `suggestion number ${i}`,
-    }));
+    const items = Array.from({ length: 51 }, (_, i) =>
+      makeSuggestion({
+        chatId: CHAT,
+        chatTitle: 'Group',
+        sender: 'Sam',
+        text: `suggestion number ${i}`,
+      }),
+    );
     for (const item of items) await addPending(dir, item);
     const read = await readPending(dir);
     expect(read).toHaveLength(50);
@@ -84,22 +129,33 @@ describe('pending store', () => {
   it('treats corrupt JSON as empty', async () => {
     const dir = await home();
     const path = join(dir, 'group-suggest', 'pending.json');
-    await import('node:fs/promises').then(({ mkdir }) => mkdir(join(dir, 'group-suggest'), { recursive: true }));
+    await import('node:fs/promises').then(({ mkdir }) =>
+      mkdir(join(dir, 'group-suggest'), { recursive: true }),
+    );
     await import('node:fs/promises').then(({ writeFile }) => writeFile(path, '{broken', 'utf8'));
     expect(await readPending(dir)).toEqual([]);
   });
 
   it('does not store secret-looking tokens or email addresses', async () => {
     const dir = await home();
-    expect(await addPending(dir, suggestion('token sk-ant-' + 'A'.repeat(30)))).toBe(false);
-    expect(await addPending(dir, suggestion('write to person@example.com for details'))).toBe(false);
+    expect(await addPending(dir, suggestion(`token sk-ant-${'A'.repeat(30)}`))).toBe(false);
+    expect(await addPending(dir, suggestion('write to person@example.com for details'))).toBe(
+      false,
+    );
     expect(await readPending(dir)).toEqual([]);
   });
 });
 
 describe('rendering and send gap', () => {
   it('renders plain text without handles or markdown markers', () => {
-    const card = renderCard(makeSuggestion({ chatId: CHAT, chatTitle: 'ZAO #1', sender: '@sam_handle', text: 'A *bold* useful `idea`' }));
+    const card = renderCard(
+      makeSuggestion({
+        chatId: CHAT,
+        chatTitle: 'ZAO #1',
+        sender: '@sam_handle',
+        text: 'A *bold* useful `idea`',
+      }),
+    );
     expect(card).not.toMatch(/@\w|[*`#]/);
     expect(card.split('\n')).toHaveLength(3);
   });

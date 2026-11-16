@@ -45,16 +45,23 @@ const SuggestionSchema = z.object({
   at: z.string().datetime(),
 });
 const PendingSchema = z.array(SuggestionSchema);
+const mutationLocks = new Map<string, Promise<void>>();
 
 export const SUGGESTION_MAX = 50;
 export const SUGGESTION_TEXT_MAX = 500;
 export const SUGGEST_DM_MIN_GAP_MS = 30 * 60_000;
 
-export function readGroupSuggestConfig(env: NodeJS.ProcessEnv = process.env): GroupSuggestConfig | null {
+export function readGroupSuggestConfig(
+  env: NodeJS.ProcessEnv = process.env,
+): GroupSuggestConfig | null {
   if (env.ZOE_GROUP_SUGGEST !== '1') return null;
-  const parseIds = (raw: string | undefined): Set<string> => new Set(
-    (raw ?? '').split(',').map((s) => s.trim()).filter((s) => /^-?\d+$/.test(s)),
-  );
+  const parseIds = (raw: string | undefined): Set<string> =>
+    new Set(
+      (raw ?? '')
+        .split(',')
+        .map((s) => s.trim())
+        .filter((s) => /^-?\d+$/.test(s)),
+    );
   const chats = parseIds(env.ZOE_GROUP_SUGGEST_CHATS);
   const senders = parseIds(env.ZOE_GROUP_SUGGEST_SENDERS);
   return chats.size && senders.size ? { chats, senders } : null;
@@ -65,17 +72,27 @@ export function shouldCapture(
   input: { chatId: string | number; fromId: string | number; isBot: boolean; text: string },
 ): boolean {
   const text = input.text.trim();
-  return !!cfg && cfg.chats.has(String(input.chatId)) && cfg.senders.has(String(input.fromId)) &&
-    !input.isBot && text.length >= 12 && !text.startsWith('/');
+  return (
+    !!cfg &&
+    cfg.chats.has(String(input.chatId)) &&
+    cfg.senders.has(String(input.fromId)) &&
+    !input.isBot &&
+    text.length >= 12 &&
+    !text.startsWith('/')
+  );
 }
 
 function safeSender(raw: string): string {
   const clean = raw.trim().replace(/\s+/g, ' ');
-  if (!clean || clean.startsWith('@') || /^user:/i.test(clean) || /^-?\d+$/.test(clean)) return 'a member';
-  return clean.replace(/[@<>`*#\[\]{}]/g, '').slice(0, 80) || 'a member';
+  if (!clean || clean.startsWith('@') || /^user:/i.test(clean) || /^-?\d+$/.test(clean))
+    return 'a member';
+  return clean.replace(/[@<>`*#[\]{}]/g, '').slice(0, 80) || 'a member';
 }
 
-export function makeSuggestion(input: Omit<GroupSuggestion, 'id' | 'at'>, now: Date = new Date()): GroupSuggestion {
+export function makeSuggestion(
+  input: Omit<GroupSuggestion, 'id' | 'at'>,
+  now: Date = new Date(),
+): GroupSuggestion {
   return {
     ...input,
     sender: safeSender(input.sender),
@@ -88,6 +105,22 @@ export function makeSuggestion(input: Omit<GroupSuggestion, 'id' | 'at'>, now: D
 
 function pendingPath(home: string): string {
   return join(home, 'group-suggest', 'pending.json');
+}
+
+async function withStoreLock<T>(home: string, operation: () => Promise<T>): Promise<T> {
+  const previous = mutationLocks.get(home) ?? Promise.resolve();
+  let release!: () => void;
+  const current = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  mutationLocks.set(home, current);
+  await previous;
+  try {
+    return await operation();
+  } finally {
+    release();
+    if (mutationLocks.get(home) === current) mutationLocks.delete(home);
+  }
 }
 
 async function readStored(home: string): Promise<GroupSuggestion[]> {
@@ -110,19 +143,36 @@ async function readStored(home: string): Promise<GroupSuggestion[]> {
 async function writeStored(home: string, items: GroupSuggestion[]): Promise<void> {
   const dir = join(home, 'group-suggest');
   await fs.mkdir(dir, { recursive: true });
-  await fs.writeFile(pendingPath(home), JSON.stringify(items.slice(-SUGGESTION_MAX), null, 2), 'utf8');
+  const target = pendingPath(home);
+  const temp = `${target}.${process.pid}.${randomBytes(4).toString('hex')}.tmp`;
+  try {
+    await fs.writeFile(temp, JSON.stringify(items.slice(-SUGGESTION_MAX), null, 2), {
+      encoding: 'utf8',
+      mode: 0o600,
+    });
+    await fs.rename(temp, target);
+  } catch (err) {
+    await fs.unlink(temp).catch(() => {});
+    throw err;
+  }
 }
 
 export async function addPending(home: string, suggestion: GroupSuggestion): Promise<boolean> {
-  const kind = containsSecret(suggestion.text) ? 'secret' : containsPii(suggestion.text) ? 'PII' : null;
-  if (kind) {
-    console.error(`[zoe/group-suggest] skipped suggestion containing ${kind}`);
-    return false;
-  }
-  const current = await readStored(home);
-  current.push(SuggestionSchema.parse(suggestion));
-  await writeStored(home, current);
-  return true;
+  return withStoreLock(home, async () => {
+    const kind = containsSecret(suggestion.text)
+      ? 'secret'
+      : containsPii(suggestion.text)
+        ? 'PII'
+        : null;
+    if (kind) {
+      console.error(`[zoe/group-suggest] skipped suggestion containing ${kind}`);
+      return false;
+    }
+    const current = await readStored(home);
+    current.push(SuggestionSchema.parse(suggestion));
+    await writeStored(home, current);
+    return true;
+  });
 }
 
 export async function readPending(home: string): Promise<GroupSuggestion[]> {
@@ -130,6 +180,10 @@ export async function readPending(home: string): Promise<GroupSuggestion[]> {
 }
 
 export async function takePending(home: string, id: string): Promise<GroupSuggestion | null> {
+  return withStoreLock(home, async () => removePending(home, id));
+}
+
+async function removePending(home: string, id: string): Promise<GroupSuggestion | null> {
   const current = await readStored(home);
   const index = current.findIndex((s) => s.id === id);
   if (index < 0) return null;
@@ -138,11 +192,37 @@ export async function takePending(home: string, id: string): Promise<GroupSugges
   return item;
 }
 
-export async function appendKept(home: string, suggestion: GroupSuggestion): Promise<void> {
+async function appendKeptUnlocked(home: string, suggestion: GroupSuggestion): Promise<void> {
   const dir = join(home, 'group-suggest');
   await fs.mkdir(dir, { recursive: true });
-  const line = `- ${suggestion.at.slice(0, 10)} ${suggestion.sender} in ${suggestion.chatTitle}: ${suggestion.text.replace(/[\r\n]+/g, ' ')}`;
-  await fs.appendFile(join(dir, 'kept.md'), `${line}\n`, 'utf8');
+  const marker = `<!-- group-suggestion:${suggestion.id} -->`;
+  const line = `- ${marker} ${suggestion.at.slice(0, 10)} ${suggestion.sender} in ${suggestion.chatTitle}: ${suggestion.text.replace(/[\r\n]+/g, ' ')}`;
+  const path = join(dir, 'kept.md');
+  try {
+    const existing = await fs.readFile(path, 'utf8');
+    if (existing.split(/\r?\n/).includes(line)) return;
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code !== 'ENOENT') throw err;
+  }
+  await fs.appendFile(path, `${line}\n`, 'utf8');
+}
+
+export async function appendKept(home: string, suggestion: GroupSuggestion): Promise<void> {
+  return withStoreLock(home, () => appendKeptUnlocked(home, suggestion));
+}
+
+export async function keepPending(home: string, id: string): Promise<GroupSuggestion | null> {
+  return withStoreLock(home, async () => {
+    const current = await readStored(home);
+    const item = current.find((s) => s.id === id);
+    if (!item) return null;
+
+    // Persist the kept record first. If removing it from pending then fails, a
+    // retry is idempotent and the user's suggestion remains recoverable.
+    await appendKeptUnlocked(home, item);
+    await removePending(home, id);
+    return item;
+  });
 }
 
 export function dueToSend(lastSentMs: number | null, nowMs: number): boolean {

@@ -253,9 +253,9 @@ import { readGroupGithubConfig, registerGroupGithubCommands } from './group-gith
 import { readGroupMemoryConfig, readYesterdayLine } from './group-memory';
 import {
   addPending,
-  appendKept as appendGroupSuggestion,
   dueToSend,
   makeSuggestion,
+  keepPending as keepGroupSuggestion,
   readGroupSuggestConfig,
   readPending,
   renderCard as renderGroupSuggestion,
@@ -1290,12 +1290,13 @@ bot.on('callback_query:data', async (ctx, next) => {
   if (groupSuggestTap) {
     const [, action, id] = groupSuggestTap;
     try {
-      const item = await takeGroupSuggestion(ZOE_PATHS.home, id);
+      const item = action === 'k'
+        ? await keepGroupSuggestion(ZOE_PATHS.home, id)
+        : await takeGroupSuggestion(ZOE_PATHS.home, id);
       if (!item) {
         await ctx.answerCallbackQuery({ text: 'Already handled.' });
         return;
       }
-      if (action === 'k') await appendGroupSuggestion(ZOE_PATHS.home, item);
       await ctx.answerCallbackQuery();
       await ctx.editMessageText(action === 'k' ? 'Kept.' : 'Dropped.');
     } catch (err) {

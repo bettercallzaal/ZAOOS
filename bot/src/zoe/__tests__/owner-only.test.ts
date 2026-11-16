@@ -1,6 +1,12 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest';
-import { OWNER_ONLY_LINE, OWNER_ONLY_WINDOW_MS, newOwnerOnlyState, shouldSendOwnerOnlyLine } from '../owner-only';
+import {
+  OWNER_ONLY_LINE,
+  OWNER_ONLY_WINDOW_MS,
+  conversationLearnAllowed,
+  newOwnerOnlyState,
+  shouldSendOwnerOnlyLine,
+} from '../owner-only';
 
 describe('owner-only line', () => {
   it('is plain, names Zaal, and carries no jargon', () => {
@@ -23,5 +29,14 @@ describe('owner-only line', () => {
     for (let i = 0; i < 50; i++) shouldSendOwnerOnlyLine(st, i, 0);
     shouldSendOwnerOnlyLine(st, 999, OWNER_ONLY_WINDOW_MS + 1);
     expect(st.lastSent.size).toBe(1);
+  });
+});
+
+describe('/learn scope gate', () => {
+  it('allows only the owner in a private chat', () => {
+    expect(conversationLearnAllowed('private', true)).toBe(true);
+    expect(conversationLearnAllowed('private', false)).toBe(false);
+    expect(conversationLearnAllowed('group', true)).toBe(false);
+    expect(conversationLearnAllowed('supergroup', true)).toBe(false);
   });
 });

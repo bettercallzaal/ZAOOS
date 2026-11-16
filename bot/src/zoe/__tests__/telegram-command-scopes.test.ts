@@ -19,6 +19,7 @@ describe("telegram command scopes and button bar", () => {
     expect(cmdNames).toContain("pulse");
     expect(cmdNames).toContain("companion");
     expect(cmdNames).toContain("help");
+    expect(cmdNames).toContain("learn");
   });
 
   it("defines assistant commands in GROUP_COMMANDS", () => {

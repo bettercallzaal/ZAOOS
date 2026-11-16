@@ -15,7 +15,14 @@
  *   OR: systemd user unit zoe-bot.service
  */
 import { groupIds } from './env';
-import { OWNER_ONLY_LINE, newOwnerOnlyState, privateScopeAllowed, shouldSendOwnerOnlyLine, voiceGate } from './owner-only';
+import {
+  OWNER_ONLY_LINE,
+  conversationLearnAllowed,
+  newOwnerOnlyState,
+  privateScopeAllowed,
+  shouldSendOwnerOnlyLine,
+  voiceGate,
+} from './owner-only';
 import { config as loadEnv } from 'dotenv';
 import { sendChunkedToTelegram } from './tg-chunk';
 import { conciergeErrorReply } from './concierge-error-reply';
@@ -131,7 +138,7 @@ import {
   type ReflectionAnswers,
   type ProposedPatch,
 } from './reflexion';
-import { applyLearnProposal, type LearnProposal } from './learn';
+import { applyLearnProposal, draftConversationLearn, type LearnProposal } from './learn';
 import { startScheduler } from './scheduler';
 import {
   applyNudgeAction,
@@ -595,6 +602,7 @@ bot.command("help", async (ctx) => {
       "/pulse - Health, models, and spend snapshot",
       "/companion - Live companion pulse and countdown",
       "/focus - Toggle hyperfocus mode",
+      "/learn - Reply to a message with /learn to propose one reusable learning",
       "/agenda - Scheduled priorities",
       "/menu - Show persistent cockpit button bar",
       "/zg - Manage group permissions and modes",
@@ -621,6 +629,67 @@ bot.command("help", async (ctx) => {
     }),
   );
   featureRan('chat-help', `group mode=${cfg?.mode ?? 'unconfigured'}`);
+});
+
+// /learn is deliberately DM-only and requires a reply, so Zaal explicitly
+// selects the source text. It only queues a proposal; the existing approval
+// resolver is the sole path that writes the learning to runtime memory.
+bot.command('learn', async (ctx) => {
+  if (!conversationLearnAllowed(ctx.chat.type, isFromZaal(ctx))) {
+    if (ctx.chat.type === 'private') await ownerOnly(ctx);
+    return;
+  }
+
+  const replied = ctx.message?.reply_to_message as { text?: string; caption?: string } | undefined;
+  const source = replied?.text?.trim() || replied?.caption?.trim();
+  if (!source) {
+    await ctx.reply('Reply to the message you want ZOE to learn from, then send /learn. I will show one proposal for your approval.');
+    return;
+  }
+
+  if (source.length > 6000) {
+    await ctx.reply('That message is too long to review. Reply to a shorter excerpt and try /learn again.');
+    return;
+  }
+
+  const scope = 'private';
+  const current = getPending(scope);
+  if (current && current.kind !== 'await-reflection') {
+    await ctx.reply(`You already have a pending ${pendingKindLabel(current.kind)}. Resolve it before starting /learn.`);
+    return;
+  }
+
+  await ctx.api.sendChatAction(ctx.chat.id, 'typing').catch(() => {});
+  try {
+    const proposal = await draftConversationLearn(source, repoDir);
+    if (!proposal) {
+      await ctx.reply('I could not find a reusable learning in that excerpt. Nothing was saved.');
+      return;
+    }
+    const pending: PendingApproval = {
+      kind: 'learn',
+      chatScope: scope,
+      createdAt: new Date().toISOString(),
+      proposals: [proposal],
+    };
+    const armed = await setPending(pending);
+    if (!armed.armed) {
+      const blockedBy = armed.blockedBy;
+      await ctx.reply(
+        blockedBy
+          ? `I couldn't queue the learning because a ${pendingKindLabel(blockedBy.kind)} is already waiting. Resolve it and try again.`
+          : "I couldn't queue the learning. Resolve any pending approval and try again.",
+      );
+      return;
+    }
+    await replyChunked(
+      ctx,
+      `Learning proposal from the message you selected:\n\n${proposal.id} (${proposal.target}): ${proposal.summary}\n- learning: ${proposal.learning}\n- why: ${proposal.rationale}\n\nReply "y lp-1" to apply it or "n" to discard it. Nothing is saved until you approve.`,
+    );
+  } catch (err) {
+    console.error('[zoe/index] /learn draft failed:', err instanceof Error ? err.message : String(err));
+    await ctx.reply('I could not draft that learning just now. Nothing was saved; please try again later.');
+  }
 });
 
 // /ask - ask ZOE a question directly in groups or DMs

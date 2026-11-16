@@ -50,6 +50,7 @@ All are owner-only unless the row says otherwise (`/help` and `/ask` also answer
 | `/shadow [YYYY-MM-DD]` | Critic-panel vs single-critic agreement on a day's Hermes reviews |
 | `/finalreview owner/repo N` | ZOE's final PR review card; private chat only, and only when `ZOE_FINAL_REVIEW=1` (`final-review/wire.ts`). Never merges |
 | `/focus`, `/focus off` | Hyperfocus mode on or off |
+| Reply to a message with `/learn` | Draft one reusable learning for approval; saves nothing until approved |
 | `/quest`, `/quests` | Quests block and quest list |
 | `/drafts` | Next queued post draft into the POST / REGEN / SKIP review |
 | `/draftdemo` | A sample draft to tap-test the approve buttons |

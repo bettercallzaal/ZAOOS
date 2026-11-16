@@ -52,6 +52,7 @@ export const PRIVATE_COMMANDS = [
   { command: "agenda", description: "Scheduled tasks and priorities" },
   { command: "menu", description: "Show the tap-first cockpit bar" },
   { command: "help", description: "Show overview of all commands" },
+  { command: "learn", description: "Reply to a message to propose a learning" },
 ];
 
 /**

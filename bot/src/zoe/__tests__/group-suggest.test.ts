@@ -110,7 +110,7 @@ describe('pending store', () => {
     expect(await readPending(dir)).toEqual([]);
   });
 
-  it('keeps only the newest 50 suggestions', async () => {
+  it('refuses new suggestions at capacity without dropping older ones', async () => {
     const dir = await home();
     const items = Array.from({ length: 51 }, (_, i) =>
       makeSuggestion({
@@ -120,20 +120,24 @@ describe('pending store', () => {
         text: `suggestion number ${i}`,
       }),
     );
-    for (const item of items) await addPending(dir, item);
+    for (const item of items.slice(0, 50)) expect(await addPending(dir, item)).toBe(true);
+    expect(await addPending(dir, items[50]!)).toBe(false);
     const read = await readPending(dir);
     expect(read).toHaveLength(50);
-    expect(read[0]?.text).toBe('suggestion number 1');
+    expect(read[0]?.text).toBe('suggestion number 0');
+    expect(read.at(-1)?.text).toBe('suggestion number 49');
   });
 
-  it('treats corrupt JSON as empty', async () => {
+  it('preserves corrupt JSON and refuses a capture instead of overwriting it', async () => {
     const dir = await home();
     const path = join(dir, 'group-suggest', 'pending.json');
     await import('node:fs/promises').then(({ mkdir }) =>
       mkdir(join(dir, 'group-suggest'), { recursive: true }),
     );
     await import('node:fs/promises').then(({ writeFile }) => writeFile(path, '{broken', 'utf8'));
-    expect(await readPending(dir)).toEqual([]);
+    await expect(readPending(dir)).rejects.toThrow(/invalid JSON/);
+    await expect(addPending(dir, suggestion())).rejects.toThrow(/invalid JSON/);
+    expect(await readFile(path, 'utf8')).toBe('{broken');
   });
 
   it('does not store secret-looking tokens or email addresses', async () => {

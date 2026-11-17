@@ -124,29 +124,35 @@ async function withStoreLock<T>(home: string, operation: () => Promise<T>): Prom
 }
 
 async function readStored(home: string): Promise<GroupSuggestion[]> {
+  let raw: string;
   try {
-    const raw = await fs.readFile(pendingPath(home), 'utf8');
-    const parsed = PendingSchema.safeParse(JSON.parse(raw));
-    if (!parsed.success) {
-      console.error('[zoe/group-suggest] corrupt pending file; treating it as empty');
-      return [];
-    }
-    return parsed.data.slice(-SUGGESTION_MAX);
+    raw = await fs.readFile(pendingPath(home), 'utf8');
   } catch (err) {
-    if ((err as NodeJS.ErrnoException).code !== 'ENOENT') {
-      console.error('[zoe/group-suggest] could not read pending file:', (err as Error).message);
-    }
-    return [];
+    if ((err as NodeJS.ErrnoException).code === 'ENOENT') return [];
+    throw err;
   }
+  let value: unknown;
+  try {
+    value = JSON.parse(raw);
+  } catch {
+    throw new Error('pending suggestions file contains invalid JSON');
+  }
+  const parsed = PendingSchema.safeParse(value);
+  if (!parsed.success) throw new Error('pending suggestions file has an invalid shape');
+  if (parsed.data.length > SUGGESTION_MAX)
+    throw new Error(`pending suggestions file exceeds the ${SUGGESTION_MAX}-item safety cap`);
+  return parsed.data;
 }
 
 async function writeStored(home: string, items: GroupSuggestion[]): Promise<void> {
+  if (items.length > SUGGESTION_MAX)
+    throw new Error(`refusing to write more than ${SUGGESTION_MAX} pending suggestions`);
   const dir = join(home, 'group-suggest');
   await fs.mkdir(dir, { recursive: true });
   const target = pendingPath(home);
   const temp = `${target}.${process.pid}.${randomBytes(4).toString('hex')}.tmp`;
   try {
-    await fs.writeFile(temp, JSON.stringify(items.slice(-SUGGESTION_MAX), null, 2), {
+    await fs.writeFile(temp, JSON.stringify(items, null, 2), {
       encoding: 'utf8',
       mode: 0o600,
     });
@@ -169,6 +175,10 @@ export async function addPending(home: string, suggestion: GroupSuggestion): Pro
       return false;
     }
     const current = await readStored(home);
+    if (current.length >= SUGGESTION_MAX) {
+      console.error(`[zoe/group-suggest] queue is full at ${SUGGESTION_MAX}; new suggestion was not saved`);
+      return false;
+    }
     current.push(SuggestionSchema.parse(suggestion));
     await writeStored(home, current);
     return true;

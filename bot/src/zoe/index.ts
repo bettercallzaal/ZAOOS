@@ -802,6 +802,7 @@ bot.command('gs', async (ctx) => {
     groupSuggestLastSentMs = Date.now();
   } catch (err) {
     console.error('[zoe/group-suggest] /gs send failed:', (err as Error)?.message);
+    await ctx.reply('I could not safely read the pending suggestions. Nothing was changed; check the service log before trying again.');
   }
 });
 

@@ -1,7 +1,7 @@
 import { test } from 'vitest';
 import assert from 'node:assert/strict';
 
-import { renderConciergePrompt } from '../memory.ts';
+import { renderConciergePrompt, withPersonaLearnings } from '../memory.ts';
 import type { MemoryBlocks } from '../memory.ts';
 
 const baseBlocks: MemoryBlocks = {
@@ -12,6 +12,13 @@ const baseBlocks: MemoryBlocks = {
   quests: '',
   chat_scope: 'private',
 };
+
+test('persona learnings are added to the ZOE prompt only when present', () => {
+  const withLearnings = withPersonaLearnings('You are ZOE.', '- Answer directly.');
+  assert.match(withLearnings, /Zaal-approved ZOE learnings/);
+  assert.match(withLearnings, /- Answer directly\./);
+  assert.equal(withPersonaLearnings('You are ZOE.', '  '), 'You are ZOE.');
+});
 
 // ===========================
 // renderConciergePrompt shape

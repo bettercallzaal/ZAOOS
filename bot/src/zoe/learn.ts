@@ -4,18 +4,17 @@
  * Weekly, this clusters the dispatch-loop run telemetry (runs.ts) and proposes
  * concise "learnings" to sharpen each worker. A learning is appended to a
  * runtime file (~/.zao/zoe/learnings/<target>.md) that workers.ts injects into
- * the worker's system prompt — it is NOT an autonomous edit of the git-tracked
- * .claude/agents specs. That keeps Gap 5 inside the same safety envelope as
- * Gap 4: every change to ZOE's behavior is a runtime memory layer applied only
- * after explicit Zaal approval, fully reversible, never a silent repo write.
+ * worker prompts and memory.ts injects into ZOE's private persona prompt. It is
+ * NOT an autonomous edit of git-tracked specs. Every change is a runtime memory
+ * layer applied only after explicit Zaal approval, fully reversible, never a
+ * silent repo write.
  *
  * summarizeRuns is pure (testable). runLearnCycle calls the CLI. apply/read
  * touch ~/.zao/zoe/learnings/.
  */
 
-import { promises as fs } from 'node:fs';
-import { join } from 'node:path';
-import { ZOE_PATHS } from './memory';
+import { appendApprovedLearning } from './learning-store';
+export { capLearnings, readLearnings, MAX_LEARNING_CHARS, MAX_LEARNING_LINES } from './learning-store';
 import { callClaudeCliCapAware } from './models/cli-cap-aware';
 import type { RunRecord } from './runs';
 import { readRuns } from './runs';
@@ -272,80 +271,9 @@ export async function runLearnCycle(opts: {
   }
 }
 
-function learningsDir(): string {
-  return join(ZOE_PATHS.home, 'learnings');
-}
-
-function learningsPath(target: string): string {
-  // Sanitize target to a safe filename.
-  const safe = target.replace(/[^a-z0-9_-]/gi, '_');
-  return join(learningsDir(), `${safe}.md`);
-}
-
-/**
- * Cap (doc 770 MED): worker learnings are spliced verbatim into every worker
- * system prompt. Left unbounded they silently inflate input-token cost on every
- * run. Defaults: keep the most recent 30 bullets, dedupe identical text, cap at
- * ~4000 chars. Override via ZOE_MAX_LEARNING_LINES / ZOE_MAX_LEARNING_CHARS.
- */
-export const MAX_LEARNING_LINES = Math.max(1, Number(process.env.ZOE_MAX_LEARNING_LINES ?? 30));
-export const MAX_LEARNING_CHARS = Math.max(200, Number(process.env.ZOE_MAX_LEARNING_CHARS ?? 4000));
-
-/** Pure cap+dedupe of a learnings file body. Keeps header lines + recent bullets. */
-export function capLearnings(
-  raw: string,
-  maxLines: number = MAX_LEARNING_LINES,
-  maxChars: number = MAX_LEARNING_CHARS,
-): string {
-  if (!raw.trim()) return '';
-  const header: string[] = [];
-  const bullets: string[] = [];
-  for (const line of raw.split('\n')) {
-    if (line.trimStart().startsWith('- ')) bullets.push(line);
-    else if (bullets.length === 0) header.push(line); // header precedes the bullets
-  }
-  // Dedupe by the learning text (strip the leading "- (YYYY-MM-DD) " prefix).
-  const seen = new Set<string>();
-  const deduped: string[] = [];
-  for (const b of bullets) {
-    const key = b.replace(/^\s*-\s*(\(\d{4}-\d{2}-\d{2}\))?\s*/, '').trim().toLowerCase();
-    if (key && !seen.has(key)) {
-      seen.add(key);
-      deduped.push(b);
-    }
-  }
-  const kept = deduped.slice(-maxLines); // bullets are appended chronologically → keep the tail
-  let out = [...header, ...kept].join('\n').trim();
-  if (out.length > maxChars) {
-    out = out.slice(out.length - maxChars);
-    const nl = out.indexOf('\n');
-    if (nl >= 0) out = out.slice(nl + 1); // drop a partial leading line
-  }
-  return out;
-}
-
-/** Read the accrued learnings for a worker/persona, capped + deduped, or '' if none. */
-export async function readLearnings(target: string): Promise<string> {
-  try {
-    return capLearnings(await fs.readFile(learningsPath(target), 'utf8'));
-  } catch {
-    return '';
-  }
-}
-
 /** Append an approved learning to its target file. Returns the line written. */
 export async function applyLearnProposal(p: LearnProposal): Promise<string> {
-  await fs.mkdir(learningsDir(), { recursive: true });
-  const line = `- (${new Date().toISOString().slice(0, 10)}) ${p.learning}`;
-  const path = learningsPath(p.target);
-  let existing = '';
-  try {
-    existing = await fs.readFile(path, 'utf8');
-  } catch {
-    existing = `# Learnings for ${p.target}\n\nAppended by ZOE's Gap 5 learning loop after Zaal approval.\n`;
-  }
-  await fs.writeFile(path, `${existing.trimEnd()}\n${line}\n`, 'utf8');
-  return line;
+  return appendApprovedLearning(p.target, p.learning);
 }
 
 /** Render proposals as a Telegram approval message. */

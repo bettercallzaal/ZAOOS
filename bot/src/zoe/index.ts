@@ -2856,15 +2856,25 @@ bot.on('message:text', async (ctx) => {
       if (saved && dueToSend(groupSuggestLastSentMs, now)) {
         groupSuggestLastSentMs = now;
         void serializeGroupSuggestDelivery(async () => {
+          let sendFailed = false;
           for (const s of await readUnnotifiedPending(ZOE_PATHS.home)) {
-            await bot.api.sendMessage(zaalId, renderGroupSuggestion(s), {
-              reply_markup: { inline_keyboard: [[
-                { text: 'Keep', callback_data: 'gs:k:' + s.id },
-                { text: 'Drop', callback_data: 'gs:d:' + s.id },
-              ]] },
-            });
+            try {
+              await bot.api.sendMessage(zaalId, renderGroupSuggestion(s), {
+                reply_markup: { inline_keyboard: [[
+                  { text: 'Keep', callback_data: 'gs:k:' + s.id },
+                  { text: 'Drop', callback_data: 'gs:d:' + s.id },
+                ]] },
+              });
+            } catch (sendErr) {
+              // one failing card must not hold back the cards queued after it
+              sendFailed = true;
+              console.error('[zoe/group-suggest] send failed for one card:', (sendErr as Error)?.message);
+              continue;
+            }
             await markPendingNotified(ZOE_PATHS.home, s.id, new Date(now));
           }
+          // a failed delivery must not silence automatic notices for the 30-minute window
+          if (sendFailed) groupSuggestLastSentMs = null;
         }).catch((err) => {
           console.error('[zoe/group-suggest] automatic notification failed:', (err as Error)?.message);
         });

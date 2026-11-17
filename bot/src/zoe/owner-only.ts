@@ -49,6 +49,11 @@ export function privateScopeAllowed(scope: string, fromZaal: boolean): boolean {
   return scope !== 'private' || fromZaal;
 }
 
+/** /learn may inspect only Zaal's private conversation, never a group. */
+export function conversationLearnAllowed(chatType: string, fromZaal: boolean): boolean {
+  return chatType === 'private' && fromZaal;
+}
+
 /**
  * Who a voice note or audio file is answered for (Zaal, 2026-11-07).
  *

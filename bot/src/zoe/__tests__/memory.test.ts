@@ -1,7 +1,10 @@
 import { test } from 'vitest';
 import assert from 'node:assert/strict';
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 
-import { renderConciergePrompt } from '../memory.ts';
+import { readPrivatePersonaLearnings, renderConciergePrompt, withPersonaLearnings } from '../memory.ts';
 import type { MemoryBlocks } from '../memory.ts';
 
 const baseBlocks: MemoryBlocks = {
@@ -12,6 +15,27 @@ const baseBlocks: MemoryBlocks = {
   quests: '',
   chat_scope: 'private',
 };
+
+test('persona learnings are added to the ZOE prompt only when present', () => {
+  const withLearnings = withPersonaLearnings('You are ZOE.', '- Answer directly.');
+  assert.match(withLearnings, /Zaal-approved ZOE learnings/);
+  assert.match(withLearnings, /- Answer directly\./);
+  assert.equal(withPersonaLearnings('You are ZOE.', '  '), 'You are ZOE.');
+});
+
+test('approved persona learnings load in private memory and stay out of group memory', async () => {
+  const home = await mkdtemp(join(tmpdir(), 'zoe-persona-learnings-'));
+  try {
+    const learningsPath = join(home, 'learnings', 'persona.md');
+    await mkdir(join(home, 'learnings'), { recursive: true });
+    await writeFile(learningsPath, '# Learnings for persona\n\n- Answer directly.\n', 'utf8');
+    assert.match(await readPrivatePersonaLearnings('private', home), /Answer directly/);
+    assert.equal(await readPrivatePersonaLearnings('-100123', home), '');
+    assert.equal(await readFile(learningsPath, 'utf8'), '# Learnings for persona\n\n- Answer directly.\n');
+  } finally {
+    await rm(home, { recursive: true, force: true });
+  }
+});
 
 // ===========================
 // renderConciergePrompt shape

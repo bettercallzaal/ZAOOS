@@ -50,6 +50,7 @@ All are owner-only unless the row says otherwise (`/help` and `/ask` also answer
 | `/shadow [YYYY-MM-DD]` | Critic-panel vs single-critic agreement on a day's Hermes reviews |
 | `/finalreview owner/repo N` | ZOE's final PR review card; private chat only, and only when `ZOE_FINAL_REVIEW=1` (`final-review/wire.ts`). Never merges |
 | `/focus`, `/focus off` | Hyperfocus mode on or off |
+| Reply to a message with `/learn` | Draft one reusable learning for approval; saves nothing until approved |
 | `/quest`, `/quests` | Quests block and quest list |
 | `/drafts` | Next queued post draft into the POST / REGEN / SKIP review |
 | `/draftdemo` | A sample draft to tap-test the approve buttons |
@@ -64,6 +65,8 @@ All are owner-only unless the row says otherwise (`/help` and `/ask` also answer
 | `/zg ...` | Group config: status, enable, mode, add, remove, list (see README "DMs vs groups") |
 
 Text commands that are not slash commands (`bot/src/zoe/commands.ts`, first match wins): `note:` / `cc:` / `claude:`, `queue:`, `plan:` / `decompose:`, `/checkpoint <note>`, `/audit`, `/budget`, and "stop nudges" / "start nudges".
+
+`/learn` works only in your private chat. ZOE checks the selected excerpt for recognizable personal information and secrets before drafting, then screens the draft too. If the excerpt contains sensitive data, ZOE refuses before sending it to a model; a draft with sensitive data is discarded. Any learning is saved only after you approve the proposal.
 
 ### Note prefix — the feedback loop
 

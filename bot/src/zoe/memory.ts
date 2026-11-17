@@ -23,6 +23,7 @@ import type { ZoeTask, DecisionRecord, BuildStateRecord, InboxContextRecord } fr
 import { buildQuestsBlock } from './sidequests';
 import { getTeamContextBlock } from './team-tracker';
 import { commitMemoryWrite } from './memory-git';
+import { readLearnings } from './learning-store';
 
 const ZOE_HOME = process.env.ZOE_HOME ?? join(homedir(), '.zao', 'zoe');
 const PERSONA_PATH = join(ZOE_HOME, 'persona.md');
@@ -421,6 +422,17 @@ export interface MemoryBlocks {
   chat_title?: string;
   /** Sanitized group context for public/partner groups (e.g. COC). */
   group_context?: string;
+}
+
+/** Keep approved ZOE learnings attached to the private persona prompt only. */
+export function withPersonaLearnings(persona: string, learnings: string): string {
+  return learnings.trim()
+    ? `${persona}\n\n# Zaal-approved ZOE learnings\n\n${learnings.trim()}`
+    : persona;
+}
+
+export async function readPrivatePersonaLearnings(scope: ChatScope, home = ZOE_HOME): Promise<string> {
+  return scope === 'private' ? readLearnings('persona', home) : '';
 }
 
 export async function ensureZoeHome(): Promise<void> {
@@ -889,8 +901,9 @@ export async function buildMemoryBlocks(
   yesterdaySummary?: string,
 ): Promise<MemoryBlocks> {
   const isPrivate = scope === 'private';
-  const [persona, human, recentTurns, tasks, quests, decisions, buildState, inbox, team] = await Promise.all([
+  const [persona, personaLearnings, human, recentTurns, tasks, quests, decisions, buildState, inbox, team] = await Promise.all([
     readPersona(),
+    readPrivatePersonaLearnings(scope),
     isPrivate ? readHuman() : Promise.resolve(''),
     readRecent(scope),
     isPrivate ? readTasks() : Promise.resolve([]),
@@ -940,7 +953,7 @@ export async function buildMemoryBlocks(
       : inbox.map((r) => `- ${r.summary}`).join('\n');
 
   const group_context = isPrivate ? undefined : buildGroupContext(scope, chatTitle, personaOverride, yesterdaySummary);
-  return { persona, human, working, tasks: tasksBlock, quests, decisions: decisionsBlock, build_state: buildStateBlock, inbox_context: inboxBlock, team, chat_scope: scope, chat_title: chatTitle, group_context };
+  return { persona: withPersonaLearnings(persona, personaLearnings), human, working, tasks: tasksBlock, quests, decisions: decisionsBlock, build_state: buildStateBlock, inbox_context: inboxBlock, team, chat_scope: scope, chat_title: chatTitle, group_context };
 }
 
 /**

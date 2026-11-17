@@ -26,7 +26,7 @@ The specific implementation described in this doc has changed substantially sinc
 - **SCOUT superseded by ZAOscout** (doc 882, 2026-06-20). The farscout.service was stopped and disabled by Zaal on 2026-11-07. Source: CLAUDE.md farscout entry.
 - **BUILDER role (Hermes) folded into ZOE** as of 2026-06-29. The coder/critic/auto-PR brain now lives in ZOE rather than a separate agent. The devz-fold (PR #4265, merged 2026-11-08) gives ZOE a /fix command in the ZAO Devz chat. Source: CLAUDE.md ZAO Devz entry.
 - **Current active surfaces (Nov 2026):** ZOE (`@zaoclaw_bot`), ZAO Devz (`@zaodevz_bot` + `@zoe_hermes_bot`), Bonfire (`@zabal_bonfire`), ZAOstock bot. The 5-agent config (ZOE, SCOUT, CASTER, ROLO, STOCK) is no longer the live topology.
-- **Powerful center model updated:** The doc referenced Claude Opus 4.6. The current Claude 5 family is Fable 5.2, Opus 5.5, Sonnet 5.5, Haiku 5.5. Source: CLAUDE.md Environment section.
+- **Powerful center model updated:** The doc referenced Claude Opus 4.6. The current Claude 5 family is Fable 5.2, Opus 5.5, Sonnet 5.5, Haiku 5.5. Source: the Claude Code environment model list, read 2026-11-16 (not a repo file; .claude/rules/agent-spend.md still prices Fable 5.1 as of 2026-10-17).
 
 ### Model Landscape (UNVERIFIED - all sources unreachable from this session's network)
 

@@ -1,4 +1,5 @@
 /** Runtime storage for Zaal-approved worker and ZOE learnings. */
+import { randomBytes } from 'node:crypto';
 import { promises as fs } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
@@ -63,17 +64,25 @@ export async function readLearnings(target: string, home?: string): Promise<stri
   }
 }
 
-export async function appendApprovedLearning(target: string, learning: string): Promise<string> {
-  const directory = learningsDir();
+export async function appendApprovedLearning(target: string, learning: string, home?: string): Promise<string> {
+  const directory = learningsDir(home);
   await fs.mkdir(directory, { recursive: true });
   const line = `- (${new Date().toISOString().slice(0, 10)}) ${learning}`;
-  const path = learningsPath(target);
+  const path = learningsPath(target, home);
+  const temp = `${path}.${process.pid}.${randomBytes(4).toString('hex')}.tmp`;
   let existing = '';
   try {
     existing = await fs.readFile(path, 'utf8');
-  } catch {
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code !== 'ENOENT') throw err;
     existing = `# Learnings for ${target}\n\nAppended by ZOE's learning loop after Zaal approval.\n`;
   }
-  await fs.writeFile(path, `${existing.trimEnd()}\n${line}\n`, 'utf8');
+  try {
+    await fs.writeFile(temp, `${existing.trimEnd()}\n${line}\n`, { encoding: 'utf8', mode: 0o600 });
+    await fs.rename(temp, path);
+  } catch (err) {
+    await fs.unlink(temp).catch(() => {});
+    throw err;
+  }
   return line;
 }

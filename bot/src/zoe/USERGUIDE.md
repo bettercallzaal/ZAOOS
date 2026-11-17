@@ -66,6 +66,8 @@ All are owner-only unless the row says otherwise (`/help` and `/ask` also answer
 
 Text commands that are not slash commands (`bot/src/zoe/commands.ts`, first match wins): `note:` / `cc:` / `claude:`, `queue:`, `plan:` / `decompose:`, `/checkpoint <note>`, `/audit`, `/budget`, and "stop nudges" / "start nudges".
 
+`/learn` works only in your private chat. ZOE checks the selected excerpt for recognizable personal information and secrets before drafting; if found, it refuses the request before sending that excerpt to a model. Any learning is saved only after you approve the proposal.
+
 ### Note prefix — the feedback loop
 
 Anything you start with `note:` (or `cc:` or `claude:`) is captured to a notes file ZOE keeps for the next Claude Code session.

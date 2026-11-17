@@ -79,7 +79,13 @@ export function parseConversationLearnProposal(text: string): LearnProposal | nu
   const proposal = coerceProposals(text)[0];
   if (!proposal) return null;
   if (!/^[a-z0-9][a-z0-9_-]{0,63}$/i.test(proposal.target)) return null;
-  if (proposal.learning.length > 600 || proposal.summary.length > 180 || proposal.rationale.length > 400) return null;
+  if (
+    proposal.learning.length > 600 ||
+    proposal.summary.length > 180 ||
+    proposal.rationale.length > 400
+  ) return null;
+  const proposalText = `${proposal.summary}\n${proposal.learning}\n${proposal.rationale}`;
+  if (conversationLearnInputBlockReason(proposalText)) return null;
   return { ...proposal, id: 'lp-1' };
 }
 

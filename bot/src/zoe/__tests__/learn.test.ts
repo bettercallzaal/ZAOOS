@@ -106,6 +106,14 @@ test('conversation learn blocks recognizable secrets and personal information be
   assert.equal(conversationLearnInputBlockReason('Answer the explicit question first.'), null);
 });
 
+test('conversation learn rejects generated proposals containing sensitive details', () => {
+  const proposal = JSON.stringify({ proposals: [{
+    id: 'lp-1', target: 'persona', summary: 'Remember the contact',
+    learning: 'Email person@example.com after the meeting.', rationale: 'The excerpt said so.',
+  }] });
+  assert.equal(parseConversationLearnProposal(proposal), null);
+});
+
 // =========================
 // capLearnings — doc 770 MED (bounded + deduped worker-prompt learnings)
 // =========================

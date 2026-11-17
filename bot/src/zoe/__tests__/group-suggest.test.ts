@@ -7,9 +7,11 @@ import {
   appendKept,
   dueToSend,
   keepPending,
+  markPendingNotified,
   makeSuggestion,
   readGroupSuggestConfig,
   readPending,
+  readUnnotifiedPending,
   renderCard,
   SUGGEST_DM_MIN_GAP_MS,
   shouldCapture,
@@ -79,6 +81,16 @@ describe('pending store', () => {
     expect(await readFile(join(dir, 'group-suggest', 'kept.md'), 'utf8')).toContain(
       `- <!-- group-suggestion:${item.id} --> ${item.at.slice(0, 10)} Sam Rivera in ZAO Group: ${item.text}`,
     );
+  });
+
+  it('remembers which pending cards were already sent automatically', async () => {
+    const dir = await home();
+    const item = suggestion();
+    await addPending(dir, item);
+    expect(await readUnnotifiedPending(dir)).toEqual([item]);
+    expect(await markPendingNotified(dir, item.id, new Date('2026-11-16T23:00:00.000Z'))).toBe(true);
+    expect(await readPending(dir)).toEqual([{ ...item, notifiedAt: '2026-11-16T23:00:00.000Z' }]);
+    expect(await readUnnotifiedPending(dir)).toEqual([]);
   });
 
   it('keeps the pending item when writing the kept record fails, then retries without duplication', async () => {

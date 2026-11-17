@@ -256,8 +256,10 @@ import {
   dueToSend,
   makeSuggestion,
   keepPending as keepGroupSuggestion,
+  markPendingNotified,
   readGroupSuggestConfig,
   readPending,
+  readUnnotifiedPending,
   renderCard as renderGroupSuggestion,
   shouldCapture,
   takePending as takeGroupSuggestion,
@@ -782,27 +784,37 @@ if (groupMemoryCfg) console.log(`[zoe/index] group memory ON for ${groupMemoryCf
 const groupSuggestCfg = readGroupSuggestConfig();
 if (groupSuggestCfg) console.log(`[zoe/index] group suggestions ON for ${groupSuggestCfg.chats.size} chat(s)`);
 let groupSuggestLastSentMs: number | null = null;
+let groupSuggestDelivery: Promise<void> = Promise.resolve();
+
+function serializeGroupSuggestDelivery(task: () => Promise<void>): Promise<void> {
+  const next = groupSuggestDelivery.then(task, task);
+  groupSuggestDelivery = next.catch(() => {});
+  return next;
+}
 
 bot.command('gs', async (ctx) => {
   if (ctx.chat.type !== 'private' || !isFromZaal(ctx)) return;
   try {
-    const pending = await readPending(ZOE_PATHS.home);
-    if (pending.length === 0) {
-      await ctx.reply('No suggestions waiting.');
-      return;
-    }
-    for (const s of pending) {
-      await bot.api.sendMessage(zaalId, renderGroupSuggestion(s), {
-        reply_markup: { inline_keyboard: [[
-          { text: 'Keep', callback_data: 'gs:k:' + s.id },
-          { text: 'Drop', callback_data: 'gs:d:' + s.id },
-        ]] },
-      });
-    }
-    groupSuggestLastSentMs = Date.now();
+    await serializeGroupSuggestDelivery(async () => {
+      const pending = await readPending(ZOE_PATHS.home);
+      if (pending.length === 0) {
+        await ctx.reply('No suggestions waiting.');
+        return;
+      }
+      for (const s of pending) {
+        await bot.api.sendMessage(zaalId, renderGroupSuggestion(s), {
+          reply_markup: { inline_keyboard: [[
+            { text: 'Keep', callback_data: 'gs:k:' + s.id },
+            { text: 'Drop', callback_data: 'gs:d:' + s.id },
+          ]] },
+        });
+        await markPendingNotified(ZOE_PATHS.home, s.id);
+      }
+      groupSuggestLastSentMs = Date.now();
+    });
   } catch (err) {
     console.error('[zoe/group-suggest] /gs send failed:', (err as Error)?.message);
-    await ctx.reply('I could not safely read the pending suggestions. Nothing was changed; check the service log before trying again.');
+    await ctx.reply('/gs did not finish. Pending suggestions remain saved; some cards may already have been sent. Check the service log before retrying.');
   }
 });
 
@@ -2842,15 +2854,20 @@ bot.on('message:text', async (ctx) => {
       if (saved) featureRan('group-suggest-capture', `chat ${chatId}`);
       const now = Date.now();
       if (saved && dueToSend(groupSuggestLastSentMs, now)) {
-        for (const s of await readPending(ZOE_PATHS.home)) {
-          await bot.api.sendMessage(zaalId, renderGroupSuggestion(s), {
-            reply_markup: { inline_keyboard: [[
-              { text: 'Keep', callback_data: 'gs:k:' + s.id },
-              { text: 'Drop', callback_data: 'gs:d:' + s.id },
-            ]] },
-          });
-        }
         groupSuggestLastSentMs = now;
+        void serializeGroupSuggestDelivery(async () => {
+          for (const s of await readUnnotifiedPending(ZOE_PATHS.home)) {
+            await bot.api.sendMessage(zaalId, renderGroupSuggestion(s), {
+              reply_markup: { inline_keyboard: [[
+                { text: 'Keep', callback_data: 'gs:k:' + s.id },
+                { text: 'Drop', callback_data: 'gs:d:' + s.id },
+              ]] },
+            });
+            await markPendingNotified(ZOE_PATHS.home, s.id, new Date(now));
+          }
+        }).catch((err) => {
+          console.error('[zoe/group-suggest] automatic notification failed:', (err as Error)?.message);
+        });
       }
     }
   } catch (err) {

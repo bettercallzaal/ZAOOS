@@ -11,8 +11,8 @@
  * Off unless ZOE_GROUP_SUGGEST=1 and both ZOE_GROUP_SUGGEST_CHATS and
  * ZOE_GROUP_SUGGEST_SENDERS list at least one numeric id. Bots are never
  * senders. A text that containsSecret (recall.ts) or containsPii (pii.ts) is
- * not stored. Cards go out at most once per SUGGEST_DM_MIN_GAP_MS; /gs in
- * Zaal's DM sends what is waiting at once.
+ * not stored. Automatic notices go out at most once per card and at most once
+ * per SUGGEST_DM_MIN_GAP_MS; /gs in Zaal's DM intentionally resends all pending.
  */
 
 import { randomBytes } from 'node:crypto';
@@ -34,6 +34,7 @@ export interface GroupSuggestion {
   sender: string;
   text: string;
   at: string;
+  notifiedAt?: string;
 }
 
 const SuggestionSchema = z.object({
@@ -43,6 +44,7 @@ const SuggestionSchema = z.object({
   sender: z.string().min(1),
   text: z.string().max(500),
   at: z.string().datetime(),
+  notifiedAt: z.string().datetime().optional(),
 });
 const PendingSchema = z.array(SuggestionSchema);
 const mutationLocks = new Map<string, Promise<void>>();
@@ -187,6 +189,21 @@ export async function addPending(home: string, suggestion: GroupSuggestion): Pro
 
 export async function readPending(home: string): Promise<GroupSuggestion[]> {
   return readStored(home);
+}
+
+export async function readUnnotifiedPending(home: string): Promise<GroupSuggestion[]> {
+  return (await readStored(home)).filter((item) => !item.notifiedAt);
+}
+
+export async function markPendingNotified(home: string, id: string, at: Date = new Date()): Promise<boolean> {
+  return withStoreLock(home, async () => {
+    const current = await readStored(home);
+    const item = current.find((suggestion) => suggestion.id === id);
+    if (!item) return false;
+    item.notifiedAt = at.toISOString();
+    await writeStored(home, current);
+    return true;
+  });
 }
 
 export async function takePending(home: string, id: string): Promise<GroupSuggestion | null> {

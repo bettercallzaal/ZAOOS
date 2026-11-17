@@ -431,6 +431,10 @@ export function withPersonaLearnings(persona: string, learnings: string): string
     : persona;
 }
 
+export async function readPrivatePersonaLearnings(scope: ChatScope, home = ZOE_HOME): Promise<string> {
+  return scope === 'private' ? readLearnings('persona', home) : '';
+}
+
 export async function ensureZoeHome(): Promise<void> {
   await fs.mkdir(ZOE_HOME, { recursive: true });
   await fs.mkdir(RECENT_DIR, { recursive: true });
@@ -899,7 +903,7 @@ export async function buildMemoryBlocks(
   const isPrivate = scope === 'private';
   const [persona, personaLearnings, human, recentTurns, tasks, quests, decisions, buildState, inbox, team] = await Promise.all([
     readPersona(),
-    isPrivate ? readLearnings('persona') : Promise.resolve(''),
+    readPrivatePersonaLearnings(scope),
     isPrivate ? readHuman() : Promise.resolve(''),
     readRecent(scope),
     isPrivate ? readTasks() : Promise.resolve([]),

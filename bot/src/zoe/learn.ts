@@ -20,6 +20,8 @@ import type { RunRecord } from './runs';
 import { readRuns } from './runs';
 import type { ZoeContext } from './types';
 import { ZOE_DEFAULT_MODEL, ZOE_QUICK_MODEL } from './types';
+import { containsPii } from './pii';
+import { containsSecret } from './recall';
 
 export interface WorkerRunSummary {
   worker: string;
@@ -81,8 +83,18 @@ export function parseConversationLearnProposal(text: string): LearnProposal | nu
   return { ...proposal, id: 'lp-1' };
 }
 
+/** Do not send excerpts containing recognizable secrets or personal data to a model. */
+export function conversationLearnInputBlockReason(source: string): 'secret' | 'personal information' | null {
+  if (containsSecret(source)) return 'secret';
+  if (containsPii(source)) return 'personal information';
+  return null;
+}
+
 /** Draft a single conversation learning with the configured quick model. */
 export async function draftConversationLearn(source: string, cwd: string): Promise<LearnProposal | null> {
+  if (conversationLearnInputBlockReason(source)) {
+    throw new Error('conversation excerpt contains recognizable sensitive information');
+  }
   const result = await callClaudeCliCapAware({
     model: ZOE_QUICK_MODEL,
     prompt: buildConversationLearnPrompt(source),

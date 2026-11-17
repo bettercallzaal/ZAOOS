@@ -138,7 +138,12 @@ import {
   type ReflectionAnswers,
   type ProposedPatch,
 } from './reflexion';
-import { applyLearnProposal, draftConversationLearn, type LearnProposal } from './learn';
+import {
+  applyLearnProposal,
+  conversationLearnInputBlockReason,
+  draftConversationLearn,
+  type LearnProposal,
+} from './learn';
 import { startScheduler } from './scheduler';
 import {
   applyNudgeAction,
@@ -649,6 +654,10 @@ bot.command('learn', async (ctx) => {
 
   if (source.length > 6000) {
     await ctx.reply('That message is too long to review. Reply to a shorter excerpt and try /learn again.');
+    return;
+  }
+  if (conversationLearnInputBlockReason(source)) {
+    await ctx.reply('That excerpt appears to contain personal information or a secret. I did not send or save it. Remove those details and try again.');
     return;
   }
 

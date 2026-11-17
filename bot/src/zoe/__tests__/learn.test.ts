@@ -6,6 +6,7 @@ import {
   renderLearnProposals,
   capLearnings,
   buildConversationLearnPrompt,
+  conversationLearnInputBlockReason,
   parseConversationLearnProposal,
 } from '../learn.ts';
 import type { LearnProposal } from '../learn.ts';
@@ -97,6 +98,12 @@ test('conversation learn accepts one bounded proposal and rejects unsafe target 
   assert.equal(parseConversationLearnProposal(valid)?.id, 'lp-1');
   assert.equal(parseConversationLearnProposal(valid.replace('persona', '../outside')), null);
   assert.equal(parseConversationLearnProposal('{"proposals":[]}'), null);
+});
+
+test('conversation learn blocks recognizable secrets and personal information before model use', () => {
+  assert.equal(conversationLearnInputBlockReason('contact person@example.com'), 'personal information');
+  assert.equal(conversationLearnInputBlockReason(`token sk-ant-${'A'.repeat(30)}`), 'secret');
+  assert.equal(conversationLearnInputBlockReason('Answer the explicit question first.'), null);
 });
 
 // =========================

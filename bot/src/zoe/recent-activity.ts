@@ -24,11 +24,11 @@
 import { promises as fs } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
-import type { SendLogRow } from './send-budget';
-import { gapsPath } from './capability-gaps';
 import type { Context } from 'grammy';
-import { featureRan, recentRuns, type FeatureRun } from './feature-ran';
-import { OWNER_ONLY_LINE, shouldSendOwnerOnlyLine, type OwnerOnlyState } from './owner-only';
+import { gapsPath } from './capability-gaps';
+import { type FeatureRun, featureRan, recentRuns } from './feature-ran';
+import { OWNER_ONLY_LINE, type OwnerOnlyState, shouldSendOwnerOnlyLine } from './owner-only';
+import type { SendLogRow } from './send-budget';
 
 /** Kill switch. /status is read-only and owner-only, so it is on unless set to 0. */
 export function statusCommandEnabled(env: NodeJS.ProcessEnv = process.env): boolean {
@@ -70,7 +70,12 @@ function etDay(d: Date): string {
 
 /** "14:05" today, "Sun 14:05" on an earlier day. Eastern, 24-hour. */
 export function shortTime(d: Date, now: Date): string {
-  const hm = new Intl.DateTimeFormat('en-GB', { timeZone: TZ, hour: '2-digit', minute: '2-digit', hour12: false }).format(d);
+  const hm = new Intl.DateTimeFormat('en-GB', {
+    timeZone: TZ,
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).format(d);
   if (etDay(d) === etDay(now)) return hm;
   const wd = new Intl.DateTimeFormat('en-US', { timeZone: TZ, weekday: 'short' }).format(d);
   return `${wd} ${hm}`;
@@ -84,7 +89,11 @@ export function renderStatus(input: StatusInput): string {
 
   for (const r of ran) {
     const times = r.count > 1 ? ` (x${r.count})` : '';
-    items.push({ at: r.at.getTime(), tag: 'ran', text: `${r.feature}${r.detail ? `: ${r.detail}` : ''}${times}` });
+    items.push({
+      at: r.at.getTime(),
+      tag: 'ran',
+      text: `${r.feature}${r.detail ? `: ${r.detail}` : ''}${times}`,
+    });
   }
   for (const s of sends) {
     const at = Date.parse(s.at);
@@ -102,7 +111,9 @@ export function renderStatus(input: StatusInput): string {
   const top = items.slice(0, limit);
 
   const today = etDay(now);
-  const todaySends = sends.filter((s) => Number.isFinite(Date.parse(s.at)) && etDay(new Date(s.at)) === today);
+  const todaySends = sends.filter(
+    (s) => Number.isFinite(Date.parse(s.at)) && etDay(new Date(s.at)) === today,
+  );
   const sent = todaySends.filter((s) => s.outcome === 'sent').length;
   const held = todaySends.filter((s) => s.outcome === 'deferred').length;
   const dropped = todaySends.filter((s) => s.outcome === 'dropped').length;
@@ -113,12 +124,15 @@ export function renderStatus(input: StatusInput): string {
   if (top.length === 0) {
     lines.push('Nothing recorded yet since the last start.');
   } else {
-    for (const it of top) lines.push(`${shortTime(new Date(it.at), now)} ${it.tag} - ${clip(it.text, 70)}`);
+    for (const it of top)
+      lines.push(`${shortTime(new Date(it.at), now)} ${it.tag} - ${clip(it.text, 70)}`);
   }
   return lines.join('\n');
 }
 
-export function statusKeyboard(): { inline_keyboard: Array<Array<{ text: string; callback_data: string }>> } {
+export function statusKeyboard(): {
+  inline_keyboard: Array<Array<{ text: string; callback_data: string }>>;
+} {
   return { inline_keyboard: [[{ text: 'Refresh', callback_data: 'zst:refresh' }]] };
 }
 
@@ -127,7 +141,10 @@ async function tailJsonl<T>(path: string, n: number): Promise<T[]> {
   try {
     const raw = await fs.readFile(path, 'utf8');
     const out: T[] = [];
-    for (const l of raw.split('\n').filter((x) => x.trim()).slice(-n)) {
+    for (const l of raw
+      .split('\n')
+      .filter((x) => x.trim())
+      .slice(-n)) {
       try {
         const row: unknown = JSON.parse(l);
         // `null`, a number or a string parses fine and would crash the render.
@@ -190,16 +207,24 @@ export function statusCommandHandler(deps: StatusHandlerDeps) {
   };
 }
 
-/** The Refresh button. A non-owner tap is answered empty and edits nothing. */
+/**
+ * The Refresh button. A non-owner tap is answered empty and edits nothing.
+ * Switched off (ZOE_STATUS_COMMAND=0), a tap on a Refresh button left in the
+ * chat from before is answered empty and edits nothing too: the kill switch
+ * covers both paths, not only the command.
+ */
 export function statusRefreshHandler(deps: StatusHandlerDeps) {
+  const enabled = deps.enabled ?? (() => statusCommandEnabled());
   const build = deps.build ?? (() => buildStatus());
   return async (ctx: Context): Promise<void> => {
-    if (ctx.from?.id !== deps.zaalId) {
+    if (!enabled() || ctx.from?.id !== deps.zaalId) {
       await ctx.answerCallbackQuery().catch(() => undefined);
       return;
     }
     await ctx.answerCallbackQuery({ text: 'Refreshed' }).catch(() => undefined);
     // Telegram refuses an edit to identical text; that is not an error worth showing.
-    await ctx.editMessageText(await build(), { reply_markup: statusKeyboard() }).catch(() => undefined);
+    await ctx
+      .editMessageText(await build(), { reply_markup: statusKeyboard() })
+      .catch(() => undefined);
   };
 }

@@ -27,6 +27,32 @@
  * which lists exactly which features have executed since the bot started.
  */
 
+import { containsSecret } from './recall';
+
+/** The longest detail kept. /status shows about 70 characters of a line anyway. */
+export const DETAIL_MAX = 80;
+export const DETAIL_WITHHELD = '[detail withheld: it looked like a key or token]';
+
+/**
+ * A detail goes to journald and, through /status, into a Telegram message.
+ * Most callers pass a count or a fixed word, but some pass text that came from
+ * outside (a task title, a filename, an intent), so every detail is screened
+ * here, once, instead of trusting each of the ~140 call sites:
+ *   - anything containsSecret() matches (the Bonfire write guard's list) is
+ *     replaced whole, never partly masked;
+ *   - a home directory path is shortened to ~ (it names the machine's user);
+ *   - whitespace collapses to one line, and the result is clipped.
+ * An empty result is dropped, so the log line reads as if no detail was given.
+ */
+export function screenDetail(detail: string | undefined): string | undefined {
+  if (typeof detail !== 'string') return undefined;
+  const one = detail.replace(/\s+/g, ' ').trim();
+  if (!one) return undefined;
+  if (containsSecret(one)) return DETAIL_WITHHELD;
+  const short = one.replace(/(?:\/home\/|\/Users\/|[A-Za-z]:\\Users\\)[^/\\\s]+/g, '~');
+  return short.length > DETAIL_MAX ? `${short.slice(0, DETAIL_MAX - 3)}...` : short;
+}
+
 /** Features that have already announced themselves this process. */
 const announced = new Set<string>();
 
@@ -50,7 +76,8 @@ const lastRuns = new Map<string, FeatureRun>();
  * done its work - not at import time, which would only prove the module was
  * loaded (the same mistake as a flag that proves reachability).
  */
-export function featureRan(feature: string, detail?: string): void {
+export function featureRan(feature: string, rawDetail?: string): void {
+  const detail = screenDetail(rawDetail);
   const prev = lastRuns.get(feature);
   lastRuns.set(feature, { feature, at: new Date(), detail, count: (prev?.count ?? 0) + 1 });
   if (announced.has(feature)) return;

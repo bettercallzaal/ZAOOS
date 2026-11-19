@@ -1,9 +1,9 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { featureRan, recentRuns, resetAnnouncedForTest } from '../feature-ran';
 import type { Context } from 'grammy';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { featureRan, recentRuns, resetAnnouncedForTest } from '../feature-ran';
 import { newOwnerOnlyState, OWNER_ONLY_LINE } from '../owner-only';
 import {
   buildStatus,
@@ -86,7 +86,14 @@ describe('renderStatus', () => {
     const text = renderStatus({
       now: NOW,
       bootAt: NOW,
-      ran: [{ feature: 'tick-lock', at: new Date('2026-10-26T13:50:00Z'), count: 42, detail: 'x'.repeat(200) }],
+      ran: [
+        {
+          feature: 'tick-lock',
+          at: new Date('2026-10-26T13:50:00Z'),
+          count: 42,
+          detail: 'x'.repeat(200),
+        },
+      ],
       sends: [],
       gaps: [],
     });
@@ -110,7 +117,9 @@ describe('renderStatus', () => {
 
 describe('statusKeyboard', () => {
   it('offers one Refresh button', () => {
-    expect(statusKeyboard().inline_keyboard).toEqual([[{ text: 'Refresh', callback_data: 'zst:refresh' }]]);
+    expect(statusKeyboard().inline_keyboard).toEqual([
+      [{ text: 'Refresh', callback_data: 'zst:refresh' }],
+    ]);
   });
 });
 
@@ -229,6 +238,37 @@ describe('owner gate on /status and the Refresh button', () => {
     await statusRefreshHandler(deps())(ctx);
     expect(calls.answer).toEqual([[]]);
     expect(calls.edit).toEqual([]);
+  });
+
+  it('switched off, the owner tapping an old Refresh button gets an empty answer, no build and no edit', async () => {
+    const { ctx, calls } = fakeCtx(ZAAL);
+    let built = 0;
+    await statusRefreshHandler({
+      ...deps(),
+      enabled: () => false,
+      build: async () => {
+        built += 1;
+        return 'STATUS TEXT';
+      },
+    })(ctx);
+    expect(calls.answer).toEqual([[]]);
+    expect(calls.edit).toEqual([]);
+    expect(built).toBe(0);
+  });
+
+  it('with no enabled dep, Refresh reads ZOE_STATUS_COMMAND and is off at 0', async () => {
+    const prev = process.env.ZOE_STATUS_COMMAND;
+    process.env.ZOE_STATUS_COMMAND = '0';
+    try {
+      const { enabled: _unused, ...rest } = deps();
+      const { ctx, calls } = fakeCtx(ZAAL);
+      await statusRefreshHandler(rest)(ctx);
+      expect(calls.answer).toEqual([[]]);
+      expect(calls.edit).toEqual([]);
+    } finally {
+      if (prev === undefined) delete process.env.ZOE_STATUS_COMMAND;
+      else process.env.ZOE_STATUS_COMMAND = prev;
+    }
   });
 
   it('the owner tapping Refresh gets the status edited in place', async () => {

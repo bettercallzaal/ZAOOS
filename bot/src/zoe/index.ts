@@ -76,6 +76,7 @@ import {
 import { NO_SPINNER, startThinkingSpinner, thinkingSpinnerEnabled } from './thinking-spinner';
 import { sendTerminalsDigest, terminalsDigestEnabled, readTerminalsPage, parseTerminalsPage, vaultDir as terminalsVaultDir } from './terminals-digest';
 import { statusCommandHandler, statusRefreshHandler } from './recent-activity';
+import { flagsCommandHandler } from './flags-command';
 import { captureTerminalTypedReply, maybeSendTailCard, recordTerminalAnswer, sendNextTerminalCard, setPendingType, tailCardScopeAllowed, terminalGrillEnabled } from './terminal-grill';
 import { formatPrList, inboxNudgeEnabled, mergeCommand, parsePrCallback, readTotals } from './inbox-nudge';
 import { RESUME_ROW, STOP_ROW, grillStopEnabled, setGrillPaused } from './grill-pause';
@@ -1154,6 +1155,11 @@ bot.command('terminals', async (ctx, next) => {
 // off and the command falls through, so the word is not swallowed.
 bot.command('status', statusCommandHandler({ zaalId, ownerOnlyState }));
 bot.callbackQuery('zst:refresh', statusRefreshHandler({ zaalId, ownerOnlyState }));
+
+// /flags - which decision flags the RUNNING process has on (flags-command.ts).
+// Read-only, owner-only, names and switch words only, never a value. Off unless
+// ZOE_FLAGS_COMMAND=1; off, the command falls through.
+bot.command('flags', flagsCommandHandler({ zaalId, ownerOnlyState }));
 
 // /working - list tasks currently in_progress with how long they've been in that state
 bot.command('working', async (ctx) => {

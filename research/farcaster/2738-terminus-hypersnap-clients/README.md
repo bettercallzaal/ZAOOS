@@ -9,7 +9,7 @@ original-query: "resaerch terminus and how it work sand other hypersnap clients"
 tier: STANDARD
 ---
 
-# 2738 - Hypersnap clients (Quilcast, Castora, Arches, Cabildo), Hypersnap itself, and "Terminus"
+# 2738 - Hypersnap clients (Terminus, Quilcast, Castora, Arches, Cabildo) and Hypersnap itself
 
 > **Goal:** Say what a Hypersnap client is, which ones exist on 19 Nov 2026, how they sign in and talk to the network, and what Sparkz can build on Hypersnap next. Scope widened mid-run by Zaal ("dive into more things for hypersnap").
 >
@@ -19,7 +19,7 @@ tier: STANDARD
 
 | # | Decision | Why |
 |---|---|---|
-| 1 | **"Terminus" is NOT FOUND.** Do not plan on it until Zaal names its link or author. | Searched hypersnap.org's full docs (190,486 bytes, 0 hits; the same file has 312 hits for "hypersnap"), the farcasterorg/hypersnap repo, GitHub repo search ("terminus farcaster", "terminus hypersnap"), and the ZAO research library and vault. Not searched: X, farcaster.xyz casts, Discord. It may be a client launched outside GitHub, or a different name. |
+| 1 | **Terminus is a closed-source native iOS (and Android) Hypersnap client, distributed by TestFlight. USE it as the model for the Sparkz app's Hypersnap side, not as code.** | Its developer (Kyle B, "kyb") posted it in the Hypersnap Telegram chat on 2026-10-26: "A lightweight, native iOS client for Hypersnap. Feeds, threads, channels, notifications and posting, with your keys kept on your iPhone." Every read and post goes to Hypersnap nodes, and sign-in adds a Hypersnap-only (gasless) signer. Only two read-only lookups go to Farcaster's public API through Terminus's own proxy: the channel directory and accounts' opt-in status. 0.1.1 went to TestFlight on 2026-10-27; iOS and Android updates for the fork shipped on 2026-11-11. Reported problems: "can't connect to any hypersnap nodes", likes failing, and lookup 404s from haatz after its reindex. No repo or website was found: it is absent from hypersnap.org's docs (0 hits in 190,486 bytes) and from GitHub repo search. [PARTIAL: from a Telegram chat extract read on 2026-11-13, quoted secondhand; the extract is no longer on disk.] |
 | 2 | **USE Quilcast as the reference Hypersnap client.** | Open source (MIT, LICENSE file read), live web + iPhone + Android apps, last commit 2026-11-20, release v1.1.1 on 2026-11-06. It reads the public node's HTTP API and submits browser-signed protobuf messages to `/v1/submitMessage`, the same pattern Sparkz already uses. |
 | 3 | **KEEP Sparkz on the same Farcaster FIDs, and know which side of the fork it reads.** No new identity work is needed. | Hypersnap reads FIDs, custody and signers from the on-chain IdRegistry and KeyRegistry, so a Sparkz user's FID is the same on both sides. But Hypersnap hard-forked from Snapchain on about 2026-11-12 (two validator sets, with a "shuttle" relaying signed messages; [doc 2736](../2736-sparkz-farcaster-hypersnap-build-guide/), [doc 2666](../2666-hypersnap-hard-fork-protocol-layer-oct2026/)). Messages from native FIDs (from 2^32, registered by proof of work) and gasless signers exist only on the Hypersnap side. |
 | 4 | **SKIP any token or reward plan.** | Tokenomics are open proposals only (FIP discussions #19 and #26). hypersnap.org says "no buy/claim flow or guaranteed reward promise", and running a node "is not a guaranteed token-reward programme". |
@@ -48,7 +48,7 @@ tier: STANDARD
 | Name | What | Sign-in / keys | Reads / writes | Open source | Activity |
 |---|---|---|---|---|---|
 | **Quilcast** (quilcast.com, by Nikita Kolmogorov / backmeupplz) | Full client: web, iPhone, Android. Feeds, threads, notifications with Web Push, DMs and Spaces relayed from farcaster.xyz, wallet with LI.FI swaps, mini apps, scheduled casts, MySpace-style profiles, 22 languages | Recovery phrase (same derivation as Warpcast), or an external wallet as custody that signs a gasless KEY_ADD; keys stay in browser IndexedDB. Can create a new FID for about $0.20 of ETH on Optimism | Reads the public node's HTTP API; writes browser-signed protobuf to `/v1/submitMessage` | MIT | created 2026-10-20, last commit 2026-11-20, v1.1.1 on 2026-11-06, 11 stars |
-| **Terminus** | NOT FOUND (see Decision 1) | - | - | - | - |
+| **Terminus** (by Kyle B / kyb) | Native iOS and Android client: feeds, threads, channels, notifications, posting | Keys kept on the phone; sign-in adds a Hypersnap-only (gasless) signer | All reads and posts to Hypersnap nodes; channel directory and opt-in status through its own proxy to Farcaster's public API | No repo found (closed or unpublished) | 0.1.1 on TestFlight 2026-10-27; fork update 2026-11-11 |
 | **Castora Desktop** (arcabotai) | Tauri v2 desktop client, macOS first; feed, compose, account panels | Signer key in the OS keychain; V1 existing FIDs only | Reads `haatz.quilibrium.com`; Phase 0 write spike (CastAdd encoder) | No LICENSE file found | created 2026-06-01, last push 2026-06-02 (stalled) |
 | **Arches / Hypersnap Lite** (jpfraneto) | Lite is a write-only self-hosted relay; Arches adds a one-command community client (domain, web UI, local feed, Redis/Postgres) | Admin FID set at install | Writes only, through the relay | GPL-3.0 | created 2026-05-28, last push 2026-05-29 |
 | **Cabildo** (arcabotai) | Async public forum for Hypersnap builders; maps posts to casts | Not documented in the README | gRPC HubService (GetCastsByParent, SubmitMessage) | No LICENSE file found | created and last pushed 2026-05-18 |
@@ -80,7 +80,7 @@ Sparkz already ships Hypersnap plumbing on main: `src/app/_components/HypersnapS
 
 | Action | Owner | Type | By When |
 |---|---|---|---|
-| Send the Terminus link or author name, so it can be added to the clients table | Zaal | Reply | When convenient |
+| Install Terminus from its TestFlight link (in the Hypersnap Telegram "Hypersnap Clients" channel) and compare it with the Sparkz app | Zaal | Test | Optional |
 | Plan "Cast a Spark to Hypersnap" after sparkz #418 lands | sparkz lane | PR plan | After #418 merges |
 | Try Quilcast with a ZAO FID to see a working Hypersnap client end to end | Zaal | Test | Optional |
 
@@ -94,4 +94,5 @@ Sparkz already ships Hypersnap plumbing on main: `src/app/_components/HypersnapS
 - [Quilcast README and LICENSE](https://github.com/backmeupplz/quilcast) [FULL]
 - [Castora Desktop](https://github.com/arcabotai/castora-desktop), [Cabildo](https://github.com/arcabotai/cabildo), [Hypersnap Lite](https://github.com/jpfraneto/hypersnap-lite), [hypersnap.org repo](https://github.com/arcacomputer/hypersnapweb) [PARTIAL - README head and LICENSE only]
 - [farcasterorg protocol discussions (community)](https://github.com/orgs/farcasterorg/discussions/19) [PARTIAL - titles, comment counts and dates from the GitHub API; thread bodies not read]
-- Terminus [FAILED - hypersnap.org docs, farcasterorg repo, GitHub repo search and the ZAO library and vault searched; DuckDuckGo returned a CAPTCHA and Google returned no results; X, farcaster.xyz and Discord not searched]
+- Hypersnap Telegram chat extract, Oct to Nov 2026 (community source; Terminus announcement 2026-10-26, release notes 2026-10-27, fork update 2026-11-11) [PARTIAL - read secondhand from session transcripts of 2026-11-13; the extract is no longer on disk]
+- Terminus web search [FAILED - hypersnap.org docs and GitHub repo search had 0 hits; DuckDuckGo returned a CAPTCHA and Google returned no results]

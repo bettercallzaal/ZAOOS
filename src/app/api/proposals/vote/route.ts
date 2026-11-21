@@ -5,6 +5,7 @@ import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { logger } from '@/lib/logger';
 import { createInAppNotification } from '@/lib/notifications';
+import { draftOfficialCast } from '@/lib/publish/official-draft';
 import { computeRespectWeight } from '@/lib/respect/voteWeight';
 import { proposalVoteSchema } from '@/lib/validation/schemas';
 
@@ -197,8 +198,8 @@ export async function POST(req: NextRequest) {
 }
 
 /**
- * Check if a proposal has reached the Respect vote threshold for auto-publishing
- * to @thezao Farcaster account. Non-blocking, fire-and-forget.
+ * Check if a proposal has reached the Respect vote threshold. Since 20 Nov 2026
+ * it is drafted to Zaal's ZOE chat, not published. Returns false: nothing is published.
  */
 async function checkPublishThreshold(proposalId: string): Promise<boolean> {
   // Get proposal with publish info
@@ -212,6 +213,8 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
 
   // Skip if already published
   if (proposal.published_cast_hash) return false;
+  // Skip if already drafted for Zaal (threshold met earlier) or approved by an admin
+  if (proposal.status === 'approved') return false;
 
   // Social posts publish immediately when threshold is met.
   // All other categories wait for the voting period to end.
@@ -240,7 +243,7 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
 
   if (totalRespectFor >= threshold) {
     logger.info(
-      `[publish-threshold] Proposal ${proposalId} reached ${totalRespectFor}/${threshold} Respect — auto-publishing`,
+      `[publish-threshold] Proposal ${proposalId} reached ${totalRespectFor}/${threshold} Respect, drafting for Zaal (not publishing)`,
     );
 
     const { data: fullProposal } = await supabaseAdmin
@@ -261,286 +264,36 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
         : `${fullProposal.title}\n\n${fullProposal.description}`);
     const attribution = `\n\n— Proposed by @${authorName} • Approved by ZAO governance\nfrom zaoos.com`;
 
-    let castHash: string | null = null;
-    let fcError: string | null = null;
-    let bskyUri: string | null = null;
-    let bskyError: string | null = null;
-
-    // Publish to Farcaster + Bluesky in parallel (independent of each other)
-    const ENV = await import('@/lib/env').then((m) => m.ENV);
+    // Zaal ruling (vault 2e556756, 20 Nov 2026): an approved proposal is no
+    // longer auto-published to Farcaster, Bluesky, X, Threads, Telegram or
+    // Discord. It becomes ONE draft in Zaal's ZOE Telegram chat. He posts it by
+    // hand, or an admin publishes it through /api/publish/farcaster.
     const isWavewarz = fullProposal.category === 'wavewarz';
-    const signerUuid = isWavewarz
-      ? ENV.WAVEWARZ_OFFICIAL_SIGNER_UUID
-      : ENV.ZAO_OFFICIAL_SIGNER_UUID;
-    const neynarApiKey = isWavewarz
-      ? ENV.WAVEWARZ_OFFICIAL_NEYNAR_API_KEY
-      : ENV.ZAO_OFFICIAL_NEYNAR_API_KEY;
-    const publishChannel = isWavewarz ? 'wavewarz' : 'zao';
+    const target = isWavewarz
+      ? 'Farcaster /wavewarz plus the mirrors'
+      : 'Farcaster /zao as @thezao plus the mirrors';
 
-    const [fcResult, bskyResult] = await Promise.allSettled([
-      // Farcaster
-      (async () => {
-        if (!signerUuid) {
-          throw new Error(`Signer not configured for /${publishChannel}`);
-        }
-        const { postCast } = await import('@/lib/farcaster/neynar');
-        const maxLen = 1024 - attribution.length;
-        const castText =
-          publishText.length > maxLen
-            ? publishText.slice(0, maxLen - 3) + '...' + attribution
-            : publishText + attribution;
+    await draftOfficialCast({
+      text: publishText + attribution,
+      embedUrl: fullProposal.publish_image_url || undefined,
+      target,
+      source: `proposal-approved ${proposalId}`,
+    });
 
-        const embedUrls = fullProposal.publish_image_url
-          ? [fullProposal.publish_image_url]
-          : undefined;
-
-        const result = await postCast(
-          signerUuid,
-          castText,
-          publishChannel,
-          undefined,
-          undefined,
-          embedUrls,
-          undefined,
-          neynarApiKey,
-        );
-        return result?.cast?.hash || null;
-      })(),
-
-      // Bluesky
-      (async () => {
-        const { postToBluesky } = await import('@/lib/bluesky/client');
-        return postToBluesky(publishText + attribution, 'https://zaoos.com/governance');
-      })(),
-    ]);
-
-    // Extract Farcaster result
-    if (fcResult.status === 'fulfilled') {
-      castHash = fcResult.value;
-      logger.info(`[publish-threshold] Published to /${publishChannel}: ${castHash}`);
-    } else {
-      fcError =
-        fcResult.reason instanceof Error ? fcResult.reason.message : 'Farcaster publish failed';
-      if (fcError.includes('Signer not configured')) {
-        logger.warn(`[publish-threshold] ${fcError}`);
-      } else {
-        logger.error('[publish-threshold] Farcaster publish failed:', fcError);
-      }
-    }
-
-    // Extract Bluesky result
-    if (bskyResult.status === 'fulfilled') {
-      bskyUri = bskyResult.value;
-      if (bskyUri) {
-        logger.info(`[publish-threshold] Published to @thezao Bluesky: ${bskyUri}`);
-      }
-    } else {
-      bskyError =
-        bskyResult.reason instanceof Error ? bskyResult.reason.message : 'Bluesky publish failed';
-      logger.error('[publish-threshold] Bluesky publish failed:', bskyError);
-    }
-
-    // Publish to X, Telegram, and Discord in parallel (may use castHash from Farcaster)
-    let xUrl: string | null = null;
-    let xError: string | null = null;
-    let threadsUrl: string | null = null;
-    let threadsError: string | null = null;
-    let telegramMessageId: number | null = null;
-    let telegramError: string | null = null;
-    let discordMessageId: string | null = null;
-    let discordError: string | null = null;
-
-    const parallelPublishResults = await Promise.allSettled([
-      // X/Twitter
-      (async () => {
-        const { publishToX, getXClient } = await import('@/lib/publish/x');
-        const client = getXClient();
-        if (!client) {
-          return { platform: 'x' as const, error: 'X not configured — add API keys in env vars' };
-        }
-        const xAttribution = `\n\n— Proposed by @${authorName} • Approved by ZAO governance\nfrom zaoos.com`;
-        const xText = publishText + xAttribution;
-        const truncated = xText.length > 280 ? xText.slice(0, 277) + '...' : xText;
-        const content = {
-          text: truncated,
-          images: [] as string[],
-          embeds: [],
-          attribution: '',
-          castHash: castHash || '',
-          castUrl: '',
-        };
-        const xResult = await publishToX(content);
-        return { platform: 'x' as const, url: xResult.tweetUrl };
-      })(),
-
-      // Telegram — only attempt if env vars are set
-      (async () => {
-        if (!process.env.TELEGRAM_BOT_TOKEN) {
-          return { platform: 'telegram' as const, skipped: true };
-        }
-        const { normalizeForTelegram } = await import('@/lib/publish/normalize');
-        const { publishToTelegram, escapeMarkdownV2 } = await import('@/lib/publish/telegram');
-        const normalized = normalizeForTelegram({
-          text: publishText + attribution,
-          castHash: castHash || 'proposal',
-        });
-        const result = await publishToTelegram({
-          text: escapeMarkdownV2(normalized.text),
-        });
-        if (!result.success) {
-          return { platform: 'telegram' as const, error: result.error };
-        }
-        return { platform: 'telegram' as const, messageId: result.messageId };
-      })(),
-
-      // Discord — only attempt if env var is set
-      (async () => {
-        if (!process.env.DISCORD_WEBHOOK_URL) {
-          return { platform: 'discord' as const, skipped: true };
-        }
-        const { normalizeForDiscord } = await import('@/lib/publish/normalize');
-        const { publishToDiscord, buildZaoEmbed } = await import('@/lib/publish/discord');
-        const normalized = normalizeForDiscord({
-          text: publishText + attribution,
-          castHash: castHash || 'proposal',
-        });
-        const embed = buildZaoEmbed({
-          title: fullProposal.title || 'ZAO Proposal',
-          description: normalized.text,
-          url: 'https://zaoos.com/governance',
-          imageUrl: fullProposal.publish_image_url || undefined,
-        });
-        const result = await publishToDiscord({
-          text: normalized.text,
-          embeds: [embed],
-          username: 'ZAO OS',
-        });
-        if (!result.success) {
-          return { platform: 'discord' as const, error: result.error };
-        }
-        return { platform: 'discord' as const, messageId: result.messageId };
-      })(),
-
-      // Threads — only attempt if env vars are set
-      (async () => {
-        if (!process.env.THREADS_ACCESS_TOKEN) {
-          return { platform: 'threads' as const, skipped: true };
-        }
-        try {
-          const { normalizeForThreads } = await import('@/lib/publish/normalize');
-          const { publishToThreads } = await import('@/lib/publish/threads');
-          const normalized = normalizeForThreads({
-            text: publishText + attribution,
-            castHash: castHash || 'proposal',
-          });
-          const result = await publishToThreads(normalized);
-          return { platform: 'threads' as const, url: result.postUrl };
-        } catch (e) {
-          return {
-            platform: 'threads' as const,
-            error: e instanceof Error ? e.message : 'Threads publish failed',
-          };
-        }
-      })(),
-    ]);
-
-    // Process parallel results
-    for (const result of parallelPublishResults) {
-      if (result.status === 'rejected') continue;
-      const val = result.value;
-      if (val.platform === 'x') {
-        if ('error' in val) {
-          xError = val.error || 'Unknown X error';
-          if (xError.includes('CreditsDepleted'))
-            xError = 'X credits depleted — add credits at developer.x.com';
-          else if (xError.includes('403'))
-            xError = 'X permissions error — check app has Read+Write';
-          else if (xError.includes('401')) xError = 'X auth failed — check API keys';
-          logger.error('[publish-threshold] X publish failed:', xError);
-        } else if ('url' in val) {
-          xUrl = val.url ?? null;
-          logger.info(`[publish-threshold] Published to @thezaodao X: ${xUrl}`);
-        }
-      } else if (val.platform === 'telegram') {
-        if ('skipped' in val) {
-          logger.info('[publish-threshold] Telegram skipped — not configured');
-        } else if ('error' in val) {
-          telegramError = val.error || 'Telegram publish failed';
-          logger.error('[publish-threshold] Telegram publish failed:', telegramError);
-        } else if ('messageId' in val) {
-          telegramMessageId = val.messageId ?? null;
-          logger.info(`[publish-threshold] Published to Telegram: ${telegramMessageId}`);
-        }
-      } else if (val.platform === 'discord') {
-        if ('skipped' in val) {
-          logger.info('[publish-threshold] Discord skipped — not configured');
-        } else if ('error' in val) {
-          discordError = val.error || 'Discord publish failed';
-          logger.error('[publish-threshold] Discord publish failed:', discordError);
-        } else if ('messageId' in val) {
-          discordMessageId = val.messageId ?? null;
-          logger.info(`[publish-threshold] Published to Discord: ${discordMessageId}`);
-        }
-      } else if (val.platform === 'threads') {
-        if ('skipped' in val) {
-          logger.info('[publish-threshold] Threads skipped — not configured');
-        } else if ('error' in val) {
-          threadsError = val.error || 'Threads publish failed';
-          logger.error('[publish-threshold] Threads publish failed:', threadsError);
-        } else if ('url' in val) {
-          threadsUrl = val.url ?? null;
-          logger.info(`[publish-threshold] Published to Threads: ${threadsUrl}`);
-        }
-      }
-    }
-
-    // Mark proposal as published with all platform results
-    const updateData: Record<string, unknown> = {
-      published_cast_hash: castHash || null,
-      published_at: new Date().toISOString(),
-      status: 'published',
-    };
-
-    if (bskyUri) updateData.published_bluesky_uri = bskyUri;
-    if (xUrl) updateData.published_x_url = xUrl;
-    if (telegramMessageId) updateData.published_telegram_id = telegramMessageId;
-    if (discordMessageId) updateData.published_discord_id = discordMessageId;
-    if (threadsUrl) updateData.published_threads_url = threadsUrl;
-    // Store errors for UI display
-    if (fcError) updateData.publish_fc_error = fcError;
-    if (bskyError) updateData.publish_bsky_error = bskyError;
-    if (xError) updateData.publish_x_error = xError;
-    if (telegramError) updateData.publish_telegram_error = telegramError;
-    if (discordError) updateData.publish_discord_error = discordError;
-    if (threadsError) updateData.publish_threads_error = threadsError;
-
+    // Mark it approved so later votes do not send the same draft again. The
+    // existing 'approved' status means "admin can then publish" (see
+    // src/app/api/proposals/route.ts). published_* fields stay empty: nothing
+    // was published.
     const { error: updateErr } = await supabaseAdmin
       .from('proposals')
-      .update(updateData)
+      .update({ status: 'approved' })
       .eq('id', proposalId);
 
     if (updateErr) {
-      logger.error('[publish-threshold] DB update failed:', updateErr);
-      // Retry without bluesky URI column in case it doesn't exist
-      const { error: retryErr } = await supabaseAdmin
-        .from('proposals')
-        .update({
-          published_cast_hash: castHash || 'bluesky-only',
-          published_at: new Date().toISOString(),
-          status: 'published',
-        })
-        .eq('id', proposalId);
-
-      if (retryErr) {
-        logger.error('[publish-threshold] DB retry also failed:', retryErr);
-      } else {
-        logger.info('[publish-threshold] DB updated (without bluesky URI column)');
-      }
-    } else {
-      logger.info('[publish-threshold] DB updated successfully — status: published');
+      logger.error('[publish-threshold] DB update to approved failed:', updateErr);
     }
 
-    return true;
+    return false;
   }
 
   return false;

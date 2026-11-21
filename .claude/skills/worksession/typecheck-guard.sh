@@ -43,6 +43,34 @@ fi
 
 cd "$PROJECT_DIR" 2>/dev/null || exit 0
 
+# Only a commit to THIS repo that carries TypeScript is this guard's business.
+# Before 21 Nov 2026 it ran a full tsc on every `git -C ~/zao-vault commit` and
+# every docs-only commit, which cost minutes and blocked vault writes on local
+# type errors that had nothing to do with them (ruling 2026-11-21 item 1).
+# If either question cannot be answered, the check runs: unsure means verify.
+HERE=$(git rev-parse --show-toplevel 2>/dev/null)
+if [ -n "$HERE" ]; then
+  if [[ "$CMD" =~ git[[:space:]]+-C[[:space:]]+(\"[^\"]+\"|\'[^\']+\'|[^[:space:]]+) ]]; then
+    TARGET="${BASH_REMATCH[1]}"
+    TARGET="${TARGET#[\"\']}"; TARGET="${TARGET%[\"\']}"
+    TARGET="${TARGET/#\~/$HOME}"
+    THERE=$(git -C "$TARGET" rev-parse --show-toplevel 2>/dev/null)
+    if [ -n "$THERE" ] && [ "$THERE" != "$HERE" ]; then
+      exit 0
+    fi
+  fi
+  if FILES=$(git diff --cached --name-only 2>/dev/null); then
+    # `commit -a` / `-am` / `--all` stages tracked changes at commit time.
+    if [[ "$CMD" =~ commit[^\&\;\|]*[[:space:]](-[[:alpha:]]*a[[:alpha:]]*|--all)([[:space:]]|$) ]]; then
+      FILES="$FILES
+$(git diff --name-only 2>/dev/null)"
+    fi
+    if ! printf '%s\n' "$FILES" | /usr/bin/grep -qE '\.(ts|tsx|mts|cts)$|(^|/)(tsconfig[^/]*\.json|package(-lock)?\.json)$'; then
+      exit 0
+    fi
+  fi
+fi
+
 # A missing toolchain is a FAIL, not a pass - a verifier that cannot run must
 # never fall through green (.claude/rules/silent-failure-guard.md rule 3). But
 # an unpopulated node_modules is an environment problem, not a code problem, and

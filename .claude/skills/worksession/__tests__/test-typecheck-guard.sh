@@ -10,10 +10,15 @@ set -u
 GUARD="$(cd "$(dirname "$0")/.." && pwd)/typecheck-guard.sh"
 PASS=0; FAIL=0
 
-# An empty PROJECT_DIR with no node_modules, so the guard reaches its
-# skip-and-say-so path instead of running a real multi-minute tsc.
+# A throwaway repo with no node_modules, so the guard reaches its
+# skip-and-say-so path instead of running a real multi-minute tsc. It has a
+# staged .ts file, so a commit here is a TypeScript commit.
 TMP=$(mktemp -d)
+OTHER=$(mktemp -d)
 export PROJECT_DIR="$TMP"
+git -C "$TMP" init -q && echo 'export const a = 1;' > "$TMP/a.ts" && git -C "$TMP" add a.ts
+git -C "$OTHER" init -q
+cd "$TMP" || exit 2
 
 fires() {  # fires <label> <should-run> <command>
   local label="$1" want="$2" cmd="$3" out
@@ -32,7 +37,37 @@ fires() {  # fires <label> <should-run> <command>
 fires "plain commit"          yes "git commit -m 'wip'"
 fires "commit with flags"     yes "git commit --amend"
 fires "commit in a chain"     yes "git add . && git commit -m 'x'"
-fires "commit with -C"        yes "git -C /some/repo commit -m 'x'"
+fires "commit with -C unknown" yes "git -C /some/repo commit -m 'x'"
+fires "commit with -C here"   yes "git -C $TMP commit -m 'x'"
+
+# --- MUST stay silent on a commit to another repo, or with no TypeScript ---
+fires "commit to other repo"  no  "git -C $OTHER commit -m 'x'"
+fires "quoted other repo"     no  "git -C \"$OTHER\" commit -m 'x'"
+git -C "$TMP" reset -q
+echo '# notes' > "$TMP/notes.md" && git -C "$TMP" add notes.md
+fires "docs-only commit"      no  "git commit -m 'docs'"
+git -C "$TMP" commit -qm base --no-verify >/dev/null 2>&1
+echo 'export const a = 2;' > "$TMP/a.ts" && git -C "$TMP" add a.ts && git -C "$TMP" commit -qm ts >/dev/null 2>&1
+echo 'export const a = 3;' > "$TMP/a.ts"
+fires "commit -am, ts unstaged" yes "git commit -am 'x'"
+fires "commit, ts not staged"   no  "git commit -m 'x'"
+git -C "$TMP" add a.ts
+
+# --- A chained `git add` stages AFTER the guard reads the index ---
+git -C "$TMP" reset -q
+echo 'export const a = 4;' > "$TMP/a.ts"
+fires "add then commit, nothing staged yet" yes "git add a.ts && git commit -m 'x'"
+echo 'export const b = 1;' > "$TMP/b.ts"
+git -C "$TMP" checkout -q -- a.ts
+fires "add new ts file then commit"         yes "git add b.ts; git commit -m 'x'"
+git -C "$TMP" add b.ts   # a TS file is staged again for the rest of the file
+fires "commit with -C ."                    yes "git -C . commit -m 'x'"
+fires "commit with -C quoted PWD"           yes "git -C \"\$PWD\" commit -m 'x'"
+# A -C on some OTHER git command in the chain says nothing about the commit.
+fires "-C other on status, then commit here" yes "git -C $OTHER status && git commit -am 'x'"
+fires "-C other on pull, then add and commit" yes "git -C $OTHER pull; git add a.ts && git commit -m 'x'"
+fires "commit elsewhere, then commit here"  yes "git -C $OTHER commit -m 'x' && git commit -m 'y'"
+fires "two commits, both elsewhere"         no  "git -C $OTHER commit -m 'x' && git -C \"$OTHER\" commit -m 'y'"
 
 # --- MUST stay silent on everything else ---
 fires "ls"                    no  "ls -la"
@@ -58,6 +93,9 @@ esac
 out=$(printf '{"tool_input":{"command":"ls -la"}}' | bash "$GUARD" 2>&1)
 if [ -z "$out" ]; then PASS=$((PASS + 1)); else FAIL=$((FAIL + 1)); echo "FAIL stdin-json ls: should be silent"; fi
 
-rmdir "$TMP" 2>/dev/null
+# Remove exactly the two dirs this run's mktemp returned (no-rm-rf.md, code carve-out).
+cd / || exit 2
+[ -n "$TMP" ] && rm -rf "$TMP"
+[ -n "$OTHER" ] && rm -rf "$OTHER"
 echo "$PASS passed, $FAIL failed"
 [ "$FAIL" = "0" ]

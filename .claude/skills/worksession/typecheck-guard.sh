@@ -39,9 +39,19 @@ fi
 [ -z "$CMD" ] && exit 0
 # `-C <path>` takes a separate argument of any shape (`.`, "$PWD"), so it is
 # matched as one option before the generic forms.
-if ! [[ "$CMD" =~ (^|[^[:alnum:]_.-])git([[:space:]]+(-C[[:space:]]+[^[:space:]]+|-[^[:space:]]+|[^[:space:]]+=[^[:space:]]*|/[^[:space:]]+))*[[:space:]]+commit([[:space:]]|$) ]]; then
+COMMIT_RE='(^|[^[:alnum:]_.-])git([[:space:]]+(-C[[:space:]]+[^[:space:]]+|-[^[:space:]]+|[^[:space:]]+=[^[:space:]]*|/[^[:space:]]+))*[[:space:]]+commit([[:space:]]|$)'
+if ! [[ "$CMD" =~ $COMMIT_RE ]]; then
   exit 0
 fi
+# Every `git ... commit` invocation in the command, one per entry. Only these
+# say where a commit lands: a `git -C <elsewhere> status` earlier in the chain
+# says nothing about where a later `git commit` goes.
+COMMITS=()
+REST="$CMD"
+while [[ "$REST" =~ $COMMIT_RE ]]; do
+  COMMITS+=("${BASH_REMATCH[0]}")
+  REST="${REST#*"${BASH_REMATCH[0]}"}"
+done
 
 cd "$PROJECT_DIR" 2>/dev/null || exit 0
 
@@ -52,15 +62,23 @@ cd "$PROJECT_DIR" 2>/dev/null || exit 0
 # If either question cannot be answered, the check runs: unsure means verify.
 HERE=$(git rev-parse --show-toplevel 2>/dev/null)
 if [ -n "$HERE" ]; then
-  if [[ "$CMD" =~ git[[:space:]]+-C[[:space:]]+(\"[^\"]+\"|\'[^\']+\'|[^[:space:]]+) ]]; then
-    TARGET="${BASH_REMATCH[1]}"
-    TARGET="${TARGET#[\"\']}"; TARGET="${TARGET%[\"\']}"
-    TARGET="${TARGET/#\~/$HOME}"
-    THERE=$(git -C "$TARGET" rev-parse --show-toplevel 2>/dev/null)
-    if [ -n "$THERE" ] && [ "$THERE" != "$HERE" ]; then
-      exit 0
+  # Skip only when EVERY commit invocation names another repo with -C. One
+  # commit with no -C, or a -C that cannot be resolved, lands (or may land)
+  # here, so the check runs.
+  ELSEWHERE=yes
+  for INV in "${COMMITS[@]}"; do
+    THERE=""
+    if [[ "$INV" =~ git[[:space:]]+-C[[:space:]]+(\"[^\"]+\"|\'[^\']+\'|[^[:space:]]+) ]]; then
+      TARGET="${BASH_REMATCH[1]}"
+      TARGET="${TARGET#[\"\']}"; TARGET="${TARGET%[\"\']}"
+      TARGET="${TARGET/#\~/$HOME}"
+      THERE=$(git -C "$TARGET" rev-parse --show-toplevel 2>/dev/null)
     fi
-  fi
+    if [ -z "$THERE" ] || [ "$THERE" = "$HERE" ]; then
+      ELSEWHERE=no
+    fi
+  done
+  [ "$ELSEWHERE" = "yes" ] && exit 0
   if FILES=$(git diff --cached --name-only 2>/dev/null); then
     # `commit -a` / `-am` / `--all` stages tracked changes at commit time.
     if [[ "$CMD" =~ commit[^\&\;\|]*[[:space:]](-[[:alpha:]]*a[[:alpha:]]*|--all)([[:space:]]|$) ]]; then

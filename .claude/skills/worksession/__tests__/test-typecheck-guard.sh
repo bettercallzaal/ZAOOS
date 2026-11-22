@@ -63,6 +63,11 @@ fires "add new ts file then commit"         yes "git add b.ts; git commit -m 'x'
 git -C "$TMP" add b.ts   # a TS file is staged again for the rest of the file
 fires "commit with -C ."                    yes "git -C . commit -m 'x'"
 fires "commit with -C quoted PWD"           yes "git -C \"\$PWD\" commit -m 'x'"
+# A -C on some OTHER git command in the chain says nothing about the commit.
+fires "-C other on status, then commit here" yes "git -C $OTHER status && git commit -am 'x'"
+fires "-C other on pull, then add and commit" yes "git -C $OTHER pull; git add a.ts && git commit -m 'x'"
+fires "commit elsewhere, then commit here"  yes "git -C $OTHER commit -m 'x' && git commit -m 'y'"
+fires "two commits, both elsewhere"         no  "git -C $OTHER commit -m 'x' && git -C \"$OTHER\" commit -m 'y'"
 
 # --- MUST stay silent on everything else ---
 fires "ls"                    no  "ls -la"

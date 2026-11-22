@@ -37,7 +37,9 @@ fi
 # loose match would count the word "commit" inside a message or a filename and
 # rebuild the same fires-on-everything problem in a new place.
 [ -z "$CMD" ] && exit 0
-if ! [[ "$CMD" =~ (^|[^[:alnum:]_.-])git([[:space:]]+(-[^[:space:]]+|[^[:space:]]+=[^[:space:]]*|/[^[:space:]]+))*[[:space:]]+commit([[:space:]]|$) ]]; then
+# `-C <path>` takes a separate argument of any shape (`.`, "$PWD"), so it is
+# matched as one option before the generic forms.
+if ! [[ "$CMD" =~ (^|[^[:alnum:]_.-])git([[:space:]]+(-C[[:space:]]+[^[:space:]]+|-[^[:space:]]+|[^[:space:]]+=[^[:space:]]*|/[^[:space:]]+))*[[:space:]]+commit([[:space:]]|$) ]]; then
   exit 0
 fi
 
@@ -64,6 +66,14 @@ if [ -n "$HERE" ]; then
     if [[ "$CMD" =~ commit[^\&\;\|]*[[:space:]](-[[:alpha:]]*a[[:alpha:]]*|--all)([[:space:]]|$) ]]; then
       FILES="$FILES
 $(git diff --name-only 2>/dev/null)"
+    fi
+    # The staged set is read NOW, before the command runs. Anything chained
+    # ahead of the commit (`git add a.ts && git commit`) can stage more, so the
+    # set cannot be known: count unstaged and untracked files too.
+    if [[ "$CMD" =~ (\&\&|\|\||;).*commit ]]; then
+      FILES="$FILES
+$(git diff --name-only 2>/dev/null)
+$(git ls-files --others --exclude-standard 2>/dev/null)"
     fi
     if ! printf '%s\n' "$FILES" | /usr/bin/grep -qE '\.(ts|tsx|mts|cts)$|(^|/)(tsconfig[^/]*\.json|package(-lock)?\.json)$'; then
       exit 0

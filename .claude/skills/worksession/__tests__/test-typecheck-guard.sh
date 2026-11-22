@@ -53,6 +53,17 @@ fires "commit -am, ts unstaged" yes "git commit -am 'x'"
 fires "commit, ts not staged"   no  "git commit -m 'x'"
 git -C "$TMP" add a.ts
 
+# --- A chained `git add` stages AFTER the guard reads the index ---
+git -C "$TMP" reset -q
+echo 'export const a = 4;' > "$TMP/a.ts"
+fires "add then commit, nothing staged yet" yes "git add a.ts && git commit -m 'x'"
+echo 'export const b = 1;' > "$TMP/b.ts"
+git -C "$TMP" checkout -q -- a.ts
+fires "add new ts file then commit"         yes "git add b.ts; git commit -m 'x'"
+git -C "$TMP" add b.ts   # a TS file is staged again for the rest of the file
+fires "commit with -C ."                    yes "git -C . commit -m 'x'"
+fires "commit with -C quoted PWD"           yes "git -C \"\$PWD\" commit -m 'x'"
+
 # --- MUST stay silent on everything else ---
 fires "ls"                    no  "ls -la"
 fires "git status"            no  "git status --short"

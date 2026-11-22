@@ -132,9 +132,10 @@ export type ClassifierMode = 'off' | 'live' | 'shadow';
 
 /** 1 is live, shadow is shadow, anything else (unset included) is off. */
 export function classifierMode(env: NodeJS.ProcessEnv = process.env): ClassifierMode {
-  const v = env.ZOE_MODEL_CLASSIFIER;
-  if (v === '1') return 'live';
-  if (v === 'shadow') return 'shadow';
+  // Compared by name on purpose: flags-command.test.ts checks that every /flags
+  // decision flag is still read as `NAME === 'on-value'` somewhere in bot/src.
+  if (env.ZOE_MODEL_CLASSIFIER === '1') return 'live';
+  if (env.ZOE_MODEL_CLASSIFIER === 'shadow') return 'shadow';
   return 'off';
 }
 

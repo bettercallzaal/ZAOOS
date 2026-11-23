@@ -1,4 +1,5 @@
 import { join } from 'node:path';
+import { writeFile } from 'node:fs/promises';
 import type { CheckResult, EstateConfig, Finding } from '../types';
 import {
   countFilesNamed,
@@ -26,6 +27,97 @@ export async function measureLiveCounts(cfg: EstateConfig): Promise<Record<strin
 function readClaim(text: string, regex: string): number | null {
   const m = text.match(new RegExp(regex));
   return m && m[1] ? Number(m[1]) : null;
+}
+
+export interface CountChange {
+  file: string;
+  key: string;
+  from: number;
+  to: number;
+}
+
+export interface CountFixPlan {
+  file: string;
+  /** the file text after the count rewrites (equal to the input when nothing changed) */
+  text: string;
+  changes: CountChange[];
+  /** set when the plan refuses: nothing may be written for this file */
+  refusal?: string;
+}
+
+/**
+ * Plans the --fix rewrite for one doc. Only the captured number (group 1 of the
+ * first match, the same match driftCheck reads) is replaced. Refuses, with no
+ * text change, when a claim's pattern finds no number to rewrite, when the
+ * captured digits are not where the match says, or when the rewritten text
+ * does not read back as the measured value.
+ */
+export function planCountFix(
+  file: string,
+  text: string,
+  claims: Record<string, string>,
+  live: Record<string, number>,
+): CountFixPlan {
+  const refuse = (why: string): CountFixPlan => ({ file, text, changes: [], refusal: why });
+  let out = text;
+  const changes: CountChange[] = [];
+  for (const [key, regex] of Object.entries(claims)) {
+    const actual = live[key];
+    if (actual == null) continue;
+    const m = out.match(new RegExp(regex));
+    if (!m || !m[1]) return refuse(`${key}: pattern ${regex} found no count to rewrite`);
+    const claimed = Number(m[1]);
+    if (claimed === actual) continue;
+    const start = (m.index ?? 0) + m[0].indexOf(m[1]);
+    if (out.slice(start, start + m[1].length) !== m[1]) {
+      return refuse(`${key}: captured digits are not at the matched position, refusing to guess`);
+    }
+    out = out.slice(0, start) + String(actual) + out.slice(start + m[1].length);
+    changes.push({ file, key, from: claimed, to: actual });
+  }
+  for (const [key, regex] of Object.entries(claims)) {
+    const actual = live[key];
+    if (actual == null) continue;
+    const m = out.match(new RegExp(regex));
+    if (!m || Number(m[1]) !== actual) return refuse(`${key}: rewrite did not read back as ${actual}`);
+  }
+  return { file, text: out, changes };
+}
+
+/**
+ * --fix: rewrites the count lines named by cfg.docPointers to the measured
+ * values. Two-phase: every doc is planned first, and nothing is written unless
+ * every doc planned cleanly, so a refusal on one file never leaves another half
+ * rewritten.
+ */
+export async function applyCountFix(
+  cfg: EstateConfig,
+  opts: { write: boolean },
+): Promise<{ changes: CountChange[]; refusals: string[]; written: string[] }> {
+  const live = await measureLiveCounts(cfg);
+  const plans: { abs: string; plan: CountFixPlan }[] = [];
+  const refusals: string[] = [];
+  for (const ptr of cfg.docPointers) {
+    const abs = join(cfg.repoRoot, ptr.file);
+    const text = await readFileSafe(abs);
+    if (text == null) {
+      refusals.push(`${ptr.file}: could not read the doc, nothing to fix against`);
+      continue;
+    }
+    const plan = planCountFix(ptr.file, text, ptr.claims, live);
+    if (plan.refusal) refusals.push(`${ptr.file}: ${plan.refusal}`);
+    else plans.push({ abs, plan });
+  }
+  const changes = plans.flatMap((p) => p.plan.changes);
+  const written: string[] = [];
+  if (opts.write && refusals.length === 0) {
+    for (const { abs, plan } of plans) {
+      if (plan.changes.length === 0) continue;
+      await writeFile(abs, plan.text);
+      written.push(plan.file);
+    }
+  }
+  return { changes, refusals, written };
 }
 
 /**

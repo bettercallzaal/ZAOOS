@@ -8,14 +8,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   getSessionData: vi.fn(),
-  autoCastToZao: vi.fn(),
+  publishToZaoNow: vi.fn(),
   publishToX: vi.fn(),
   publishToBluesky: vi.fn(),
   broadcastToChannels: vi.fn(),
 }));
 
 vi.mock('@/lib/auth/session', () => ({ getSessionData: mocks.getSessionData }));
-vi.mock('@/lib/publish/auto-cast', () => ({ autoCastToZao: mocks.autoCastToZao }));
+vi.mock('@/lib/publish/auto-cast', () => ({ publishToZaoNow: mocks.publishToZaoNow }));
 vi.mock('@/lib/publish/x', () => ({ publishToX: mocks.publishToX }));
 vi.mock('@/lib/publish/bluesky', () => ({ publishToBluesky: mocks.publishToBluesky }));
 vi.mock('@/lib/publish/broadcast', () => ({ broadcastToChannels: mocks.broadcastToChannels }));
@@ -51,7 +51,7 @@ describe('POST /api/publish/compose', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.getSessionData.mockResolvedValue({ isAdmin: true, fid: 19640 });
-    mocks.autoCastToZao.mockResolvedValue('0xcast');
+    mocks.publishToZaoNow.mockResolvedValue('0xcast');
     mocks.publishToX.mockResolvedValue({ tweetId: '1', tweetUrl: 'https://x.com/p/1' });
     mocks.publishToBluesky.mockResolvedValue({
       uri: 'at://1',
@@ -68,14 +68,14 @@ describe('POST /api/publish/compose', () => {
     mocks.getSessionData.mockResolvedValue(null);
     const res = await POST(req({ text: 'hi', platforms: ['farcaster'] }));
     expect(res.status).toBe(401);
-    expect(mocks.autoCastToZao).not.toHaveBeenCalled();
+    expect(mocks.publishToZaoNow).not.toHaveBeenCalled();
   });
 
   it('403s for a non-admin', async () => {
     mocks.getSessionData.mockResolvedValue({ isAdmin: false, fid: 1 });
     const res = await POST(req({ text: 'hi', platforms: ['farcaster'] }));
     expect(res.status).toBe(403);
-    expect(mocks.autoCastToZao).not.toHaveBeenCalled();
+    expect(mocks.publishToZaoNow).not.toHaveBeenCalled();
   });
 
   it('DRY RUN (the default) publishes NOTHING', async () => {
@@ -88,7 +88,7 @@ describe('POST /api/publish/compose', () => {
     expect(json.data.results).toHaveLength(5);
     expect(json.data.results.every((r: { simulated: boolean }) => r.simulated)).toBe(true);
     // the load-bearing assertion: no publisher was called
-    expect(mocks.autoCastToZao).not.toHaveBeenCalled();
+    expect(mocks.publishToZaoNow).not.toHaveBeenCalled();
     expect(mocks.publishToX).not.toHaveBeenCalled();
     expect(mocks.publishToBluesky).not.toHaveBeenCalled();
     expect(mocks.broadcastToChannels).not.toHaveBeenCalled();
@@ -107,7 +107,7 @@ describe('POST /api/publish/compose', () => {
     const json = await res.json();
     expect(json.success).toBe(true);
     expect(json.data.castHash).toBe('0xcast');
-    expect(mocks.autoCastToZao).toHaveBeenCalledWith('real post', undefined);
+    expect(mocks.publishToZaoNow).toHaveBeenCalledWith('real post', undefined);
     expect(mocks.publishToX).toHaveBeenCalledWith(
       expect.objectContaining({ castHash: '0xcast', text: 'real post' }),
     );
@@ -123,7 +123,7 @@ describe('POST /api/publish/compose', () => {
     expect(res.status).toBe(400);
     const json = await res.json();
     expect(json.details.join(' ')).toContain('farcaster: 400/320');
-    expect(mocks.autoCastToZao).not.toHaveBeenCalled();
+    expect(mocks.publishToZaoNow).not.toHaveBeenCalled();
   });
 
   it('reports a partial failure honestly instead of claiming success', async () => {
@@ -137,7 +137,7 @@ describe('POST /api/publish/compose', () => {
   });
 
   it('reports a failed cast rather than silently continuing', async () => {
-    mocks.autoCastToZao.mockResolvedValue(null);
+    mocks.publishToZaoNow.mockResolvedValue(null);
     const res = await POST(req({ text: 'post', platforms: ['farcaster'], dryRun: false }));
     const json = await res.json();
     expect(json.success).toBe(false);
@@ -187,7 +187,7 @@ describe('POST /api/publish/compose - PUBLISH_BOT_TOKEN bearer', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.getSessionData.mockResolvedValue(null); // no session: only the bearer can pass
-    mocks.autoCastToZao.mockResolvedValue('0xcast');
+    mocks.publishToZaoNow.mockResolvedValue('0xcast');
     process.env.PUBLISH_BOT_TOKEN = TOKEN;
   });
   afterEach(() => {
@@ -206,7 +206,7 @@ describe('POST /api/publish/compose - PUBLISH_BOT_TOKEN bearer', () => {
       bearerReq('y'.repeat(48), { text: 'hi', platforms: ['farcaster'], dryRun: false }),
     );
     expect(res.status).toBe(401);
-    expect(mocks.autoCastToZao).not.toHaveBeenCalled();
+    expect(mocks.publishToZaoNow).not.toHaveBeenCalled();
   });
 
   it('with PUBLISH_BOT_TOKEN unset the header is ignored: no session means 401 even with the right-looking bearer', async () => {
@@ -215,7 +215,7 @@ describe('POST /api/publish/compose - PUBLISH_BOT_TOKEN bearer', () => {
       bearerReq(TOKEN, { text: 'hi', platforms: ['farcaster'], dryRun: false }),
     );
     expect(res.status).toBe(401);
-    expect(mocks.autoCastToZao).not.toHaveBeenCalled();
+    expect(mocks.publishToZaoNow).not.toHaveBeenCalled();
   });
 
   it('a PUBLISH_BOT_TOKEN saved with a trailing newline still matches (trimmed on both sides)', async () => {
@@ -230,6 +230,6 @@ describe('POST /api/publish/compose - PUBLISH_BOT_TOKEN bearer', () => {
       bearerReq('short', { text: 'hi', platforms: ['farcaster'], dryRun: false }),
     );
     expect(res.status).toBe(401);
-    expect(mocks.autoCastToZao).not.toHaveBeenCalled();
+    expect(mocks.publishToZaoNow).not.toHaveBeenCalled();
   });
 });

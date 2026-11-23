@@ -8,7 +8,7 @@ vi.mock('@/lib/logger', () => ({
   logger: { info: vi.fn(), error: vi.fn(), warn: vi.fn() },
 }));
 
-import { autoCastToZao } from '../auto-cast';
+import { publishToZaoNow } from '../auto-cast';
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -16,23 +16,23 @@ beforeEach(() => {
   delete process.env.ZAO_OFFICIAL_NEYNAR_API_KEY;
 });
 
-describe('autoCastToZao', () => {
+describe('publishToZaoNow', () => {
   it('returns null when ZAO_OFFICIAL_SIGNER_UUID is missing', async () => {
     process.env.ZAO_OFFICIAL_NEYNAR_API_KEY = 'api-key';
-    const result = await autoCastToZao('hello');
+    const result = await publishToZaoNow('hello');
     expect(result).toBeNull();
     expect(mockPostCast).not.toHaveBeenCalled();
   });
 
   it('returns null when ZAO_OFFICIAL_NEYNAR_API_KEY is missing', async () => {
     process.env.ZAO_OFFICIAL_SIGNER_UUID = 'signer-uuid';
-    const result = await autoCastToZao('hello');
+    const result = await publishToZaoNow('hello');
     expect(result).toBeNull();
     expect(mockPostCast).not.toHaveBeenCalled();
   });
 
   it('returns null when both env vars are missing', async () => {
-    const result = await autoCastToZao('hello');
+    const result = await publishToZaoNow('hello');
     expect(result).toBeNull();
     expect(mockPostCast).not.toHaveBeenCalled();
   });
@@ -43,7 +43,7 @@ describe('autoCastToZao', () => {
     const text = 'a'.repeat(320);
     mockPostCast.mockResolvedValue({ cast: { hash: 'hash-abc' } });
 
-    await autoCastToZao(text);
+    await publishToZaoNow(text);
 
     expect(mockPostCast).toHaveBeenCalledWith(
       'signer-uuid',
@@ -63,7 +63,7 @@ describe('autoCastToZao', () => {
     const text = 'b'.repeat(321);
     mockPostCast.mockResolvedValue({ cast: { hash: 'hash-abc' } });
 
-    await autoCastToZao(text);
+    await publishToZaoNow(text);
 
     const calledText = mockPostCast.mock.calls[0][1] as string;
     expect(calledText).toHaveLength(320);
@@ -76,7 +76,7 @@ describe('autoCastToZao', () => {
     process.env.ZAO_OFFICIAL_NEYNAR_API_KEY = 'api-key';
     mockPostCast.mockResolvedValue({ cast: { hash: 'cast-hash-123' } });
 
-    const result = await autoCastToZao('hello');
+    const result = await publishToZaoNow('hello');
 
     expect(result).toBe('cast-hash-123');
   });
@@ -86,7 +86,7 @@ describe('autoCastToZao', () => {
     process.env.ZAO_OFFICIAL_NEYNAR_API_KEY = 'api-key';
     mockPostCast.mockResolvedValue({ cast: undefined });
 
-    const result = await autoCastToZao('hello');
+    const result = await publishToZaoNow('hello');
 
     expect(result).toBeNull();
   });
@@ -96,7 +96,7 @@ describe('autoCastToZao', () => {
     process.env.ZAO_OFFICIAL_NEYNAR_API_KEY = 'api-key';
     mockPostCast.mockRejectedValue(new Error('network error'));
 
-    const result = await autoCastToZao('hello');
+    const result = await publishToZaoNow('hello');
 
     expect(result).toBeNull();
   });
@@ -106,7 +106,7 @@ describe('autoCastToZao', () => {
     process.env.ZAO_OFFICIAL_NEYNAR_API_KEY = 'api-key';
     mockPostCast.mockResolvedValue({ cast: { hash: 'hash-xyz' } });
 
-    await autoCastToZao('hello', 'https://example.com/post');
+    await publishToZaoNow('hello', 'https://example.com/post');
 
     expect(mockPostCast).toHaveBeenCalledWith(
       'signer-uuid',
@@ -125,7 +125,7 @@ describe('autoCastToZao', () => {
     process.env.ZAO_OFFICIAL_NEYNAR_API_KEY = 'api-key';
     mockPostCast.mockResolvedValue({ cast: { hash: 'hash-xyz' } });
 
-    await autoCastToZao('hello');
+    await publishToZaoNow('hello');
 
     expect(mockPostCast).toHaveBeenCalledWith(
       'signer-uuid',

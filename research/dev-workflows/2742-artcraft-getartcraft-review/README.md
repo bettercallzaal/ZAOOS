@@ -20,7 +20,7 @@ Source page: private Notion research page "Research: ArtCraft (getartcraft.com),
 | # | Decision | Why |
 |---|---|---|
 | 1 | **SKIP ArtCraft as a ZAO dependency or integration.** | No onchain, social or community layer. The music side is a feature built on hosted Suno credits. Its own DAW, SoundCraft (v0.20.1), is marked In development. |
-| 2 | **OPTIONAL: one member trial of SoundCraft or ArtCraft Studio, public or throwaway content only.** Do it only if a member asks. | /terms, /privacy and /terms-of-service all return 404 (CHECKED 2026-11-26), so output ownership and training-on-content language are unknown. Do not put member or unreleased audio through it. |
+| 2 | **OPTIONAL: one member trial of SoundCraft or ArtCraft Studio, public or throwaway content only.** Do it only if a member asks. | /terms and /privacy return 404 (CHECKED 2026-11-26 by curl; /terms-of-service also 404 per the research worker, not re-checked), so output ownership and training-on-content language are unknown. Do not put member or unreleased audio through it. |
 | 3 | **DO NOT contact the ArtCraft team on our own.** Outbound to hello@storyteller.ai is Zaal's call, and only if a member wants to use it. | Terms and output ownership are the open question, and only the owner of the relationship should ask. |
 
 ## What it is
@@ -30,7 +30,7 @@ Source page: private Notion research page "Research: ArtCraft (getartcraft.com),
 - Stack: Rust desktop apps for macOS, Windows and Linux, many also as WebAssembly. Automation through a CLI, a JSON control channel or an MCP server.
 - Music and sound: five Suno or Seed Audio models listed in the README. SoundCraft is a separate free DAW (multitrack audio and MIDI, CLAP plugins).
 - Web3: no mention of minting, NFTs or onchain anything on the pages read (UNVERIFIED beyond those pages).
-- Liveness: https://getartcraft.com returned HTTP 200 on 2026-11-26 (one check, nothing else fetched for this doc).
+- Liveness: the home page https://getartcraft.com returned HTTP 200 in this doc author's own check on 2026-11-26. The source Notion page itself recorded a 200 only for /pricing.
 
 ## Pricing (getartcraft.com/pricing, CHECKED 2026-11-26, HTTP 200)
 

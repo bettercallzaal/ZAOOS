@@ -3,7 +3,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { logger } from '@/lib/logger';
-import { autoCastToZao } from '@/lib/publish/auto-cast';
+import { publishToZaoNow } from '@/lib/publish/auto-cast';
 import { publishToBluesky } from '@/lib/publish/bluesky';
 import { broadcastToChannels } from '@/lib/publish/broadcast';
 import { normalizeForBluesky, normalizeForX } from '@/lib/publish/normalize';
@@ -19,7 +19,7 @@ import { publishToX } from '@/lib/publish/x';
  * button had nothing to call and fell back to "approved - paste it".
  *
  * The chain this runs:
- *   1. Farcaster FIRST (autoCastToZao) - it produces the castHash the mirrors need
+ *   1. Farcaster FIRST (publishToZaoNow) - it produces the castHash the mirrors need
  *   2. X + Bluesky mirror that cast (they take {castHash, text})
  *   3. Telegram + Discord via broadcastToChannels
  *
@@ -137,7 +137,7 @@ export async function POST(req: NextRequest) {
           simulated: true,
         });
       } else {
-        castHash = await autoCastToZao(text, embedUrl);
+        castHash = await publishToZaoNow(text, embedUrl);
         results.push({
           platform: 'farcaster',
           ok: Boolean(castHash),

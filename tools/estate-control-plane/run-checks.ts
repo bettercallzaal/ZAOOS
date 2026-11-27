@@ -3,7 +3,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { dirname, join, isAbsolute, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { CheckResult, EstateConfig, Report } from './types';
-import { driftCheck } from './checks/drift';
+import { applyCountFix, driftCheck } from './checks/drift';
 import { zombieCheck } from './checks/zombie';
 import { qualityCheck } from './checks/quality';
 import { estateCheck } from './checks/estate';
@@ -84,6 +84,20 @@ export async function runOne(name: string, fn: () => Promise<CheckResult>): Prom
 async function main() {
   const cfg = await loadConfig();
   const runHeavy = has('heavy');
+
+  // --fix (explicit, default off): rewrite the doc count lines named in
+  // config.docPointers to the measured values. Edits only those captured
+  // numbers, prints each change, and writes nothing if any doc refuses.
+  if (has('fix')) {
+    const { changes, refusals, written } = await applyCountFix(cfg, { write: true });
+    for (const c of changes) console.log(`fix: ${c.file} ${c.key} ${c.from} -> ${c.to}`);
+    for (const r of refusals) console.error(`fix refused: ${r}`);
+    if (refusals.length > 0) {
+      console.error('fix: refused, no file was written');
+      process.exit(1);
+    }
+    console.log(changes.length === 0 ? 'fix: no count drift, nothing written' : `fix: wrote ${written.join(', ')}`);
+  }
 
   // Isolated: one failing check never sinks the run.
   const checks = await Promise.all([

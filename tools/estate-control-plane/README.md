@@ -22,10 +22,14 @@ npx tsx tools/estate-control-plane/run-checks.ts \
 
 # include the heavy checks (npm audit + tsc; needs node_modules)
 npx tsx tools/estate-control-plane/run-checks.ts --heavy
+
+# rewrite the doc count lines (CLAUDE.md, AGENTS.md) to the measured values
+# before the checks run; off by default, refuses to write if any doc has no count to rewrite
+npx tsx tools/estate-control-plane/run-checks.ts --fix
 ```
 
 Flags: `--config=`, `--repo=`, `--out=`, `--dashboard=`, `--digest=`,
-`--pr-comment=`, `--baseline-fails=`, `--ci`, `--max-fails=`, `--heavy`.
+`--pr-comment=`, `--baseline-fails=`, `--ci`, `--max-fails=`, `--heavy`, `--fix`.
 Repo can also be set via `ESTATE_REPO_ROOT`.
 
 ## Checks

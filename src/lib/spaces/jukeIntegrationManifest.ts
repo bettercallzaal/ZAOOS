@@ -249,7 +249,7 @@ const SHIPPED: ShippedFeature[] = [
     id: 'recap-cast-room-finished',
     title: 'Recap cast on room.finished (ended_via host/api only)',
     description:
-      "When a Juke space ends with ended_via in {host, api}, the webhook handler auto-casts a 'Just wrapped: {title}' message to /zao from @thezao via autoCastToZao. Embeds the /live/{id} URL so Farcaster unfurls the OG card. Skips silent idle-timeouts (ended_via=null) since there's nobody to recap to. The recording.ready handler still fires its own 'Recording up' follow-up cast independently when a recording is on - two-cast pattern is intentional so listeners get a re-engagement ping when the file lands.",
+      "When a Juke space ends with ended_via in {host, api}, the webhook handler drafts a 'Just wrapped: {title}' message for /zao via autoCastToZao, which since 20 Nov 2026 sends it to Zaal as a ZOE Telegram draft instead of posting. Embeds the /live/{id} URL so Farcaster unfurls the OG card. Skips silent idle-timeouts (ended_via=null) since there's nobody to recap to. The recording.ready handler still fires its own 'Recording up' follow-up cast independently when a recording is on - two-cast pattern is intentional so listeners get a re-engagement ping when the file lands.",
     shippedAt: '2026-05-25',
     files: ['src/lib/spaces/jukeWebhookHandlers.ts'],
     reference: 'Branches on Nicky 2026-05-24 ended_via payload addition.',
@@ -407,7 +407,7 @@ export const INTEGRATION_ARCHITECTURE_ASCII = String.raw`
     |    room.finished     -> juke_spaces.status='ended'
     |    participant.*     -> juke_spaces.participant_count
     |    recording.ready   -> juke_spaces.recording_url
-    |                        + autoCastToZao recap to /zao channel
+    |                        + autoCastToZao recap, ZOE draft for Zaal
     v
   Supabase juke_spaces + juke_webhook_events
 

@@ -175,3 +175,50 @@ describe('cap-fallback ladder depth', () => {
     expect(formatPreflightReport(checkCapabilities(env), env)).toBeNull();
   });
 });
+
+// ORD-915: the cheap-ai capability is optional while the OpenRouter rung is
+// off (ruling item 194). A box with no OPENROUTER_API_KEY and no
+// ZOE_OPENROUTER_RUNG must boot clean and send no alert. Turning the rung on
+// later (ZOE_OPENROUTER_RUNG=1 plus a capped key) makes the key required again
+// with no code change.
+describe('cheap-ai is optional while the OpenRouter rung is off', () => {
+  const NO_OPENROUTER: Record<string, string | undefined> = { ...FULL_ENV };
+  delete NO_OPENROUTER.OPENROUTER_API_KEY;
+  delete NO_OPENROUTER.ZOE_OPENROUTER_RUNG;
+
+  it('reports cheap-ai ok and skipped, not missing', () => {
+    const cheap = checkCapabilities(NO_OPENROUTER).find((r) => r.name === 'cheap-ai');
+    expect(cheap?.ok).toBe(true);
+    expect(cheap?.missing).toEqual([]);
+    expect(cheap?.skipped).toBe(true);
+  });
+
+  it('passes boot (no critical failure) and sends no alert', async () => {
+    const alert = vi.fn(async (_report: string) => {});
+    const results = await runPreflight(alert, NO_OPENROUTER);
+    expect(hasCriticalFailure(results)).toBe(false);
+    expect(results.every((r) => r.ok)).toBe(true);
+    expect(alert).not.toHaveBeenCalled();
+  });
+
+  it('with the rung turned on, a missing key is reported again (no rework to re-enable)', async () => {
+    const alert = vi.fn(async (_report: string) => {});
+    const env = { ...NO_OPENROUTER, ZOE_OPENROUTER_RUNG: '1' };
+    const cheap = checkCapabilities(env).find((r) => r.name === 'cheap-ai');
+    expect(cheap?.ok).toBe(false);
+    expect(cheap?.missing).toEqual(['OPENROUTER_API_KEY']);
+    await runPreflight(alert, env);
+    expect(alert).toHaveBeenCalledOnce();
+    expect(alert.mock.calls[0][0]).toContain('OPENROUTER_API_KEY');
+  });
+
+  it('a genuinely required capability still fails boot with the rung off', async () => {
+    const alert = vi.fn(async (_report: string) => {});
+    const env = { ...NO_OPENROUTER };
+    delete env.ZOE_BOT_TOKEN;
+    const results = await runPreflight(alert, env);
+    expect(hasCriticalFailure(results)).toBe(true);
+    expect(alert).toHaveBeenCalledOnce();
+    expect(alert.mock.calls[0][0]).toContain('ZOE_BOT_TOKEN');
+  });
+});

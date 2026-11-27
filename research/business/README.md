@@ -330,3 +330,4 @@
 | 2697 | [POIDH as "onchain social": who builds on it, its agent interface, and the ad-spend framing](./2697-poidh-onchain-social-builders/) | STANDALONE | POIDH calls itself "an onchain social bounty protocol"; its MCP server has 4 read tools and 7 unsigned-tx builders; third-party builders listed; NARS unverified |
 | 2717 | [Bangor to New York on Points](./2717-bgr-nyc-award-points/) | STANDALONE | One program that flies BGR-NYC on points on any day: United to Newark, JetBlue and Alaska as side pockets |
 | 2729 | [Investigate sound gear in Ellsworth](./2729-investigate-sound-gear-in-ellsworth/) | DISPATCH | ZOE research: Investigate sound gear in Ellsworth |
+| 2739 | [Mercor: expert marketplace, pay, matching, interview and reputation](./2739-mercor-expert-marketplace/) | STANDALONE | Mercor applicant side: listed pay by role, contract pay terms, the AI interview, the 2026 breach and lawsuits, and profile positioning; Reddit and Glassdoor not read |

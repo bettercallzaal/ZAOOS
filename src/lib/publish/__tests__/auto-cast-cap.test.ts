@@ -44,7 +44,7 @@ vi.mock('@/lib/db/supabase', () => ({
   },
 }));
 
-import { autoCastToZao } from '../auto-cast';
+import { publishToZaoNow } from '../auto-cast';
 import {
   autoCastDailyCap,
   checkAutoCastCap,
@@ -128,12 +128,12 @@ describe('checkAutoCastCap', () => {
   });
 });
 
-describe('autoCastToZao with the cap', () => {
+describe('publishToZaoNow with the cap', () => {
   it('posts exactly as before when the flag is unset', async () => {
     process.env.ZAO_OFFICIAL_SIGNER_UUID = 'signer-uuid';
     process.env.ZAO_OFFICIAL_NEYNAR_API_KEY = 'api-key';
     mockPostCast.mockResolvedValue({ cast: { hash: 'hash-abc' } });
-    expect(await autoCastToZao('hello')).toBe('hash-abc');
+    expect(await publishToZaoNow('hello')).toBe('hash-abc');
     expect(mockPostCast).toHaveBeenCalledTimes(1);
   });
 
@@ -142,7 +142,7 @@ describe('autoCastToZao with the cap', () => {
     process.env.ZAO_OFFICIAL_NEYNAR_API_KEY = 'api-key';
     process.env.FARCASTER_AUTOCAST_DAILY_CAP = '5';
     // No ZAO_OFFICIAL_FID: the cap fails closed before any database access.
-    expect(await autoCastToZao('hello')).toBeNull();
+    expect(await publishToZaoNow('hello')).toBeNull();
     expect(mockPostCast).not.toHaveBeenCalled();
   });
 });
@@ -203,24 +203,24 @@ describe('the cap when the webhook delivers nothing', () => {
 
   it('blocks the cast after the cap using only what the function itself recorded', async () => {
     process.env.FARCASTER_AUTOCAST_DAILY_CAP = '2';
-    expect(await autoCastToZao('one')).toBe('0xhash1');
-    expect(await autoCastToZao('two')).toBe('0xhash2');
-    expect(await autoCastToZao('three')).toBeNull();
+    expect(await publishToZaoNow('one')).toBe('0xhash1');
+    expect(await publishToZaoNow('two')).toBe('0xhash2');
+    expect(await publishToZaoNow('three')).toBeNull();
     expect(mockPostCast).toHaveBeenCalledTimes(2);
     expect(table.rows.map((r) => r.hash)).toEqual(['0xhash1', '0xhash2']);
   });
 
   it('does not write to the table at all when the cap is off', async () => {
-    expect(await autoCastToZao('one')).toBe('0xhash1');
-    expect(await autoCastToZao('two')).toBe('0xhash2');
-    expect(await autoCastToZao('three')).toBe('0xhash3');
+    expect(await publishToZaoNow('one')).toBe('0xhash1');
+    expect(await publishToZaoNow('two')).toBe('0xhash2');
+    expect(await publishToZaoNow('three')).toBe('0xhash3');
     expect(table.rows).toEqual([]);
   });
 
   it('still returns the hash when recording fails, and says the cap will undercount', async () => {
     process.env.FARCASTER_AUTOCAST_DAILY_CAP = '2';
     table.failUpsert = true;
-    expect(await autoCastToZao('one')).toBe('0xhash1');
+    expect(await publishToZaoNow('one')).toBe('0xhash1');
     expect(mockLogger.error).toHaveBeenCalled();
   });
 });

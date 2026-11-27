@@ -21,7 +21,7 @@ Source page: private Notion research page "Research: ArtCraft (getartcraft.com),
 |---|---|---|
 | 1 | **SKIP ArtCraft as a ZAO dependency or integration.** | No onchain, social or community layer. The music side is a feature built on hosted Suno credits. Its own DAW, SoundCraft (v0.20.1), is marked In development. |
 | 2 | **OPTIONAL: one member trial of SoundCraft or ArtCraft Studio, public or throwaway content only.** Do it only if a member asks. | /terms and /privacy return 404 (CHECKED 2026-11-26 by curl; /terms-of-service also 404 per the research worker, not re-checked), so output ownership and training-on-content language are unknown. Do not put member or unreleased audio through it. |
-| 3 | **DO NOT contact the ArtCraft team on our own.** Outbound to hello@storyteller.ai is Zaal's call, and only if a member wants to use it. | Terms and output ownership are the open question, and only the owner of the relationship should ask. |
+| 3 | **DO NOT contact the ArtCraft team on our own.** Outbound to the ArtCraft team contact address listed on their site is Zaal's call, and only if a member wants to use it. | Terms and output ownership are the open question, and only the owner of the relationship should ask. |
 
 ## What it is
 
@@ -87,7 +87,7 @@ Credit line (required if any code is ever adopted): storytold/artcraft, MIT or A
 | Action | Owner | Type | By When |
 |---|---|---|---|
 | Merge this doc: done when the PR is merged to main after an evaluator verdict | Desktop coordinator | PR | 2026-12-03 |
-| Ask the ArtCraft team for terms and output ownership: done when Zaal has sent or declined the email to hello@storyteller.ai. Only if a member wants to use it. | Zaal | Other | wontfix unless a member asks |
+| Ask the ArtCraft team for terms and output ownership: done when Zaal has sent or declined the email to the ArtCraft team contact address listed on their site. Only if a member wants to use it. | Zaal | Other | wontfix unless a member asks |
 | Optional member trial of SoundCraft or ArtCraft Studio, public content only: done when a member reports back or the item is closed | Zaal | Todo | wontfix unless a member asks |
 | Re-validate this doc if a terms page appears: done when /terms returns 200 and ownership is read | Desktop coordinator | Todo | 2026-12-26 |
 

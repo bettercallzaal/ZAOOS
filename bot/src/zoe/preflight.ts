@@ -27,6 +27,12 @@ export interface Capability {
   impact: string;
   /** critical = ZOE is broken; degraded = a feature is off but ZOE runs. */
   severity: 'critical' | 'degraded';
+  /**
+   * Optional gate. When present and it returns false, the capability is
+   * switched off on purpose: its vars are not checked, it is not reported as
+   * missing, and it never alerts. Absent = always checked.
+   */
+  enabledWhen?: (env: Record<string, string | undefined>) => boolean;
 }
 
 export const CAPABILITIES: Capability[] = [
@@ -47,6 +53,11 @@ export const CAPABILITIES: Capability[] = [
     requires: ['OPENROUTER_API_KEY'],
     impact: 'no cap-fallback and no repo-improver scout audits (Claude cap becomes a hard stop)',
     severity: 'degraded',
+    // Optional while the OpenRouter rung is off (ruling item 194; ORD-915): the
+    // router never calls it then, and the repo-improver scout already skips
+    // itself without the key. Setting ZOE_OPENROUTER_RUNG=1 together with a
+    // capped key makes the key required again, with no code change.
+    enabledWhen: (e) => e.ZOE_OPENROUTER_RUNG?.trim() === '1',
   },
   {
     name: 'group-status',
@@ -94,7 +105,7 @@ export function formatFallbackDepth(env: Record<string, string | undefined>): st
   if (rungs.length >= 2) return null;
   if (rungs.length === 0) {
     return 'CAP FALLBACK: no rungs. A Claude cap is a hard stop for every judgment call. '
-      + 'Set OPENROUTER_API_KEY, or OLLAMA_ENABLED=1 on a box with a model pulled.';
+      + 'Set ZOE_OPENROUTER_RUNG=1 with OPENROUTER_API_KEY, or OLLAMA_ENABLED=1 on a box with a model pulled.';
   }
   return `CAP FALLBACK: one rung (${rungs[0]}). One rung is not a fallback, it is a second single `
     + 'point of failure - on 2026-08-21 the top rung ran out of credits and 17 loops went silent. '
@@ -107,6 +118,8 @@ export interface CapabilityResult {
   missing: string[];
   impact: string;
   severity: 'critical' | 'degraded';
+  /** True when the capability's enabledWhen gate is off: ok, nothing checked. */
+  skipped?: true;
 }
 
 /**
@@ -118,6 +131,16 @@ export function checkCapabilities(
   caps: Capability[] = CAPABILITIES,
 ): CapabilityResult[] {
   return caps.map((c) => {
+    if (c.enabledWhen && !c.enabledWhen(env)) {
+      return {
+        name: c.name,
+        ok: true,
+        missing: [],
+        impact: c.impact,
+        severity: c.severity,
+        skipped: true,
+      };
+    }
     const missing = c.requires.filter((v) => !env[v] || String(env[v]).trim() === '');
     return { name: c.name, ok: missing.length === 0, missing, impact: c.impact, severity: c.severity };
   });

@@ -25,7 +25,7 @@ const ORIGINAL_ENV = { ...process.env };
 
 beforeEach(() => {
   vi.restoreAllMocks();
-  process.env = { ...ORIGINAL_ENV, BONFIRE_API_KEY: 'test-key', BONFIRE_ID: 'test-bonfire' };
+  process.env = { ...ORIGINAL_ENV, BONFIRE_API_KEY: 'test-key', BONFIRE_ID: 'test-bonfire', ZOE_BONFIRE_ENABLED: '1' };
   vi.resetModules();
 });
 
@@ -104,5 +104,61 @@ describe('recall() - a DM turn does not wait 10 s on a hung delve (2026-10-17)',
     expect(src).toContain('{ turnMs: TURN_RECALL_TIMEOUT_MS, backgroundMs: BACKGROUND_RECALL_MS }');
     expect(src.match(/reason: 'concierge turn context'/g)).toHaveLength(1);
     expect(src).not.toMatch(/await recall\(\{\s*query: text,\s*reason: 'concierge turn context'/);
+  });
+});
+
+// ORD-950 item 2, 2026-11-28: the Bonfires service is dead. With the flag off,
+// no call may reach the network and none may read as a success.
+describe('Bonfire service down - every call fails loud, none is sent', () => {
+  beforeEach(() => {
+    delete process.env.ZOE_BONFIRE_ENABLED;
+  });
+
+  it('remember() sends nothing and returns ok:false with the unavailable error, logged at error level', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch');
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { remember, BONFIRE_UNAVAILABLE } = await import('../recall');
+    const r = await remember({
+      body: 'ZOE captured a note',
+      name: 'zoe-capture:1',
+      sourceTag: 'zoe:capture',
+    });
+    expect(fetchSpy).not.toHaveBeenCalled();
+    expect(r).toEqual({ ok: false, error: BONFIRE_UNAVAILABLE });
+    // no `skipped`: the retry queues treat skipped as terminal and would drop the write
+    expect(r.skipped).toBeUndefined();
+    expect(errSpy).toHaveBeenCalledWith(expect.stringContaining('Bonfire unavailable'));
+  });
+
+  it('recall() sends nothing and returns kind unavailable, never sdk_response', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch');
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { recall, BONFIRE_UNAVAILABLE } = await import('../recall');
+    const r = await recall({ query: 'what is ZAO', reason: 'unit test', expected_kind: 'fact' });
+    expect(fetchSpy).not.toHaveBeenCalled();
+    expect(r.kind).toBe('unavailable');
+    expect(r.error).toBe(BONFIRE_UNAVAILABLE);
+    expect(errSpy).toHaveBeenCalledWith(expect.stringContaining('Bonfire unavailable'));
+  });
+
+  it('graphTopicAgeDays() sends nothing, returns null, and logs', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch');
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { graphTopicAgeDays } = await import('../recall');
+    expect(await graphTopicAgeDays('zol-cast')).toBeNull();
+    expect(fetchSpy).not.toHaveBeenCalled();
+    expect(errSpy).toHaveBeenCalledWith(expect.stringContaining('Bonfire unavailable'));
+  });
+
+  it('a burst of failures is one error line per minute, carrying the folded count', async () => {
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { logBonfireUnavailable } = await import('../recall');
+    logBonfireUnavailable('remember', 0);
+    logBonfireUnavailable('remember', 1_000);
+    logBonfireUnavailable('remember', 2_000);
+    expect(errSpy).toHaveBeenCalledTimes(1);
+    logBonfireUnavailable('remember', 61_000);
+    expect(errSpy).toHaveBeenCalledTimes(2);
+    expect(errSpy.mock.calls[1][0]).toContain('(2 more since the last line)');
   });
 });

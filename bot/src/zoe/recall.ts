@@ -21,6 +21,16 @@
  *   BONFIRE_API_KEY  required for any API path; absent => manual relay only
  *   BONFIRE_ID       the ZABAL bonfire id
  *   BONFIRE_API_URL  default https://tnt-v2.api.bonfires.ai
+ *   ZOE_BONFIRE_ENABLED  "1" turns the HTTP calls back on (see below)
+ *
+ * SERVICE DOWN (2026-11-28, ORD-950 item 2): Bonfires (bonfires.ai,
+ * zabal.bonfires.ai) is dead. Every call in this file sits behind
+ * bonfireServiceEnabled(), which is false unless ZOE_BONFIRE_ENABLED=1. With
+ * the service off, nothing is sent: remember() returns ok:false with
+ * BONFIRE_UNAVAILABLE (no `skipped`, so the retry queues keep the write),
+ * recall() returns kind 'unavailable', graphTopicAgeDays() returns null, and
+ * each logs an error-level line. The code is kept so the service can come back
+ * by setting the flag, not by a rewrite.
  */
 
 import { detectPromptInjection } from '../lib/injection-guard';
@@ -65,6 +75,31 @@ export function bonfireConfigured(): boolean {
   return !!API_KEY && !!BONFIRE_ID;
 }
 
+/** The error every disabled Bonfire call returns and logs. */
+export const BONFIRE_UNAVAILABLE =
+  'Bonfire unavailable: the Bonfires service (bonfires.ai) is down, so no call was made. Set ZOE_BONFIRE_ENABLED=1 only once it is back.';
+
+/** The one check every Bonfire HTTP call goes through. Read per call so a test can flip it. */
+export function bonfireServiceEnabled(): boolean {
+  return process.env.ZOE_BONFIRE_ENABLED === '1';
+}
+
+// One error line per operation per minute, carrying how many were folded in, so
+// a retry flush of 500 queued writes is one loud line, not 500.
+const UNAVAILABLE_LOG_EVERY_MS = 60_000;
+const unavailableLog = new Map<string, { at: number; suppressed: number }>();
+
+export function logBonfireUnavailable(op: string, now: number = Date.now()): void {
+  const last = unavailableLog.get(op);
+  if (last && now - last.at < UNAVAILABLE_LOG_EVERY_MS) {
+    last.suppressed += 1;
+    return;
+  }
+  const more = last && last.suppressed > 0 ? ` (${last.suppressed} more since the last line)` : '';
+  console.error(`[zoe/recall] ${op}: ${BONFIRE_UNAVAILABLE}${more}`);
+  unavailableLog.set(op, { at: now, suppressed: 0 });
+}
+
 // --- secret guard for writes -------------------------------------------------
 // ZOE's captures are facts about Zaal/the team - low risk, but never let an
 // API key / private key slip into the knowledge graph. Minimal HIGH-severity
@@ -102,8 +137,9 @@ export interface RecallRequest {
 }
 
 export interface RecallResult {
-  kind: 'sdk_response' | 'manual_relay_needed';
+  kind: 'sdk_response' | 'manual_relay_needed' | 'unavailable';
   query: string;
+  error?: string; // set when kind is 'unavailable'
   text?: string; // formatted bonfire reply when sdk_response
   hits?: number;
   relay?: string; // Telegram-ready manual-relay text when manual_relay_needed
@@ -133,6 +169,10 @@ export async function remember(opts: {
   if (containsSecret(body)) {
     console.warn('[zoe/recall] remember() blocked - body contains a secret-shaped string');
     return { ok: false, skipped: 'secret-detected' };
+  }
+  if (!bonfireServiceEnabled()) {
+    logBonfireUnavailable('remember');
+    return { ok: false, error: BONFIRE_UNAVAILABLE };
   }
 
   try {
@@ -253,6 +293,10 @@ export async function recall(req: RecallRequest): Promise<RecallResult> {
   if (!bonfireConfigured()) {
     return { kind: 'manual_relay_needed', query: req.query, relay: formatManualRelay(req) };
   }
+  if (!bonfireServiceEnabled()) {
+    logBonfireUnavailable('recall');
+    return { kind: 'unavailable', query: req.query, hits: 0, error: BONFIRE_UNAVAILABLE };
+  }
   const started = Date.now();
   const search = await delveBonfire(req.query, 12, req.timeoutMs);
   const took = `${Date.now() - started}ms`;
@@ -282,6 +326,10 @@ export async function recall(req: RecallRequest): Promise<RecallResult> {
  */
 export async function graphTopicAgeDays(topic: string, now: number = Date.now()): Promise<number | null> {
   if (!bonfireConfigured()) return null;
+  if (!bonfireServiceEnabled()) {
+    logBonfireUnavailable('graphTopicAgeDays');
+    return null;
+  }
   const search = await delveBonfire(topic, 25);
   if (!search.ok || search.results.length === 0) return null;
   let newest = 0;

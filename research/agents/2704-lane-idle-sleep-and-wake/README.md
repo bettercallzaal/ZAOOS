@@ -215,7 +215,7 @@ What changed since the 23 Oct baseline. Each line names its source.
 - Claude session memory fell. 10 claude session trees used 2.73 GiB on 27 Nov, against 9.97 GiB for 26 sessions on 23 Oct (Part 1). Measured by orchestrator3 on 27 Nov, not re-checked.
 - The three zero-use plugin MCP servers from Part 5 no longer appear in the session trees. Measured by orchestrator3 on 27 Nov, not re-checked.
 - Auto-sleep is BUILT and loaded. Re-checked by orchestrator6 on 27 Nov:
-  - zaal-dotfiles #779 is MERGED, mergedAt 2026-10-25T22:12:06Z, title "zao-lane-sleep-auto: sleep idle lanes every 15 min while sleep-on exists and load is 10+" (`gh pr view 779 --repo bettercallzaal/zaal-dotfiles --json state,mergedAt,title`).
+  - zaal-dotfiles #779 is MERGED, mergedAt 2026-10-25T22:12:06Z, title "zao-lane-sleep-auto: sleep idle lanes every 15 min while sleep-on exists and load is 10+ (grill item 3)" (`gh pr view 779 --repo bettercallzaal/zaal-dotfiles --json state,mergedAt,title`).
   - `command -v zao-lane-sleep-auto` resolves to `~/bin/zao-lane-sleep-auto`; the script sets `LOAD_FLOOR = 10.0` against the 1-minute load average and does nothing without `~/.zao/sleep-on` (script lines 35 and 65 to 68).
   - `~/.zao/sleep-on` exists (`ls -l`, a 0-byte file dated 24 Oct).
   - `launchctl list` (544 rows, written to a file and then searched) shows `com.zao.lane-sleep-auto` loaded with last exit status 0 and no running pid.

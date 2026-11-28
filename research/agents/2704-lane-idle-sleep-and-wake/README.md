@@ -207,3 +207,21 @@ A research scout fetched sources 7 to 24 (25 sources from 27 tool calls); the lo
 ## Method
 
 The scripts are in this folder: `stopper.js` and `sigstop.py` (Part 2b) and `resume.py` (Part 3). Both experiments ran niced, on processes they started, cleaned up by pid; `resume.py` makes 6 Haiku calls (about $0.07 in total here). The SIGSTOP run started at a 1-minute load of 22, over the estate's 20 cap (logged in vault MISTAKES as brief-limit-not-enforced); the wake run was gated in the same command.
+
+## Update 2026-11-27
+
+What changed since the 23 Oct baseline. Each line names its source.
+
+- Claude session memory fell. 10 claude session trees used 2.73 GiB on 27 Nov, against 9.97 GiB for 26 sessions on 23 Oct (Part 1). Measured by orchestrator3 on 27 Nov, not re-checked.
+- The three zero-use plugin MCP servers from Part 5 no longer appear in the session trees. Measured by orchestrator3 on 27 Nov, not re-checked.
+- Auto-sleep is BUILT and loaded. Re-checked by orchestrator6 on 27 Nov:
+  - zaal-dotfiles #779 is MERGED, mergedAt 2026-10-25T22:12:06Z, title "zao-lane-sleep-auto: sleep idle lanes every 15 min while sleep-on exists and load is 10+ (grill item 3)" (`gh pr view 779 --repo bettercallzaal/zaal-dotfiles --json state,mergedAt,title`).
+  - `command -v zao-lane-sleep-auto` resolves to `~/bin/zao-lane-sleep-auto`; the script sets `LOAD_FLOOR = 10.0` against the 1-minute load average and does nothing without `~/.zao/sleep-on` (script lines 35 and 65 to 68).
+  - `~/.zao/sleep-on` exists (`ls -l`, a 0-byte file dated 24 Oct).
+  - `launchctl list` (544 rows, written to a file and then searched) shows `com.zao.lane-sleep-auto` loaded with last exit status 0 and no running pid.
+  - Not re-checked: whether it has actually slept a lane since 25 Oct. Its log lines (`off`, `skip`, `ran`, `error`) were not read.
+- The RAM pressure on the night of 27 Nov came from Chrome (59 processes, 5.9 GB) and Spotlight, not from Claude. Measured by orchestrator3 on 27 Nov, not re-checked.
+
+So the Part 4 design is half done: the sleep side runs on its own under load; the doorbell wake side is not covered by this update.
+
+Related: [2506 - orchestration setup review](../2506-orchestration-setup-review/).

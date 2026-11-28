@@ -159,6 +159,7 @@ async function loadBonfireContext(topic: string): Promise<string> {
     if (result.kind === 'sdk_response') {
       return (result.text ?? '').slice(0, 1500) || '(empty Bonfire reply)';
     }
+    if (result.kind === 'unavailable') return `(${result.error})`;
     return '(manual relay path - Bonfire not auto-queryable)';
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
